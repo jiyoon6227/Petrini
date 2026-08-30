@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.main.section.mapper.MainSectionMapper">
+
+<!-- 
+    메인 섹션 SQL
+    TB_PRODUCT — 판매중(NORMAL) 상품 중 주문 수량 합계 많은 순 TOP N
+    (주문 없으면 PRODUCT_ID 내림차순으로 최신 상품 우선)
+-->
+    <!-- 지윤 26.07.09: DESCRIPTION -> TB_FILE로 이미지 저장방식 변경됨 -->
+<select id="selectPopularProducts" resultType="com.petcare.petcare.main.section.vo.MainPopularProductVO">
+    SELECT *
+    FROM (
+        SELECT
+            p.PRODUCT_ID   AS productId,
+            p.PRODUCT_NAME AS productName,
+            p.BRAND_NAME   AS brandName,
+            TO_NUMBER(p.PRICE)      AS price,
+            TO_NUMBER(p.SALE_PRICE) AS salePrice,
+            f.FILE_URL     AS imageUrl
+        FROM TB_PRODUCT p
+        LEFT JOIN (
+            SELECT PRODUCT_ID, SUM(QTY) AS ORDER_QTY
+            FROM TB_ORDER_ITEM
+            GROUP BY PRODUCT_ID
+        ) oi ON p.PRODUCT_ID = oi.PRODUCT_ID
+        LEFT JOIN (
+            SELECT REF_ID, FILE_URL,
+                   ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+            FROM TB_FILE
+            WHERE REF_TYPE = 'PRODUCT'
+        ) f ON f.REF_ID = p.PRODUCT_ID AND f.RN = 1
+        WHERE p.STATUS_CD = 'NORMAL'
+        ORDER BY NVL(oi.ORDER_QTY, 0) DESC, p.PRODUCT_ID DESC
+    )
+    WHERE ROWNUM &lt;= #{limit}
+</select>
+
+<!--
+    TB_POST 테이블에서 최신글 + 작성자 닉네임 , 댓글 수를 최신순으로 3건 출력
+-->
+    <select id="selectCommunityPreview" resultType="com.petcare.petcare.main.section.vo.MainCommunityPreviewVO">
+        SELECT *
+        FROM (
+            SELECT
+                p.POST_ID AS postId,
+                p.TITLE AS title,
+                DBMS_LOB.SUBSTR(p.BODY, 80, 1) AS bodyPreview,
+                m.NICKNAME AS nickname,
+                TO_CHAR(p.REG_DATE, 'MM.DD HH24:MI') AS regDateLabel,
+                (
+                    SELECT COUNT(*)
+                    FROM TB_POST_COMMENT c
+                    WHERE c.POST_ID = p.POST_ID
+                      AND NVL(c.IS_DELETED, 'N') = 'N'
+                ) AS commentCount
+            FROM TB_POST p
+            INNER JOIN TB_MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+            WHERE p.STATUS_CD = 'ACTIVE'
+            ORDER BY p.REG_DATE DESC
+        )
+        WHERE ROWNUM &lt;= #{limit}
+    </select>
+
+</mapper>

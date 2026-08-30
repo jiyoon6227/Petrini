@@ -1,0 +1,405 @@
+/* ================================================================
+   관리자 전용 CSS  /admin/**
+================================================================ */
+
+/* ── 전체 페이지 ── */
+.adm-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #F1F3F7;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* ================================================================
+   관리자 헤더
+================================================================ */
+.adm-header {
+    height: 56px;
+    background: #1E2130;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 8px rgba(0,0,0,.22);
+    gap: 0;
+}
+.adm-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; margin-right: 28px;
+}
+.adm-logo span { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -.3px; }
+.adm-logo .adm-tag {
+    font-size: 10px; font-weight: 700;
+    background: #E74C3C; color: #fff;
+    padding: 2px 7px; border-radius: 4px;
+    margin-left: 4px; letter-spacing: 0;
+}
+.adm-header-divider { width: 1px; height: 20px; background: rgba(255,255,255,.12); margin: 0 20px; }
+.adm-header-title   { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.7); }
+.adm-header-right   { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+.adm-header-right a {
+    font-size: 13px; color: rgba(255,255,255,.55);
+    text-decoration: none; transition: color .2s;
+    display: flex; align-items: center; gap: 5px;
+}
+.adm-header-right a:hover { color: #fff; }
+.adm-header-right svg {
+    width: 15px; height: 15px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.adm-noti-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 17px; height: 17px;
+    background: #E74C3C; color: #fff;
+    font-size: 10px; font-weight: 700;
+    border-radius: 50%; margin-left: 2px;
+}
+
+/* 2026/07/27 장우철 — 관리자 카드등록 헤더 버튼·모달 */
+.adm-header-card-btn {
+    font-size: 13px; color: rgba(255,255,255,.55);
+    background: transparent; border: none; cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+    font-family: inherit; padding: 0; transition: color .2s;
+}
+.adm-header-card-btn:hover { color: #fff; }
+.adm-header-card-btn svg {
+    width: 15px; height: 15px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.adm-card-modal-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(15, 23, 42, .45);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+}
+.adm-card-modal {
+    width: 100%; max-width: 420px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.2);
+    overflow: hidden;
+}
+.adm-card-modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 18px; border-bottom: 1px solid #E4E6ED;
+}
+.adm-card-modal-head h3 { margin: 0; font-size: 16px; font-weight: 800; color: #1A1A2E; }
+.adm-card-modal-close {
+    border: none; background: transparent; font-size: 22px;
+    line-height: 1; cursor: pointer; color: #888; padding: 0 4px;
+}
+.adm-card-modal-body { padding: 18px; }
+.adm-card-modal-desc {
+    margin: 0 0 16px; font-size: 13px; color: #666; line-height: 1.55;
+}
+.adm-card-modal-btn {
+    width: 100%; padding: 12px 16px; border: none; border-radius: 10px;
+    background: #2BAB82; color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+}
+.adm-card-modal-btn:hover { background: #23916e; }
+.adm-card-modal-btn.ghost {
+    width: auto; background: #fff; color: #166534;
+    border: 1px solid #86EFAC; padding: 8px 12px; font-size: 13px;
+}
+.adm-card-modal-btn.ghost.danger { color: #B91C1C; border-color: #FCA5A5; }
+.adm-card-registered-box {
+    border: 1px solid #BBF7D0; background: #F0FDF4;
+    border-radius: 10px; padding: 16px;
+}
+.adm-card-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    color: #166534; background: #DCFCE7; padding: 2px 8px;
+    border-radius: 999px; margin-bottom: 6px;
+}
+.adm-card-registered-box strong {
+    display: block; font-size: 16px; color: #1A1A2E; margin-bottom: 12px;
+}
+.adm-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ================================================================
+   본문 래퍼 (사이드바 + 메인)
+================================================================ */
+.adm-body { display: flex; flex: 1; }
+
+/* ================================================================
+   사이드바
+================================================================ */
+.adm-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid #E4E6ED;
+    min-height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+}
+.adm-sidebar-profile {
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid #E4E6ED;
+    display: flex; align-items: center; gap: 12px;
+}
+.adm-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%; object-fit: cover;
+    border: 2px solid #E4E6ED; flex-shrink: 0;
+}
+.adm-profile-name { font-size: 13px; font-weight: 700; color: #1A1A2E; }
+.adm-profile-role {
+    font-size: 11px; font-weight: 700;
+    color: #E74C3C; background: #FEE2E2;
+    padding: 1px 8px; border-radius: 20px;
+    display: inline-block; margin-top: 3px;
+}
+
+.adm-nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+.adm-nav-group {
+    font-size: 10px; font-weight: 700; color: #aaa;
+    padding: 14px 18px 4px; letter-spacing: .8px; text-transform: uppercase;
+}
+.adm-nav-link {
+    display: flex; align-items: center; gap: 9px;
+    padding: 10px 18px; font-size: 13px; color: #555;
+    text-decoration: none; transition: all .15s;
+    border-left: 3px solid transparent; position: relative;
+}
+.adm-nav-link svg {
+    width: 16px; height: 16px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+}
+.adm-nav-link:hover  { background: #F5F7FF; color: #3B5BDB; }
+.adm-nav-link.active { background: #EEF2FF; color: #3B5BDB; font-weight: 700; border-left-color: #3B5BDB; }
+.adm-nav-badge {
+    margin-left: auto;
+    background: #E74C3C; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 1px 7px; border-radius: 20px; min-width: 18px; text-align: center;
+}
+
+/* ================================================================
+   메인 콘텐츠
+================================================================ */
+.adm-main { flex: 1; min-width: 0; padding: 28px 32px 60px; }
+
+/* 페이지 헤더 */
+.adm-page-head {
+    display: flex; align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+.adm-page-head-left {}
+.adm-page-title { font-size: 22px; font-weight: 800; color: #1A1A2E; margin: 0 0 4px; }
+.adm-page-desc  { font-size: 14px; color: #999; margin: 0; }
+.adm-page-actions { display: flex; gap: 10px; }
+
+/* ================================================================
+   통계 카드
+================================================================ */
+.adm-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.adm-stat-card {
+    background: #fff; border: 1px solid #E4E6ED;
+    border-radius: 12px; padding: 20px;
+    display: flex; align-items: center; gap: 14px;
+}
+.adm-stat-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.adm-stat-icon svg { width: 22px; height: 22px; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.adm-stat-icon.blue   { background: #EEF2FF; } .adm-stat-icon.blue svg   { stroke: #3B5BDB; }
+.adm-stat-icon.green  { background: #DCFCE7; } .adm-stat-icon.green svg  { stroke: #16A34A; }
+.adm-stat-icon.orange { background: #FFF7ED; } .adm-stat-icon.orange svg { stroke: #EA580C; }
+.adm-stat-icon.red    { background: #FEE2E2; } .adm-stat-icon.red svg    { stroke: #DC2626; }
+.adm-stat-body { flex: 1; min-width: 0; }
+.adm-stat-label { font-size: 12px; color: #999; margin-bottom: 4px; }
+.adm-stat-val   { font-size: 22px; font-weight: 800; color: #1A1A2E; line-height: 1; }
+.adm-stat-unit  { font-size: 12px; color: #888; font-weight: 400; margin-left: 2px; }
+.adm-stat-diff  { font-size: 12px; margin-top: 4px; }
+.adm-stat-diff.up   { color: #16A34A; }
+.adm-stat-diff.down { color: #DC2626; }
+
+/* ================================================================
+   카드 컨테이너
+================================================================ */
+.adm-card {
+    background: #fff; border: 1px solid #E4E6ED;
+    border-radius: 12px; overflow: hidden; margin-bottom: 20px;
+}
+.adm-card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 20px; border-bottom: 1px solid #E4E6ED; background: #FAFBFC;
+}
+.adm-card-head-title { font-size: 14px; font-weight: 700; color: #1A1A2E; }
+.adm-card-head-sub   { font-size: 12px; color: #999; }
+.adm-card-body { padding: 20px; }
+
+/* ================================================================
+   테이블
+================================================================ */
+.adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.adm-table th {
+    background: #FAFBFC; color: #999; font-weight: 600; font-size: 12px;
+    padding: 10px 16px; text-align: left; border-bottom: 1px solid #E4E6ED;
+    white-space: nowrap;
+}
+.adm-table td {
+    padding: 13px 16px; border-bottom: 1px solid #E4E6ED;
+    color: #333; vertical-align: middle;
+}
+.adm-table tr:last-child td { border-bottom: none; }
+.adm-table tr:hover td { background: #F8F9FF; }
+.adm-table-wrap { overflow-x: auto; }
+
+
+/* ================================================================
+   검색/필터 바
+================================================================ */
+.adm-filter-bar {
+    display: flex; gap: 10px; align-items: center;
+    margin-bottom: 16px; flex-wrap: wrap;
+}
+.adm-filter-input {
+    flex: 1; min-width: 180px;
+    border: 1px solid #E4E6ED; border-radius: 8px;
+    padding: 8px 14px; font-size: 14px; color: #1A1A2E;
+    outline: none; transition: border-color .2s; background: #fff;
+}
+.adm-filter-input:focus { border-color: #3B5BDB; }
+.adm-filter-select {
+    border: 1px solid #E4E6ED; border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; color: #555;
+    background: #fff; outline: none; cursor: pointer;
+}
+.adm-filter-btn {
+    padding: 8px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all .15s;
+}
+.adm-filter-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.adm-filter-btn.primary { background: #3B5BDB; color: #fff; border: none; }
+.adm-filter-btn.primary:hover { background: #2F4AC7; }
+.adm-filter-btn.outline { background: #fff; color: #555; border: 1px solid #E4E6ED; }
+.adm-filter-btn.outline:hover { border-color: #3B5BDB; color: #3B5BDB; }
+
+/* ================================================================
+   뱃지/상태
+================================================================ */
+.adm-badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.adm-badge.wait    { background: #FFF8E1; color: #F59E0B; }
+.adm-badge.active  { background: #DCFCE7; color: #16A34A; }
+.adm-badge.pending { background: #EEF2FF; color: #3B5BDB; }
+.adm-badge.banned  { background: #FEE2E2; color: #DC2626; }
+.adm-badge.done    { background: #DCFCE7; color: #16A34A; }
+.adm-badge.cancel  { background: #FEE2E2; color: #DC2626; }
+.adm-badge.shipping{ background: #E0F2FE; color: #0284C7; }
+.adm-badge.warning { background: #FFF8E1; color: #D97706; }
+.adm-badge.danger  { background: #FEE2E2; color: #DC2626; }
+.adm-badge.inactive { background: #F3F4F6; color: #6B7280; }
+
+/* ================================================================
+   버튼
+================================================================ */
+.adm-btn {
+    padding: 5px 14px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
+    display: inline-flex; align-items: center; gap: 5px;
+}
+.adm-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.adm-btn.blue   { background: #EEF2FF; color: #3B5BDB; border: 1px solid #C5D0FB; }
+.adm-btn.blue:hover   { background: #3B5BDB; color: #fff; }
+.adm-btn.green  { background: #DCFCE7; color: #16A34A; border: 1px solid #A7F3C0; }
+.adm-btn.green:hover  { background: #16A34A; color: #fff; }
+.adm-btn.red    { background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; }
+.adm-btn.red:hover    { background: #DC2626; color: #fff; }
+.adm-btn.gray   { background: #F1F3F7; color: #555; border: 1px solid #E4E6ED; }
+.adm-btn.gray:hover   { background: #E4E6ED; }
+a.adm-btn { text-decoration: none; }
+.adm-table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+/* ================================================================
+   페이지네이션
+================================================================ */
+.adm-pagination { display: flex; justify-content: center; gap: 5px; margin-top: 24px; }
+.adm-page-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid #E4E6ED; background: #fff;
+    font-size: 13px; color: #555; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.adm-page-btn:hover  { border-color: #3B5BDB; color: #3B5BDB; }
+.adm-page-btn.active { background: #3B5BDB; border-color: #3B5BDB; color: #fff; font-weight: 700; }
+.adm-page-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ================================================================
+   그리드 레이아웃 유틸
+================================================================ */
+.adm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.adm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+
+/* ================================================================
+   폼 요소
+================================================================ */
+.adm-form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.adm-form-group label { font-size: 13px; font-weight: 600; color: #555; }
+.adm-form-group label .req { color: #DC2626; margin-left: 2px; }
+.adm-form-group input,
+.adm-form-group select,
+.adm-form-group textarea {
+    border: 1px solid #E4E6ED; border-radius: 8px;
+    padding: 9px 14px; font-size: 14px; color: #1A1A2E;
+    background: #fff; outline: none; transition: border-color .2s;
+    font-family: inherit; width: 100%; box-sizing: border-box;
+}
+.adm-form-group input:focus,
+.adm-form-group select:focus,
+.adm-form-group textarea:focus { border-color: #3B5BDB; }
+.adm-form-group textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+
+/* ================================================================
+   토글 스위치
+================================================================ */
+.adm-toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
+.adm-toggle input { opacity: 0; width: 0; height: 0; }
+.adm-toggle-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: #ccc; border-radius: 22px; transition: .3s;
+}
+.adm-toggle-slider:before {
+    content: ''; position: absolute;
+    width: 16px; height: 16px; left: 3px; bottom: 3px;
+    background: #fff; border-radius: 50%; transition: .3s;
+}
+.adm-toggle input:checked + .adm-toggle-slider { background: #3B5BDB; }
+.adm-toggle input:checked + .adm-toggle-slider:before { transform: translateX(18px); }
+
+/* ================================================================
+   빈 상태
+================================================================ */
+.adm-empty {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px; padding: 60px 20px; text-align: center;
+}
+.adm-empty-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #EEF2FF;
+    display: flex; align-items: center; justify-content: center;
+}
+.adm-empty-icon svg { width: 28px; height: 28px; stroke: #3B5BDB; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.adm-empty p     { font-size: 15px; color: #555; margin: 0; font-weight: 600; }
+.adm-empty small { font-size: 13px; color: #aaa; }

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.community.comment.mapper.CommunityCommentMapper">
+
+<!--
+  역할: CommunityCommentMapper SQL 정의
+  - 박유정 / 2026-07-09
+
+  테이블: TB_POST_COMMENT, TB_MEMBER
+  시퀀스: SEQ_TB_POST_COMMENT
+
+  [조회] selectCommentList — 게시글 일반댓글만 (레거시)
+  [조회] selectAllCommentsByPostId — 일반 + 대댓글 전체
+  [조회] selectCommentById — 부모 댓글 검증
+  [등록] insertComment — PARENT_ID 포함 INSERT
+  [삭제] softDeleteComment — IS_DELETED='Y'
+  [수정] updateCommentBody — BODY UPDATE
+-->
+
+  <sql id="commentColumns">
+      c.COMMENT_ID  AS commentId,
+      c.POST_ID     AS postId,
+      c.PARENT_ID   AS parentId,
+      c.MEMBER_NO   AS memberNo,
+      DBMS_LOB.SUBSTR(c.BODY, 32000, 1) AS body,
+      c.IS_DELETED  AS isDeleted,
+      c.REG_DATE    AS regDate,
+      NVL(m.NICKNAME, '익명') AS nickname,
+      m.PROFILE_IMG_URL AS profileImgUrl
+  </sql>
+
+  <!-- 2026/08/03 장우철 — 삭제된 댓글도 조회 (화면에서 '삭제된 댓글입니다' + 대댓글 유지) -->
+  <select id="selectCommentList"
+          parameterType="long"
+          resultType="com.petcare.petcare.community.comment.vo.CommunityCommentVO">
+    SELECT
+      <include refid="commentColumns"/>
+    FROM TB_POST_COMMENT c
+    LEFT JOIN TB_MEMBER m ON c.MEMBER_NO = m.MEMBER_NO
+    WHERE c.POST_ID = #{postId}
+      AND c.PARENT_ID IS NULL
+    ORDER BY c.REG_DATE ASC
+  </select>
+
+  <select id="selectRepliesByPostId"
+          parameterType="long"
+          resultType="com.petcare.petcare.community.comment.vo.CommunityCommentVO">
+    SELECT
+      <include refid="commentColumns"/>
+    FROM TB_POST_COMMENT c
+    LEFT JOIN TB_MEMBER m ON c.MEMBER_NO = m.MEMBER_NO
+    WHERE c.POST_ID = #{postId}
+      AND c.PARENT_ID IS NOT NULL
+    ORDER BY c.REG_DATE ASC
+  </select>
+
+  <select id="selectAllCommentsByPostId"
+          parameterType="long"
+          resultType="com.petcare.petcare.community.comment.vo.CommunityCommentVO">
+    SELECT
+      <include refid="commentColumns"/>
+    FROM TB_POST_COMMENT c
+    LEFT JOIN TB_MEMBER m ON c.MEMBER_NO = m.MEMBER_NO
+    WHERE c.POST_ID = #{postId}
+    ORDER BY NVL(c.PARENT_ID, c.COMMENT_ID), c.REG_DATE ASC
+  </select>
+
+  <!-- 삭제 여부 무관 단건 조회 (대댓글 부모 검증·삭제 전 상태 확인) -->
+  <select id="selectCommentById"
+          parameterType="long"
+          resultType="com.petcare.petcare.community.comment.vo.CommunityCommentVO">
+    SELECT
+      <include refid="commentColumns"/>
+    FROM TB_POST_COMMENT c
+    LEFT JOIN TB_MEMBER m ON c.MEMBER_NO = m.MEMBER_NO
+    WHERE c.COMMENT_ID = #{commentId}
+  </select>
+
+  <select id="selectCommentCountByPostId" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_POST_COMMENT
+    WHERE POST_ID = #{postId}
+      AND NVL(IS_DELETED, 'N') = 'N'
+  </select>
+
+  <insert id="insertComment"
+          parameterType="com.petcare.petcare.community.comment.vo.CommunityCommentVO">
+    <selectKey keyProperty="commentId" resultType="long" order="BEFORE">
+      SELECT SEQ_TB_POST_COMMENT.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TB_POST_COMMENT (
+      COMMENT_ID,
+      POST_ID,
+      <if test="parentId != null">PARENT_ID,</if>
+      MEMBER_NO,
+      BODY,
+      IS_DELETED,
+      REG_DATE
+    ) VALUES (
+      #{commentId},
+      #{postId},
+      <if test="parentId != null">#{parentId},</if>
+      #{memberNo},
+      #{body},
+      'N',
+      SYSDATE
+    )
+  </insert>
+
+  <!--HYJ 26.07.28 댓글작성회수 반영-->
+  <update id="updateMemberCommentCount" parameterType="string">
+    UPDATE TB_MEMBER
+    SET COMMENT_COUNT = NVL(COMMENT_COUNT, 0) + 1
+    WHERE MEMBER_ID = #{memberId}
+  </update>
+
+  <select id="selectMemberNoByMemberId" resultType="long">
+    SELECT MEMBER_NO
+    FROM TB_MEMBER
+    WHERE MEMBER_ID = #{memberId}
+  </select>
+
+  <select id="selectMemberNoByEmail" resultType="long">
+    SELECT MEMBER_NO
+    FROM TB_MEMBER
+    WHERE EMAIL = #{email}
+  </select>
+
+    <!-- 댓글 삭제(soft) — 작성자 본인만 Service에서 검증 후 호출 -->
+  <update id="softDeleteComment">
+    UPDATE TB_POST_COMMENT
+    SET IS_DELETED   = 'Y',
+        DELETE_DATE = SYSDATE
+    WHERE COMMENT_ID = #{commentId}
+      AND NVL(IS_DELETED, 'N') = 'N'
+  </update>
+
+  <!--HYJ 26.07.28 댓글삭제-->
+  <delete id="hardDeleteComment">
+    DELETE FROM TB_POST_COMMENT
+    WHERE COMMENT_ID = #{commentId}
+  </delete>
+
+  <!-- 2026-07-14 박유정 — 댓글 본문 수정 (작성자 본인만 Service에서 검증) -->
+  <update id="updateCommentBody">
+    UPDATE TB_POST_COMMENT
+    SET BODY = #{body}
+    WHERE COMMENT_ID = #{commentId}
+      AND NVL(IS_DELETED, 'N') = 'N'
+  </update>
+
+  <!-- 2026-07-23 HYJ — LIFE 게시글 삭제 시 댓글·대댓글 일괄 소프트 삭제 -->
+  <update id="softDeleteCommentsByPostId">
+    UPDATE TB_POST_COMMENT
+    SET IS_DELETED   = 'Y',
+        DELETE_DATE = SYSDATE
+    WHERE POST_ID = #{postId}
+      AND NVL(IS_DELETED, 'N') = 'N'
+  </update>
+
+  <!-- 2026-07-23 HYJ — TOWN/SHARE 게시글 삭제 시 댓글·대댓글 일괄 물리 삭제 -->
+  <delete id="hardDeleteCommentsByPostId">
+    DELETE FROM TB_POST_COMMENT
+    WHERE POST_ID = #{postId}
+  </delete>
+
+</mapper>

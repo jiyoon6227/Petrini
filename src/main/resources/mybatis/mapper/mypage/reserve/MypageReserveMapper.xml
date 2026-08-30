@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.mypage.reserve.mapper.MypageReserveMapper">
+
+<!--
+  역할: MypageReserveMapper SQL 정의
+  2026/07/11 장우철 — 마이페이지 예약 내역·상세 (2차)
+  테이블: TB_RESERVATION, TB_HOSPITAL, TB_PET
+-->
+
+  <!-- 2026/08/06 장우철 — 숙소 환불 UI 상태 (B: 문의 STATUS_CD로 구분, 예약은 유지)
+       PENDING / APPROVED / REJECTED
+       레거시: DONE+살아있는예약=거절, DONE+CANCEL=승인으로 보지 않고 상세는 CANCEL 뱃지 -->
+  <sql id="stayRefundStatusExpr">
+    CASE
+      WHEN R.RESV_TYPE = 'STAY' AND EXISTS (
+             SELECT 1 FROM TB_INQUIRY I
+              WHERE I.MEMBER_NO = R.MEMBER_NO
+                AND I.REF_TYPE = 'RESV'
+                AND I.REF_ID = R.RESV_ID
+                AND I.STATUS_CD = 'WAIT'
+                AND I.TITLE LIKE '숙소 환불신청%'
+           ) THEN 'PENDING'
+      WHEN R.RESV_TYPE = 'STAY' AND EXISTS (
+             SELECT 1 FROM TB_INQUIRY I
+              WHERE I.MEMBER_NO = R.MEMBER_NO
+                AND I.REF_TYPE = 'RESV'
+                AND I.REF_ID = R.RESV_ID
+                AND I.STATUS_CD = 'APPROVED'
+                AND I.TITLE LIKE '숙소 환불신청%'
+           ) THEN 'APPROVED'
+      WHEN R.RESV_TYPE = 'STAY' AND EXISTS (
+             SELECT 1 FROM TB_INQUIRY I
+              WHERE I.MEMBER_NO = R.MEMBER_NO
+                AND I.REF_TYPE = 'RESV'
+                AND I.REF_ID = R.RESV_ID
+                AND I.STATUS_CD = 'REJECTED'
+                AND I.TITLE LIKE '숙소 환불신청%'
+           ) THEN 'REJECTED'
+      WHEN R.RESV_TYPE = 'STAY'
+           AND R.STATUS_CD IN ('CHECKIN', 'CHECKOUT', 'DONE')
+           AND EXISTS (
+             SELECT 1 FROM TB_INQUIRY I
+              WHERE I.MEMBER_NO = R.MEMBER_NO
+                AND I.REF_TYPE = 'RESV'
+                AND I.REF_ID = R.RESV_ID
+                AND I.STATUS_CD = 'DONE'
+                AND I.TITLE LIKE '숙소 환불신청%'
+           ) THEN 'REJECTED'
+      ELSE NULL
+    END
+  </sql>
+
+  <!-- 2026/08/18 장우철 — 숙소·병원 대표 사진 (TB_FILE.FILE_URL, FileService 상대경로) -->
+  <sql id="stayHospitalThumbExpr">
+    (SELECT F.FILE_URL
+       FROM TB_FILE F
+      WHERE F.REF_TYPE = R.RESV_TYPE
+        AND F.REF_ID   = TO_NUMBER(R.TARGET_ID)
+        AND ROWNUM     = 1)
+  </sql>
+
+  <!-- 2026/08/06 장우철 — 환불 승인/거절 관리자 답변 -->
+  <sql id="stayRefundAnswerExpr">
+    (SELECT I.ANSWER
+       FROM TB_INQUIRY I
+      WHERE I.MEMBER_NO = R.MEMBER_NO
+        AND I.REF_TYPE = 'RESV'
+        AND I.REF_ID = R.RESV_ID
+        AND I.STATUS_CD IN ('APPROVED', 'REJECTED', 'DONE')
+        AND I.TITLE LIKE '숙소 환불신청%'
+      ORDER BY I.ANSWER_DATE DESC NULLS LAST, I.INQUIRY_ID DESC
+      FETCH FIRST 1 ROW ONLY)
+  </sql>
+
+  <select id="selectMyReservationList"
+          resultType="com.petcare.petcare.mypage.reserve.vo.MypageReserveVO">
+    SELECT  R.RESV_ID       AS resvId,
+            R.RESV_NO       AS resvNo,
+            R.RESV_TYPE     AS resvType,
+            R.MEMBER_NO     AS memberNo,
+            R.PET_ID        AS petId,
+            R.PET_CNT       AS petCnt,
+            R.TARGET_ID     AS targetId,
+            R.RESV_DATE     AS resvDate,
+            R.RESV_TIME     AS resvTime,
+            R.TREAT_TYPE_ID AS treatTypeId,
+            R.DOCTOR_ID     AS doctorId,
+            R.DURATION_MIN  AS durationMin,
+            R.END_TIME      AS endTime,
+            R.SYMPTOMS      AS symptoms,
+            R.REQUEST_MEMO  AS requestMemo,
+            R.STATUS_CD     AS statusCd,
+            R.REJECT_REASON AS rejectReason,
+            R.REG_DATE      AS regDate,
+            R.CHECKIN_DATE  AS checkinDate,
+            R.CHECKOUT_DATE AS checkoutDate,
+            R.NIGHT_CNT     AS nightCnt,
+            R.TOTAL_AMOUNT  AS totalAmount,
+            R.MEMBER_COUPON_ID AS memberCouponId,
+            R.COUPON_DISCOUNT  AS couponDiscount,
+            R.POINT_USED       AS pointUsed,
+            R.ROOM_ID       AS roomId,
+            R.CANCEL_FEE_AMT AS cancelFeeAmt,
+            R.REFUND_AMT    AS refundAmt,
+            R.CANCEL_AT     AS cancelAt,
+            P.PET_NAME      AS petName,
+            P.SPECIES       AS petSpecies,
+            P.BREED         AS petBreed,
+            H.NAME          AS hospitalName,
+            H.ADDR          AS hospitalAddr,
+            D.DOCTOR_NAME   AS doctorName,
+            T.TYPE_NAME     AS treatTypeName,
+            CASE WHEN RV.REVIEW_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS reviewedYn,
+            S.NAME          AS stayName,
+            S.ADDR          AS stayAddr,
+            SR.NAME         AS roomName,
+            <include refid="stayRefundStatusExpr"/> AS stayRefundStatus,
+            <include refid="stayRefundAnswerExpr"/> AS stayRefundAnswer,
+            <include refid="stayHospitalThumbExpr"/> AS thumbUrl
+      FROM  TB_RESERVATION R
+      JOIN  TB_PET P ON P.PET_ID = R.PET_ID
+      LEFT JOIN TB_HOSPITAL H
+             ON R.RESV_TYPE = 'HOSPITAL'
+            AND H.HOSPITAL_ID = TO_NUMBER(R.TARGET_ID)
+      LEFT JOIN TB_HOSPITAL_DOCTOR D ON D.DOCTOR_ID = R.DOCTOR_ID
+      LEFT JOIN TB_HOSPITAL_TREAT_TYPE T ON T.TREAT_TYPE_ID = R.TREAT_TYPE_ID
+      LEFT JOIN TB_REVIEW RV
+             ON RV.RESV_ID = R.RESV_ID
+            AND RV.MEMBER_NO = R.MEMBER_NO
+            AND RV.REVIEW_TYPE = R.RESV_TYPE
+      LEFT JOIN TB_STAY S
+             ON R.RESV_TYPE = 'STAY'
+            AND S.STAY_ID = TO_NUMBER(R.TARGET_ID)
+      LEFT JOIN TB_STAY_ROOM SR
+             ON SR.ROOM_ID = R.ROOM_ID
+     WHERE  R.MEMBER_NO = #{memberNo}
+    <!-- 2026/07/21 장우철 — 예약 유형 필터 (전체/병원/숙소) -->
+    <choose>
+      <when test="typeFilter == 'hospital'">
+       AND  R.RESV_TYPE = 'HOSPITAL'
+      </when>
+      <when test="typeFilter == 'stay'">
+       AND  R.RESV_TYPE = 'STAY'
+      </when>
+    </choose>
+    <choose>
+      <when test="statusFilter == 'pending'">
+       AND  R.STATUS_CD = 'PENDING'
+      </when>
+      <when test="statusFilter == 'confirmed'">
+       AND  R.STATUS_CD = 'CONFIRMED'
+      </when>
+      <when test="statusFilter == 'checkin'">
+       AND  R.STATUS_CD = 'CHECKIN'
+      </when>
+      <when test="statusFilter == 'checkout'">
+       AND  R.STATUS_CD = 'CHECKOUT'
+      </when>
+      <when test="statusFilter == 'done'">
+       AND  R.STATUS_CD = 'DONE'
+      </when>
+      <when test="statusFilter == 'cancel'">
+       AND  R.STATUS_CD IN ('CANCEL', 'REJECTED')
+      </when>
+    </choose>
+     ORDER BY R.RESV_DATE DESC, R.RESV_TIME DESC, R.RESV_ID DESC
+  </select>
+
+  <!-- 2026-08-10 박유정 — 재능나눔 참여 신청 (마이페이지 예약내역) -->
+  <select id="selectMyTalentApplyList"
+          resultType="com.petcare.petcare.mypage.reserve.vo.MypageReserveVO">
+    SELECT A.APPLY_ID     AS resvId,
+           ('TA' || A.APPLY_ID) AS resvNo,
+           'TALENT'       AS resvType,
+           A.MEMBER_NO    AS memberNo,
+           A.TALENT_ID    AS targetId,
+           A.REG_DATE     AS resvDate,
+           A.REG_DATE     AS regDate,
+           T.SCHEDULE     AS resvTime,
+           T.SCHEDULE     AS talentSchedule,
+           T.DURATION     AS endTime,
+           A.MESSAGE      AS requestMemo,
+           A.STATUS_CD    AS statusCd,
+           T.TITLE        AS talentTitle,
+           T.LOCATION     AS hospitalAddr,
+           B.BIZ_NAME     AS bizName,
+           T.THUMB_URL    AS thumbUrl
+      FROM TB_TALENT_APPLY A
+      JOIN TB_TALENT T ON T.TALENT_ID = A.TALENT_ID
+      JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+     WHERE A.MEMBER_NO = #{memberNo}
+    <choose>
+      <when test="statusFilter == 'pending'">
+       AND A.STATUS_CD = 'PENDING'
+      </when>
+      <when test="statusFilter == 'confirmed'">
+       AND A.STATUS_CD = 'CONFIRMED'
+      </when>
+      <when test="statusFilter == 'done'">
+       AND A.STATUS_CD = 'CONFIRMED'
+      </when>
+      <when test="statusFilter == 'cancel'">
+       AND A.STATUS_CD = 'CANCELLED'
+      </when>
+    </choose>
+     ORDER BY A.REG_DATE DESC, A.APPLY_ID DESC
+  </select>
+
+  <!-- 2026-08-10 박유정 — 재능나눔 참여 신청 상세 (마이페이지 예약내역) -->
+  <select id="selectMyTalentApplyDetail"
+          resultType="com.petcare.petcare.mypage.reserve.vo.MypageReserveVO">
+    SELECT A.APPLY_ID     AS resvId,
+           ('TA' || A.APPLY_ID) AS resvNo,
+           'TALENT'       AS resvType,
+           A.MEMBER_NO    AS memberNo,
+           A.TALENT_ID    AS targetId,
+           A.REG_DATE     AS resvDate,
+           A.REG_DATE     AS regDate,
+           T.SCHEDULE     AS resvTime,
+           T.SCHEDULE     AS talentSchedule,
+           T.DURATION     AS endTime,
+           A.MESSAGE      AS requestMemo,
+           A.STATUS_CD    AS statusCd,
+           T.TITLE        AS talentTitle,
+           T.LOCATION     AS hospitalAddr,
+           B.BIZ_NAME     AS bizName,
+           T.THUMB_URL    AS thumbUrl,
+           DBMS_LOB.SUBSTR(T.BODY, 32000, 1) AS symptoms
+      FROM TB_TALENT_APPLY A
+      JOIN TB_TALENT T ON T.TALENT_ID = A.TALENT_ID
+      JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+     WHERE A.MEMBER_NO = #{memberNo}
+       AND A.APPLY_ID  = #{applyId}
+  </select>
+
+  <select id="selectMyReservationDetail"
+          resultType="com.petcare.petcare.mypage.reserve.vo.MypageReserveVO">
+    SELECT  R.RESV_ID       AS resvId,
+            R.RESV_NO       AS resvNo,
+            R.RESV_TYPE     AS resvType,
+            R.MEMBER_NO     AS memberNo,
+            R.PET_ID        AS petId,
+            R.PET_CNT       AS petCnt,
+            R.TARGET_ID     AS targetId,
+            R.RESV_DATE     AS resvDate,
+            R.RESV_TIME     AS resvTime,
+            R.TREAT_TYPE_ID AS treatTypeId,
+            R.DOCTOR_ID     AS doctorId,
+            R.DURATION_MIN  AS durationMin,
+            R.END_TIME      AS endTime,
+            R.SYMPTOMS      AS symptoms,
+            R.REQUEST_MEMO  AS requestMemo,
+            R.STATUS_CD     AS statusCd,
+            R.REJECT_REASON AS rejectReason,
+            R.REG_DATE      AS regDate,
+            R.CHECKIN_DATE  AS checkinDate,
+            R.CHECKOUT_DATE AS checkoutDate,
+            R.NIGHT_CNT     AS nightCnt,
+            R.TOTAL_AMOUNT  AS totalAmount,
+            R.MEMBER_COUPON_ID AS memberCouponId,
+            R.COUPON_DISCOUNT  AS couponDiscount,
+            R.POINT_USED       AS pointUsed,
+            R.ROOM_ID       AS roomId,
+            R.CANCEL_FEE_AMT AS cancelFeeAmt,
+            R.REFUND_AMT    AS refundAmt,
+            R.CANCEL_AT     AS cancelAt,
+            P.PET_NAME      AS petName,
+            P.SPECIES       AS petSpecies,
+            P.BREED         AS petBreed,
+            COALESCE(H.NAME, S.NAME)  AS hospitalName,
+            COALESCE(H.ADDR, S.ADDR)  AS hospitalAddr,
+            D.DOCTOR_NAME   AS doctorName,
+            T.TYPE_NAME     AS treatTypeName,
+            CASE WHEN RV.REVIEW_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS reviewedYn,
+            SR.NAME         AS roomName,
+            <include refid="stayRefundStatusExpr"/> AS stayRefundStatus,
+            <include refid="stayRefundAnswerExpr"/> AS stayRefundAnswer,
+            <include refid="stayHospitalThumbExpr"/> AS thumbUrl
+      FROM  TB_RESERVATION R
+      JOIN  TB_PET P ON P.PET_ID = R.PET_ID
+      LEFT JOIN TB_HOSPITAL H
+             ON R.RESV_TYPE = 'HOSPITAL'
+            AND H.HOSPITAL_ID = TO_NUMBER(R.TARGET_ID)
+<!-- HYJ 26.07.20 병원/숙소 통합     LEFT JOIN TB_REVIEW RV
+             ON RV.RESV_ID = R.RESV_ID
+            AND RV.REVIEW_TYPE = 'HOSPITAL'-->
+      LEFT JOIN TB_HOSPITAL_DOCTOR D ON D.DOCTOR_ID = R.DOCTOR_ID
+      LEFT JOIN TB_HOSPITAL_TREAT_TYPE T ON T.TREAT_TYPE_ID = R.TREAT_TYPE_ID
+      LEFT JOIN TB_REVIEW RV
+             ON RV.RESV_ID = R.RESV_ID
+            AND RV.MEMBER_NO = R.MEMBER_NO
+            AND RV.REVIEW_TYPE = R.RESV_TYPE
+      LEFT JOIN TB_STAY S
+             ON R.RESV_TYPE = 'STAY'
+            AND S.STAY_ID = TO_NUMBER(R.TARGET_ID)
+      LEFT JOIN TB_STAY_ROOM SR
+             ON SR.ROOM_ID = R.ROOM_ID
+     WHERE  R.MEMBER_NO = #{memberNo}
+       AND  R.RESV_ID   = #{resvId}
+  </select>
+
+  <!-- 2026/07/13 장우철 — 동일 예약 리뷰 중복 방지 -->
+  <select id="countHospitalReviewByResvId" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_REVIEW
+     WHERE REVIEW_TYPE = 'HOSPITAL'
+       AND RESV_ID = #{resvId}
+       AND MEMBER_NO = #{memberNo}
+  </select>
+
+  <!-- 2026/07/13 장우철 — 병원 리뷰 등록 (시퀀스 없이 MAX+1) -->
+  <insert id="insertHospitalReview"
+          parameterType="com.petcare.petcare.hospital.vo.HospitalReviewVO">
+    <selectKey keyProperty="reviewId" resultType="long" order="BEFORE">
+      SELECT NVL(MAX(REVIEW_ID), 0) + 1 FROM TB_REVIEW
+    </selectKey>
+    INSERT INTO TB_REVIEW (
+      REVIEW_ID, REVIEW_TYPE, TARGET_ID, MEMBER_NO, RESV_ID,
+      RATING, CONTENT, REG_DATE
+    ) VALUES (
+      #{reviewId}, 'HOSPITAL', #{targetId}, #{memberNo}, #{resvId},
+      #{rating}, #{content, jdbcType=VARCHAR}, SYSDATE
+    )
+  </insert>
+
+  <!-- 2026/07/13 장우철 — 병원 평균별점·리뷰수 재계산 -->
+  <update id="updateHospitalRatingSummary">
+    UPDATE TB_HOSPITAL H
+       SET AVG_RATING = (
+             SELECT ROUND(AVG(R.RATING), 1)
+               FROM TB_REVIEW R
+              WHERE R.REVIEW_TYPE = 'HOSPITAL'
+                AND R.TARGET_ID = #{hospitalId}
+           ),
+           REVIEW_CNT = (
+             SELECT COUNT(*)
+               FROM TB_REVIEW R
+              WHERE R.REVIEW_TYPE = 'HOSPITAL'
+                AND R.TARGET_ID = #{hospitalId}
+           )
+     WHERE H.HOSPITAL_ID = #{hospitalId}
+  </update>
+
+  <!-- 2026-07-28 박유정 — 숙소 평균별점·리뷰수 재계산 (병원 updateHospitalRatingSummary와 동일 패턴) -->
+  <update id="updateStayRatingSummary">
+    UPDATE TB_STAY S
+       SET AVG_RATING = (
+             SELECT ROUND(AVG(R.RATING), 1)
+               FROM TB_REVIEW R
+              WHERE R.REVIEW_TYPE = 'STAY'
+                AND R.TARGET_ID = #{stayId}
+           ),
+           REVIEW_CNT = (
+             SELECT COUNT(*)
+               FROM TB_REVIEW R
+              WHERE R.REVIEW_TYPE = 'STAY'
+                AND R.TARGET_ID = #{stayId}
+           )
+     WHERE S.STAY_ID = #{stayId}
+  </update>
+
+  <!-- 2026/07/13 장우철 — 리뷰 알림 대상 사업자 회원 -->
+  <select id="selectHospitalMemberNo" resultType="long">
+    SELECT MEMBER_NO FROM TB_HOSPITAL WHERE HOSPITAL_ID = #{hospitalId}
+  </select>
+
+  <select id="selectMemberNickname" resultType="string">
+    SELECT NICKNAME FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
+  </select>
+
+  <!-- HYJ 26.07.20 숙소 리뷰 중복 확인 -->
+  <select id="countStayReviewByResvId" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_REVIEW
+     WHERE REVIEW_TYPE = 'STAY'
+       AND RESV_ID = #{resvId}
+       AND MEMBER_NO = #{memberNo}
+  </select>
+
+  <!-- HYJ 26.07.20 숙소 리뷰 등록 -->
+  <insert id="insertStayReview"
+          parameterType="com.petcare.petcare.stay.vo.StayReviewVO">
+    <selectKey keyProperty="reviewId" resultType="long" order="BEFORE">
+      SELECT NVL(MAX(REVIEW_ID), 0) + 1 FROM TB_REVIEW
+    </selectKey>
+    INSERT INTO TB_REVIEW (
+      REVIEW_ID, REVIEW_TYPE, TARGET_ID, MEMBER_NO, RESV_ID,
+      RATING, CONTENT, REG_DATE
+    ) VALUES (
+      #{reviewId}, 'STAY', #{targetId}, #{memberNo}, #{resvId},
+      #{rating}, #{content, jdbcType=VARCHAR}, SYSDATE
+    )
+  </insert>
+
+  <!-- HYJ 26.07.21 리뷰 작성 포인트 적립 이력 INSERT -->
+  <insert id="insertReviewPoint" parameterType="map">
+    INSERT INTO TB_POINT (
+      POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT,
+      BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE
+    ) VALUES (
+      (SELECT NVL(MAX(POINT_ID), 0) + 1 FROM TB_POINT),
+      #{memberNo},
+      'EARN',
+      #{pointAmount},
+      #{balanceAfter},
+      'REVIEW',
+      #{refType},
+      #{refId},
+      SYSDATE
+    )
+  </insert>
+
+  <!-- HYJ 26.07.21 회원 포인트 잔액 증가 -->
+  <update id="addMemberPointBalance" parameterType="map">
+    UPDATE TB_MEMBER
+       SET POINT_BALANCE = NVL(POINT_BALANCE, 0) + #{pointAmount}
+     WHERE MEMBER_NO = #{memberNo}
+  </update>
+
+  <!-- HYJ 26.07.21 현재 포인트 잔액 조회 -->
+  <select id="selectMemberPointBalance" parameterType="long" resultType="long">
+    SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
+  </select>
+  
+  <!-- HYJ 26.07.20 숙소 소유 사업자 회원번호 조회 -->
+  <select id="selectStayMemberNo" resultType="long">
+    SELECT MEMBER_NO FROM TB_STAY WHERE STAY_ID = #{stayId}
+  </select>
+
+  <!-- 2026/07/31 장우철 — 유저 숙소 취소 (CONFIRMED만) -->
+  <update id="updateStayUserCancel">
+    UPDATE TB_RESERVATION
+       SET STATUS_CD      = 'CANCEL',
+           REJECT_REASON  = #{rejectReason, jdbcType=VARCHAR},
+           CANCEL_FEE_AMT = #{cancelFeeAmt},
+           REFUND_AMT     = #{refundAmt},
+           CANCEL_AT      = SYSDATE
+     WHERE RESV_ID   = #{resvId}
+       AND MEMBER_NO = #{memberNo}
+       AND RESV_TYPE = 'STAY'
+       AND STATUS_CD = 'CONFIRMED'
+  </update>
+
+  <!-- 2026/07/31 장우철 — 예약 결제(완료) 조회 -->
+  <!-- 2026/08/01 장우철 — PAY_METHOD 추가 (빌링 취소 시 billing secret 분기) -->
+  <select id="selectDonePaymentByResvId" resultType="map">
+    SELECT PAYMENT_ID      AS "paymentId",
+           TOSS_PAYMENT_KEY AS "tossPaymentKey",
+           PAY_AMOUNT      AS "payAmount",
+           PAY_STATUS      AS "payStatus",
+           REFUND_AMT      AS "refundAmt",
+           PAY_METHOD      AS "payMethod"
+      FROM TB_PAYMENT
+     WHERE RESV_ID = #{resvId}
+       AND PAY_TYPE = 'RESERVATION'
+       AND PAY_STATUS = 'DONE'
+       AND ROWNUM = 1
+  </select>
+
+  <!-- 2026/07/31 장우철 — 결제 환불 반영 -->
+  <update id="updatePaymentRefundByResvId">
+    UPDATE TB_PAYMENT
+       SET REFUND_AMT = #{refundAmt},
+           PAY_STATUS = 'REFUND'
+     WHERE RESV_ID = #{resvId}
+       AND PAY_TYPE = 'RESERVATION'
+       AND PAY_STATUS = 'DONE'
+  </update>
+
+</mapper>

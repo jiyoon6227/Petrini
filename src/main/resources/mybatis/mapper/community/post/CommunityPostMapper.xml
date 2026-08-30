@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.community.post.mapper.CommunityPostMapper">
+
+<!--
+  역할: CommunityPostMapper SQL 정의
+  - 박유정 / 2026-07-08~10
+  - give/report 의 GiveReportMapper.xml 패턴 참고
+
+  테이블: TB_POST (BOARD_TYPE = TOWN/SHARE/LIFE), TB_FILE (사진)
+  시퀀스: SEQ_TB_POST (POST_ID), SEQ_TB_FILE (FILE_ID)
+
+  [목록] selectPostList / selectPostCount — 탭·검색·페이징
+  [상세] selectPostDetail / increaseViewCount — 조회수 +1
+  [등록] insertPost / insertFile — 글·사진 저장
+  [좋아요] increaseLikeCnt / decreaseLikeCnt — LIKE_CNT 증감
+  [LIFE] updatePostTags — 답변완료 TAGS 변경 (2026-07-10 STEP 4)
+-->
+<insert id="insertPost" parameterType="com.petcare.petcare.community.post.vo.CommunityPostVO">
+    <!-- 글 등록 (SEQ_TB_POST) -->
+    <selectKey keyProperty="postId" resultType="long" order="BEFORE">
+      SELECT SEQ_TB_POST.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TB_POST (
+      POST_ID,
+      MEMBER_NO,
+      BOARD_TYPE,
+      TITLE,
+      BODY,
+      LOST_SPECIES,
+      LOST_FEATURE,
+      REGION,
+      STATUS_CD,
+      REG_DATE,
+      TAGS,
+      VIEW_COUNT,
+      LIKE_CNT
+    ) VALUES (
+      #{postId},
+      #{memberNo},
+      #{boardType},
+      #{title},
+      #{body},
+      #{lostSpecies},
+      #{lostFeature},
+      #{region},
+      #{statusCd},
+      SYSDATE,
+      #{tags},
+      0,
+      0
+    )
+  </insert>
+
+  <!--HYJ 26.07.28 게시글작성회수 반영-->
+  <update id="updateMemberPostCount" parameterType="string">
+    UPDATE TB_MEMBER
+    SET POST_COUNT = NVL(POST_COUNT, 0) + 1
+    WHERE MEMBER_ID = #{memberId}
+  </update>
+
+  <select id="selectMemberNoByMemberId" resultType="long">
+    SELECT MEMBER_NO
+    FROM TB_MEMBER
+    WHERE MEMBER_ID = #{memberId}
+  </select>
+
+  <select id="selectMemberNoByEmail" resultType="long">
+    SELECT MEMBER_NO
+    FROM TB_MEMBER
+    WHERE EMAIL = #{email}
+  </select>
+
+  <sql id="postColumns">
+    POST_ID      AS postId,
+    MEMBER_NO    AS memberNo,
+    BOARD_TYPE   AS boardType,
+    TITLE        AS title,
+    DBMS_LOB.SUBSTR(BODY, 32000, 1) AS body,
+    LOST_SPECIES AS lostSpecies,
+    LOST_FEATURE AS lostFeature,
+    REGION       AS region,
+    STATUS_CD    AS statusCd,
+    REG_DATE     AS regDate,
+    TAGS         AS tags,
+    VIEW_COUNT   AS viewCount,
+    LIKE_CNT     AS likeCnt
+  </sql>
+
+  <!-- 상세 1건 -->
+  <select id="selectPostDetail"
+        parameterType="long"
+        resultType="com.petcare.petcare.community.post.vo.CommunityPostVO">
+    SELECT
+    <include refid="postColumns"/>
+    FROM TB_POST
+    WHERE POST_ID = #{postId}
+      AND NVL(STATUS_CD, 'ACTIVE') = 'ACTIVE'
+      AND BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+  </select>
+
+  <!-- 목록 공통 WHERE (탭별 boardType) -->
+  <sql id="postListWhere">
+    WHERE p.STATUS_CD = 'ACTIVE'
+    <choose>
+      <when test="boardType == null or boardType == ''">
+        AND p.BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+      </when>
+      <otherwise>
+        AND p.BOARD_TYPE = #{boardType}
+      </otherwise>
+    </choose>
+    <if test="keyword != null and keyword != ''">
+      AND (
+        UPPER(p.TITLE) LIKE '%' || UPPER(#{keyword}) || '%'
+        OR UPPER(DBMS_LOB.SUBSTR(p.BODY, 32000, 1)) LIKE '%' || UPPER(#{keyword}) || '%'
+        OR UPPER(m.NICKNAME) LIKE '%' || UPPER(#{keyword}) || '%'
+      )
+    </if>
+    <if test="petSpecies != null and petSpecies != ''">
+      AND p.LOST_SPECIES = #{petSpecies}
+    </if>
+    <if test="vetStatus != null and vetStatus == 'ANSWERED'">
+      AND p.TAGS LIKE '%ANSWERED%'
+    </if>
+    <if test="vetStatus != null and vetStatus == 'WAITING'">
+      AND (p.TAGS IS NULL OR p.TAGS NOT LIKE '%ANSWERED%')
+    </if>
+  </sql>
+
+  <!-- 목록: 작성자 JOIN + 페이징 + 검색 -->
+  <select id="selectPostList"
+        resultType="com.petcare.petcare.community.post.vo.CommunityPostVO">
+    SELECT
+      p.POST_ID      AS postId,
+      p.BOARD_TYPE   AS boardType,
+      p.TITLE        AS title,
+      DBMS_LOB.SUBSTR(p.BODY, 200, 1) AS body,
+      p.REG_DATE     AS regDate,
+      p.VIEW_COUNT   AS viewCount,
+      p.LIKE_CNT     AS likeCnt,
+      p.TAGS         AS tags,
+      p.LOST_SPECIES AS lostSpecies,
+      m.NICKNAME     AS authorName
+    FROM TB_POST p
+    LEFT JOIN TB_MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+    <include refid="postListWhere"/>
+    ORDER BY p.REG_DATE DESC
+    OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+  </select>
+
+  <select id="selectPostCount" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_POST p
+    LEFT JOIN TB_MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+    <include refid="postListWhere"/>
+  </select>
+
+  <!-- TB_FILE INSERT (로컬 C:/upload/ 저장 후) -->
+ <insert id="insertFile" parameterType="com.petcare.petcare.give.report.vo.GiveReportFileVO">
+    <selectKey keyProperty="fileId" resultType="long" order="BEFORE">
+      SELECT SEQ_TB_FILE.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TB_FILE (
+      FILE_ID,
+      REF_TYPE,
+      REF_ID,
+      DRIVE_FILE_ID,
+      FILE_URL,
+      ORIGIN_NAME,
+      REG_DATE
+    ) VALUES (
+      #{fileId},
+      #{refType},
+      #{refId},
+      #{driveFileId},
+      #{fileUrl},
+      #{originName},
+      SYSDATE
+    )
+  </insert>
+
+  <!-- 게시글(postId)에 연결된 사진 URL 목록 — 상세·목록 썸네일 -->
+  <select id="selectFileUrlsByPostId" resultType="string">
+    SELECT FILE_URL
+    FROM TB_FILE
+    WHERE REF_TYPE = 'POST'
+      AND REF_ID = #{postId}
+    ORDER BY FILE_ID
+  </select>
+
+  <update id="increaseViewCount">
+    UPDATE TB_POST
+    SET VIEW_COUNT = NVL(VIEW_COUNT, 0) + 1
+    WHERE POST_ID = #{postId}
+      AND BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+  </update>
+
+  <update id="increaseLikeCnt">
+    UPDATE TB_POST
+    SET LIKE_CNT = NVL(LIKE_CNT, 0) + 1
+    WHERE POST_ID = #{postId}
+      AND BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+  </update>
+
+  <update id="decreaseLikeCnt">
+    UPDATE TB_POST
+    SET LIKE_CNT = GREATEST(NVL(LIKE_CNT, 0) - 1, 0)
+    WHERE POST_ID = #{postId}
+      AND BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+  </update>
+
+  <!-- 2026-07-10 박유정 STEP 4 — LIFE 답변완료(WAITING → ANSWERED) -->
+  <update id="updatePostTags">
+    UPDATE TB_POST
+    SET TAGS = #{tags}
+    WHERE POST_ID = #{postId}
+      AND BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+  </update>
+
+  <!-- 2026-07-23 HYJ — 게시글 수정 (본인 글만, Controller에서 검증) -->
+  <update id="updatePost" parameterType="com.petcare.petcare.community.post.vo.CommunityPostVO">
+    UPDATE TB_POST
+    SET TITLE = #{title},
+        BODY  = #{body}
+    WHERE POST_ID = #{postId}
+      AND MEMBER_NO = #{memberNo}
+      AND BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+      AND NVL(STATUS_CD, 'ACTIVE') = 'ACTIVE'
+  </update>
+
+  <!-- 2026-07-23 HYJ — LIFE 유저 삭제: STATUS_CD='DELETED' (관리자 방식 통일, 7일 보관) -->
+  <update id="softDeletePostByUser">
+    UPDATE TB_POST
+    SET STATUS_CD    = 'DELETED',
+        DELETE_DATE = SYSDATE
+    WHERE POST_ID = #{postId}
+      AND MEMBER_NO = #{memberNo}
+      AND NVL(STATUS_CD, 'ACTIVE') = 'ACTIVE'
+      AND BOARD_TYPE = 'LIFE'
+  </update>
+
+  <!-- 2026-07-23 HYJ — TOWN/SHARE 유저 삭제: 즉시 물리 삭제 -->
+  <delete id="hardDeletePostByUser">
+    DELETE FROM TB_POST
+    WHERE POST_ID = #{postId}
+      AND MEMBER_NO = #{memberNo}
+      AND NVL(STATUS_CD, 'ACTIVE') = 'ACTIVE'
+      AND BOARD_TYPE IN ('TOWN', 'SHARE')
+  </delete>
+
+  <!-- 2026/08/03 장우철 — 글 물리 삭제 전 TB_POST_REPORT (FK_PTN65_0058) -->
+  <delete id="deleteReportsByPostId">
+    DELETE FROM TB_POST_REPORT
+    WHERE POST_ID = #{postId}
+  </delete>
+
+  <!-- 2026/08/03 장우철 — 글 물리 삭제 전 TB_POST_LIKE -->
+  <delete id="deleteLikesByPostId">
+    DELETE FROM TB_POST_LIKE
+    WHERE POST_ID = #{postId}
+  </delete>
+
+  <!-- 2026-07-23 HYJ — 게시글에 연결된 파일 삭제 -->
+  <delete id="deleteFilesByPostId">
+    DELETE FROM TB_FILE
+    WHERE REF_TYPE = 'POST'
+      AND REF_ID = #{postId}
+  </delete>
+
+  <!-- 2026-08-13 박유정 — 수정 화면에서 선택 삭제 -->
+  <delete id="deleteFileByPostIdAndUrl">
+    DELETE FROM TB_FILE
+     WHERE REF_TYPE = 'POST'
+       AND REF_ID = #{postId}
+       AND FILE_URL = #{fileUrl}
+  </delete>
+
+
+  <!-- 2026-07-23 HYJ — 7일 경과 DELETED LIFE 게시글 ID 목록 (스케줄러용) -->
+  <select id="selectExpiredDeletedPostIds" resultType="long">
+    SELECT POST_ID
+    FROM TB_POST
+    WHERE STATUS_CD = 'DELETED'
+      AND DELETE_DATE &lt;= SYSDATE - #{days}
+      AND BOARD_TYPE = 'LIFE'
+  </select>
+
+  <!-- 2026-07-23 HYJ — DELETED 게시글 물리 삭제 (스케줄러용) -->
+  <delete id="hardDeleteExpiredPost">
+    DELETE FROM TB_POST
+    WHERE POST_ID = #{postId}
+      AND STATUS_CD = 'DELETED'
+  </delete>
+</mapper>
+
+

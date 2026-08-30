@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.mypage.wishlist.mapper.MypageWishlistMapper">
+
+<!-- 2026/08/13 장우철 — 찜 목록. 가격은 전부 NUMBER로 맞춰 UNION 오류 방지 -->
+<select id="selectMyWishlist" resultType="com.petcare.petcare.mypage.wishlist.vo.MypageWishlistVO">
+    SELECT FAV_ID, MEMBER_NO, FAV_TYPE, TARGET_ID, REG_DATE,
+           TITLE, PRICE, IMAGE_URL, LINK, WISH_KEY
+      FROM (
+        SELECT f.FAV_ID, f.MEMBER_NO, f.FAV_TYPE, f.TARGET_ID, f.REG_DATE,
+               p.PRODUCT_NAME AS TITLE,
+               NVL(TO_NUMBER(REGEXP_REPLACE(p.SALE_PRICE, '[^0-9]', '')), 0) AS PRICE,
+               img.FILE_URL AS IMAGE_URL,
+               '/store/detail?id=' || TO_CHAR(p.PRODUCT_ID) AS LINK,
+               'store:' || TO_CHAR(p.PRODUCT_ID) AS WISH_KEY
+          FROM TB_FAVORITE f
+          JOIN TB_PRODUCT p ON p.PRODUCT_ID = f.TARGET_ID
+          LEFT JOIN (
+              SELECT REF_ID, FILE_URL,
+                     ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+                FROM TB_FILE WHERE REF_TYPE = 'PRODUCT'
+          ) img ON img.REF_ID = p.PRODUCT_ID AND img.RN = 1
+         WHERE f.MEMBER_NO = #{memberNo} AND f.FAV_TYPE = 'PRODUCT'
+        UNION ALL
+        SELECT f.FAV_ID, f.MEMBER_NO, f.FAV_TYPE, f.TARGET_ID, f.REG_DATE,
+               s.NAME AS TITLE,
+               NVL((SELECT MIN(r.PRICE_PER_NIGHT) FROM TB_STAY_ROOM r
+                     WHERE r.STAY_ID = s.STAY_ID AND r.STATUS_CD = 'APPROVE'), 0) AS PRICE,
+               img.FILE_URL AS IMAGE_URL,
+               '/stay/detail?id=' || TO_CHAR(s.STAY_ID) AS LINK,
+               'stay:' || TO_CHAR(s.STAY_ID) AS WISH_KEY
+          FROM TB_FAVORITE f
+          JOIN TB_STAY s ON s.STAY_ID = f.TARGET_ID
+          LEFT JOIN (
+              SELECT REF_ID, FILE_URL,
+                     ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+                FROM TB_FILE WHERE REF_TYPE = 'STAY'
+          ) img ON img.REF_ID = s.STAY_ID AND img.RN = 1
+         WHERE f.MEMBER_NO = #{memberNo} AND f.FAV_TYPE IN ('LODGE', 'STAY')
+        UNION ALL
+        SELECT f.FAV_ID, f.MEMBER_NO, f.FAV_TYPE, f.TARGET_ID, f.REG_DATE,
+               h.NAME AS TITLE,
+               0 AS PRICE,
+               img.FILE_URL AS IMAGE_URL,
+               '/hospital/detail?id=' || TO_CHAR(h.HOSPITAL_ID) AS LINK,
+               'hospital:' || TO_CHAR(h.HOSPITAL_ID) AS WISH_KEY
+          FROM TB_FAVORITE f
+          JOIN TB_HOSPITAL h ON h.HOSPITAL_ID = f.TARGET_ID
+          LEFT JOIN (
+              SELECT REF_ID, FILE_URL,
+                     ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+                FROM TB_FILE WHERE REF_TYPE = 'HOSPITAL'
+          ) img ON img.REF_ID = h.HOSPITAL_ID AND img.RN = 1
+         WHERE f.MEMBER_NO = #{memberNo} AND f.FAV_TYPE = 'HOSPITAL'
+      ) x
+    ORDER BY x.REG_DATE DESC, x.FAV_ID DESC
+</select>
+
+<select id="selectMyWishKeys" resultType="String">
+    SELECT CASE
+             WHEN FAV_TYPE = 'PRODUCT' THEN 'store:' || TO_CHAR(TARGET_ID)
+             WHEN FAV_TYPE IN ('LODGE', 'STAY') THEN 'stay:' || TO_CHAR(TARGET_ID)
+             WHEN FAV_TYPE = 'HOSPITAL' THEN 'hospital:' || TO_CHAR(TARGET_ID)
+             ELSE FAV_TYPE || ':' || TO_CHAR(TARGET_ID)
+           END
+      FROM TB_FAVORITE
+     WHERE MEMBER_NO = #{memberNo}
+</select>
+
+<select id="countFavorite" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_FAVORITE
+     WHERE MEMBER_NO = #{memberNo}
+       AND TARGET_ID = #{targetId}
+    <choose>
+        <when test="favType == 'LODGE' or favType == 'STAY'">
+       AND FAV_TYPE IN ('LODGE', 'STAY')
+        </when>
+        <otherwise>
+       AND FAV_TYPE = #{favType}
+        </otherwise>
+    </choose>
+</select>
+
+<insert id="insertFavorite" parameterType="com.petcare.petcare.mypage.wishlist.vo.MypageWishlistVO">
+    <selectKey keyProperty="favId" resultType="long" order="BEFORE">
+        SELECT NVL(MAX(FAV_ID), 0) + 1 FROM TB_FAVORITE
+    </selectKey>
+    INSERT INTO TB_FAVORITE (FAV_ID, MEMBER_NO, FAV_TYPE, TARGET_ID, REG_DATE)
+    VALUES (#{favId}, #{memberNo}, #{favType}, #{targetId}, SYSDATE)
+</insert>
+
+<delete id="deleteFavorite">
+    DELETE FROM TB_FAVORITE
+     WHERE MEMBER_NO = #{memberNo}
+       AND TARGET_ID = #{targetId}
+    <choose>
+        <when test="favType == 'LODGE' or favType == 'STAY'">
+       AND FAV_TYPE IN ('LODGE', 'STAY')
+        </when>
+        <otherwise>
+       AND FAV_TYPE = #{favType}
+        </otherwise>
+    </choose>
+</delete>
+
+</mapper>

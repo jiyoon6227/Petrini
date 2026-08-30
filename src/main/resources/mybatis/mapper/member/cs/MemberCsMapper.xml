@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.member.cs.mapper.MemberCsMapper">
+
+<!--
+  역할: MemberCsMapper SQL 정의
+
+  쿼리 id 예시
+  - selectNoticeList
+  - selectNoticeDetail
+  - selectFaqList
+
+  테이블
+  - TB_NOTICE
+  - TB_FAQ
+-->
+
+    <!-- 2026-08-11 박유정 — 고객센터 노출 FAQ (VISIBLE_YN = Y) -->
+    <select id="selectVisibleFaqList" resultType="com.petcare.petcare.admin.cms.vo.FaqVO">
+        SELECT F.FAQ_ID      AS faqId,
+               F.CATEGORY_CD AS categoryCd,
+               F.QUESTION    AS question,
+               F.ANSWER      AS answer,
+               F.VISIBLE_YN  AS visibleYn,
+               F.SORT_ORDER  AS sortOrder,
+               F.REG_DATE    AS regDate,
+               F.MOD_DATE    AS modDate
+          FROM TB_FAQ F
+         WHERE F.VISIBLE_YN = 'Y'
+         ORDER BY F.SORT_ORDER ASC, F.FAQ_ID DESC
+    </select>
+
+    <!-- 2026-08-11 박유정 — 고객센터 노출 공지 (VISIBLE_YN = Y) -->
+    <select id="selectVisibleNoticeList" resultType="com.petcare.petcare.admin.cms.vo.NoticeVO">
+        SELECT N.NOTICE_ID      AS noticeId,
+               N.NOTICE_TYPE_CD AS noticeTypeCd,
+               N.TITLE          AS title,
+               N.BODY           AS body,
+               N.WRITER_NAME    AS writerName,
+               TRIM(N.PIN_YN)     AS pinYn,
+               TRIM(N.VISIBLE_YN) AS visibleYn,
+               N.VIEW_COUNT     AS viewCount,
+               N.REG_DATE       AS regDate,
+               N.MOD_DATE       AS modDate
+          FROM TB_NOTICE N
+         WHERE TRIM(N.VISIBLE_YN) = 'Y'
+         ORDER BY TRIM(N.PIN_YN) DESC, N.REG_DATE DESC, N.NOTICE_ID DESC
+    </select>
+
+    <select id="selectVisibleNoticeById" parameterType="long"
+            resultType="com.petcare.petcare.admin.cms.vo.NoticeVO">
+        SELECT N.NOTICE_ID      AS noticeId,
+               N.NOTICE_TYPE_CD AS noticeTypeCd,
+               N.TITLE          AS title,
+               N.BODY           AS body,
+               N.WRITER_NAME    AS writerName,
+               TRIM(N.PIN_YN)     AS pinYn,
+               TRIM(N.VISIBLE_YN) AS visibleYn,
+               N.VIEW_COUNT     AS viewCount,
+               N.REG_DATE       AS regDate,
+               N.MOD_DATE       AS modDate
+          FROM TB_NOTICE N
+         WHERE N.NOTICE_ID = #{noticeId}
+           AND TRIM(N.VISIBLE_YN) = 'Y'
+    </select>
+
+    <update id="incrementNoticeViewCount" parameterType="long">
+        UPDATE TB_NOTICE
+           SET VIEW_COUNT = NVL(VIEW_COUNT, 0) + 1
+         WHERE NOTICE_ID = #{noticeId}
+           AND TRIM(VISIBLE_YN) = 'Y'
+    </update>
+
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.mypage.address.mapper.MypageAddressMapper">
+
+<!-- 지윤 26.07.29 추가: 배송지록(TB_MEMBER_ADDRESS) SQL -->
+
+<select id="selectAddressList" resultType="com.petcare.petcare.mypage.address.vo.MypageAddressVO">
+    SELECT ADDR_ID AS addrId, MEMBER_NO AS memberNo, RECV_NAME AS recvName, RECV_PHONE AS recvPhone,
+           ZIP_CODE AS zipCode, ADDR1 AS addr1, ADDR2 AS addr2, IS_DEFAULT AS isDefault
+    FROM TB_MEMBER_ADDRESS
+    WHERE MEMBER_NO = #{memberNo}
+    <!-- 지윤 26.07.29 수정: 기본배송지가 매번 맨 위로 튀던 정렬(DECODE) 제거 -> 등록순서(ADDR_ID)로만 고정 정렬 -->
+    ORDER BY ADDR_ID DESC
+</select>
+
+<select id="selectDefaultAddress" resultType="com.petcare.petcare.mypage.address.vo.MypageAddressVO">
+    SELECT ADDR_ID AS addrId, MEMBER_NO AS memberNo, RECV_NAME AS recvName, RECV_PHONE AS recvPhone,
+           ZIP_CODE AS zipCode, ADDR1 AS addr1, ADDR2 AS addr2, IS_DEFAULT AS isDefault
+    FROM TB_MEMBER_ADDRESS
+    WHERE MEMBER_NO = #{memberNo} AND IS_DEFAULT = 'Y'
+    FETCH FIRST 1 ROWS ONLY
+</select>
+
+<select id="selectNextAddrId" resultType="Long">
+    SELECT NVL(MAX(ADDR_ID), 0) + 1 FROM TB_MEMBER_ADDRESS
+</select>
+
+<insert id="insertAddress">
+    INSERT INTO TB_MEMBER_ADDRESS (ADDR_ID, MEMBER_NO, RECV_NAME, RECV_PHONE, ZIP_CODE, ADDR1, ADDR2, IS_DEFAULT)
+    VALUES (#{addrId}, #{memberNo}, #{recvName}, #{recvPhone}, #{zipCode}, #{addr1}, #{addr2}, #{isDefault})
+</insert>
+
+<update id="clearDefaultAddress">
+    UPDATE TB_MEMBER_ADDRESS SET IS_DEFAULT = 'N' WHERE MEMBER_NO = #{memberNo} AND IS_DEFAULT = 'Y'
+</update>
+
+<update id="setDefaultAddress">
+    UPDATE TB_MEMBER_ADDRESS SET IS_DEFAULT = 'Y' WHERE ADDR_ID = #{addrId} AND MEMBER_NO = #{memberNo}
+</update>
+
+<!-- 지윤 26.07.29 추가: 배송지 수정 -->
+<update id="updateAddress">
+    UPDATE TB_MEMBER_ADDRESS
+    SET RECV_NAME = #{recvName}, RECV_PHONE = #{recvPhone}, ZIP_CODE = #{zipCode}, ADDR1 = #{addr1}, ADDR2 = #{addr2}
+    WHERE ADDR_ID = #{addrId} AND MEMBER_NO = #{memberNo}
+</update>
+
+<!-- 지윤 26.07.29 추가: 배송지 삭제 -->
+<delete id="deleteAddress">
+    DELETE FROM TB_MEMBER_ADDRESS WHERE ADDR_ID = #{addrId} AND MEMBER_NO = #{memberNo}
+</delete>
+
+</mapper>

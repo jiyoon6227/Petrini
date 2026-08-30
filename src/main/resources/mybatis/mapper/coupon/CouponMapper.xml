@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.coupon.mapper.CouponMapper">
+
+<!--
+  역할: 사용자 이벤트/쿠폰 페이지 SQL
+  테이블: TB_COUPON, TB_MEMBER_COUPON, TB_BUSINESS
+-->
+
+  <!-- 전체 쿠폰 목록 (APPROVED 전체 — 기간·수량 필터 없음)
+       로그인 시 이미 받았는지 체크 (alreadyClaimed) -->
+  <select id="selectAvailableCoupons"
+          resultType="com.petcare.petcare.store.vo.CouponVO">
+    SELECT C.COUPON_ID,
+           C.COUPON_CODE,
+           C.COUPON_NAME,
+           C.COUPON_TYPE,
+           C.DISCOUNT_VALUE,
+           C.MAX_DISCOUNT_AMT,
+           C.MIN_ORDER_AMT,
+           C.TOTAL_QTY,
+           C.ISSUED_QTY,
+           C.TOTAL_BUDGET,    <!-- 2026-08-13 박유정 — 회원 목록 예산 소진 표시용 -->
+           C.ISSUED_BUDGET,
+           C.USE_START_DATE,
+           C.USE_END_DATE,
+           C.STATUS_CD,
+           B.BIZ_NAME,
+           TO_CHAR(C.BIZ_MEMBER_NO) AS BIZ_NO,
+           B.BIZ_TYPE,
+           CASE B.BIZ_TYPE
+           WHEN 'HOSPITAL' THEN (
+           SELECT MAX(H.HOSPITAL_ID)
+           FROM TB_HOSPITAL H
+           WHERE H.BIZ_NO = B.BIZ_NO
+    )
+           WHEN 'STAY' THEN (
+           SELECT MAX(S.STAY_ID)
+           FROM TB_STAY S
+           WHERE S.BIZ_NO = B.BIZ_NO
+    )
+    ELSE NULL
+END AS TARGET_ID,
+           <choose>
+               <when test="memberNo != null">
+                   CASE WHEN EXISTS (
+                       SELECT 1 FROM TB_MEMBER_COUPON MC
+                        WHERE MC.MEMBER_NO = #{memberNo}
+                          AND MC.COUPON_ID = C.COUPON_ID
+                   ) THEN 1 ELSE 0 END AS ALREADY_CLAIMED
+               </when>
+               <otherwise>
+                   0 AS ALREADY_CLAIMED
+               </otherwise>
+           </choose>
+      FROM TB_COUPON C
+      LEFT JOIN TB_BUSINESS B ON B.BIZ_NO = C.BIZ_MEMBER_NO
+     WHERE C.APPROVAL_STATUS = 'APPROVED'
+       AND C.STATUS_CD != 'INACTIVE'   <!-- 조기마감(INACTIVE)은 이벤트탭에서 제외 -->
+       AND C.USE_END_DATE &gt;= #{today}   <!-- 지윤 26.08.10 추가: 사용기간 지난 쿠폰은 화면에서 제외 -->
+     ORDER BY CASE C.STATUS_CD WHEN 'ACTIVE' THEN 1 WHEN 'EXHAUSTED' THEN 2 ELSE 3 END,
+              C.REG_DATE DESC
+  </select>
+
+  <!-- 보유 쿠폰 목록 (TB_MEMBER_COUPON JOIN TB_COUPON) -->
+  <!-- 2026/08/01 장우철 — TB_MEMBER_COUPON에 USED_DATE 없음 → NULL 별칭 -->
+  <select id="selectMyCoupons"
+          resultType="com.petcare.petcare.store.vo.CouponVO">
+    SELECT MC.MEMBER_COUPON_ID,
+           MC.STATUS_CD     AS MEMBER_COUPON_STATUS,
+           NULL            AS USED_DATE,
+           MC.REG_DATE,
+           MC.EXPIRE_DATE,
+           C.COUPON_ID,
+           C.COUPON_CODE,
+           C.COUPON_NAME,
+           C.COUPON_TYPE,
+           C.DISCOUNT_VALUE,
+           C.MAX_DISCOUNT_AMT,
+           C.MIN_ORDER_AMT,
+           C.USE_START_DATE,
+           C.USE_END_DATE,
+           B.BIZ_NAME
+      FROM TB_MEMBER_COUPON MC
+      JOIN TB_COUPON C    ON C.COUPON_ID = MC.COUPON_ID
+      LEFT JOIN TB_BUSINESS B ON B.BIZ_NO = C.BIZ_MEMBER_NO
+     WHERE MC.MEMBER_NO = #{memberNo}
+     ORDER BY CASE MC.STATUS_CD
+                  WHEN 'UNUSED'  THEN 1
+                  WHEN 'USED'    THEN 2
+                  WHEN 'EXPIRED' THEN 3
+                  ELSE 4
+              END,
+              MC.REG_DATE DESC
+  </select>
+
+  <!-- 사용 가능 보유 쿠폰 개수 -->
+  <select id="countUsableCoupons"
+          parameterType="long"
+          resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER_COUPON MC
+      JOIN TB_COUPON C ON C.COUPON_ID = MC.COUPON_ID
+     WHERE MC.MEMBER_NO  = #{memberNo}
+       AND MC.STATUS_CD  = 'UNUSED'
+       AND C.USE_END_DATE &gt;= TO_CHAR(SYSDATE, 'YYYYMMDD')
+  </select>
+
+  <!-- 이미 받았는지 체크 -->
+  <select id="countMemberCoupon" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER_COUPON
+     WHERE MEMBER_NO = #{memberNo}
+       AND COUPON_ID = #{couponId}
+  </select>
+
+  <!-- 쿠폰 받기 (TB_MEMBER_COUPON INSERT) -->
+  <!--HYJ 26.08.13 만료일자 추가-->
+  <!-- 2026/08/13 장우철 — 예주 USE_END_DATE + 우철 조건부 INSERT(중복발급 방지) 병합 -->
+  <insert id="insertMemberCoupon">
+    INSERT INTO TB_MEMBER_COUPON (
+      MEMBER_COUPON_ID,
+      MEMBER_NO,
+      COUPON_ID,
+      STATUS_CD,
+      REG_DATE,
+      USE_END_DATE
+    )
+    SELECT
+      SEQ_MEMBER_COUPON.NEXTVAL,
+      #{memberNo},
+      #{couponId},
+      'UNUSED',
+      TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+      #{useEndDate}
+    FROM DUAL
+    WHERE NOT EXISTS (
+      SELECT 1
+        FROM TB_MEMBER_COUPON
+       WHERE MEMBER_NO = #{memberNo}
+         AND COUPON_ID = #{couponId}
+    )
+  </insert>
+
+ <!-- 발급 수량·예산 갱신
+       지윤 26.08.07: 동시성 방지 위해 조건부 UPDATE로 변경.
+       ACTIVE 상태 + 잔여수량 + 잔여예산 조건을 만족할 때만 실제로 갱신되고,
+       그 순간 소진되면 STATUS_CD를 EXHAUSTED로 바로 전환.
+       0건 갱신되면(=동시요청으로 이미 소진) 서비스단에서 롤백 처리 -->
+  <!-- 지윤 26.08.10 수정: 예산 소진도 EXHAUSTED로 전환되도록 CASE 조건 추가 -->
+  <!-- 2026-08-13 박유정 — ISSUED_QTY/ISSUED_BUDGET NULL이면 Oracle에서 NULL+N=NULL → 발급 UPDATE 0건 방지 -->
+  <update id="updateCouponIssued">
+    UPDATE TB_COUPON
+       SET ISSUED_QTY    = NVL(ISSUED_QTY, 0) + 1,
+           ISSUED_BUDGET = NVL(ISSUED_BUDGET, 0) + #{discountValue},
+           STATUS_CD     = CASE
+                                WHEN NVL(ISSUED_QTY, 0) + 1 &gt;= TOTAL_QTY THEN 'EXHAUSTED'
+                                WHEN TOTAL_BUDGET IS NOT NULL
+                                     AND (TOTAL_BUDGET - (NVL(ISSUED_BUDGET, 0) + #{discountValue})) &lt; #{discountValue}
+                                     THEN 'EXHAUSTED'
+                                ELSE STATUS_CD
+                            END,
+           MOD_DATE      = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+     WHERE COUPON_ID = #{couponId}
+       AND STATUS_CD = 'ACTIVE'
+       AND NVL(ISSUED_QTY, 0) &lt; TOTAL_QTY
+       AND (TOTAL_BUDGET IS NULL OR NVL(ISSUED_BUDGET, 0) + #{discountValue} &lt;= TOTAL_BUDGET)
+  </update>
+
+    <!-- 쿠폰 상세 1건 (발급 가능 여부 검증) -->
+  <select id="selectCouponById"
+          parameterType="long"
+          resultType="com.petcare.petcare.store.vo.CouponVO">
+    SELECT COUPON_ID,
+           COUPON_TYPE,
+           DISCOUNT_VALUE,
+           MAX_DISCOUNT_AMT,
+           TOTAL_BUDGET,
+           ISSUED_BUDGET,
+           TOTAL_QTY,
+           ISSUED_QTY,
+           STATUS_CD,
+           USE_START_DATE,
+           USE_END_DATE
+      FROM TB_COUPON
+     WHERE COUPON_ID = #{couponId}
+       AND APPROVAL_STATUS = 'APPROVED'
+  </select>
+
+
+    <!--
+    지윤 26.08.06
+    선택한 쿠폰과 쿠폰 발급 사업자 정보 조회
+  -->
+  <select id="selectCouponTarget"
+          parameterType="long"
+          resultType="com.petcare.petcare.store.vo.CouponVO">
+
+    SELECT C.COUPON_ID,
+           C.COUPON_CODE,
+           C.COUPON_NAME,
+           C.COUPON_TYPE,
+           C.DISCOUNT_VALUE,
+           C.MIN_ORDER_AMT,
+           C.USE_START_DATE,
+           C.USE_END_DATE,
+           C.STATUS_CD,
+           TO_CHAR(C.BIZ_MEMBER_NO) AS BIZ_NO,
+           B.BIZ_NAME,
+           B.BIZ_TYPE,
+           CASE B.BIZ_TYPE
+               WHEN 'HOSPITAL' THEN (
+                   SELECT MAX(H.HOSPITAL_ID)
+                     FROM TB_HOSPITAL H
+                    WHERE H.BIZ_NO = B.BIZ_NO
+               )
+               WHEN 'STAY' THEN (
+                   SELECT MAX(S.STAY_ID)
+                     FROM TB_STAY S
+                    WHERE S.BIZ_NO = B.BIZ_NO
+               )
+               ELSE NULL
+           END AS TARGET_ID
+      FROM TB_COUPON C
+      JOIN TB_BUSINESS B
+        ON B.BIZ_NO = C.BIZ_MEMBER_NO
+     WHERE C.COUPON_ID = #{couponId}
+       AND C.APPROVAL_STATUS = 'APPROVED'
+
+  </select>
+
+
+  <!--
+    지윤 26.08.06
+    쿠폰을 발급한 쇼핑몰 사업자의 상품만 조회
+  -->
+  <select id="selectCouponProducts"
+          resultType="com.petcare.petcare.store.vo.StoreShopVO">
+
+    SELECT P.PRODUCT_ID,
+           P.PRODUCT_CD,
+           P.PRODUCT_NAME,
+           P.BRAND_NAME,
+           P.CATEGORY_ID,
+           TO_NUMBER(P.PRICE) AS PRICE,
+           TO_NUMBER(P.SALE_PRICE) AS SALE_PRICE,
+           F.FILE_URL AS THUMBNAIL_URL,
+           NVL(RV.AVG_RATING, 0) AS AVG_RATING,
+           NVL(RV.REVIEW_COUNT, 0) AS REVIEW_COUNT
+
+      FROM TB_PRODUCT P
+
+      <!-- 상품 대표 이미지 1개 조회 -->
+      LEFT JOIN (
+          SELECT REF_ID,
+                 FILE_URL,
+                 ROW_NUMBER() OVER (
+                     PARTITION BY REF_ID
+                     ORDER BY FILE_ID
+                 ) AS RN
+            FROM TB_FILE
+           WHERE REF_TYPE = 'PRODUCT'
+      ) F
+        ON F.REF_ID = P.PRODUCT_ID
+       AND F.RN = 1
+
+      <!-- 상품 평균 별점과 리뷰 개수 -->
+      LEFT JOIN (
+          SELECT TARGET_ID,
+                 ROUND(AVG(RATING), 1) AS AVG_RATING,
+                 COUNT(REVIEW_ID) AS REVIEW_COUNT
+            FROM TB_REVIEW
+           WHERE REVIEW_TYPE = 'PRODUCT'
+           GROUP BY TARGET_ID
+      ) RV
+        ON RV.TARGET_ID = P.PRODUCT_ID
+
+      <!-- 인기순 정렬에 사용할 상품 판매 수량 -->
+      LEFT JOIN (
+          SELECT PRODUCT_ID,
+                 SUM(QTY) AS SALES_QTY
+            FROM TB_ORDER_ITEM
+           GROUP BY PRODUCT_ID
+      ) SALES
+        ON SALES.PRODUCT_ID = P.PRODUCT_ID
+
+    <!-- 2026/08/12 장우철 — bizNo 타입/공백 차이로 필터가 누락되는 케이스 대응 -->
+    WHERE TO_CHAR(P.BIZ_NO) = TRIM(#{bizNo})
+  AND P.STATUS_CD = 'NORMAL'
+
+<!-- 지윤 26.08.06: 상품명 또는 브랜드명 검색 -->
+<if test="keyword != null and keyword != ''">
+  AND (
+       UPPER(P.PRODUCT_NAME)
+       LIKE '%' || UPPER(#{keyword}) || '%'
+       OR
+       UPPER(P.BRAND_NAME)
+       LIKE '%' || UPPER(#{keyword}) || '%'
+  )
+</if>
+
+<!-- 지윤 26.08.06: 인기순·가격순 정렬 -->
+<choose>
+      <when test="sort == 'priceAsc'">
+        ORDER BY TO_NUMBER(P.SALE_PRICE) ASC
+      </when>
+
+      <when test="sort == 'priceDesc'">
+        ORDER BY TO_NUMBER(P.SALE_PRICE) DESC
+      </when>
+
+      <otherwise>
+        ORDER BY NVL(SALES.SALES_QTY, 0) DESC,
+                 P.PRODUCT_ID DESC
+      </otherwise>
+    </choose>
+
+  </select>
+
+<!--
+    지윤 26.08.07
+    특정 사업자(병원/숙소)가 발급한 쿠폰 중, 회원이 보유(UNUSED)하고
+    사용기간이 남아있는 쿠폰만 조회 (예약 결제 화면용)
+  -->
+  <select id="selectMemberCouponsByBiz"
+          resultType="com.petcare.petcare.store.vo.CouponVO">
+    SELECT MC.MEMBER_COUPON_ID,
+       C.COUPON_ID,
+       C.COUPON_NAME,
+       C.COUPON_TYPE,
+       C.DISCOUNT_VALUE,
+       C.MAX_DISCOUNT_AMT,
+       C.MIN_ORDER_AMT,
+       TO_CHAR(C.BIZ_NO) AS BIZ_NO
+  FROM TB_MEMBER_COUPON MC
+  JOIN TB_COUPON C ON C.COUPON_ID = MC.COUPON_ID
+  WHERE MC.MEMBER_NO = #{memberNo}
+   AND MC.STATUS_CD = 'UNUSED'
+   AND C.BIZ_NO = #{bizNo}
+       AND C.USE_END_DATE &gt;= TO_CHAR(SYSDATE, 'YYYYMMDD')
+     ORDER BY MC.MEMBER_COUPON_ID
+  </select>
+
+<!-- 2026-08-13 박유정 — 쇼핑 주문서: 주문 상품 사업자에 맞는 보유 쿠폰만 -->
+<select id="selectMemberCouponsByBizNos"
+        resultType="com.petcare.petcare.store.vo.CouponVO">
+  SELECT MC.MEMBER_COUPON_ID,
+         C.COUPON_ID,
+         C.COUPON_NAME,
+         C.COUPON_TYPE,
+         C.DISCOUNT_VALUE,
+         C.MAX_DISCOUNT_AMT,
+         C.MIN_ORDER_AMT,
+         TO_CHAR(NVL(C.BIZ_NO, C.BIZ_MEMBER_NO)) AS BIZ_NO
+    FROM TB_MEMBER_COUPON MC
+    JOIN TB_COUPON C ON C.COUPON_ID = MC.COUPON_ID
+   WHERE MC.MEMBER_NO = #{memberNo}
+     AND MC.STATUS_CD = 'UNUSED'
+     AND C.USE_END_DATE &gt;= TO_CHAR(SYSDATE, 'YYYYMMDD')
+     AND NVL(C.BIZ_NO, C.BIZ_MEMBER_NO) IN
+     <foreach collection="bizNos" item="bizNo" open="(" separator="," close=")">
+       #{bizNo}
+     </foreach>
+   ORDER BY MC.MEMBER_COUPON_ID
+</select>
+
+  <!--
+    지윤 26.08.07
+    결제 확정 시 서버 재검증용 — 본인 소유 + 미사용 쿠폰만 조회
+    (클라이언트가 보낸 memberCouponId를 그대로 믿지 않고 여기서 다시 확인)
+  -->
+  <select id="selectMemberCouponForUse"
+        resultType="com.petcare.petcare.store.vo.CouponVO">
+  SELECT MC.MEMBER_COUPON_ID,
+         C.COUPON_ID,
+         C.COUPON_NAME,
+         C.COUPON_TYPE,
+         C.DISCOUNT_VALUE,
+         C.MAX_DISCOUNT_AMT,
+         C.MIN_ORDER_AMT,
+         TO_CHAR(C.BIZ_NO) AS BIZ_NO
+    FROM TB_MEMBER_COUPON MC
+    JOIN TB_COUPON C ON C.COUPON_ID = MC.COUPON_ID
+   WHERE MC.MEMBER_COUPON_ID = #{memberCouponId}
+     AND MC.MEMBER_NO = #{memberNo}
+     AND MC.STATUS_CD = 'UNUSED'
+</select>
+
+  <!-- 지윤 26.08.07: 쿠폰 사용 확정 -->
+  <update id="markMemberCouponUsed">
+    UPDATE TB_MEMBER_COUPON
+       SET STATUS_CD = 'USED'
+     WHERE MEMBER_COUPON_ID = #{memberCouponId}
+       AND STATUS_CD = 'UNUSED'
+  </update>
+
+  <!-- 2026/08/07 장우철 — 숙소 취소/환불 쿠폰 복구 -->
+  <update id="restoreMemberCouponUsed">
+    UPDATE TB_MEMBER_COUPON
+       SET STATUS_CD = 'UNUSED'
+     WHERE MEMBER_COUPON_ID = #{memberCouponId}
+       AND STATUS_CD = 'USED'
+  </update>
+
+  <!-- HYJ 26.08.13 기간 만료 쿠폰 자동 EXPIRED 처리 (스케줄러용) -->
+  <update id="expireOverdueCoupons">
+      UPDATE TB_MEMBER_COUPON
+         SET STATUS_CD = 'EXPIRED'
+       WHERE STATUS_CD = 'UNUSED'
+         AND USE_END_DATE IS NOT NULL
+         AND TO_DATE(USE_END_DATE, 'YYYYMMDD') &lt; SYSDATE
+  </update>
+</mapper>
+

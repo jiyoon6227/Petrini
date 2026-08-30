@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  2026/07/27 장우철 — TB_BILLING_CARD SQL
+  - 활성 카드만 목록 조회 (STATUS_CD = ACTIVE)
+  - 삭제는 물리 DELETE 대신 STATUS_CD = DELETED
+  - PK 는 시퀀스 없이 NVL(MAX)+1 (프로젝트 공통 패턴)
+-->
+<mapper namespace="com.petcare.petcare.common.billing.mapper.BillingCardMapper">
+
+    <!-- 2026/07/27 장우철 — 소유자 활성 카드 목록 (최신 등록순) -->
+    <select id="selectBillingCardList" resultType="com.petcare.petcare.common.billing.vo.BillingCardVO">
+        SELECT  BILLING_CARD_ID,
+                OWNER_TYPE,
+                OWNER_NO,
+                CUSTOMER_KEY,
+                BILLING_KEY,
+                CARD_COMPANY,
+                CARD_NUMBER,
+                STATUS_CD,
+                REG_DATE
+        FROM    TB_BILLING_CARD
+        WHERE   OWNER_TYPE = #{ownerType}
+        AND     OWNER_NO   = #{ownerNo}
+        AND     STATUS_CD  = 'ACTIVE'
+        ORDER BY BILLING_CARD_ID DESC
+    </select>
+
+    <!-- 2026/07/27 장우철 — PK 단건 조회 -->
+    <select id="selectBillingCard" resultType="com.petcare.petcare.common.billing.vo.BillingCardVO">
+        SELECT  BILLING_CARD_ID,
+                OWNER_TYPE,
+                OWNER_NO,
+                CUSTOMER_KEY,
+                BILLING_KEY,
+                CARD_COMPANY,
+                CARD_NUMBER,
+                STATUS_CD,
+                REG_DATE
+        FROM    TB_BILLING_CARD
+        WHERE   BILLING_CARD_ID = #{billingCardId}
+    </select>
+
+    <!-- 2026/07/27 장우철 — 빌링키/카드정보 INSERT -->
+    <insert id="insertBillingCard" parameterType="com.petcare.petcare.common.billing.vo.BillingCardVO">
+        <selectKey keyProperty="billingCardId" resultType="long" order="BEFORE">
+            SELECT SEQ_TB_BILLING_CARD.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_BILLING_CARD (
+            BILLING_CARD_ID,
+            OWNER_TYPE,
+            OWNER_NO,
+            CUSTOMER_KEY,
+            BILLING_KEY,
+            CARD_COMPANY,
+            CARD_NUMBER,
+            STATUS_CD,
+            REG_DATE
+        ) VALUES (
+            #{billingCardId},
+            #{ownerType},
+            #{ownerNo},
+            #{customerKey},
+            #{billingKey},
+            #{cardCompany, jdbcType=VARCHAR},
+            #{cardNumber, jdbcType=VARCHAR},
+            NVL(#{statusCd, jdbcType=VARCHAR}, 'ACTIVE'),
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 2026/07/27 장우철 — 논리삭제 (ACTIVE → DELETED) -->
+    <update id="deleteBillingCard">
+        UPDATE  TB_BILLING_CARD
+        SET     STATUS_CD = 'DELETED'
+        WHERE   BILLING_CARD_ID = #{billingCardId}
+        AND     STATUS_CD = 'ACTIVE'
+    </update>
+
+</mapper>

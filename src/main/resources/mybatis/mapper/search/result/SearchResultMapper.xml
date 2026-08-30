@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.search.result.mapper.SearchResultMapper">
+
+<!--
+  역할: SearchResultMapper SQL 정의
+
+  테이블
+  - TB_PRODUCT   (상품)
+  - TB_HOSPITAL  (병원)
+  - TB_STAY      (숙소)
+  - TB_POST      (커뮤니티 게시글)
+
+  각 쿼리는 영역별 최대 limit 건만 조회
+  자동완성용으로도, 결과 페이지용으로도 공용 사용
+-->
+
+<!-- 상품 검색 (상품명 · 브랜드명) -->
+<select id="searchProducts" resultType="com.petcare.petcare.search.result.vo.SearchResultVO">
+    SELECT PRODUCT_ID   AS id,
+           PRODUCT_NAME AS name,
+           BRAND_NAME   AS meta
+      FROM TB_PRODUCT
+     WHERE STATUS_CD = 'NORMAL'
+       AND (UPPER(PRODUCT_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(BRAND_NAME) LIKE '%' || UPPER(#{keyword}) || '%')
+     ORDER BY PRODUCT_ID DESC
+     FETCH FIRST #{limit} ROWS ONLY
+</select>
+
+<!-- 병원 검색 (병원명 · 주소) -->
+<select id="searchHospitals" resultType="com.petcare.petcare.search.result.vo.SearchResultVO">
+    SELECT HOSPITAL_ID AS id,
+           NAME        AS name,
+           ADDR        AS meta
+      FROM TB_HOSPITAL
+     WHERE STATUS_CD IN ('ACTIVE', 'NORMAL')
+       AND (UPPER(NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(ADDR) LIKE '%' || UPPER(#{keyword}) || '%')
+     ORDER BY HOSPITAL_ID DESC
+     FETCH FIRST #{limit} ROWS ONLY
+</select>
+
+<!-- 숙소 검색 (숙소명 · 주소) -->
+<select id="searchStays" resultType="com.petcare.petcare.search.result.vo.SearchResultVO">
+    SELECT STAY_ID AS id,
+           NAME    AS name,
+           ADDR    AS meta
+      FROM TB_STAY
+     WHERE STATUS_CD IN ('ACTIVE', 'NORMAL')
+       AND (UPPER(NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(ADDR) LIKE '%' || UPPER(#{keyword}) || '%')
+     ORDER BY STAY_ID DESC
+     FETCH FIRST #{limit} ROWS ONLY
+</select>
+
+<!-- 커뮤니티 게시글 검색 (제목) -->
+<select id="searchPosts" resultType="com.petcare.petcare.search.result.vo.SearchResultVO">
+    SELECT p.POST_ID   AS id,
+           p.TITLE     AS name,
+           m.NICKNAME  AS meta
+      FROM TB_POST p
+      LEFT JOIN TB_MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+     WHERE p.STATUS_CD = 'ACTIVE'
+       AND p.BOARD_TYPE IN ('TOWN', 'LIFE', 'SHARE')
+       AND UPPER(p.TITLE) LIKE '%' || UPPER(#{keyword}) || '%'
+     ORDER BY p.POST_ID DESC
+     FETCH FIRST #{limit} ROWS ONLY
+</select>
+
+</mapper>

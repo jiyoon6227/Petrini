@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.store.mapper.StoreShopMapper">
+
+<!--
+  역할: StoreShopMapper SQL 정의
+
+  쿼리 id 예시
+  - selectProductList
+  - selectProductDetail
+  - selectCartItems
+  - insertOrder
+
+  테이블
+  - TB_PRODUCT
+  - TB_CART
+  - TB_ORDER
+-->
+
+<sql id="productFilter">
+    p.STATUS_CD = 'NORMAL'
+<!-- 지윤 26.07.06 카테고리 트리 구조 변경으로 하위카테고리까지 조회하도록 수정 -->
+    <if test="categoryId != null">
+        AND p.CATEGORY_ID IN (
+            SELECT CATEGORY_ID FROM TB_PRODUCT_CATEGORY
+            START WITH CATEGORY_ID = #{categoryId}
+            CONNECT BY PRIOR CATEGORY_ID = PARENT_ID
+        )
+    </if>
+     <if test="keyword != null and keyword != ''">
+        AND (UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+             OR UPPER(p.BRAND_NAME) LIKE '%' || UPPER(#{keyword}) || '%')
+    </if>
+    <!-- 지윤 26.07.12 가격대 필터 추가 (SALE_PRICE 기준) -->
+    <if test="minPrice != null">
+        AND TO_NUMBER(p.SALE_PRICE) &gt;= #{minPrice}
+    </if>
+    <if test="maxPrice != null">
+        AND TO_NUMBER(p.SALE_PRICE) &lt;= #{maxPrice}
+    </if>
+    <if test="bizNo != null">
+        AND p.BIZ_NO = #{bizNo}
+    </if>
+</sql>
+
+<!-- 지윤 26.07.12 브랜드 필터는 브랜드 카운트 집계 쿼리와 별개 적용해야 해서 productFilter와 분리 -->
+<!-- 지윤 26.07.30 수정: 단일값(=) -> 리스트 다중선택(IN) -->
+<sql id="brandFilter">
+    <if test="brand != null and brand.size() > 0">
+        AND p.BRAND_NAME IN
+        <foreach collection="brand" item="b" open="(" separator="," close=")">
+            #{b}
+        </foreach>
+    </if>
+</sql>
+
+<!-- 지윤 26.07.16 수정: STOCK_QTY 컬럼 삭제 -> 옵션 재고 합계로 대체 -->
+<select id="selectProductList" resultType="com.petcare.petcare.store.vo.StoreShopVO">
+    SELECT
+        p.PRODUCT_ID,
+        p.PRODUCT_CD,
+        p.PRODUCT_NAME,
+        p.BRAND_NAME,
+        p.CATEGORY_ID,
+        c.CATEGORY_NAME,
+        TO_NUMBER(p.PRICE)        AS PRICE,
+        TO_NUMBER(p.SALE_PRICE)   AS SALE_PRICE,
+        NVL(os.STOCK_QTY, 0)      AS STOCK_QTY,
+        f.FILE_URL                AS THUMBNAIL_URL,
+        NVL(rv.AVG_RATING, 0)     AS AVG_RATING,
+        NVL(rv.REVIEW_COUNT, 0)   AS REVIEW_COUNT
+    FROM TB_PRODUCT p
+    JOIN TB_PRODUCT_CATEGORY c ON c.CATEGORY_ID = p.CATEGORY_ID
+    LEFT JOIN (
+        SELECT PRODUCT_ID, SUM(STOCK_QTY) AS STOCK_QTY
+        FROM TB_PRODUCT_OPTION GROUP BY PRODUCT_ID
+    ) os ON os.PRODUCT_ID = p.PRODUCT_ID
+    LEFT JOIN (
+        SELECT TARGET_ID,
+               ROUND(AVG(RATING), 1) AS AVG_RATING,
+               COUNT(REVIEW_ID)      AS REVIEW_COUNT
+        FROM TB_REVIEW
+        WHERE REVIEW_TYPE = 'PRODUCT'
+        GROUP BY TARGET_ID
+    ) rv ON rv.TARGET_ID = p.PRODUCT_ID
+    LEFT JOIN (
+        SELECT REF_ID, FILE_URL,
+               ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+        FROM TB_FILE
+        WHERE REF_TYPE = 'PRODUCT'
+    ) f ON f.REF_ID = p.PRODUCT_ID AND f.RN = 1
+    <!-- 지윤 26.08.05 추가: 인기순(판매량) 정렬용 - 상품별 총 판매수량(TB_ORDER_ITEM.QTY 합계) 집계 -->
+    <!-- 참고: 지금은 취소/반품 여부 안 가리고 전체 주문수량을 다 더함. 나중에 취소분 빼고 싶으면
+         WHERE oi.RETURN_STATUS_CD IS NULL OR oi.RETURN_STATUS_CD != 'DONE' 조건 추가하면 됨 -->
+    LEFT JOIN (
+        SELECT oi.PRODUCT_ID, SUM(oi.QTY) AS SALES_QTY
+        FROM TB_ORDER_ITEM oi
+        GROUP BY oi.PRODUCT_ID
+    ) sales ON sales.PRODUCT_ID = p.PRODUCT_ID
+    WHERE <include refid="productFilter"/>
+    <include refid="brandFilter"/>
+    <choose>
+        <when test="sort == 'latest'">ORDER BY p.PRODUCT_ID DESC</when>
+        <when test="sort == 'priceAsc'">ORDER BY TO_NUMBER(p.SALE_PRICE) ASC</when>
+        <when test="sort == 'priceDesc'">ORDER BY TO_NUMBER(p.SALE_PRICE) DESC</when>
+        <!-- 지윤 26.08.05 추가: 인기순 = 판매수량 많은 순, 판매량 같으면(둘 다 0인 신상품끼리 등) 최신 등록순 -->
+        <when test="sort == 'popular'">ORDER BY NVL(sales.SALES_QTY, 0) DESC, p.PRODUCT_ID DESC</when>
+        <otherwise>ORDER BY p.PRODUCT_ID ASC</otherwise>
+    </choose>
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+</select>
+
+<!-- 지윤 26.07.06: 페이지네이션용 전체 개수 조회 -->
+<select id="selectProductCount" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_PRODUCT p
+    WHERE <include refid="productFilter"/>
+    <include refid="brandFilter"/>
+</select>
+
+<!-- 지윤 26.07.12 브랜드별 상품 수 집계 (브랜드 필터 자체는 미적용 -> 사이드바에서 다른 브랜드도 계속 선택 가능) -->
+<select id="selectBrandCounts" resultType="com.petcare.petcare.store.vo.BrandVO">
+    SELECT p.BRAND_NAME AS BRAND_NAME, COUNT(*) AS PRODUCT_COUNT
+    FROM TB_PRODUCT p
+    WHERE <include refid="productFilter"/>
+    AND p.BRAND_NAME IS NOT NULL
+    GROUP BY p.BRAND_NAME
+    ORDER BY COUNT(*) DESC
+</select>
+
+<!-- 지윤 26.07.06 카테고리 트리 전체 조회 -->
+<select id="selectCategoryTree" resultType="com.petcare.petcare.store.vo.CategoryVO">
+    SELECT CATEGORY_ID, PARENT_ID, CATEGORY_NAME, DEPTH
+    FROM TB_PRODUCT_CATEGORY
+    WHERE USE_YN = 'Y'
+    ORDER BY CATEGORY_ID
+</select>
+
+<!-- 지윤 26.07.16 수정: STOCK_QTY 컬럼 삭제 -> 옵션 재고 합계로 대체 -->
+<select id="selectProductDetail" resultType="com.petcare.petcare.store.vo.StoreShopVO">
+    SELECT
+        p.PRODUCT_ID,
+        p.PRODUCT_CD,
+        p.PRODUCT_NAME,
+        p.BRAND_NAME,
+        p.CATEGORY_ID,
+        c.CATEGORY_NAME,
+        TO_NUMBER(p.PRICE)        AS PRICE,
+        TO_NUMBER(p.SALE_PRICE)   AS SALE_PRICE,
+        NVL(os.STOCK_QTY, 0)      AS STOCK_QTY,
+        f.FILE_URL                AS THUMBNAIL_URL,
+        p.DESCRIPTION             AS DESCRIPTION,
+        p.TAGS                    AS TAGS,
+        NVL(rv.AVG_RATING, 0)     AS AVG_RATING,
+        NVL(rv.REVIEW_COUNT, 0)   AS REVIEW_COUNT
+    FROM TB_PRODUCT p
+    
+    JOIN TB_PRODUCT_CATEGORY c ON c.CATEGORY_ID = p.CATEGORY_ID
+    LEFT JOIN (
+        SELECT PRODUCT_ID, SUM(STOCK_QTY) AS STOCK_QTY
+        FROM TB_PRODUCT_OPTION GROUP BY PRODUCT_ID
+    ) os ON os.PRODUCT_ID = p.PRODUCT_ID
+    LEFT JOIN (
+        SELECT TARGET_ID,
+               ROUND(AVG(RATING), 1) AS AVG_RATING,
+               COUNT(REVIEW_ID)      AS REVIEW_COUNT
+        FROM TB_REVIEW
+        WHERE REVIEW_TYPE = 'PRODUCT'
+        GROUP BY TARGET_ID
+    ) rv ON rv.TARGET_ID = p.PRODUCT_ID
+    LEFT JOIN (
+        SELECT REF_ID, FILE_URL,
+               ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+        FROM TB_FILE
+        WHERE REF_TYPE = 'PRODUCT'
+    ) f ON f.REF_ID = p.PRODUCT_ID AND f.RN = 1
+    WHERE p.PRODUCT_ID = #{productId}
+</select>
+
+<!-- 지윤 26.07.07 상품 이미지 목록 조회 (등록순) -->
+<select id="selectProductImages" resultType="String">
+    SELECT FILE_URL
+    FROM TB_FILE
+    WHERE REF_TYPE = 'PRODUCT' AND REF_ID = #{productId}
+    ORDER BY FILE_ID
+</select>
+
+<!-- 지윤 26.07.07 상품 옵션 목록 조회 -->
+<select id="selectProductOptions" resultType="com.petcare.petcare.store.vo.OptionVO">
+    SELECT OPTION_ID, PRODUCT_ID, OPTION_COLOR, OPTION_SIZE, ADD_PRICE, STOCK_QTY
+    FROM TB_PRODUCT_OPTION
+    WHERE PRODUCT_ID = #{productId}
+    ORDER BY OPTION_ID
+</select>
+
+<!-- 지윤 26.07.07 상품 리뷰 목록 조회 (TB_MEMBER 조인해서 닉네임 가져옴, 최신순) -->
+<select id="selectProductReviews" resultType="com.petcare.petcare.store.vo.ReviewVO">
+    SELECT r.REVIEW_ID, r.MEMBER_NO, m.NICKNAME, r.RATING, r.CONTENT, r.REG_DATE, r.BIZ_REPLY,
+           CASE WHEN EXISTS (
+               SELECT 1 FROM TB_REVIEW_REPORT rr
+               WHERE rr.REVIEW_ID = r.REVIEW_ID AND rr.REPORTER_TYPE = 'BIZ' AND rr.STATUS_CD = 'PENDING'
+           ) THEN 1 ELSE 0 END AS BLINDED
+    FROM TB_REVIEW r
+    JOIN TB_MEMBER m ON m.MEMBER_NO = r.MEMBER_NO
+    WHERE r.REVIEW_TYPE = 'PRODUCT' AND r.TARGET_ID = #{productId}
+    ORDER BY r.REG_DATE DESC
+</select>
+
+<!-- 지윤 26.07.23 추가: 리뷰 첨부 이미지 목록 조회 (REF_TYPE='REVIEW' 기준) -->
+<select id="selectReviewImages" resultType="String">
+    SELECT FILE_URL FROM TB_FILE WHERE REF_TYPE = 'REVIEW' AND REF_ID = #{reviewId} ORDER BY FILE_ID
+</select>
+
+<!-- 지윤 26.07.07 상품 Q&A 목록 조회 (TB_MEMBER 조인해서 질문자 닉네임 가져옴, 최신순) -->
+<select id="selectProductQna" resultType="com.petcare.petcare.store.vo.QnaVO">
+    SELECT q.QNA_ID, q.MEMBER_NO, m.NICKNAME, q.QUESTION, q.ANSWER, q.REG_DATE
+    FROM TB_PRODUCT_QNA q
+    JOIN TB_MEMBER m ON m.MEMBER_NO = q.MEMBER_NO
+    WHERE q.PRODUCT_ID = #{productId}
+    ORDER BY q.QNA_ID DESC
+</select>
+
+<!-- 지윤 26.07.30 수정: BIZ_NO/BIZ_NAME 추가해서 사업자별 그룹핑 가능하게, ORDER BY도 BIZ_NO 기준으로 변경(같은 사업자 상품끼리 붙어서 나오게) -->
+<select id="selectCartItems" resultType="com.petcare.petcare.store.vo.CartItemVO">
+    SELECT
+        ci.CART_ITEM_ID,
+        ci.CART_ID,
+        ci.PRODUCT_ID,
+        ci.OPTION_ID,
+        p.PRODUCT_NAME,
+        p.BRAND_NAME,
+        p.BIZ_NO,
+        b.BIZ_NAME,
+        f.FILE_URL          AS THUMBNAIL_URL,
+        o.OPTION_COLOR,
+        o.OPTION_SIZE,
+        TO_NUMBER(ci.QTY)   AS QTY,
+        TO_NUMBER(ci.PRICE) AS PRICE,
+        o.STOCK_QTY
+    FROM TB_CART_ITEM ci
+    JOIN TB_CART c ON c.CART_ID = ci.CART_ID
+    JOIN TB_PRODUCT p ON p.PRODUCT_ID = ci.PRODUCT_ID
+    JOIN TB_BUSINESS b ON b.BIZ_NO = p.BIZ_NO
+    LEFT JOIN TB_PRODUCT_OPTION o ON o.OPTION_ID = ci.OPTION_ID
+    LEFT JOIN (
+        SELECT REF_ID, FILE_URL,
+               ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+        FROM TB_FILE
+        WHERE REF_TYPE = 'PRODUCT'
+    ) f ON f.REF_ID = ci.PRODUCT_ID AND f.RN = 1
+    WHERE c.MEMBER_NO = #{memberNo}
+    ORDER BY p.BIZ_NO, ci.CART_ITEM_ID
+</select>
+
+<!-- 지윤 26.07.09 장바구니에서 체크한 항목들로 주문페이지 이동 -->
+<!-- 지윤 26.07.30 수정: BIZ_NAME 추가, BIZ_NO순 정렬로 주문서에서도 사업자별 그룹핑 가능하게 -->
+<select id="selectCartItemsByIds" resultType="com.petcare.petcare.store.vo.CartItemVO">
+    SELECT
+        ci.CART_ITEM_ID,
+        ci.CART_ID,
+        ci.PRODUCT_ID,
+        ci.OPTION_ID,
+        p.PRODUCT_NAME,
+        p.BRAND_NAME,
+        p.BIZ_NO,
+        b.BIZ_NAME,
+        f.FILE_URL          AS THUMBNAIL_URL,
+        o.OPTION_COLOR,
+        o.OPTION_SIZE,
+        TO_NUMBER(ci.QTY)   AS QTY,
+        TO_NUMBER(ci.PRICE) AS PRICE,
+        o.STOCK_QTY
+    FROM TB_CART_ITEM ci
+
+    JOIN TB_PRODUCT p ON p.PRODUCT_ID = ci.PRODUCT_ID
+    JOIN TB_BUSINESS b ON b.BIZ_NO = p.BIZ_NO
+    LEFT JOIN TB_PRODUCT_OPTION o ON o.OPTION_ID = ci.OPTION_ID
+    LEFT JOIN (
+        SELECT REF_ID, FILE_URL,
+               ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+        FROM TB_FILE
+        WHERE REF_TYPE = 'PRODUCT'
+    ) f ON f.REF_ID = ci.PRODUCT_ID AND f.RN = 1
+    WHERE ci.CART_ITEM_ID IN
+    <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+    ORDER BY p.BIZ_NO
+</select>
+
+<!-- 지윤 26.07.09 바로구매 상품 1개 조회 -->
+<select id="selectDirectOrderItem"
+        resultType="com.petcare.petcare.store.vo.CartItemVO">
+
+<!-- 지윤 26.07.30 수정: BIZ_NAME 추가 -->
+SELECT
+        p.PRODUCT_ID,
+        #{optionId, jdbcType=NUMERIC} AS OPTION_ID,
+        p.PRODUCT_NAME,
+        p.BRAND_NAME,
+        p.BIZ_NO,
+        b.BIZ_NAME,
+        f.FILE_URL AS THUMBNAIL_URL,
+        o.OPTION_COLOR,
+        o.OPTION_SIZE,
+        TO_NUMBER(p.SALE_PRICE) + NVL(o.ADD_PRICE, 0) AS PRICE,
+        NVL(o.STOCK_QTY, (SELECT NVL(SUM(STOCK_QTY),0) FROM TB_PRODUCT_OPTION WHERE PRODUCT_ID = p.PRODUCT_ID)) AS STOCK_QTY
+    
+    FROM TB_PRODUCT p
+    JOIN TB_BUSINESS b ON b.BIZ_NO = p.BIZ_NO
+    LEFT JOIN TB_PRODUCT_OPTION o
+
+        ON o.PRODUCT_ID = p.PRODUCT_ID
+        AND o.OPTION_ID = #{optionId, jdbcType=NUMERIC}
+    LEFT JOIN (
+        SELECT
+            REF_ID,
+            FILE_URL,
+            ROW_NUMBER() OVER (
+                PARTITION BY REF_ID
+                ORDER BY FILE_ID
+            ) AS RN
+        FROM TB_FILE
+        WHERE REF_TYPE = 'PRODUCT'
+    ) f
+        ON f.REF_ID = p.PRODUCT_ID
+        AND f.RN = 1
+    WHERE p.PRODUCT_ID = #{productId}
+</select>
+
+<!-- 지윤 26.07.08 이 회원의 장바구니(CART_ID) 조회 -->
+<select id="selectCartIdByMember" resultType="Long">
+    SELECT CART_ID FROM TB_CART WHERE MEMBER_NO = #{memberNo}
+</select>
+<!-- 지윤 26.07.08 신규 장바구니 생성 (CART_ID는 기존 최대값+1로 간단 처리, 시퀀스 없음) -->
+<insert id="insertCart">
+    INSERT INTO TB_CART (CART_ID, MEMBER_NO, REG_DATE)
+    VALUES ((SELECT NVL(MAX(CART_ID), 0) + 1 FROM TB_CART), #{memberNo}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'))
+</insert>
+<!-- 지윤 26.07.08 같은 상품+옵션이 이미 담겨있는지 확인 -->
+<!-- 지윤 26.07.08 수정: optionId가 null일 때 ORA-17004(jdbcType 미지정) 나서 jdbcType=NUMERIC 명시.
+     'OPTION_ID = NULL'은 SQL에서 항상 거짓이라 옵션없는 상품은 매번 새 줄로 담기던 것도 IS NULL 분기로 수정 -->
+<select id="selectExistingCartItemId" resultType="Long">
+    SELECT CART_ITEM_ID FROM TB_CART_ITEM
+    WHERE CART_ID = #{cartId} AND PRODUCT_ID = #{productId}
+    <if test="optionId != null">
+        AND OPTION_ID = #{optionId, jdbcType=NUMERIC}
+    </if>
+    <if test="optionId == null">
+        AND OPTION_ID IS NULL
+    </if>
+    AND ROWNUM = 1
+</select>
+<!-- 지윤 26.07.08 기존 항목 수량 추가 -->
+<update id="updateCartItemQtyAdd">
+    UPDATE TB_CART_ITEM
+    SET QTY = TO_NUMBER(QTY) + #{addQty}
+    WHERE CART_ITEM_ID = #{cartItemId}
+</update>
+<!-- 지윤 26.07.08 새 장바구니 항목 추가 (CART_ITEM_ID는 최대값+1로 간단 처리) -->
+<!-- 지윤 26.07.08 수정: optionId null 삽입 시 ORA-17004 방지용 jdbcType=NUMERIC 명시 -->
+<insert id="insertCartItem">
+    INSERT INTO TB_CART_ITEM (CART_ITEM_ID, CART_ID, PRODUCT_ID, OPTION_ID, QTY, PRICE)
+    VALUES ((SELECT NVL(MAX(CART_ITEM_ID), 0) + 1 FROM TB_CART_ITEM), #{cartId}, #{productId}, #{optionId, jdbcType=NUMERIC}, #{qty}, #{price})
+</insert>
+
+<!-- 지윤 26.07.08 장바구니 수량 변경 -->
+<update id="updateCartItemQty">
+    UPDATE TB_CART_ITEM
+    SET QTY = #{qty}
+    WHERE CART_ITEM_ID = #{cartItemId}
+</update>
+
+<!-- 지윤 26.07.08 장바구니 항목 삭제 -->
+<delete id="deleteCartItem">
+    DELETE FROM TB_CART_ITEM
+    WHERE CART_ITEM_ID = #{cartItemId}
+</delete>
+
+<!-- 지윤 26.07.08 장바구니 항목 여러 개 한번에 삭제 (선택삭제/전체삭제) -->
+<delete id="deleteCartItems">
+    DELETE FROM TB_CART_ITEM
+    WHERE CART_ITEM_ID IN
+    <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+</delete>
+
+<!-- 지윤 26.07.08 헤더 장바구니 뱃지용 - 회원의 장바구니 항목 개수 -->
+<select id="selectCartItemCount" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_CART_ITEM ci
+    JOIN TB_CART c ON c.CART_ID = ci.CART_ID
+    WHERE c.MEMBER_NO = #{memberNo}
+</select>
+
+<!-- 지윤 26.07.09 회원 보유쿠폰 목록 조회 (미사용 상태만) -->
+<!-- 지윤 26.07.30 수정: 실제 컬럼명이 BIZ_NO라서 그대로 사용 (자바 필드명도 bizNo로 통일함) -->
+<select id="selectMemberCoupons" resultType="com.petcare.petcare.store.vo.CouponVO">
+    SELECT mc.MEMBER_COUPON_ID, c.COUPON_ID, c.COUPON_NAME, c.COUPON_TYPE,
+           c.DISCOUNT_VALUE,
+           c.MAX_DISCOUNT_AMT,
+           c.MIN_ORDER_AMT,
+           c.BIZ_NO
+    FROM TB_MEMBER_COUPON mc
+    JOIN TB_COUPON c ON c.COUPON_ID = mc.COUPON_ID
+    WHERE mc.MEMBER_NO = #{memberNo} AND mc.STATUS_CD = 'UNUSED'
+    ORDER BY mc.MEMBER_COUPON_ID
+</select>
+
+<!-- 지윤 26.07.10 상품 Q&A 문의 등록 -->
+<insert id="insertProductQna">
+    INSERT INTO TB_PRODUCT_QNA (QNA_ID, PRODUCT_ID, MEMBER_NO, QUESTION, REG_DATE, OPTION_ID)
+    VALUES ((SELECT NVL(MAX(QNA_ID), 0) + 1 FROM TB_PRODUCT_QNA), #{productId}, #{memberNo}, #{question}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{optionId, jdbcType=NUMERIC})
+</insert>
+
+<!-- 지윤 26.07.12 상품 Q&A 삭제: MEMBER_NO 조건으로 본인 글만, ANSWER IS NULL 조건으로 답변 달린 글은 삭제 불가 -->
+<delete id="deleteProductQna">
+    DELETE FROM TB_PRODUCT_QNA
+    WHERE QNA_ID = #{qnaId} AND MEMBER_NO = #{memberNo} AND ANSWER IS NULL
+</delete>
+
+<!-- 지윤 26.07.12 방금 등록한 문의의 QNA_ID 조회 (MAX+1 채번 방식이라 등록 직후 다시 조회해서 값을 알아냄) -->
+<select id="selectLatestQnaId" resultType="Long">
+    SELECT MAX(QNA_ID) FROM TB_PRODUCT_QNA
+    WHERE PRODUCT_ID = #{productId} AND MEMBER_NO = #{memberNo}
+</select>
+
+<!-- 지윤 26.07.13 주문 저장 (반품/취소 관련 컬럼은 NULL 허용으로 DDL 변경해둠 -> INSERT 시 생략 가능) -->
+<!-- 2026/07/14 장우철 — REQUESTED_AT 등 취소·반품 컬럼은 NULL 허용(주문 생성 시 미삽입) -->
+<!-- 2026/08/01 장우철 — ORDER_DATE가 DATE 타입이라 TO_CHAR 문자열 INSERT → ORA-01861, SYSDATE로 변경 -->
+<insert id="insertOrder">
+    INSERT INTO TB_ORDER (
+        ORDER_ID, ORDER_NO, MEMBER_NO, ORDER_STATUS, TOTAL_AMOUNT, DELIVERY_FEE,
+        DISCOUNT_AMOUNT, POINT_USED, PAY_AMOUNT, ORDER_DATE,
+        RECV_NAME, RECV_PHONE, ZIP_CODE, ADDR1, ADDR2, DELIVERY_MEMO, BIZ_NO, MEMBER_COUPON_ID
+    ) VALUES (
+        #{orderId}, #{orderNo}, #{memberNo}, 'PAID',
+        #{totalAmount}, #{deliveryFee}, #{discountAmount}, #{pointUsed}, #{payAmount},
+        SYSDATE,
+       #{recvName}, #{recvPhone}, #{zipCode}, #{addr1}, #{addr2}, #{deliveryMemo}, #{bizNo}, #{memberCouponId, jdbcType=NUMERIC}
+    )
+</insert>
+
+<!-- 지윤 26.07.29 추가: 주문번호 뒷자리로 쓸 다음 ORDER_ID 미리 조회 (프로젝트 공통 PK 채번 규칙 재사용) -->
+<select id="selectNextOrderId" resultType="Long">
+    SELECT NVL(MAX(ORDER_ID), 0) + 1 FROM TB_ORDER
+</select>
+
+<select id="selectOrderIdByOrderNo" resultType="Long">
+    SELECT ORDER_ID FROM TB_ORDER WHERE ORDER_NO = #{orderNo}
+</select>
+
+<insert id="insertOrderItem">
+    INSERT INTO TB_ORDER_ITEM (
+        ORDER_ITEM_ID, ORDER_ID, PRODUCT_ID, OPTION_ID, OPTION_COLOR, OPTION_SIZE,
+        PRODUCT_NAME, QTY, UNIT_PRICE, TOTAL_PRICE
+    ) VALUES (
+        (SELECT NVL(MAX(ORDER_ITEM_ID), 0) + 1 FROM TB_ORDER_ITEM), #{orderId}, #{productId},
+        #{optionId, jdbcType=NUMERIC}, #{optionColor, jdbcType=VARCHAR}, #{optionSize, jdbcType=VARCHAR},
+        #{productName}, #{qty}, #{unitPrice}, #{totalPrice}
+    )
+</insert>
+
+<!-- 2026/08/01 장우철 — MAX+1 → SEQ_PAYMENT (팀 시퀀스 규칙. jiyoon MAX+1이 숙소 SEQ와 PK 충돌) -->
+<insert id="insertPayment">
+    INSERT INTO TB_PAYMENT (
+        PAYMENT_ID, ORDER_ID, PAY_TYPE, PAY_METHOD, PAY_AMOUNT,
+        TOSS_PAYMENT_KEY, TOSS_ORDER_ID, PAY_STATUS, PAY_DATE
+    ) VALUES (
+        SEQ_PAYMENT.NEXTVAL, #{orderId}, 'ORDER', #{payMethod}, #{payAmount},
+        #{tossPaymentKey}, #{tossOrderId}, 'DONE', SYSDATE
+    )
+</insert>
+
+<update id="updateCouponUsed">
+    UPDATE TB_MEMBER_COUPON SET STATUS_CD = 'USED' WHERE MEMBER_COUPON_ID = #{memberCouponId}
+</update>
+
+<update id="updateMemberPointBalance">
+    <!-- 2026/07/27 장우철 — 보유분 이상 차감 불가 (음수 잔액 방지) -->
+    UPDATE TB_MEMBER
+       SET POINT_BALANCE = NVL(POINT_BALANCE, 0) - #{pointUsed}
+     WHERE MEMBER_NO = #{memberNo}
+       AND NVL(POINT_BALANCE, 0) >= #{pointUsed}
+</update>
+
+<!-- 2026/07/27 장우철 — 실제 보유 포인트 조회 (세션 대신 DB 기준 검증용) -->
+<select id="selectMemberPointBalance" resultType="long">
+    SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
+</select>
+
+<insert id="insertPointHistory">
+    INSERT INTO TB_POINT (POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT, BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE)
+    VALUES (
+        (SELECT NVL(MAX(POINT_ID), 0) + 1 FROM TB_POINT), #{memberNo}, 'USE', #{pointUsed},
+        (SELECT POINT_BALANCE FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}),
+        'ORDER_USE', 'ORDER', #{orderId}, TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+    )
+</insert>
+
+
+<!-- 지윤 26.07.13 주문 완료 시 재고 차감 (옵션 있는 상품, STOCK_QTY는 NUMBER라 그대로 차감) -->
+<update id="updateOptionStock">
+    UPDATE TB_PRODUCT_OPTION
+    SET STOCK_QTY = GREATEST(0, STOCK_QTY - #{qty})
+    WHERE OPTION_ID = #{optionId}
+</update>
+
+<!-- 지윤 26.07.16 수정: STOCK_QTY 컬럼 삭제 -> 옵션 재고 합계가 0인지로 판단 -->
+<update id="checkAndSetSoldout">
+    UPDATE TB_PRODUCT
+    SET STATUS_CD = 'SOLDOUT'
+    WHERE PRODUCT_ID = #{productId}
+      AND STATUS_CD = 'NORMAL'
+      AND (SELECT NVL(SUM(STOCK_QTY),0) FROM TB_PRODUCT_OPTION WHERE PRODUCT_ID = #{productId}) &lt;= 0
+</update>
+
+<!-- 지윤 26.07.16 추가: 품절 알림 보낼 대상(사업자 회원번호) 조회. TB_BUSINESS.BIZ_ID(로그인ID) = TB_MEMBER.MEMBER_ID로 연결 -->
+<select id="selectBizMemberNoByBizNo" resultType="Long">
+    SELECT M.MEMBER_NO
+    FROM TB_BUSINESS B
+    JOIN TB_MEMBER M ON M.MEMBER_ID = B.BIZ_ID
+    WHERE B.BIZ_NO = #{bizNo}
+</select>
+
+<!-- 지윤 26.07.21 추가: 신고할 리뷰가 속한 상품의 BIZ_NO 조회 -->
+<select id="selectBizNoByReviewId" resultType="Long">
+    SELECT p.BIZ_NO FROM TB_REVIEW r JOIN TB_PRODUCT p ON p.PRODUCT_ID = r.TARGET_ID
+    WHERE r.REVIEW_ID = #{reviewId}
+</select>
+
+<!-- 지윤 26.07.21 추가: 같은 유저가 같은 리뷰를 이미 신고했는지 확인 (0/1) -->
+<select id="selectUserReportExists" resultType="int">
+    SELECT COUNT(*) FROM TB_REVIEW_REPORT
+     WHERE REVIEW_ID = #{reviewId} AND REPORTER_TYPE = 'USER' AND REPORTER_NO = #{reporterNo}
+</select>
+
+<!-- 지윤 26.07.21 추가: 유저 리뷰신고 등록 (TB_REVIEW와 동일하게 시퀀스 없이 MAX+1) -->
+<insert id="insertUserReviewReport">
+    INSERT INTO TB_REVIEW_REPORT (REPORT_ID, REPORTER_TYPE, REPORTER_NO, REVIEW_ID, BIZ_NO, REASON, STATUS_CD, REG_DATE)
+    VALUES ((SELECT NVL(MAX(REPORT_ID), 0) + 1 FROM TB_REVIEW_REPORT), 'USER', #{reporterNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
+</insert>
+
+<!-- 지윤 26.07.21 추가: 리뷰 삭제 전 신고/삭제요청 FK 참조 해제 (관리자 승인 처리와 동일) -->
+<update id="clearReviewReportsByReviewId">
+    UPDATE TB_REVIEW_REPORT SET REVIEW_ID = NULL WHERE REVIEW_ID = #{reviewId}
+</update>
+
+<!-- 지윤 26.07.21 추가: 본인 상품 리뷰만 삭제 -->
+<delete id="deleteProductReview">
+    DELETE FROM TB_REVIEW
+    WHERE REVIEW_ID = #{reviewId} AND MEMBER_NO = #{memberNo} AND REVIEW_TYPE = 'PRODUCT'
+</delete>
+
+<!-- 지윤 26.08.05 추가: 품절 이메일 발송용 사업자 이메일 조회 -->
+<select id="selectBizEmailByBizNo" resultType="String">
+    SELECT B.EMAIL
+    FROM TB_BUSINESS B
+    WHERE B.BIZ_NO = #{bizNo}
+</select>
+
+<!-- 지윤 26.08.05 추가: 품절 이메일 인사말에 넣을 사업자명 조회 -->
+<select id="selectBizNameByBizNo" resultType="String">
+    SELECT B.BIZ_NAME
+    FROM TB_BUSINESS B
+    WHERE B.BIZ_NO = #{bizNo}
+</select>
+
+<!-- HYJ 26.08.13 옵션 재고 조회 + 행 잠금 (동시 주문 방지) -->
+<select id="selectOptionStockForUpdate" resultType="int">
+    SELECT STOCK_QTY
+    FROM TB_PRODUCT_OPTION
+    WHERE OPTION_ID = #{optionId}
+    FOR UPDATE
+</select>
+
+</mapper>

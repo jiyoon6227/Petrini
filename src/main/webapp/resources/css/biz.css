@@ -1,0 +1,766 @@
+/* ================================================================
+   사업자센터 전용 CSS  /biz/**  전용 레이아웃
+================================================================ */
+
+/* ── 기본 변수 (petcare.css 변수 그대로 활용) ── */
+/*사업자(숙박) 예약관리 버튼색상넣기*/
+:root {
+    --biz-primary: #2BAB82;
+    --biz-border: #E2E8E4;
+}
+/* ── 전체 페이지 구조 ── */
+.biz-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #F0F4F8;
+}
+
+/* ================================================================
+   사업자 전용 헤더
+================================================================ */
+.biz-header {
+    height: 56px;
+    background: #1A2E22;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.18);
+}
+.biz-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    margin-right: 28px;
+}
+.biz-header-logo svg { width: 26px; height: 26px; }
+.biz-header-logo span {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.3px;
+}
+.biz-header-logo .biz-tag {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--primary);
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 4px;
+    letter-spacing: 0;
+}
+.biz-header-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,.15);
+    margin: 0 20px;
+}
+.biz-header-bizname {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,.85);
+}
+.biz-header-type {
+    font-size: 12px;
+    color: rgba(255,255,255,.45);
+    margin-left: 8px;
+}
+.biz-header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+.biz-header-right a {
+    font-size: 13px;
+    color: rgba(255,255,255,.6);
+    text-decoration: none;
+    transition: color .2s;
+}
+.biz-header-right a:hover { color: #fff; }
+.biz-header-right .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: rgba(255,255,255,.6);
+    text-decoration: none;
+    transition: color .2s;
+}
+.biz-header-right .back-btn:hover { color: #fff; }
+.biz-header-right .back-btn svg {
+    width: 14px; height: 14px;
+    stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* ================================================================
+   본문 래퍼
+================================================================ */
+.biz-body {
+    display: flex;
+    flex: 1;
+}
+
+/* ================================================================
+   사이드바
+================================================================ */
+.biz-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid #E2E8E4;
+    min-height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+}
+.biz-sidebar-profile {
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid #E2E8E4;
+}
+.biz-sidebar-biz-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+}
+.biz-sidebar-biz-icon svg {
+    width: 24px; height: 24px;
+    fill: none; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+}
+.biz-sidebar-biz-icon.hospital   { background: #E0F2FE; } .biz-sidebar-biz-icon.hospital svg   { stroke: #0284C7; }
+.biz-sidebar-biz-icon.stay       { background: #F3E8FF; } .biz-sidebar-biz-icon.stay svg       { stroke: #9333EA; }
+.biz-sidebar-biz-icon.restaurant { background: #FFF7ED; } .biz-sidebar-biz-icon.restaurant svg { stroke: #EA580C; }
+.biz-sidebar-biz-icon.grooming   { background: #FDF2F8; } .biz-sidebar-biz-icon.grooming svg   { stroke: #DB2777; }
+.biz-sidebar-biz-icon.store       { background: #EAF7F2; } .biz-sidebar-biz-icon.store svg       { stroke: #2BAB82; }
+
+.biz-sidebar-bizname { font-size: 14px; font-weight: 700; color: #1A1A2E; }
+.biz-sidebar-biztype { font-size: 12px; color: #999; margin-top: 2px; }
+
+.biz-nav { flex: 1; padding: 12px 0; }
+.biz-nav-group {
+    font-size: 10px;
+    font-weight: 700;
+    color: #aaa;
+    padding: 14px 18px 4px;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+}
+.biz-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: #666;
+    text-decoration: none;
+    transition: all .15s;
+    border-left: 3px solid transparent;
+    position: relative;
+}
+.biz-nav-link svg {
+    width: 16px; height: 16px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+}
+.biz-nav-link:hover  { background: #F0F9F5; color: #1F8464; }
+.biz-nav-link.active {
+    background: #EAF7F2;
+    color: #1F8464;
+    font-weight: 700;
+    border-left-color: #2BAB82;
+}
+.biz-nav-badge {
+    margin-left: auto;
+    background: #FF6B6B; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 1px 7px; border-radius: 20px;
+    min-width: 18px; text-align: center;
+}
+
+/* ================================================================
+   메인 콘텐츠
+================================================================ */
+.biz-main {
+    flex: 1;
+    min-width: 0;
+    padding: 32px 32px 60px;
+}
+
+/* 페이지 타이틀 */
+.biz-page-head {
+    margin-bottom: 24px;
+}
+.biz-page-head.has-action {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+}
+.biz-page-head.has-action .biz-page-title {
+    margin-bottom: 10px;
+}
+.biz-page-head.has-action .biz-page-desc {
+    line-height: 1.55;
+}
+.biz-page-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1A1A2E;
+    margin: 0 0 4px;
+}
+.biz-page-desc {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+}
+
+/* 통계 카드 */
+.biz-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+}
+.biz-stat-card {
+    background: #fff;
+    border: 1px solid #E2E8E4;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.bsc-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.bsc-icon svg { width: 20px; height: 20px; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bsc-icon.appt   { background: #E0F2FE; } .bsc-icon.appt svg   { stroke: #0284C7; }
+.bsc-icon.done   { background: #DCFCE7; } .bsc-icon.done svg   { stroke: #16A34A; }
+.bsc-icon.revenue{ background: #EAF7F2; } .bsc-icon.revenue svg{ stroke: #2BAB82; }
+.bsc-icon.review { background: #FFF8E1; } .bsc-icon.review svg { stroke: #F59E0B; }
+.bsc-body { display: flex; flex-direction: column; gap: 3px; }
+.bsc-label { font-size: 12px; color: #999; }
+.bsc-val   { font-size: 20px; font-weight: 800; color: #1A1A2E; line-height: 1; }
+.bsc-unit  { font-size: 12px; color: #888; font-weight: 400; margin-left: 2px; }
+
+/* 카드 컨테이너 */
+.biz-card {
+    background: #fff;
+    border: 1px solid #E2E8E4;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.biz-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #E2E8E4;
+    background: #FAFBFA;
+}
+.biz-card-head span  { font-size: 14px; font-weight: 700; color: #1A1A2E; }
+.biz-card-head small { font-size: 12px; color: #999; }
+
+/* 테이블 */
+.biz-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.biz-table th {
+    background: #FAFBFA; color: #999;
+    font-weight: 600; font-size: 12px;
+    padding: 10px 16px; text-align: left;
+    border-bottom: 1px solid #E2E8E4;
+}
+.biz-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #E2E8E4;
+    color: #555; vertical-align: middle;
+}
+.biz-table tr:last-child td { border-bottom: none; }
+.biz-table tr:hover td { background: #FAFBFA; }
+
+/* 상태 뱃지 */
+.bs-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+}
+.bs-badge.bs-wait  { background: #FFF8E1; color: #F59E0B; }
+.bs-badge.bs-ready { background: #E0F2FE; color: #0284C7; }
+.bs-badge.bs-done  { background: #DCFCE7; color: #16A34A; }
+.bs-badge.bs-cancel{ background: #FEE2E2; color: #DC2626; }
+.bs-badge.bs-empty { background: #F5F5F5; color: #aaa; border: 1px solid #E2E8E4; }
+/* 지윤 26.07.29 추가: 배송준비(READY) 전용 - 기존 4색(결제완료/배송중/배송완료/취소)과 안 겹치는 보라색 */
+.bs-badge.bs-prep  { background: #F3E8FF; color: #9333EA; }
+
+/* 배너·공통 상태 뱃지 */
+.biz-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #F5F5F5;
+    color: #666;
+}
+.biz-badge.warning { background: #FFF8E1; color: #D97706; }
+.biz-badge.success { background: #DCFCE7; color: #16A34A; }
+.biz-badge.danger  { background: #FEE2E2; color: #DC2626; }
+.biz-badge.inactive { background: #F3F4F6; color: #6B7280; }
+
+/* 버튼 */
+.biz-btn {
+    padding: 5px 14px;
+    border: 1px solid #2BAB82;
+    border-radius: 6px;
+    background: #fff;
+    color: #2BAB82;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+}
+.biz-btn:hover { background: #2BAB82; color: #fff; }
+.biz-btn.primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #2BAB82;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.biz-btn.primary:hover { background: #1F8464; color: #fff; }
+.biz-btn.danger { border-color: #FF6B6B; color: #FF6B6B; }
+.biz-btn.danger:hover { background: #FF6B6B; color: #fff; }
+
+/* 플레이스홀더 */
+.biz-placeholder {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px; padding: 80px 20px;
+    text-align: center;
+}
+.bp-icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #EAF7F2;
+    display: flex; align-items: center; justify-content: center;
+}
+.bp-icon svg {
+    width: 30px; height: 30px;
+    stroke: #2BAB82; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
+.biz-placeholder p     { font-size: 15px; color: #555; margin: 0; font-weight: 600; }
+.biz-placeholder small { font-size: 13px; color: #aaa; }
+
+
+/* ================================================================
+   병원 대시보드 (dashboard.jsp "after" 버전) 전용 CSS , 7/2 지윤
+================================================================ */
+.dashboard-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 22px;
+}
+.dashboard-top h1 { font-size: 20px; font-weight: 800; color: #1A1A2E; margin: 0 0 4px; }
+.dashboard-top p  { font-size: 13px; color: #999; margin: 0; }
+.date-select {
+    border: 1px solid #E2E8E4; border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; color: #555;
+    background: #fff; cursor: pointer;
+}
+
+.summary-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin-bottom: 20px;
+}
+.summary-card {
+    background: #fff; border: 1px solid #E2E8E4; border-radius: 12px;
+    padding: 18px; display: flex; align-items: flex-start; gap: 12px;
+}
+.summary-icon {
+    width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+}
+.summary-icon.green  { background: #EAF7F2; }
+.summary-icon.purple { background: #F3E8FF; }
+.summary-icon.blue   { background: #E0F2FE; }
+.summary-icon.orange { background: #FFF7ED; }
+.summary-card p { font-size: 12px; color: #999; margin: 0 0 4px; }
+.summary-card strong { font-size: 20px; font-weight: 800; color: #1A1A2E; }
+.summary-card strong span { font-size: 12px; font-weight: 400; color: #888; margin-left: 2px; }
+.summary-card small { display: block; font-size: 11px; color: #aaa; margin-top: 3px; }
+
+.dashboard-grid {
+    display: grid; grid-template-columns: 1.7fr 1fr;
+    gap: 16px; margin-bottom: 16px;
+}
+.dash-card {
+    background: #fff; border: 1px solid #E2E8E4; border-radius: 12px;
+    padding: 20px;
+}
+.card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+}
+.card-head h3 { font-size: 15px; font-weight: 700; color: #1A1A2E; margin: 0; }
+
+.tab-btns { display: flex; gap: 4px; background: #F5F7F6; padding: 3px; border-radius: 8px; }
+.tab-btns button {
+    border: none; background: none; padding: 5px 12px; border-radius: 6px;
+    font-size: 12px; color: #888; cursor: pointer;
+}
+.tab-btns button.active { background: #2BAB82; color: #fff; font-weight: 700; }
+
+.chart-legend { display: flex; gap: 16px; font-size: 12px; color: #888; margin-bottom: 10px; }
+.chart-legend .green-dot, .chart-legend .blue-dot, .chart-legend .red-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px;
+}
+.chart-legend .green-dot { background: #2BAB82; }
+.chart-legend .blue-dot  { background: #0284C7; }
+.chart-legend .red-dot   { background: #E34948; }
+
+.fake-line-chart { width: 100%; }
+.fake-line-chart svg { width: 100%; height: 220px; display: block; overflow: visible; }
+.fake-line-chart line { stroke: #F0F2F0; stroke-width: 1; }
+.fake-line-chart .line-green { fill: none; stroke: #2BAB82; stroke-width: 2.5; }
+.fake-line-chart .line-blue  { fill: none; stroke: #0284C7; stroke-width: 2.5; }
+.fake-line-chart .dot-green  { fill: #2BAB82; stroke: #fff; stroke-width: 2; }
+.fake-line-chart .dot-blue   { fill: #0284C7; stroke: #fff; stroke-width: 2; }
+
+/* 지윤 26.08.13 추가: 실제 Chart.js 캔버스용 - position 없으면 캔버스가 계속 커지는 버그 있음 */
+.line-chart { position: relative; width: 100%; height: 240px; }
+.line-chart canvas { width: 100% !important; height: 100% !important; }
+
+.chart-days {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: #aaa; margin-top: 6px; padding: 0 6px;
+}
+
+.donut-wrap { display: flex; align-items: center; gap: 22px; }
+.donut-chart {
+    position: relative; width: 120px; height: 120px; border-radius: 50%; flex-shrink: 0;
+    background: conic-gradient(
+        #2BAB82 0% 55%,
+        #0284C7 55% 81%,
+        #F59E0B 81% 94%,
+        #D1D5D1 94% 100%
+    );
+}
+.donut-chart::after {
+    content: ""; position: absolute; inset: 16px;
+    background: #fff; border-radius: 50%;
+}
+.donut-chart div {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 1;
+}
+.donut-chart span { font-size: 11px; color: #999; }
+.donut-chart strong { font-size: 16px; font-weight: 800; color: #1A1A2E; }
+
+.status-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.status-list li { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666; }
+.status-list b { margin-left: auto; color: #1A1A2E; font-weight: 700; }
+.status-list .box { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.status-list .green-box  { background: #2BAB82; }
+.status-list .blue-box   { background: #0284C7; }
+.status-list .orange-box { background: #F59E0B; }
+.status-list .gray-box   { background: #D1D5D1; }
+
+.bottom-grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; }
+
+.outline-btn {
+    border: 1px solid #E2E8E4; background: #fff; color: #666;
+    font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer;
+    text-decoration: none; display: inline-block; /*사업자 대시보드 버튼 활성화*/
+}
+.outline-btn:hover { background: #F5F5F5; }
+.detail-btn {
+    border: 1px solid #2BAB82; background: #fff; color: #2BAB82;
+    font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer;
+}
+.detail-btn:hover { background: #2BAB82; color: #fff; }
+
+.badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.badge.confirm { background: #EAF7F2; color: #1F8464; }
+.badge.wait    { background: #E0F2FE; color: #0284C7; }
+.badge.cancel  { background: #FEE2E2; color: #DC2626; }
+
+.review-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 0; border-bottom: 1px solid #F0F2F0;
+}
+.review-item:last-child { border-bottom: none; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: #E2E8E4; flex-shrink: 0; }
+.review-item p { margin: 0 0 3px; font-size: 13px; }
+.review-item small { color: #888; font-size: 12px; }
+.review-item .stars { color: #F59E0B; font-size: 12px; margin-left: 4px; }
+.review-item em { font-style: normal; font-size: 11px; color: #bbb; margin-left: auto; white-space: nowrap; }
+
+/* ================================================================
+   리뷰 답글 인라인 박스 (모달 대신 카드 안에서 펼쳐지는 방식) 7/2 지윤
+================================================================ */
+.biz-reply-box {
+    background: #fff; border: 1px solid #E2E8E4; border-radius: 12px;
+    padding: 16px; margin-top: 12px;
+    display: flex; flex-direction: column; gap: 10px;
+    box-sizing: border-box; width: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.biz-reply-box-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 700; color: #1F8464;
+}
+.biz-reply-box-label svg { width: 14px; height: 14px; stroke: #1F8464; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.biz-reply-box textarea {
+    width: 100%; min-height: 70px; padding: 12px;
+    border: 1px solid #E2E8E4; border-radius: 8px;
+    font-family: inherit; font-size: 13px; line-height: 1.5; resize: vertical;
+    background: #FAFBFA; transition: border-color .15s, background .15s;
+}
+.biz-reply-box textarea:focus {
+    outline: none; border-color: #2BAB82; background: #fff;
+}
+.biz-reply-box-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.biz-reply-box-actions button {
+    padding: 7px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all .15s;
+}
+.biz-reply-box-actions .btn-submit { border: none; background: #2BAB82; color: #fff; }
+.biz-reply-box-actions .btn-submit:hover { background: #1F8464; }
+.biz-reply-box-actions .btn-cancel { border: 1px solid #E2E8E4; background: #fff; color: #666; }
+.biz-reply-box-actions .btn-cancel:hover { background: #F5F5F5; }
+
+/* ================================================================
+   7/2, [지윤] — info.jsp (업체정보 수정) 화면 전용
+   좌측 이미지 + 우측 폼 필드 레이아웃, 저장/취소 버튼
+================================================================ */
+.biz-form-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 32px;
+    padding: 28px;
+}
+.biz-form-image-box {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #F0F4F2 center/cover no-repeat;
+    border: 1px solid #E2E8E4;
+    display: flex; align-items: center; justify-content: center;
+    color: #bbb; font-size: 13px;
+    margin-bottom: 10px;
+}
+.biz-form-image-box img { width: 100%; height: 100%; object-fit: cover; }
+.biz-form-image-hint { font-size: 11px; color: #aaa; text-align: center; margin-top: 6px; }
+
+.biz-form-fields { display: flex; flex-direction: column; gap: 16px; }
+.biz-form-row { display: flex; flex-direction: column; gap: 6px; }
+.biz-form-row label {
+    font-size: 13px; font-weight: 700; color: #1A1A2E;
+}
+.biz-form-row .req { color: #FF6B6B; margin-left: 2px; }
+.biz-form-row input[type="text"],
+.biz-form-row input[type="tel"],
+.biz-form-row input[type="number"],
+.biz-form-row select,
+.biz-form-row textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #E2E8E4;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #333;
+    background: #fff;
+    transition: border-color .15s;
+}
+/* 사업자(상점) 상품등록 숫자 입력창 스피너 제거 */
+.biz-form-row input[type="number"]::-webkit-outer-spin-button,
+.biz-form-row input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.biz-form-row input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.biz-form-row input:focus,
+.biz-form-row select:focus,
+.biz-form-row textarea:focus {
+    outline: none;
+    border-color: #2BAB82;
+}
+.biz-form-row textarea { resize: vertical; min-height: 70px; }
+.biz-form-hint { font-size: 12px; color: #aaa; }
+.biz-form-hashtags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.biz-form-hashtag {
+    font-size: 12px; color: #2BAB82; background: #EAF7F2;
+    padding: 3px 10px; border-radius: 20px; font-weight: 600;
+}
+.biz-form-actions {
+    display: flex; justify-content: flex-end; gap: 10px;
+    margin-top: 6px;
+}
+.biz-btn-primary {
+    padding: 10px 26px;
+    border: none; border-radius: 8px;
+    background: #2BAB82; color: #fff;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: background .15s;
+}
+.biz-btn-primary:hover { background: #1F8464; }
+.biz-btn-ghost {
+    padding: 10px 22px;
+    border: 1px solid #E2E8E4; border-radius: 8px;
+    background: #fff; color: #666;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.biz-btn-ghost:hover { background: #F5F5F5; }
+
+/* ================================================================
+   7/2, [지윤] — info.jsp 저장 완료 / reviews.jsp 답글 등록 완료
+   화면 하단에 잠깐 떴다 사라지는 토스트 알림 (두 화면 공용)
+================================================================ */
+.biz-toast {
+    position: fixed; bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1A2E22; color: #fff;
+    padding: 12px 24px; border-radius: 30px;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    z-index: 9999;
+}
+.biz-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+.biz-toast svg { width: 16px; height: 16px; stroke: #4ADE80; }
+
+/* ================================================================
+   7/2, [지윤] — reviews.jsp 상단 "전체 / 신고관리" 탭 + 정렬 드롭다운
+================================================================ */
+.biz-tabs {
+    display: flex; gap: 26px;
+    border-bottom: 1px solid #E2E8E4;
+    margin-bottom: 18px;
+    align-items: center;
+}
+.biz-tab {
+    padding: 0 0 12px;
+    font-size: 15px; font-weight: 700; color: #999;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; background: none; border-left: none; border-right: none; border-top: none;
+}
+.biz-tab.active { color: #1A1A2E; border-bottom-color: #2BAB82; }
+.biz-tab .biz-tab-count { color: #bbb; font-weight: 600; margin-left: 3px; }
+.biz-tab.active .biz-tab-count { color: #2BAB82; }
+.biz-tabs-right { margin-left: auto; margin-bottom: 8px; }
+.biz-select-sm {
+    padding: 7px 12px; border: 1px solid #E2E8E4; border-radius: 8px;
+    font-size: 13px; color: #555; background: #fff;
+}
+
+/* ================================================================
+   7/2, [지윤] — reviews.jsp 리뷰 카드 리스트 (별점/작성자/내용/답글 표시)
+   "답글쓰기" 눌렀을 때 펼쳐지는 입력창(.biz-reply-box)은 이미 파일에 있음
+================================================================ */
+.biz-review-list { display: flex; flex-direction: column; padding: 0 20px 20px; }
+.biz-review-item {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px;
+    padding: 22px 4px; border-bottom: 1px solid #E2E8E4;
+}
+/* 지윤 26.07.22 추가: 답변수정 입력창(.biz-edit-box)이 flex 3번째 자식으로 끼어들면서 본문이 눌려 깨지던 문제 -
+   무조건 다음 줄로 내려가서 카드 전체 폭을 쓰게 강제 */
+.biz-edit-box { flex: 1 1 100%; order: 3; }
+
+.biz-review-item:last-child { border-bottom: none; }
+.biz-review-main { flex: 1; min-width: 0; }
+/* 상품 썸네일 + 상품명/옵션 상단 블록 */
+.biz-review-product-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.biz-review-thumb { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; border: 1px solid #E2E8E4; flex-shrink: 0; }
+.biz-review-thumb-empty { background: #F1F3F7; }
+.biz-review-product-info { min-width: 0; }
+.biz-review-product-name { font-size: 14px; font-weight: 700; color: #1A1A2E; margin-bottom: 3px; }
+.biz-review-option { font-size: 12px; color: #999; }
+
+.biz-review-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.biz-review-stars { display: flex; align-items: center; gap: 2px; }
+.biz-review-stars svg { width: 15px; height: 15px; }
+.biz-review-stars svg.on { fill: #F59E0B; stroke: #F59E0B; }
+.biz-review-stars svg.off { fill: none; stroke: #E2E8E4; }
+.biz-review-score { font-size: 13px; font-weight: 700; color: #1A1A2E; margin-left: 4px; }
+.biz-review-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.biz-review-author { font-size: 13px; font-weight: 700; color: #1A1A2E; }
+.biz-review-date { font-size: 12px; color: #aaa; }
+.biz-review-reported {
+    font-size: 11px; font-weight: 700; color: #0284C7;
+    background: #E0F2FE; border: 1px solid #7DD3FC; border-radius: 6px;
+    padding: 2px 8px; line-height: 1.6;
+    box-sizing: border-box; vertical-align: middle;
+}
+.biz-review-rejected {
+    font-size: 11px; font-weight: 700; color: #6B7280;
+    background: #F1F3F7; padding: 2px 8px; border-radius: 20px;
+}
+.biz-review-flagged {
+    font-family: inherit; font-size: 11px; font-weight: 700; color: #DC2626;
+    background: #FEE2E2; border: 1px solid #FCA5A5; border-radius: 6px;
+    padding: 2px 8px; cursor: pointer; line-height: 1.6;
+    box-sizing: border-box; margin: 0; vertical-align: middle; -webkit-appearance: none; appearance: none;
+}
+.biz-review-flagged:hover { background: #FCA5A5; color: #fff; }
+.biz-review-reporters {
+    font-size: 12px; color: #DC2626; background: #FFF5F5;
+    border-radius: 6px; padding: 6px 10px; margin-bottom: 8px;
+}
+/* 2026-07-24 박유정 — 삭제요청 승인(삭제) 완료 뱃지 */
+.biz-review-status-done {
+    font-size: 11px; font-weight: 700; color: #1A1A2E;
+    background: #F1F5F4; padding: 2px 8px; border-radius: 20px;
+}
+/* 2026-07-24 박유정 — 삭제요청 반려 뱃지 */
+.biz-review-status-rejected {
+    font-size: 11px; font-weight: 700; color: #6B7280;
+    background: #F3F4F6; padding: 2px 8px; border-radius: 20px;
+}
+.biz-review-content { font-size: 14px; color: #555; line-height: 1.55; }
+
+/* 2026/08/12 장우철 — 사업자 답글 긴 문자열 줄바꿈 */
+.biz-review-reply {
+    background: #EAF7F2; border-radius: 8px; border-left: 3px solid #2BAB82;
+    padding: 14px 16px; margin-top: 14px; font-size: 13px; color: #555;
+    overflow-wrap: anywhere; word-break: break-word; max-width: 100%; box-sizing: border-box;
+}
+
+.biz-review-reply-label { font-size: 13px; font-weight: 700; color: #2BAB82; margin-right: 8px; }
+.biz-review-reply-date { font-size: 12px; color: #aaa; }
+.biz-review-reply-text {
+    margin-top: 6px; line-height: 1.55;
+    white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;
+}
+.biz-review-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+.biz-review-actions .biz-btn { width: 84px; text-align: center; }
+.biz-review-empty { text-align: center; padding: 60px 20px; color: #aaa; font-size: 14px; }
+.biz-review-section-title { padding: 0 0 8px; font-size: 13px; font-weight: 700; color: #555; }
+.biz-review-section-title.spaced { padding-top: 16px; }

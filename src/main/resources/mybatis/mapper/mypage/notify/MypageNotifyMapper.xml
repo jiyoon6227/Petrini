@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.mypage.notify.mapper.MypageNotifyMapper">
+
+<!--
+  역할: MypageNotifyMapper SQL 정의
+  테이블: TB_NOTIFICATION (DATABASE_TABLE.sql)
+-->
+
+  <!-- 2026-07-09 장우철 — 알림 1건 등록
+       이유: 사업자 반려 시 유저 알림함에 제목·반려사유 전달 (3번 알림함 UI 연동 전 INSERT 선행) -->
+  <insert id="insertNotification" parameterType="com.petcare.petcare.mypage.notify.vo.MypageNotifyVO">
+    <selectKey keyProperty="notiId" resultType="long" order="BEFORE">
+      SELECT NVL(MAX(NOTI_ID), 0) + 1 FROM TB_NOTIFICATION
+    </selectKey>
+    INSERT INTO TB_NOTIFICATION (
+      NOTI_ID,
+      MEMBER_NO,
+      NOTI_TYPE,
+      TITLE,
+      CONTENT,
+      LINK_URL,
+      IS_READ,
+      REG_DATE
+    ) VALUES (
+      #{notiId},
+      #{memberNo},
+      #{notiType},
+      #{title},
+      #{content, jdbcType=VARCHAR},
+      #{linkUrl, jdbcType=VARCHAR},
+      #{isRead},
+      SYSDATE
+    )
+  </insert>
+
+  <!-- 2026-07-09 장우철 — 알림 목록 (이메일/푸시 API 없이 TB_NOTIFICATION 만 사용) -->
+  <select id="selectNotificationList" resultType="com.petcare.petcare.mypage.notify.vo.MypageNotifyVO">
+    SELECT NOTI_ID    AS notiId,
+           MEMBER_NO  AS memberNo,
+           NOTI_TYPE  AS notiType,
+           TITLE      AS title,
+           CONTENT    AS content,
+           LINK_URL   AS linkUrl,
+           IS_READ    AS isRead,
+           REG_DATE   AS regDate
+    FROM   TB_NOTIFICATION
+    WHERE  MEMBER_NO = #{memberNo}
+    ORDER BY REG_DATE DESC, NOTI_ID DESC
+  </select>
+
+  <select id="selectNotificationDetail" resultType="com.petcare.petcare.mypage.notify.vo.MypageNotifyVO">
+    SELECT NOTI_ID    AS notiId,
+           MEMBER_NO  AS memberNo,
+           NOTI_TYPE  AS notiType,
+           TITLE      AS title,
+           CONTENT    AS content,
+           LINK_URL   AS linkUrl,
+           IS_READ    AS isRead,
+           REG_DATE   AS regDate
+    FROM   TB_NOTIFICATION
+    WHERE  NOTI_ID   = #{notiId}
+      AND  MEMBER_NO = #{memberNo}
+  </select>
+
+  <update id="updateNotificationRead">
+    UPDATE TB_NOTIFICATION
+    SET    IS_READ = 'Y'
+    WHERE  NOTI_ID   = #{notiId}
+      AND  MEMBER_NO = #{memberNo}
+  </update>
+
+  <!-- 2026-07-10 장우철 — 알림함 전체 읽음 -->
+  <update id="updateAllNotificationRead">
+    UPDATE TB_NOTIFICATION
+    SET    IS_READ = 'Y'
+    WHERE  MEMBER_NO = #{memberNo}
+      AND  IS_READ   = 'N'
+  </update>
+
+  <!-- 2026-07-10 장우철 — 알림함 전체 삭제 -->
+  <delete id="deleteAllNotificationsByMemberNo">
+    DELETE FROM TB_NOTIFICATION
+    WHERE  MEMBER_NO = #{memberNo}
+  </delete>
+
+  <!-- 2026/07/11 장우철 — 헤더 미읽음 알림 배지 -->
+  <select id="countUnreadNotifications" resultType="int">
+    SELECT COUNT(*)
+    FROM   TB_NOTIFICATION
+    WHERE  MEMBER_NO = #{memberNo}
+      AND  NVL(IS_READ, 'N') = 'N'
+  </select>
+
+</mapper>

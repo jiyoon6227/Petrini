@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.admin.member.mapper.AdminMemberMapper">
+
+<!--
+  역할: AdminMemberMapper SQL 정의
+
+  - 박유정 / 2026-07-16 (목록·상세), 2026-07-20 (STEP 7·8)
+
+  쿼리 id
+  - selectAdminMemberList / selectAdminMemberCount
+  - selectAdminMemberDetail
+  - updateMemberStatus (STEP 7 — STATUS_CD: NORMAL/SUSPENDED/WITHDRAWN)
+  - selectAdminMemberActivityStats (STEP 8 — DUAL + 서브쿼리 COUNT)
+
+  테이블
+  - TB_MEMBER, TB_BUSINESS
+  - TB_ORDER, TB_RESERVATION, TB_POST, TB_POST_REPORT
+  - TB_MEMBER_COUPON, TB_FAVORITE, TB_PET
+-->
+  <!-- 2026-07-16 박유정 — 관리자 회원 목록 -->
+  <select id="selectAdminMemberList"
+          resultType="com.petcare.petcare.admin.member.vo.AdminMemberVO">
+    SELECT *
+    FROM (
+      SELECT
+        M.MEMBER_NO       AS memberNo,
+        M.MEMBER_NAME     AS memberName,
+        M.EMAIL           AS email,
+        M.PHONE           AS phone,
+        M.GRADE_CD        AS gradeCd,
+        M.POINT_BALANCE   AS pointBalance,
+        M.STATUS_CD       AS statusCd,
+        M.JOIN_DATE       AS joinDate,
+        M.LAST_LOGIN_DATE AS lastLoginDate,
+        M.SUSPEND_END_DATE AS suspendEndDate,
+        CASE
+          WHEN EXISTS (
+            SELECT 1 FROM TB_BUSINESS B
+            WHERE B.BIZ_ID = M.MEMBER_ID
+              AND B.STATUS_CD = 'APPROVED'
+          ) THEN 'BIZ'
+          ELSE 'GENERAL'
+        END AS roleType,
+        <!-- 2026/08/11 장우철 — 회원번호 숫자 오름차순 (기존 JOIN_DATE DESC 는 11,12,1 처럼 보임) -->
+        ROW_NUMBER() OVER (ORDER BY M.MEMBER_NO ASC) AS rn
+      FROM TB_MEMBER M
+      WHERE 1 = 1
+      <if test="keyword != null and keyword != ''">
+        AND (M.MEMBER_NAME LIKE '%' || #{keyword} || '%'
+          OR M.EMAIL LIKE '%' || #{keyword} || '%'
+          OR M.PHONE LIKE '%' || #{keyword} || '%')
+      </if>
+      <if test="statusCd != null and statusCd != ''">
+        AND M.STATUS_CD = #{statusCd}
+      </if>
+      <if test="roleType != null and roleType != ''">
+        <choose>
+          <when test="roleType == 'BIZ'">
+            AND EXISTS (
+              SELECT 1 FROM TB_BUSINESS B
+              WHERE B.BIZ_ID = M.MEMBER_ID
+                AND B.STATUS_CD = 'APPROVED'
+            )
+          </when>
+          <when test="roleType == 'GENERAL'">
+            AND NOT EXISTS (
+              SELECT 1 FROM TB_BUSINESS B
+              WHERE B.BIZ_ID = M.MEMBER_ID
+                AND B.STATUS_CD = 'APPROVED'
+            )
+          </when>
+        </choose>
+      </if>
+    )
+    WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+  </select>
+
+  <!-- 2026-07-16 박유정 — 목록 총 건수 -->
+  <select id="selectAdminMemberCount" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_MEMBER M
+    WHERE 1 = 1
+    <if test="keyword != null and keyword != ''">
+      AND (M.MEMBER_NAME LIKE '%' || #{keyword} || '%'
+        OR M.EMAIL LIKE '%' || #{keyword} || '%'
+        OR M.PHONE LIKE '%' || #{keyword} || '%')
+    </if>
+    <if test="statusCd != null and statusCd != ''">
+      AND M.STATUS_CD = #{statusCd}
+    </if>
+    <if test="roleType != null and roleType != ''">
+      <choose>
+        <when test="roleType == 'BIZ'">
+          AND EXISTS (
+            SELECT 1 FROM TB_BUSINESS B
+            WHERE B.BIZ_ID = M.MEMBER_ID
+              AND B.STATUS_CD = 'APPROVED'
+          )
+        </when>
+        <when test="roleType == 'GENERAL'">
+          AND NOT EXISTS (
+            SELECT 1 FROM TB_BUSINESS B
+            WHERE B.BIZ_ID = M.MEMBER_ID
+              AND B.STATUS_CD = 'APPROVED'
+          )
+        </when>
+      </choose>
+    </if>
+  </select>
+
+    <!-- 2026-07-16 박유정 — 관리자 회원 상세 (기본정보) -->
+  <select id="selectAdminMemberDetail"
+          resultType="com.petcare.petcare.admin.member.vo.AdminMemberVO">
+    SELECT
+      M.MEMBER_NO       AS memberNo,
+      M.MEMBER_ID       AS memberId,
+      M.MEMBER_NAME     AS memberName,
+      M.EMAIL           AS email,
+      M.PHONE           AS phone,
+      M.ZIP_CODE        AS zipCode,
+      M.ADDR1           AS addr1,
+      M.ADDR2           AS addr2,
+      M.GRADE_CD        AS gradeCd,
+      M.POINT_BALANCE   AS pointBalance,
+      M.STATUS_CD       AS statusCd,
+      M.JOIN_DATE       AS joinDate,
+      M.LAST_LOGIN_DATE AS lastLoginDate,
+      M.SUSPEND_END_DATE AS suspendEndDate,
+      <!--HYJ 26.07.28 활동 이력-->
+      M.POST_COUNT       AS posts,
+      M.COMMENT_COUNT    AS comments,
+      M.ADMIN_POST_DEL_COUNT,
+      M.ADMIN_COMMENT_DEL_COUNT,
+      CASE
+        WHEN EXISTS (
+          SELECT 1 FROM TB_BUSINESS B
+          WHERE B.BIZ_ID = M.MEMBER_ID
+            AND B.STATUS_CD = 'APPROVED'
+        ) THEN 'BIZ'
+        ELSE 'GENERAL'
+      END AS roleType
+    FROM TB_MEMBER M
+    WHERE M.MEMBER_NO = #{memberNo}
+  </select>
+
+    <!-- 2026-07-20 박유정 STEP 7 — 회원 상태 변경 (NORMAL / SUSPENDED / WITHDRAWN) -->
+  <!-- 2026/07/23 장우철 — SET 절 콤마 누락으로 강제탈퇴 SQL 오류 나던 부분 수정 -->
+  <update id="updateMemberStatus">
+    UPDATE TB_MEMBER
+    SET STATUS_CD = #{statusCd},
+        SUSPEND_END_DATE = NULL
+    WHERE MEMBER_NO = #{memberNo}
+  </update>
+    <!-- 2026-07-21 박유정 STEP 9 — 회원 등급 변경 (BRONZE / SILVER / GOLD) -->
+  <update id="updateMemberGrade">
+    UPDATE TB_MEMBER
+    SET GRADE_CD = #{gradeCd}
+    WHERE MEMBER_NO = #{memberNo}
+  </update>
+
+  <!-- 2026-07-20 박유정 STEP 8 — 관리자 회원 활동 현황 (서브쿼리 COUNT) -->
+  <select id="selectAdminMemberActivityStats"
+          resultType="com.petcare.petcare.admin.member.vo.AdminMemberVO">
+    SELECT
+      (SELECT COUNT(*)
+         FROM TB_ORDER
+        WHERE MEMBER_NO = #{memberNo}) AS orderCount,
+
+      (SELECT NVL(SUM(TO_NUMBER(NVL(PAY_AMOUNT, '0'))), 0)
+         FROM TB_ORDER
+        WHERE MEMBER_NO = #{memberNo}) AS totalPayAmount,
+
+      (SELECT COUNT(*)
+         FROM TB_ORDER
+        WHERE MEMBER_NO = #{memberNo}
+          AND (ORDER_STATUS = 'CANCEL'
+            OR CLAIM_TYPE IN ('CANCEL', 'RETURN', 'EXCHANGE'))) AS cancelCount,
+
+      (SELECT COUNT(*)
+         FROM TB_RESERVATION
+        WHERE MEMBER_NO = #{memberNo}
+          AND RESV_TYPE = 'HOSPITAL') AS hospitalResvCount,
+
+      (SELECT COUNT(*)
+         FROM TB_POST
+        WHERE MEMBER_NO = #{memberNo}
+          AND BOARD_TYPE IN ('TOWN', 'SHARE', 'LIFE')
+          AND STATUS_CD &lt;&gt; 'DELETED') AS postCount,
+
+      (SELECT COUNT(*)
+         FROM TB_POST_REPORT R
+         JOIN TB_POST P ON R.POST_ID = P.POST_ID
+        WHERE P.MEMBER_NO = #{memberNo}) AS reportCount,
+
+      (SELECT COUNT(*)
+         FROM TB_MEMBER_COUPON
+        WHERE MEMBER_NO = #{memberNo}
+          AND STATUS_CD = 'USED') AS usedCouponCount,
+
+      (SELECT COUNT(*)
+         FROM TB_FAVORITE
+        WHERE MEMBER_NO = #{memberNo}
+          AND FAV_TYPE = 'PRODUCT') AS favoriteCount,
+
+      (SELECT COUNT(*)
+         FROM TB_PET
+        WHERE MEMBER_NO = #{memberNo}
+          AND NVL(DEL_YN, 'N') = 'N') AS petCount,
+
+      (SELECT LISTAGG(PET_NAME, ', ') WITHIN GROUP (ORDER BY PET_ID)
+         FROM TB_PET
+        WHERE MEMBER_NO = #{memberNo}
+          AND NVL(DEL_YN, 'N') = 'N') AS petNames
+    FROM DUAL
+  </select>
+
+    <!-- 2026-07-21 박유정 STEP 10 — 포인트 적립·사용 합계 -->
+  <select id="selectAdminMemberPointSummary"
+          resultType="com.petcare.petcare.admin.member.vo.AdminMemberVO">
+    SELECT
+      (SELECT NVL(SUM(TO_NUMBER(NVL(POINT_AMOUNT, '0'))), 0)
+         FROM TB_POINT
+        WHERE MEMBER_NO = #{memberNo}
+          AND POINT_TYPE = 'EARN') AS totalEarnPoint,
+
+      (SELECT NVL(SUM(TO_NUMBER(NVL(POINT_AMOUNT, '0'))), 0)
+         FROM TB_POINT
+        WHERE MEMBER_NO = #{memberNo}
+          AND POINT_TYPE = 'USE') AS totalUsePoint
+    FROM DUAL
+  </select>
+
+  <!-- 2026-07-21 박유정 STEP 10 — 포인트 이력 (최근 10건) -->
+  <select id="selectAdminMemberPointHistory"
+          resultType="com.petcare.petcare.admin.member.vo.AdminMemberPointVO">
+    SELECT
+      POINT_ID     AS pointId,
+      POINT_TYPE   AS pointType,
+      TO_NUMBER(NVL(POINT_AMOUNT, '0'))   AS pointAmount,
+      TO_NUMBER(NVL(BALANCE_AFTER, '0'))  AS balanceAfter,
+      REASON_CD    AS reasonCd,
+      REF_ID       AS reasonDetail,
+      REG_DATE     AS regDate
+    FROM TB_POINT
+    WHERE MEMBER_NO = #{memberNo}
+    ORDER BY POINT_ID DESC
+    FETCH FIRST 10 ROWS ONLY
+  </select>
+
+  <!-- 2026-07-21 박유정 STEP 10 — 보유 포인트 증가 -->
+  <update id="addMemberPointBalance">
+    UPDATE TB_MEMBER
+    SET POINT_BALANCE = NVL(POINT_BALANCE, 0) + #{amount}
+    WHERE MEMBER_NO = #{memberNo}
+  </update>
+
+  <!-- 2026-07-21 박유정 STEP 10 — 보유 포인트 차감 (잔액 부족 시 0건) -->
+  <update id="subtractMemberPointBalance">
+    UPDATE TB_MEMBER
+    SET POINT_BALANCE = NVL(POINT_BALANCE, 0) - #{amount}
+    WHERE MEMBER_NO = #{memberNo}
+      AND NVL(POINT_BALANCE, 0) >= #{amount}
+  </update>
+
+  <!-- 2026-07-21 박유정 STEP 10 — 포인트 이력 INSERT -->
+  <insert id="insertMemberPointHistory">
+    INSERT INTO TB_POINT (
+      POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT,
+      BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE
+    ) VALUES (
+      (SELECT NVL(MAX(POINT_ID), 0) + 1 FROM TB_POINT),
+      #{memberNo},
+      #{pointType},
+      #{pointAmount},
+      #{balanceAfter},
+      #{reasonCd},
+      'ADMIN',
+      #{reasonDetail},
+      TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+    )
+  </insert>
+
+  <!-- 2026-07-21 박유정 STEP 11 — 회원 최근 주문 (최근 5건) -->
+  <select id="selectAdminMemberRecentOrders"
+          resultType="com.petcare.petcare.admin.member.vo.AdminMemberOrderVO">
+    SELECT
+      O.ORDER_ID   AS orderId,
+      O.ORDER_NO   AS orderNo,
+      O.ORDER_STATUS AS orderStatus,
+      TO_NUMBER(NVL(O.PAY_AMOUNT, '0')) AS payAmount,
+      O.ORDER_DATE AS orderDate,
+      (SELECT MIN(I.PRODUCT_NAME)
+         FROM TB_ORDER_ITEM I
+        WHERE I.ORDER_ID = O.ORDER_ID) AS firstProductName,
+      (SELECT COUNT(*)
+         FROM TB_ORDER_ITEM I
+        WHERE I.ORDER_ID = O.ORDER_ID) AS itemCount
+    FROM TB_ORDER O
+    WHERE O.MEMBER_NO = #{memberNo}
+    ORDER BY O.ORDER_ID DESC
+    FETCH FIRST 5 ROWS ONLY
+  </select>
+
+  <!-- 2026-07-21 박유정 STEP 12 — 회원 상태 일괄 변경 -->
+<update id="updateMemberStatusBulk">
+  UPDATE TB_MEMBER
+  SET STATUS_CD = #{statusCd}
+  WHERE MEMBER_NO IN
+  <foreach collection="memberNos" item="no" open="(" separator="," close=")">
+    #{no}
+  </foreach>
+</update>
+
+<!-- 2026-07-21 박유정 — 회원 목록 Excel(CSV)보내기 (검색·필터 동일, 전체) -->
+<select id="selectAdminMemberListForExport"
+        resultType="com.petcare.petcare.admin.member.vo.AdminMemberVO">
+  SELECT
+    M.MEMBER_NO       AS memberNo,
+    M.MEMBER_NAME     AS memberName,
+    M.EMAIL           AS email,
+    M.PHONE           AS phone,
+    M.GRADE_CD        AS gradeCd,
+    M.POINT_BALANCE   AS pointBalance,
+    M.STATUS_CD       AS statusCd,
+    M.JOIN_DATE       AS joinDate,
+    M.LAST_LOGIN_DATE AS lastLoginDate,
+    M.SUSPEND_END_DATE AS suspendEndDate,
+    CASE
+      WHEN EXISTS (
+        SELECT 1 FROM TB_BUSINESS B
+        WHERE B.BIZ_ID = M.MEMBER_ID
+          AND B.STATUS_CD = 'APPROVED'
+      ) THEN 'BIZ'
+      ELSE 'GENERAL'
+    END AS roleType
+  FROM TB_MEMBER M
+  WHERE 1 = 1
+  <if test="keyword != null and keyword != ''">
+    AND (M.MEMBER_NAME LIKE '%' || #{keyword} || '%'
+      OR M.EMAIL LIKE '%' || #{keyword} || '%'
+      OR M.PHONE LIKE '%' || #{keyword} || '%')
+  </if>
+  <if test="statusCd != null and statusCd != ''">
+    AND M.STATUS_CD = #{statusCd}
+  </if>
+  <if test="roleType != null and roleType != ''">
+    <choose>
+      <when test="roleType == 'BIZ'">
+        AND EXISTS (
+          SELECT 1 FROM TB_BUSINESS B
+          WHERE B.BIZ_ID = M.MEMBER_ID
+            AND B.STATUS_CD = 'APPROVED'
+        )
+      </when>
+      <when test="roleType == 'GENERAL'">
+        AND NOT EXISTS (
+          SELECT 1 FROM TB_BUSINESS B
+          WHERE B.BIZ_ID = M.MEMBER_ID
+            AND B.STATUS_CD = 'APPROVED'
+        )
+      </when>
+    </choose>
+  </if>
+  ORDER BY M.MEMBER_NO ASC
+</select>
+
+<!-- 2026-07-21 박유정 — 기간 정지 (STATUS_CD=SUSPENDED + 종료일) -->
+<update id="updateMemberSuspend">
+  UPDATE TB_MEMBER
+  SET STATUS_CD = 'SUSPENDED',
+      SUSPEND_END_DATE = #{suspendEndDate, jdbcType=TIMESTAMP}
+  WHERE MEMBER_NO = #{memberNo}
+</update>
+
+<!-- 2026-07-21 박유정 — 복구 (종료일 초기화) -->
+<update id="restoreMemberStatus">
+  UPDATE TB_MEMBER
+  SET STATUS_CD = 'NORMAL',
+      SUSPEND_END_DATE = NULL
+  WHERE MEMBER_NO = #{memberNo}
+</update>
+
+<!-- 2026-07-21 박유정 — 만료된 기간 정지 자동 복구 -->
+<update id="releaseExpiredSuspensions">
+  UPDATE TB_MEMBER
+  SET STATUS_CD = 'NORMAL',
+      SUSPEND_END_DATE = NULL
+  WHERE STATUS_CD = 'SUSPENDED'
+    AND SUSPEND_END_DATE IS NOT NULL
+    AND TRUNC(SUSPEND_END_DATE) &lt;= TRUNC(SYSDATE)
+</update>
+
+<!-- 2026-07-21 박유정 — 일괄 기간 정지 -->
+<update id="updateMemberSuspendBulk">
+  UPDATE TB_MEMBER
+  SET STATUS_CD = 'SUSPENDED',
+      SUSPEND_END_DATE = #{suspendEndDate, jdbcType=TIMESTAMP}
+  WHERE MEMBER_NO IN
+  <foreach collection="memberNos" item="no" open="(" separator="," close=")">
+    #{no}
+  </foreach>
+</update>
+
+<!-- 2026-07-22 박유정 — 일괄 복구 (정지 회원만) -->
+<update id="restoreMemberStatusBulk">
+  UPDATE TB_MEMBER
+  SET STATUS_CD = 'NORMAL',
+      SUSPEND_END_DATE = NULL
+  WHERE STATUS_CD = 'SUSPENDED'
+    AND MEMBER_NO IN
+  <foreach collection="memberNos" item="no" open="(" separator="," close=")">
+    #{no}
+  </foreach>
+</update>
+</mapper>

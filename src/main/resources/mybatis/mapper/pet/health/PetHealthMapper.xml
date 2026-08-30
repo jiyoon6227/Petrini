@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.pet.health.mapper.PetHealthMapper">
+
+<!--
+  역할: 마이페이지 건강수첩 SQL
+  2026/07/14 장우철 — TB_MEDICAL_RECORD (사업자 진료완료 기록) 회원 측 조회
+-->
+
+    <!-- 2026/07/14 장우철 — 회원·선택 반려견 진료 타임라인 -->
+    <select id="selectMedicalRecordsByMember"
+            resultType="com.petcare.petcare.hospital.vo.MedicalRecordVO">
+        SELECT  MR.RECORD_ID     AS recordId,
+                MR.HOSPITAL_ID   AS hospitalId,
+                MR.RESV_ID       AS resvId,
+                MR.PET_ID        AS petId,
+                MR.MEMBER_NO     AS memberNo,
+                MR.VISIT_DATE    AS visitDate,
+                MR.SYMPTOMS      AS symptoms,
+                MR.DIAGNOSIS     AS diagnosis,
+                MR.PRESCRIPTION  AS prescription,
+                MR.MEMO          AS memo,
+                MR.VET_NAME      AS vetName,
+                MR.REG_DATE      AS regDate,
+                P.PET_NAME       AS petName,
+                P.SPECIES        AS petSpecies,
+                P.BREED          AS petBreed,
+                P.AGE            AS petAge,
+                H.NAME           AS hospitalName
+          FROM  TB_MEDICAL_RECORD MR
+          JOIN  TB_PET P ON P.PET_ID = MR.PET_ID
+          JOIN  TB_HOSPITAL H ON H.HOSPITAL_ID = MR.HOSPITAL_ID
+         WHERE  MR.MEMBER_NO = #{memberNo}
+        <if test="petId != null">
+           AND  MR.PET_ID = #{petId}
+        </if>
+         ORDER BY MR.VISIT_DATE DESC, MR.RECORD_ID DESC
+    </select>
+
+</mapper>

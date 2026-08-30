@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 2026/07/31 장우철 — 관리자 숙소 예약 관리 -->
+<!-- 2026/08/11 장우철 — 목록에 결제수단·결제일(TB_PAYMENT) 조인 -->
+<mapper namespace="com.petcare.petcare.admin.reservation.mapper.AdminReservationMapper">
+
+  <!-- 예약당 최신 결제 1건 -->
+  <sql id="latestPaymentJoin">
+    LEFT JOIN (
+      SELECT P.RESV_ID,
+             P.PAY_METHOD,
+             P.PAY_DATE,
+             ROW_NUMBER() OVER (PARTITION BY P.RESV_ID ORDER BY P.PAY_DATE DESC NULLS LAST, P.PAYMENT_ID DESC) AS RN
+        FROM TB_PAYMENT P
+       WHERE P.PAY_TYPE = 'RESERVATION'
+    ) PAY ON PAY.RESV_ID = R.RESV_ID AND PAY.RN = 1
+  </sql>
+
+  <select id="selectStayReservationList"
+          resultType="com.petcare.petcare.admin.reservation.vo.AdminStayReservationVO">
+    SELECT  R.RESV_ID        AS resvId,
+            R.RESV_NO        AS resvNo,
+            R.RESV_TYPE      AS resvType,
+            R.MEMBER_NO      AS memberNo,
+            M.MEMBER_NAME    AS memberName,
+            M.EMAIL          AS memberEmail,
+            R.TARGET_ID      AS targetId,
+            TO_NUMBER(R.TARGET_ID) AS stayId,
+            S.NAME           AS stayName,
+            SR.NAME          AS roomName,
+            R.CHECKIN_DATE   AS checkinDate,
+            R.CHECKOUT_DATE  AS checkoutDate,
+            R.NIGHT_CNT      AS nightCnt,
+            R.TOTAL_AMOUNT   AS totalAmount,
+            R.STATUS_CD      AS statusCd,
+            R.REJECT_REASON  AS rejectReason,
+            R.CANCEL_FEE_AMT AS cancelFeeAmt,
+            R.REFUND_AMT     AS refundAmt,
+            R.CANCEL_AT      AS cancelAt,
+            R.REG_DATE       AS regDate,
+            P.PET_NAME       AS petName,
+            PAY.PAY_METHOD   AS payMethod,
+            PAY.PAY_DATE     AS payDate
+      FROM  TB_RESERVATION R
+      JOIN  TB_MEMBER M ON M.MEMBER_NO = R.MEMBER_NO
+      LEFT JOIN TB_PET P ON P.PET_ID = R.PET_ID
+      LEFT JOIN TB_STAY S ON S.STAY_ID = TO_NUMBER(R.TARGET_ID)
+      LEFT JOIN TB_STAY_ROOM SR ON SR.ROOM_ID = R.ROOM_ID
+      <include refid="latestPaymentJoin"/>
+     WHERE  R.RESV_TYPE = 'STAY'
+    <if test="statusCd != null and statusCd != '' and statusCd != 'ALL'">
+      <choose>
+        <when test="statusCd == 'CANCEL'">
+       AND  R.STATUS_CD IN ('CANCEL', 'REJECTED')
+        </when>
+        <otherwise>
+       AND  R.STATUS_CD = #{statusCd}
+        </otherwise>
+      </choose>
+    </if>
+    <if test="keyword != null and keyword != ''">
+       AND (
+            UPPER(R.RESV_NO) LIKE '%' || UPPER(#{keyword}) || '%'
+         OR UPPER(M.MEMBER_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+         OR UPPER(NVL(S.NAME, ' ')) LIKE '%' || UPPER(#{keyword}) || '%'
+       )
+    </if>
+     ORDER BY R.REG_DATE DESC, R.RESV_ID DESC
+  </select>
+
+  <select id="selectStayReservationStatusCounts" resultType="map">
+    SELECT NVL(SUM(CASE WHEN STATUS_CD = 'PENDING' THEN 1 ELSE 0 END), 0)   AS "PENDING",
+           NVL(SUM(CASE WHEN STATUS_CD = 'CONFIRMED' THEN 1 ELSE 0 END), 0) AS "CONFIRMED",
+           NVL(SUM(CASE WHEN STATUS_CD = 'CHECKIN' THEN 1 ELSE 0 END), 0)   AS "CHECKIN",
+           NVL(SUM(CASE WHEN STATUS_CD = 'CHECKOUT' THEN 1 ELSE 0 END), 0)  AS "CHECKOUT",
+           NVL(SUM(CASE WHEN STATUS_CD = 'DONE' THEN 1 ELSE 0 END), 0)      AS "DONE",
+           NVL(SUM(CASE WHEN STATUS_CD IN ('CANCEL','REJECTED') THEN 1 ELSE 0 END), 0) AS "CANCEL",
+           COUNT(*) AS "ALL"
+      FROM TB_RESERVATION
+     WHERE RESV_TYPE = 'STAY'
+  </select>
+
+  <select id="selectStayReservationDetail"
+          resultType="com.petcare.petcare.admin.reservation.vo.AdminStayReservationVO">
+    SELECT  R.RESV_ID        AS resvId,
+            R.RESV_NO        AS resvNo,
+            R.RESV_TYPE      AS resvType,
+            R.MEMBER_NO      AS memberNo,
+            M.MEMBER_NAME    AS memberName,
+            M.EMAIL          AS memberEmail,
+            R.TARGET_ID      AS targetId,
+            TO_NUMBER(R.TARGET_ID) AS stayId,
+            S.NAME           AS stayName,
+            SR.NAME          AS roomName,
+            R.CHECKIN_DATE   AS checkinDate,
+            R.CHECKOUT_DATE  AS checkoutDate,
+            R.NIGHT_CNT      AS nightCnt,
+            R.TOTAL_AMOUNT   AS totalAmount,
+            R.STATUS_CD      AS statusCd,
+            R.REJECT_REASON  AS rejectReason,
+            R.CANCEL_FEE_AMT AS cancelFeeAmt,
+            R.REFUND_AMT     AS refundAmt,
+            R.CANCEL_AT      AS cancelAt,
+            R.REG_DATE       AS regDate,
+            P.PET_NAME       AS petName,
+            PAY.PAY_METHOD   AS payMethod,
+            PAY.PAY_DATE     AS payDate
+      FROM  TB_RESERVATION R
+      JOIN  TB_MEMBER M ON M.MEMBER_NO = R.MEMBER_NO
+      LEFT JOIN TB_PET P ON P.PET_ID = R.PET_ID
+      LEFT JOIN TB_STAY S ON S.STAY_ID = TO_NUMBER(R.TARGET_ID)
+      LEFT JOIN TB_STAY_ROOM SR ON SR.ROOM_ID = R.ROOM_ID
+      <include refid="latestPaymentJoin"/>
+     WHERE  R.RESV_ID   = #{resvId}
+       AND  R.RESV_TYPE = 'STAY'
+  </select>
+
+</mapper>

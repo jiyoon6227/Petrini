@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.give.talent.mapper.GiveTalentMapper">
+
+<!--
+  역할: GiveTalentMapper SQL 정의
+  - 박유정 / 2026-07-13~14
+  - 팀 DDL: TB_TALENT (BIZ_ID 컬럼 없음 → TB_BUSINESS JOIN)
+
+  테이블: TB_TALENT, TB_BUSINESS
+  시퀀스: SEQ_TB_TALENT
+
+  [STATUS_CD] PENDING / APPROVED / REJECTED / DONE
+-->
+
+  <sql id="talentColumns">
+    T.TALENT_ID     AS talentId,
+    T.BIZ_NO        AS bizNo,
+    T.TITLE         AS title,
+    T.TALENT_TYPE   AS talentType,
+    T.CAPACITY      AS capacity,
+    T.CURRENT_CNT   AS currentCnt,
+    T.SCHEDULE      AS schedule,
+    T.DURATION      AS duration,
+    T.LOCATION      AS location,
+    T.CONTACT       AS contact,
+    DBMS_LOB.SUBSTR(T.BODY, 32000, 1) AS body,
+    T.THUMB_URL     AS thumbUrl,
+    T.STATUS_CD     AS statusCd,
+    T.REJECT_REASON AS rejectReason,
+    T.ADMIN_NO      AS adminNo,
+    T.REG_DATE      AS regDate,
+    T.APPROVE_DATE  AS approveDate,
+    B.BIZ_ID        AS bizId,
+    B.BIZ_NAME      AS bizName,
+    B.BIZ_TYPE      AS bizType
+  </sql>
+
+  <!-- 2026-07-14 박유정 STEP 4 — 사업자 재능나눔 신청 INSERT (STATUS_CD=PENDING) -->
+  <insert id="insertTalent" parameterType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
+    <selectKey keyProperty="talentId" resultType="long" order="BEFORE">
+      SELECT SEQ_TB_TALENT.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TB_TALENT (
+      TALENT_ID,
+      BIZ_NO,
+      TITLE,
+      TALENT_TYPE,
+      CAPACITY,
+      CURRENT_CNT,
+      SCHEDULE,
+      DURATION,
+      LOCATION,
+      CONTACT,
+      BODY,
+      THUMB_URL,
+      STATUS_CD,
+      REG_DATE
+    ) VALUES (
+      #{talentId},
+      #{bizNo},
+      #{title},
+      #{talentType},
+      #{capacity},
+      NVL(#{currentCnt}, 0),
+      #{schedule},
+      #{duration},
+      #{location},
+      #{contact},
+      #{body},
+      #{thumbUrl, jdbcType=VARCHAR},
+      NVL(#{statusCd}, 'PENDING'),
+      SYSDATE
+    )
+  </insert>
+
+  <!-- 2026-07-13 박유정 — 사용자 노출 목록 (APPROVED만) -->
+  <select id="selectApprovedTalentList"
+          resultType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
+    SELECT
+    <include refid="talentColumns"/>
+    FROM TB_TALENT T
+    JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+    <!-- 2026-08-10 박유정 — APPROVED(모집중) + DONE(모집마감) 목록 노출 -->
+    WHERE T.STATUS_CD IN ('APPROVED', 'DONE')
+    <if test="talentType != null and talentType != ''">
+      AND T.TALENT_TYPE = #{talentType}
+    </if>
+    ORDER BY T.APPROVE_DATE DESC NULLS LAST, T.REG_DATE DESC
+  </select>
+
+  <select id="selectTalentDetail"
+          resultType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
+    SELECT
+    <include refid="talentColumns"/>
+    FROM TB_TALENT T
+    JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+    WHERE T.TALENT_ID = #{talentId}
+  </select>
+
+  <select id="selectTalentListByStatus"
+          resultType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
+    SELECT
+    <include refid="talentColumns"/>
+    FROM TB_TALENT T
+    JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+    WHERE T.STATUS_CD = #{statusCd}
+    ORDER BY T.REG_DATE DESC
+  </select>
+
+  <select id="countTalentByStatus" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_TALENT
+    WHERE STATUS_CD = #{statusCd}
+  </select>
+
+  <!-- 2026-07-13 박유정 — 관리자 승인·반려 시 STATUS_CD / APPROVE_DATE 갱신 -->
+  <update id="updateTalentStatus" parameterType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
+    UPDATE TB_TALENT
+    SET STATUS_CD = #{statusCd},
+        REJECT_REASON = #{rejectReason, jdbcType=VARCHAR},
+        ADMIN_NO = #{adminNo, jdbcType=NUMERIC},
+        APPROVE_DATE = CASE WHEN #{statusCd} = 'APPROVED' THEN SYSDATE ELSE APPROVE_DATE END
+    WHERE TALENT_ID = #{talentId}
+  </update>
+
+  <!-- 2026-07-14 박유정 — 사업자 본인 이력 (biz/hospital/talent.jsp) -->
+  <select id="selectTalentListByBizId"
+          resultType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
+    SELECT
+    <include refid="talentColumns"/>
+    FROM TB_TALENT T
+    JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+    WHERE B.BIZ_ID = #{bizId}
+    ORDER BY T.REG_DATE DESC
+  </select>
+
+  <!-- 2026-07-14 박유정 — 신청 전 사업자 승인 여부 (TB_BUSINESS STATUS_CD=APPROVED) -->
+  <select id="selectBusinessStatusByBizId" resultType="string">
+    SELECT STATUS_CD
+    FROM TB_BUSINESS
+    WHERE BIZ_ID = #{bizId}
+      AND STATUS_CD = 'APPROVED'
+      AND ROWNUM = 1
+  </select>
+
+  <!-- 2026-07-14 박유정 — 로그인 bizId(=MEMBER_ID) → BIZ_NO FK -->
+  <select id="selectBizNoByBizId" resultType="long">
+    SELECT BIZ_NO
+    FROM TB_BUSINESS
+    WHERE BIZ_ID = #{bizId}
+      AND STATUS_CD = 'APPROVED'
+      AND ROWNUM = 1
+  </select>
+
+  <!-- 2026-08-10 박유정 — 병원 수동 모집 마감 권한 -->
+  <select id="countTalentOwnedByBiz" resultType="int">
+  SELECT COUNT(*)
+  FROM TB_TALENT T
+  JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+  WHERE T.TALENT_ID = #{talentId}
+    AND B.BIZ_ID = #{bizId}
+    AND T.STATUS_CD = 'APPROVED'
+</select>
+
+<!-- 2026-08-10 박유정 — BIZ_ID → MEMBER_NO (재능나눔 신청 알림)
+     AdminBizMapper 와 동일: MEMBER_ID 또는 EMAIL 로 조회 -->
+<select id="selectMemberNoByBizId" resultType="long">
+  SELECT MEMBER_NO
+  FROM TB_MEMBER
+  WHERE MEMBER_ID = #{bizId}
+     OR EMAIL = #{bizId}
+  FETCH FIRST 1 ROW ONLY
+</select>
+
+  <!-- 2026-08-10 박유정 — 대표 이미지 업로드 후 THUMB_URL 저장 -->
+  <update id="updateTalentThumbUrl" parameterType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
+    UPDATE TB_TALENT
+    SET THUMB_URL = #{thumbUrl, jdbcType=VARCHAR}
+    WHERE TALENT_ID = #{talentId}
+  </update>
+
+</mapper>

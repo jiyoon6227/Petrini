@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.admin.cms.mapper.AdminCMSMapper">
+
+<!--
+  역할: AdminCMSMapper SQL 정의
+
+  쿼리 id 예시
+  - selectBannerList
+  - insertBanner
+  - updateBanner
+  - deleteBanner
+  - selectNoticeList
+  - insertNotice
+  - updateNotice
+  - deleteNotice
+  - selectFaqList
+  - insertFaq
+  - updateFaq
+  - deleteFaq
+
+  테이블
+  - TB_BANNER
+  - TB_NOTICE
+  - TB_FAQ
+-->
+    <!-- 2026/08/03 장우철 — 이미지 JOIN을 FILE_ID로 -->
+    <sql id="bannerImageJoin">
+        LEFT JOIN TB_FILE f ON f.FILE_ID = b.FILE_ID
+    </sql>
+    
+    <!-- ─── 관리자: 전체 배너 목록 (PENDING 우선) ─── -->
+    <!-- 2026/08/03 장우철 — DATE → TO_CHAR, 이미지 JOIN REF_ID=BIZ_NO -->
+    <select id="selectAllBannerList" resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">
+        SELECT
+                    b.BANNER_ID, 
+                    b.BIZ_NO, 
+                    b.TITLE, 
+                    b.LINK_URL,
+                    b.POSITION_CD, 
+                    TO_CHAR(b.START_DATE, 'YYYY-MM-DD') AS startDate, 
+                    TO_CHAR(b.END_DATE, 'YYYY-MM-DD') AS endDate, 
+                    b.STATUS_CD,
+                    b.REJECT_REASON, 
+                    b.REG_DATE,
+                    biz.BIZ_NAME AS bizName,
+                    f.FILE_URL AS imageUrl
+        FROM        TB_BANNER b
+        JOIN        TB_BUSINESS biz ON biz.BIZ_NO = b.BIZ_NO
+        <include refid="bannerImageJoin"/>
+        ORDER BY    CASE b.STATUS_CD WHEN 'PENDING' THEN 0 ELSE 1 END,
+                    b.REG_DATE DESC
+    </select>
+
+    <!-- ─── 관리자: PENDING 건수 (사이드바 배지용) ─── -->
+    <select id="selectPendingBannerCount" resultType="int">
+        SELECT COUNT(*) FROM TB_BANNER WHERE STATUS_CD = 'PENDING'
+    </select>
+
+    <!-- ─── 관리자: 상태 변경 (승인/반려) ─── -->
+    <update id="updateBannerStatus" parameterType="com.petcare.petcare.main.banner.vo.MainBannerVO">
+        UPDATE  TB_BANNER
+        SET     STATUS_CD = #{statusCd},
+                <if test="rejectReason != null">REJECT_REASON = #{rejectReason},</if>
+                MOD_DATE = SYSDATE
+        WHERE   BANNER_ID = #{bannerId}
+    </update>
+
+    <!-- ─── 관리자: 배너 1건 (승인 알림용) ─── -->
+    <select id="selectBannerById" parameterType="long"
+            resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">
+        SELECT
+                b.BANNER_ID   AS bannerId,
+                b.BIZ_NO      AS bizNo,
+                b.TITLE       AS title,
+                b.POSITION_CD AS positionCd,
+                b.STATUS_CD   AS statusCd,
+                biz.BIZ_NAME  AS bizName,
+                biz.BIZ_TYPE  AS bizType
+        FROM    TB_BANNER b
+        JOIN    TB_BUSINESS biz ON biz.BIZ_NO = b.BIZ_NO
+        WHERE   b.BANNER_ID = #{bannerId}
+    </select>
+
+    <!-- ─── 관리자: 배너 상세 — 2026-08-06 박유정 ─── -->
+    <!-- 2026-08-07 박유정 — b.FILE_ID AS fileId SELECT 정리 (FROM 절 오타 수정) -->
+    <select id="selectBannerDetail" parameterType="long"
+            resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">
+        SELECT
+                b.BANNER_ID   AS bannerId,
+                b.BIZ_NO      AS bizNo,
+                b.TITLE       AS title,
+                b.LINK_URL    AS linkUrl,
+                b.POSITION_CD AS positionCd,
+                TO_CHAR(b.START_DATE, 'YYYY-MM-DD') AS startDate,
+                TO_CHAR(b.END_DATE, 'YYYY-MM-DD') AS endDate,
+                b.STATUS_CD   AS statusCd,
+                b.REJECT_REASON AS rejectReason,
+                b.REG_DATE    AS regDate,
+                b.FILE_ID     AS fileId,
+                biz.BIZ_NAME  AS bizName,
+                biz.BIZ_TYPE  AS bizType,
+                f.FILE_URL    AS imageUrl
+        FROM    TB_BANNER b
+        JOIN    TB_BUSINESS biz ON biz.BIZ_NO = b.BIZ_NO
+        <include refid="bannerImageJoin"/>
+        WHERE   b.BANNER_ID = #{bannerId}
+    </select>
+
+    <!-- 2026-08-07 박유정 — 관리자 배너 정보 수정 (제목·링크·이미지 FILE_ID) -->
+    <update id="updateBannerInfo" parameterType="com.petcare.petcare.main.banner.vo.MainBannerVO">
+        UPDATE  TB_BANNER
+        SET     TITLE    = #{title},
+                LINK_URL = #{linkUrl, jdbcType=VARCHAR},
+                <if test="fileId != null">FILE_ID = #{fileId},</if>
+                MOD_DATE = SYSDATE
+        WHERE   BANNER_ID = #{bannerId}
+    </update>
+
+    <update id="updateBannerPeriod" parameterType="com.petcare.petcare.main.banner.vo.MainBannerVO">
+        <!-- 2026-08-06 박유정 — 관리자 광고 기간 재설정 -->
+        UPDATE  TB_BANNER
+        SET     START_DATE = TO_DATE(#{startDate}, 'YYYY-MM-DD'),
+                END_DATE   = TO_DATE(#{endDate}, 'YYYY-MM-DD'),
+                MOD_DATE   = SYSDATE
+        WHERE   BANNER_ID  = #{bannerId}
+    </update>
+
+    <delete id="deleteBanner" parameterType="long">
+        DELETE FROM TB_BANNER WHERE BANNER_ID = #{bannerId}
+    </delete>
+
+    <!-- 테스트 숙소 더미 배너 정리 — 2026-08-06 박유정 -->
+    <delete id="deleteTestStayBanners">
+        DELETE FROM TB_BANNER b
+        WHERE EXISTS (
+            SELECT 1
+            FROM   TB_BUSINESS biz
+            WHERE  biz.BIZ_NO = b.BIZ_NO
+              AND  biz.BIZ_TYPE = 'STAY'
+              AND  (
+                    biz.BIZ_NAME LIKE '%테스트%'
+                 OR biz.BIZ_NAME LIKE '테스트%'
+                 OR biz.BIZ_ID LIKE 'test%'
+                 OR biz.BIZ_ID = 'stay'
+              )
+        )
+    </delete>
+
+    <select id="selectMemberNoByBizNo" parameterType="long" resultType="long">
+        SELECT M.MEMBER_NO
+        FROM   TB_BUSINESS B
+        JOIN   TB_MEMBER M ON M.MEMBER_ID = B.BIZ_ID
+        WHERE  B.BIZ_NO = #{bizNo}
+    </select>
+
+    <!-- 2026-08-11 박유정 — FAQ CMS -->
+    <select id="selectFaqList" resultType="com.petcare.petcare.admin.cms.vo.FaqVO">
+        SELECT F.FAQ_ID      AS faqId,
+               F.CATEGORY_CD AS categoryCd,
+               F.QUESTION    AS question,
+               F.ANSWER      AS answer,
+               F.VISIBLE_YN  AS visibleYn,
+               F.SORT_ORDER  AS sortOrder,
+               F.REG_DATE    AS regDate,
+               F.MOD_DATE    AS modDate
+          FROM TB_FAQ F
+         ORDER BY F.SORT_ORDER ASC, F.FAQ_ID DESC
+    </select>
+
+    <select id="selectFaqById" parameterType="long"
+            resultType="com.petcare.petcare.admin.cms.vo.FaqVO">
+        SELECT F.FAQ_ID      AS faqId,
+               F.CATEGORY_CD AS categoryCd,
+               F.QUESTION    AS question,
+               F.ANSWER      AS answer,
+               F.VISIBLE_YN  AS visibleYn,
+               F.SORT_ORDER  AS sortOrder,
+               F.REG_DATE    AS regDate,
+               F.MOD_DATE    AS modDate
+          FROM TB_FAQ F
+         WHERE F.FAQ_ID = #{faqId}
+    </select>
+
+    <insert id="insertFaq" parameterType="com.petcare.petcare.admin.cms.vo.FaqVO">
+        <selectKey keyProperty="faqId" resultType="long" order="BEFORE">
+            SELECT NVL(MAX(FAQ_ID), 0) + 1 FROM TB_FAQ
+        </selectKey>
+        INSERT INTO TB_FAQ (
+            FAQ_ID, CATEGORY_CD, QUESTION, ANSWER,
+            VISIBLE_YN, SORT_ORDER, REG_DATE
+        ) VALUES (
+            #{faqId},
+            #{categoryCd},
+            #{question},
+            #{answer, jdbcType=CLOB},
+            #{visibleYn},
+            #{sortOrder, jdbcType=NUMERIC},
+            SYSDATE
+        )
+    </insert>
+
+    <update id="updateFaq" parameterType="com.petcare.petcare.admin.cms.vo.FaqVO">
+        UPDATE TB_FAQ
+           SET CATEGORY_CD = #{categoryCd},
+               QUESTION    = #{question},
+               ANSWER      = #{answer, jdbcType=CLOB},
+               VISIBLE_YN  = #{visibleYn},
+               SORT_ORDER  = #{sortOrder, jdbcType=NUMERIC},
+               MOD_DATE    = SYSDATE
+         WHERE FAQ_ID = #{faqId}
+    </update>
+
+    <delete id="deleteFaq" parameterType="long">
+        DELETE FROM TB_FAQ WHERE FAQ_ID = #{faqId}
+    </delete>
+
+    <!-- 2026-08-11 박유정 — 공지사항 CMS -->
+    <select id="selectNoticeList" resultType="com.petcare.petcare.admin.cms.vo.NoticeVO">
+        SELECT N.NOTICE_ID      AS noticeId,
+               N.NOTICE_TYPE_CD AS noticeTypeCd,
+               N.TITLE          AS title,
+               N.BODY           AS body,
+               N.WRITER_NAME    AS writerName,
+               TRIM(N.PIN_YN)     AS pinYn,
+               TRIM(N.VISIBLE_YN) AS visibleYn,
+               N.VIEW_COUNT     AS viewCount,
+               N.REG_DATE       AS regDate,
+               N.MOD_DATE       AS modDate
+          FROM TB_NOTICE N
+         ORDER BY TRIM(N.PIN_YN) DESC, N.REG_DATE DESC, N.NOTICE_ID DESC
+    </select>
+
+    <select id="selectNoticeById" parameterType="long"
+            resultType="com.petcare.petcare.admin.cms.vo.NoticeVO">
+        SELECT N.NOTICE_ID      AS noticeId,
+               N.NOTICE_TYPE_CD AS noticeTypeCd,
+               N.TITLE          AS title,
+               N.BODY           AS body,
+               N.WRITER_NAME    AS writerName,
+               TRIM(N.PIN_YN)     AS pinYn,
+               TRIM(N.VISIBLE_YN) AS visibleYn,
+               N.VIEW_COUNT     AS viewCount,
+               N.REG_DATE       AS regDate,
+               N.MOD_DATE       AS modDate
+          FROM TB_NOTICE N
+         WHERE N.NOTICE_ID = #{noticeId}
+    </select>
+
+    <insert id="insertNotice" parameterType="com.petcare.petcare.admin.cms.vo.NoticeVO">
+        <selectKey keyProperty="noticeId" resultType="long" order="BEFORE">
+            SELECT NVL(MAX(NOTICE_ID), 0) + 1 FROM TB_NOTICE
+        </selectKey>
+        INSERT INTO TB_NOTICE (
+            NOTICE_ID, NOTICE_TYPE_CD, TITLE, BODY, WRITER_NAME,
+            PIN_YN, VISIBLE_YN, VIEW_COUNT, REG_DATE
+        ) VALUES (
+            #{noticeId},
+            #{noticeTypeCd},
+            #{title},
+            #{body, jdbcType=CLOB},
+            #{writerName, jdbcType=VARCHAR},
+            #{pinYn},
+            #{visibleYn},
+            NVL(#{viewCount, jdbcType=NUMERIC}, 0),
+            SYSDATE
+        )
+    </insert>
+
+    <update id="updateNotice" parameterType="com.petcare.petcare.admin.cms.vo.NoticeVO">
+        UPDATE TB_NOTICE
+           SET NOTICE_TYPE_CD = #{noticeTypeCd},
+               TITLE          = #{title},
+               BODY           = #{body, jdbcType=CLOB},
+               WRITER_NAME    = #{writerName, jdbcType=VARCHAR},
+               PIN_YN         = #{pinYn},
+               VISIBLE_YN     = #{visibleYn},
+               MOD_DATE       = SYSDATE
+         WHERE NOTICE_ID = #{noticeId}
+    </update>
+
+    <delete id="deleteNotice" parameterType="long">
+        DELETE FROM TB_NOTICE WHERE NOTICE_ID = #{noticeId}
+    </delete>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.community.report.mapper.CommunityReportMapper">
+
+<!--
+  역할: CommunityReportMapper SQL 정의
+  - 박유정 / 2026-07-10
+
+  테이블: TB_POST_REPORT
+  시퀀스: SEQ_TB_POST_REPORT
+  컬럼: REPORT_ID, POST_ID, REPORTER_NO, REASON, STATUS_CD, ADMIN_NO(접수 시 NULL)
+  2026/07/11 장우철 — DATABASE_TABLE 에서 ADMIN_NO NULL 허용으로 맞춤
+
+  [등록] insertReport — 신고 접수 (STATUS_CD = PENDING, ADMIN_NO = NULL)
+  [중복] countPendingByPostAndMember — 동일 회원·게시글 대기 신고 (REPORTER_NO)
+-->
+
+  <!-- 2026/07/11 장우철 — DB 실제 컬럼(REPORTER_NO/REASON/ADMIN_NO)에 맞춤
+       [변경 전] MEMBER_NO, REASON_CD, REASON_DETAIL, REG_DATE 로 INSERT → ORA-00904 -->
+  <insert id="insertReport" parameterType="com.petcare.petcare.community.report.vo.CommunityReportVO">
+    <selectKey keyProperty="reportId" resultType="long" order="BEFORE">
+      SELECT SEQ_TB_POST_REPORT.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TB_POST_REPORT (
+      REPORT_ID,
+      POST_ID,
+      REPORTER_NO,
+      REASON,
+      STATUS_CD,
+      ADMIN_NO
+    ) VALUES (
+      #{reportId},
+      #{postId},
+      #{memberNo},
+      #{reasonCd},
+      #{statusCd},
+      NULL
+    )
+  </insert>
+
+  <select id="countPendingByPostAndMember" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_POST_REPORT
+    WHERE POST_ID = #{postId}
+      AND REPORTER_NO = #{memberNo}
+      AND STATUS_CD = 'PENDING'
+  </select>
+
+  <select id="selectMemberNoByMemberId" resultType="long">
+    SELECT MEMBER_NO
+    FROM TB_MEMBER
+    WHERE MEMBER_ID = #{memberId}
+  </select>
+
+  <select id="selectMemberNoByEmail" resultType="long">
+    SELECT MEMBER_NO
+    FROM TB_MEMBER
+    WHERE EMAIL = #{email}
+  </select>
+
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.main.banner.mapper.MainBannerMapper">
+
+<!--
+  역할: MainBannerMapper SQL 정의
+
+  테이블
+  - TB_BANNER
+  - TB_FILE (REF_TYPE = 'BANNER')
+  - TB_BUSINESS
+-->
+
+    <!-- 배너 이미지: TB_BANNER.FILE_ID 기준 (2026/08/03 장우철 — BIZ_NO JOIN은 다른 배너 이미지 섞임/누락) -->
+    <sql id="bannerImageJoin">
+        LEFT JOIN TB_FILE f ON f.FILE_ID = b.FILE_ID
+    </sql>
+
+    <!-- ─── 사용자: 위치별 활성 배너 조회 ─── -->
+    <!-- 2026/08/03 장우철 — START/END_DATE = DATE 기준 조회 + VO String용 TO_CHAR -->
+    <resultMap id="bannerActiveMap" type="com.petcare.petcare.main.banner.vo.MainBannerVO">
+        <id     property="bannerId"   column="BANNER_ID"/>
+        <result property="title"      column="TITLE"/>
+        <result property="linkUrl"    column="LINK_URL"/>
+        <result property="positionCd" column="POSITION_CD"/>
+        <result property="startDate"  column="START_DATE" jdbcType="VARCHAR"/>
+        <result property="endDate"    column="END_DATE"   jdbcType="VARCHAR"/>
+        <result property="bizName"    column="BIZ_NAME"/>
+        <result property="imageUrl"   column="IMAGE_URL"/>
+    </resultMap>
+
+    <!-- 2026-08-07 박유정 — Oracle ROWNUM + maxCount 바인드 (FETCH FIRST #{n} 은 바인드 미지원 환경 있음) -->
+    <select id="selectActiveBannersByPosition"
+            resultMap="bannerActiveMap">
+        SELECT * FROM (
+            SELECT
+                        b.BANNER_ID,
+                        b.TITLE,
+                        b.LINK_URL,
+                        b.POSITION_CD,
+                        TO_CHAR(b.START_DATE, 'YYYY-MM-DD') AS START_DATE,
+                        TO_CHAR(b.END_DATE, 'YYYY-MM-DD') AS END_DATE,
+                        biz.BIZ_NAME,
+                        f.FILE_URL AS IMAGE_URL
+            FROM        TB_BANNER b
+            JOIN        TB_BUSINESS biz ON biz.BIZ_NO = b.BIZ_NO
+            <include refid="bannerImageJoin"/>
+            WHERE       b.STATUS_CD = 'ACTIVE'
+              AND       b.POSITION_CD = #{positionCd}
+              AND       TRUNC(SYSDATE) BETWEEN TRUNC(b.START_DATE) AND TRUNC(b.END_DATE)
+            ORDER       BY b.BANNER_ID ASC
+        ) WHERE ROWNUM &lt;= #{maxCount}
+    </select>
+
+    <!-- 2026-08-06 박유정 — 위치·상태별 건수 (레거시) -->
+    <select id="countByPositionAndStatuses" resultType="int">
+        SELECT  COUNT(*)
+        FROM    TB_BANNER
+        WHERE   POSITION_CD = #{positionCd}
+          AND   STATUS_CD IN
+        <foreach collection="statusCds" item="statusCd" open="(" separator="," close=")">
+            #{statusCd}
+        </foreach>
+    </select>
+
+    <!-- 2026-08-06 박유정 — 사업자 신청 슬롯 (PENDING + 기간 만료 전 ACTIVE) -->
+    <select id="countReservedSlotsByPosition" resultType="int">
+        SELECT  COUNT(*)
+        FROM    TB_BANNER
+        WHERE   POSITION_CD = #{positionCd}
+          AND   (
+                    STATUS_CD = 'PENDING'
+                 OR (STATUS_CD = 'ACTIVE' AND TRUNC(END_DATE) >= TRUNC(SYSDATE))
+                )
+    </select>
+
+    <!-- 2026-08-06 박유정 — 승인·올리기 슬롯 (기간 만료 전 ACTIVE) -->
+    <select id="countLiveSlotsByPosition" resultType="int">
+        SELECT  COUNT(*)
+        FROM    TB_BANNER
+        WHERE   POSITION_CD = #{positionCd}
+          AND   STATUS_CD = 'ACTIVE'
+          AND   TRUNC(END_DATE) >= TRUNC(SYSDATE)
+    </select>
+
+    <!-- 2026-08-06 박유정 — 종료일 지난 ACTIVE 배너 자동 EXPIRED -->
+    <update id="expirePastEndDateBanners">
+        UPDATE  TB_BANNER
+        SET     STATUS_CD = 'EXPIRED',
+                MOD_DATE  = SYSDATE
+        WHERE   STATUS_CD = 'ACTIVE'
+          AND   TRUNC(END_DATE) &lt; TRUNC(SYSDATE)
+    </update>
+</mapper>

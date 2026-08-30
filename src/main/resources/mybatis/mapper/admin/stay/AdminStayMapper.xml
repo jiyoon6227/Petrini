@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 2026/08/13 장우철 — 관리자 숙소 관리 (전체 숙소·객실 운영 상태) -->
+<mapper namespace="com.petcare.petcare.admin.stay.mapper.AdminStayMapper">
+
+  <sql id="roomCountJoin">
+    LEFT JOIN (
+      SELECT STAY_ID,
+             COUNT(*) AS ROOM_CNT,
+             SUM(CASE WHEN NVL(STATUS_CD, 'APPROVE') = 'APPROVE' THEN 1 ELSE 0 END) AS APPROVE_CNT,
+             SUM(CASE WHEN STATUS_CD = 'HOLD' THEN 1 ELSE 0 END) AS HOLD_CNT,
+             SUM(CASE WHEN STATUS_CD IN ('CLOSED', 'DELETED') THEN 1 ELSE 0 END) AS CLOSED_CNT,
+             MIN(PRICE_PER_NIGHT) AS MIN_PRICE
+        FROM TB_STAY_ROOM
+       GROUP BY STAY_ID
+    ) R ON R.STAY_ID = S.STAY_ID
+  </sql>
+
+  <select id="selectStayList" resultType="com.petcare.petcare.admin.stay.vo.AdminStayVO">
+    SELECT S.STAY_ID        AS stayId,
+           S.BIZ_NO         AS bizNo,
+           B.BIZ_NAME       AS bizName,
+           S.NAME           AS name,
+           S.PHONE          AS phone,
+           S.ADDR           AS addr,
+           S.ADDR_DETAIL    AS addrDetail,
+           S.REGION         AS region,
+           S.STATUS_CD      AS statusCd,
+           S.APPROVE_DATE   AS approveDate,
+           NVL(R.ROOM_CNT, 0)     AS roomCount,
+           NVL(R.APPROVE_CNT, 0)  AS approveRoomCount,
+           NVL(R.HOLD_CNT, 0)     AS holdRoomCount,
+           NVL(R.CLOSED_CNT, 0)   AS closedRoomCount,
+           NVL(R.MIN_PRICE, 0)    AS minPrice,
+           (SELECT F.FILE_URL
+              FROM TB_FILE F
+             WHERE F.REF_TYPE = 'STAY'
+               AND F.REF_ID   = S.STAY_ID
+               AND ROWNUM     = 1) AS thumbPath
+      FROM TB_STAY S
+      LEFT JOIN TB_BUSINESS B ON B.BIZ_NO = S.BIZ_NO
+      <include refid="roomCountJoin"/>
+     WHERE 1 = 1
+    <if test="statusCd != null and statusCd != '' and statusCd != 'ALL'">
+      <choose>
+        <when test="statusCd == 'ACTIVE'">
+       AND S.STATUS_CD IN ('ACTIVE', 'NORMAL')
+        </when>
+        <otherwise>
+       AND S.STATUS_CD = #{statusCd}
+        </otherwise>
+      </choose>
+    </if>
+    <if test="keyword != null and keyword != ''">
+       AND (
+            UPPER(NVL(S.NAME, ' ')) LIKE '%' || UPPER(#{keyword}) || '%'
+         OR UPPER(NVL(B.BIZ_NAME, ' ')) LIKE '%' || UPPER(#{keyword}) || '%'
+         OR UPPER(NVL(S.ADDR, ' ')) LIKE '%' || UPPER(#{keyword}) || '%'
+       )
+    </if>
+     ORDER BY S.STAY_ID DESC
+  </select>
+
+  <select id="selectStayStatusCounts" resultType="map">
+    SELECT NVL(SUM(CASE WHEN STATUS_CD IN ('ACTIVE', 'NORMAL') THEN 1 ELSE 0 END), 0) AS "ACTIVE",
+           COUNT(*) AS "ALL"
+      FROM TB_STAY
+  </select>
+
+  <select id="selectStayDetail" resultType="com.petcare.petcare.admin.stay.vo.AdminStayVO">
+    SELECT S.STAY_ID        AS stayId,
+           S.BIZ_NO         AS bizNo,
+           B.BIZ_NAME       AS bizName,
+           S.NAME           AS name,
+           S.PHONE          AS phone,
+           S.ADDR           AS addr,
+           S.ADDR_DETAIL    AS addrDetail,
+           S.REGION         AS region,
+           S.STATUS_CD      AS statusCd,
+           S.APPROVE_DATE   AS approveDate,
+           S.CHECK_IN       AS checkIn,
+           S.CHECK_OUT      AS checkOut,
+           NVL(R.ROOM_CNT, 0)     AS roomCount,
+           NVL(R.APPROVE_CNT, 0)  AS approveRoomCount,
+           NVL(R.HOLD_CNT, 0)     AS holdRoomCount,
+           NVL(R.CLOSED_CNT, 0)   AS closedRoomCount,
+           NVL(R.MIN_PRICE, 0)    AS minPrice,
+           (SELECT F.FILE_URL
+              FROM TB_FILE F
+             WHERE F.REF_TYPE = 'STAY'
+               AND F.REF_ID   = S.STAY_ID
+               AND ROWNUM     = 1) AS thumbPath
+      FROM TB_STAY S
+      LEFT JOIN TB_BUSINESS B ON B.BIZ_NO = S.BIZ_NO
+      <include refid="roomCountJoin"/>
+     WHERE S.STAY_ID = #{stayId}
+  </select>
+
+  <select id="selectRoomListByStayId" resultType="com.petcare.petcare.stay.vo.StayRoomVO">
+    SELECT ROOM_ID,
+           STAY_ID,
+           NAME,
+           PRICE_PER_NIGHT,
+           CAPACITY,
+           PET_LIMIT,
+           STATUS_CD
+      FROM TB_STAY_ROOM
+     WHERE STAY_ID = #{stayId}
+     ORDER BY ROOM_ID
+  </select>
+
+</mapper>

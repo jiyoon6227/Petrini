@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.member.auth.mapper.MemberAuthMapper">
+<!-- 2026/07/06 장우철 -->
+    <!--
+        로그인: 이메일로 TB_MEMBER 1건 조회
+        - MEMBER_ID, EMAIL 둘 다 비교 (화면에서 이메일로 로그인)
+        - resultType: MemberAuthVO (camelCase 매핑)
+        2026/07/08 장우철 — POINT_BALANCE 추가 (마이페이지 보유 포인트 세션용)
+    
+    <select id="selectMemberByLoginId"
+            resultType="com.petcare.petcare.member.auth.vo.MemberAuthVO">
+        SELECT
+            MEMBER_NO      AS memberNo,
+            MEMBER_ID      AS memberId,
+            MEMBER_PWD     AS memberPwd,
+            MEMBER_NAME    AS memberName,
+            NICKNAME       AS nickname,
+            EMAIL          AS email,
+            STATUS_CD      AS statusCd,
+            GRADE_CD       AS gradeCd,
+            POINT_BALANCE  AS pointBalance
+        FROM TB_MEMBER
+        WHERE MEMBER_ID = #{loginId}
+           OR EMAIL = #{loginId}
+    </select> -->
+
+    <!--2026/07/10 지윤 — 주문서(order.jsp) 배송지 자동 셋팅용 PHONE, ZIP_CODE, ADDR1, ADDR2 컬럼 추가 조회-->
+    <select id="selectMemberByLoginId"
+            resultType="com.petcare.petcare.member.auth.vo.MemberAuthVO">
+        SELECT
+            MEMBER_NO      AS memberNo,
+            MEMBER_ID      AS memberId,
+            MEMBER_PWD     AS memberPwd,
+            MEMBER_NAME    AS memberName,
+            NICKNAME       AS nickname,
+            EMAIL          AS email,
+            PHONE          AS phone,
+            ZIP_CODE       AS zipcode,
+            ADDR1          AS addr1,
+            ADDR2          AS addr2,
+            STATUS_CD      AS statusCd,
+            GRADE_CD       AS gradeCd,
+            POINT_BALANCE  AS pointBalance,
+            PROFILE_IMG_URL AS profileImgUrl   <!-- 2026-08-04 박유정 — 로그인 세션 사이드바용 -->
+        FROM TB_MEMBER
+        WHERE MEMBER_ID = #{loginId}
+           OR EMAIL = #{loginId}
+    </select>
+    
+    <!-- [변경 전] 2026/07/06 — POINT_BALANCE 미조회
+    <select id="selectMemberByLoginId" ...>
+        SELECT MEMBER_NO AS memberNo, ... GRADE_CD AS gradeCd
+        FROM TB_MEMBER WHERE ...
+    </select>
+    -->
+
+    <!--
+        2026/07/07 장우철 — 관리자 로그인 확장
+        로그인: 아이디로 TB_ADMIN 1건 조회
+        - 관리자 ID(ADMIN_ID)는 이메일 형식이 아닌 일반 아이디 (예: admin)
+        - resultType: AdminAuthVO (camelCase 매핑)
+        - 유저 홈(/login)에서 TB_MEMBER 조회 결과가 없을 때 이 쿼리로 관리자 여부 확인
+    -->
+    <select id="selectAdminByLoginId"
+            resultType="com.petcare.petcare.member.auth.vo.AdminAuthVO">
+        SELECT
+            ADMIN_NO    AS adminNo,
+            ADMIN_ID    AS adminId,
+            ADMIN_PWD   AS adminPwd,
+            ADMIN_NAME  AS adminName,
+            ROLE_ID     AS roleId,
+            STATUS_CD   AS statusCd
+        FROM TB_ADMIN
+        WHERE ADMIN_ID = #{loginId}
+    </select>
+
+    <!--
+        로그인 성공 시 LAST_LOGIN_DATE 갱신
+    -->
+    <update id="updateLastLoginDate">
+        UPDATE TB_MEMBER
+        SET LAST_LOGIN_DATE = SYSDATE
+        WHERE MEMBER_NO = #{memberNo}
+    </update>
+
+    <!-- 2026-07-09 장우철 — 승인 완료 사업자 조회 (로그인 세션용)
+         이유: 신청(apply) 시 TB_BUSINESS.BIZ_TYPE 에 저장된 업종으로
+               /testHospital→HOSPITAL, /testStay→STAY, /testStore→STORE 와 동일하게 분기 -->
+    <select id="selectApprovedBusinessByBizId"
+            resultType="com.petcare.petcare.member.auth.vo.MemberAuthBizVO">
+        SELECT
+            BIZ_NO     AS bizNo,
+            BIZ_TYPE   AS bizType,
+            STATUS_CD  AS statusCd
+        FROM TB_BUSINESS
+        WHERE BIZ_ID = #{bizId}
+          AND STATUS_CD = 'APPROVED'
+        FETCH FIRST 1 ROW ONLY
+    </select>
+
+    <!-- 2026/07/07 장우철 — join(회원가입) -->
+
+    <!--
+        이메일 중복 확인 (join — checkEmail)
+        - EMAIL 컬럼만 검사 (MEMBER_ID 는 아이디이므로 별도)
+    -->
+    <!-- 2026-07-22 박유정 — 이메일 중복 확인 시 탈퇴(WITHDRAWN) 회원 제외 -->
+    <select id="countMemberByEmail" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_MEMBER
+         WHERE EMAIL = #{email}
+          AND STATUS_CD !='WITHDRAWN'
+    </select>
+
+    <!-- 2026-07-22 박유정 — 탈퇴 회원 이메일 재가입 차단 -->
+    <select id="countWithdrawnMemberByEmail" resultType="int">
+        SELECT COUNT(*)
+           FROM TB_MEMBER
+         WHERE EMAIL = #{email}
+           AND STATUS_CD = 'WITHDRAWN'
+    </select>
+
+    <!--
+        아이디 중복 확인 (join — checkMemberId)
+        - MEMBER_ID 컬럼 검사
+    -->
+    <select id="countMemberById" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_MEMBER
+         WHERE MEMBER_ID = #{memberId}
+    </select>
+
+    <!-- 회원 INSERT (join — register 1단계) -->
+    <!-- 2026-07-28 박유정 — BIRTH_DATE, GENDER 컬럼 저장 추가 -->
+    <insert id="insertMember" parameterType="com.petcare.petcare.member.auth.vo.MemberRegisterVO">
+        <selectKey keyProperty="memberNo" resultType="long" order="BEFORE">
+            SELECT SEQ_MEMBER.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_MEMBER (
+            MEMBER_NO,
+            MEMBER_ID,
+            MEMBER_PWD,
+            MEMBER_NAME,
+            NICKNAME,
+            EMAIL,
+            PHONE,
+            ZIP_CODE,
+            ADDR1,
+            ADDR2,
+            BIRTH_DATE,
+            GENDER,
+            GRADE_CD,
+            POINT_BALANCE,
+            STATUS_CD,
+            MARKETING_YN,
+            JOIN_DATE
+        ) VALUES (
+            #{memberNo},
+            #{memberId},
+            #{password},
+            #{memberName},
+            #{memberName},
+            #{email},
+            #{phone},
+            #{zipcode, jdbcType=VARCHAR},
+            #{addr1, jdbcType=VARCHAR},
+            #{addr2, jdbcType=VARCHAR},
+            TO_DATE(#{birthDate}, 'YYYY-MM-DD'),
+            #{gender, jdbcType=CHAR},
+            'BRONZE',
+            0,
+            'NORMAL',
+            #{agreeMarketing},
+            SYSDATE
+        )
+    </insert>
+
+    <!--
+        약관 동의 1건 INSERT (join — register 2단계, 종류별 반복 호출)
+        - AGREE_ID 는 SEQ_MEMBER_AGREEMENT 전역 증가 (회원별 1부터가 아님)
+    -->
+    <insert id="insertMemberAgreement">
+        INSERT INTO TB_MEMBER_AGREEMENT (
+            AGREE_ID,
+            MEMBER_NO,
+            TERMS_TYPE,
+            TERMS_VER,
+            AGREE_YN,
+            AGREE_DATE
+        ) VALUES (
+            SEQ_MEMBER_AGREEMENT.NEXTVAL,
+            #{memberNo},
+            #{termsType},
+            #{termsVer},
+            #{agreeYn},
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 반려동물 INSERT (join — register 3단계, petName 있을 때만) -->
+    <!-- 2026/07/11 장우철 — DEL_YN='N' 명시 (DATABASE_TABLE TB_PET.DEL_YN 소프트삭제 컬럼) -->
+    <insert id="insertPet" parameterType="com.petcare.petcare.member.auth.vo.MemberRegisterVO">
+        <selectKey keyProperty="petId" resultType="long" order="BEFORE">
+            SELECT SEQ_PET.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_PET (
+            PET_ID,
+            MEMBER_NO,
+            PET_NAME,
+            SPECIES,
+            BREED,
+            GENDER,
+            AGE,
+            BIRTH_DATE,
+            WEIGHT,
+            PHOTO_URL,
+            IS_REPRESENT,
+            DEL_YN,
+            REG_DATE
+        ) VALUES (
+            #{petId},
+            #{memberNo},
+            #{petName},
+            #{petType},
+            #{petBreed, jdbcType=VARCHAR},
+            #{petGender, jdbcType=CHAR},
+            #{petAge, jdbcType=NUMERIC},
+            #{petBirthDate, jdbcType=DATE},
+            #{petWeight, jdbcType=NUMERIC},
+            #{petPhotoUrl, jdbcType=VARCHAR},
+            'Y',
+            'N',
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 2026/08/11 장우철 — 가입 시 펫 사진 업로드 후 PHOTO_URL 갱신 -->
+    <update id="updatePetPhotoUrl">
+        UPDATE TB_PET
+           SET PHOTO_URL = #{photoUrl, jdbcType=VARCHAR}
+         WHERE PET_ID = #{petId}
+           AND MEMBER_NO = #{memberNo}
+    </update>
+
+
+    <!--
+        HYJ 26.07.15 카카오 SOCIAL_ID 로 TB_MEMBER 조회
+        - 카카오 로그인 시 기존 가입 여부 확인용
+        - resultType: MemberAuthVO (기존 로그인과 동일 VO 재사용)
+    -->
+    <select id="selectMemberBySocialId"
+            resultType="com.petcare.petcare.member.auth.vo.MemberAuthVO">
+        SELECT
+            M.MEMBER_NO      AS memberNo,
+            M.MEMBER_ID      AS memberId,
+            M.MEMBER_PWD     AS memberPwd,
+            M.MEMBER_NAME    AS memberName,
+            M.NICKNAME       AS nickname,
+            M.EMAIL          AS email,
+            M.PHONE          AS phone,
+            M.ZIP_CODE       AS zipcode,
+            M.ADDR1          AS addr1,
+            M.ADDR2          AS addr2,
+            M.STATUS_CD      AS statusCd,
+            M.GRADE_CD       AS gradeCd,
+            M.POINT_BALANCE  AS pointBalance,
+            M.PROFILE_IMG_URL AS profileImgUrl   <!-- 2026-08-04 박유정 — 카카오 로그인 세션용 -->
+        FROM TB_MEMBER M
+        INNER JOIN TB_MEMBER_SOCIAL S
+            ON M.MEMBER_NO = S.MEMBER_NO
+        WHERE S.PROVIDER_UID = #{socialId}
+          AND S.PROVIDER     = 'KAKAO'
+    </select>
+
+    <!--
+        기존 회원에 카카오 소셜 연동 INSERT
+        - 회원가입 후 또는 기존 회원이 처음 카카오 로그인할 때 호출
+        - TB_MEMBER_SOCIAL 에 1행 INSERT
+    -->
+    <insert id="insertSocialLink">
+        INSERT INTO TB_MEMBER_SOCIAL (
+            SOCIAL_ID,
+            MEMBER_NO,
+            PROVIDER,
+            PROVIDER_UID,
+            REG_DATE
+        ) VALUES (
+            SEQ_MEMBER_SOCIAL.NEXTVAL,
+            #{memberNo},
+            'KAKAO',
+            #{providerUid},
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 2026-07-21 박유정 — 기간 정지 만료 시 자동 복구 -->
+    <update id="releaseExpiredSuspensions">
+      UPDATE TB_MEMBER
+      SET STATUS_CD = 'NORMAL',
+          SUSPEND_END_DATE = NULL
+      WHERE STATUS_CD = 'SUSPENDED'
+        AND SUSPEND_END_DATE IS NOT NULL
+        AND TRUNC(SUSPEND_END_DATE) &lt;= TRUNC(SYSDATE)
+</update>
+</mapper>

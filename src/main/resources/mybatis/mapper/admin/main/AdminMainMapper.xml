@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.admin.main.mapper.AdminMainMapper">
+
+<!--
+  역할: AdminMainMapper SQL 정의
+
+  - 박유정 / 2026-07-30 — ADMIN-01 대시보드 통계·차트 / ADMIN-04 Phase 1
+  - 박유정 / 2026-07-31 — ADMIN-04 Phase 2~5-A: 차트·업종·지난달 SQL
+
+  테이블
+  - TB_MEMBER
+  - TB_ORDER
+  - TB_RESERVATION
+  - TB_BUSINESS
+-->
+  <!-- 2026-07-30 박유정 — Phase 2: 오늘 신규 가입자 (JOIN_DATE = SYSDATE 날짜) -->
+  <select id="countTodayNewMembers" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER
+     WHERE TRUNC(JOIN_DATE) = TRUNC(SYSDATE)
+  </select>
+
+  <!-- 2026-07-30 박유정 — Phase 2: 오늘 주문 건수 (ORDER_DATE DATE, TRUNC 비교) -->
+  <select id="countTodayOrders" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_ORDER
+     WHERE TRUNC(ORDER_DATE) = TRUNC(SYSDATE)
+  </select>
+
+  <!-- 2026-07-30 박유정 — Phase 2: 오늘 매출 합(원), 취소 주문 제외 -->
+  <select id="sumTodaySalesAmount" resultType="long">
+    SELECT NVL(SUM(NVL(PAY_AMOUNT, 0)), 0)
+      FROM TB_ORDER
+     WHERE TRUNC(ORDER_DATE) = TRUNC(SYSDATE)
+       AND ORDER_STATUS &lt;&gt; 'CANCEL'
+  </select>
+
+  <!-- 2026-07-30 박유정 — Phase 2: 미처리 예약 (사업자 사이드바 배지와 동일 기준) -->
+  <select id="countPendingReservations" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_RESERVATION
+     WHERE STATUS_CD IN ('PENDING', 'CONFIRMED')
+  </select>
+
+  <!-- 2026-07-30 박유정 — Phase 3-A: 최근 주문 5건 (TB_ORDER + TB_MEMBER, 새 DDL) -->
+  <select id="selectRecentOrders"
+          resultType="com.petcare.petcare.admin.main.vo.AdminMainOrderVO">
+    SELECT
+      O.ORDER_ID     AS orderId,
+      O.ORDER_NO     AS orderNo,
+      M.MEMBER_NAME  AS memberName,
+      O.PAY_AMOUNT   AS payAmount,
+      O.ORDER_STATUS AS orderStatus
+    FROM TB_ORDER O
+    JOIN TB_MEMBER M ON M.MEMBER_NO = O.MEMBER_NO
+    ORDER BY O.ORDER_ID DESC
+    FETCH FIRST 5 ROWS ONLY
+  </select>
+
+    <!-- 2026-07-30 박유정 — Phase 3-B: 탈퇴 회원 (가장 단순, 먼저 이해) -->
+  <select id="countMemberWithdrawn" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER
+     WHERE STATUS_CD = 'WITHDRAWN'
+  </select>
+
+  <!-- 2026-07-30 박유정 — Phase 3-B: 사업자 회원 (AdminMemberMapper roleType=BIZ 와 동일) -->
+  <select id="countMemberBiz" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER M
+     WHERE M.STATUS_CD &lt;&gt; 'WITHDRAWN'
+       AND EXISTS (
+             SELECT 1
+               FROM TB_BUSINESS B
+              WHERE B.BIZ_ID = M.MEMBER_ID
+                AND B.STATUS_CD = 'APPROVED'
+           )
+  </select>
+
+  <!-- 2026-07-30 박유정 — Phase 3-B: 일반회원 (탈퇴·승인사업자 제외) -->
+  <select id="countMemberGeneral" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER M
+     WHERE M.STATUS_CD &lt;&gt; 'WITHDRAWN'
+       AND NOT EXISTS (
+             SELECT 1
+               FROM TB_BUSINESS B
+              WHERE B.BIZ_ID = M.MEMBER_ID
+                AND B.STATUS_CD = 'APPROVED'
+           )
+  </select>
+
+  <!-- 2026-07-30 박유정 — Phase 3-C: 최근 7일 일별 매출 (취소 제외, 오늘 포함) -->
+  <select id="selectWeeklySales"
+          resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
+    SELECT
+      TO_CHAR(TRUNC(O.ORDER_DATE), 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS dayLabel,
+      NVL(SUM(NVL(O.PAY_AMOUNT, 0)), 0)                              AS salesAmount
+    FROM TB_ORDER O
+    WHERE TRUNC(O.ORDER_DATE) &gt;= TRUNC(SYSDATE) - 6
+      AND TRUNC(O.ORDER_DATE) &lt;= TRUNC(SYSDATE)
+      AND O.ORDER_STATUS &lt;&gt; 'CANCEL'
+    GROUP BY TRUNC(O.ORDER_DATE)
+    ORDER BY TRUNC(O.ORDER_DATE)
+  </select>
+
+  <!-- 2026-07-30 박유정 — 월간 매출: 이번 달 1일~말일 일별 (취소 제외) -->
+  <select id="selectMonthlySales"
+          resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
+    SELECT
+      TO_CHAR(TRUNC(O.ORDER_DATE), 'FMDD') AS dayLabel,
+      NVL(SUM(NVL(O.PAY_AMOUNT, 0)), 0)     AS salesAmount
+    FROM TB_ORDER O
+    WHERE TRUNC(O.ORDER_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+      AND TRUNC(O.ORDER_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+      AND O.ORDER_STATUS &lt;&gt; 'CANCEL'
+    GROUP BY TRUNC(O.ORDER_DATE)
+    ORDER BY TRUNC(O.ORDER_DATE)
+  </select>
+
+  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 총 매출(원), 취소 제외 -->
+  <select id="sumMonthSalesAmount" resultType="long">
+    SELECT NVL(SUM(NVL(PAY_AMOUNT, 0)), 0)
+      FROM TB_ORDER
+     WHERE TRUNC(ORDER_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+       AND TRUNC(ORDER_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+       AND ORDER_STATUS &lt;&gt; 'CANCEL'
+  </select>
+
+  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 신규 가입 -->
+  <select id="countMonthNewMembers" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER
+     WHERE TRUNC(JOIN_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+       AND TRUNC(JOIN_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+  </select>
+
+  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 예약 건수 (등록일 기준) -->
+  <select id="countMonthReservations" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_RESERVATION
+     WHERE TRUNC(REG_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+       AND TRUNC(REG_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+  </select>
+
+  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 주문 수 -->
+  <select id="countMonthOrders" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_ORDER
+     WHERE TRUNC(ORDER_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+       AND TRUNC(ORDER_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+  </select>
+
+    <!-- 2026-07-31 박유정 — ADMIN-04 Phase 2: 최근 6개월 월별 매출 (취소 제외) -->
+  <select id="selectLast6MonthsSales"
+          resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
+    SELECT
+      TO_CHAR(TRUNC(O.ORDER_DATE, 'MM'), 'YYYY-MM') AS dayLabel,
+      NVL(SUM(NVL(O.PAY_AMOUNT, 0)), 0)              AS salesAmount
+    FROM TB_ORDER O
+    WHERE TRUNC(O.ORDER_DATE, 'MM') &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+      AND TRUNC(O.ORDER_DATE, 'MM') &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+      AND O.ORDER_STATUS &lt;&gt; 'CANCEL'
+    GROUP BY TRUNC(O.ORDER_DATE, 'MM')
+    ORDER BY TRUNC(O.ORDER_DATE, 'MM')
+  </select>
+
+    <!-- 2026-07-31 박유정 — ADMIN-04 Phase 3: 최근 6개월 월별 신규 가입 -->
+  <select id="selectLast6MonthsNewMembers"
+          resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
+    SELECT
+      TO_CHAR(TRUNC(M.JOIN_DATE, 'MM'), 'YYYY-MM') AS dayLabel,
+      COUNT(*)                                       AS salesAmount
+    FROM TB_MEMBER M
+    WHERE TRUNC(M.JOIN_DATE, 'MM') &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+      AND TRUNC(M.JOIN_DATE, 'MM') &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+    GROUP BY TRUNC(M.JOIN_DATE, 'MM')
+    ORDER BY TRUNC(M.JOIN_DATE, 'MM')
+  </select>
+
+  <!-- 2026-07-31 박유정 — ADMIN-04 Phase 4: 이번 달 업종별 예약/주문 (병원·숙소·쇼핑) -->
+  <select id="selectMonthCategoryResvOrderStats"
+          resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
+    SELECT dayLabel, salesAmount
+      FROM (
+        SELECT '병원' AS dayLabel, COUNT(*) AS salesAmount
+          FROM TB_RESERVATION
+         WHERE RESV_TYPE = 'HOSPITAL'
+           AND TRUNC(REG_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+           AND TRUNC(REG_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+        UNION ALL
+        SELECT '숙소', COUNT(*)
+          FROM TB_RESERVATION
+         WHERE RESV_TYPE = 'STAY'
+           AND TRUNC(REG_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+           AND TRUNC(REG_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+        UNION ALL
+        SELECT '쇼핑', COUNT(*)
+          FROM TB_ORDER
+         WHERE TRUNC(ORDER_DATE) &gt;= TRUNC(SYSDATE, 'MM')
+           AND TRUNC(ORDER_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+      ) T
+     ORDER BY CASE dayLabel
+                WHEN '병원' THEN 1
+                WHEN '숙소' THEN 2
+                WHEN '쇼핑' THEN 3
+              END
+  </select>
+
+  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 총 매출(원), 취소 제외 -->
+  <select id="sumPrevMonthSalesAmount" resultType="long">
+    SELECT NVL(SUM(NVL(PAY_AMOUNT, 0)), 0)
+      FROM TB_ORDER
+     WHERE TRUNC(ORDER_DATE) &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+       AND TRUNC(ORDER_DATE) &lt; TRUNC(SYSDATE, 'MM')
+       AND ORDER_STATUS &lt;&gt; 'CANCEL'
+  </select>
+
+  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 신규 가입 -->
+  <select id="countPrevMonthNewMembers" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_MEMBER
+     WHERE TRUNC(JOIN_DATE) &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+       AND TRUNC(JOIN_DATE) &lt; TRUNC(SYSDATE, 'MM')
+  </select>
+
+  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 예약 건수 (등록일 기준) -->
+  <select id="countPrevMonthReservations" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_RESERVATION
+     WHERE TRUNC(REG_DATE) &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+       AND TRUNC(REG_DATE) &lt; TRUNC(SYSDATE, 'MM')
+  </select>
+
+  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 주문 수 -->
+  <select id="countPrevMonthOrders" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_ORDER
+     WHERE TRUNC(ORDER_DATE) &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+       AND TRUNC(ORDER_DATE) &lt; TRUNC(SYSDATE, 'MM')
+  </select>
+</mapper>

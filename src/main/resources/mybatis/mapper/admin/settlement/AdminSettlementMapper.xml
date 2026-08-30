@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  역할: 관리자 정산 SQL (사업자 settlement 매퍼와 분리)
+  2026/07/30 장우철 — 숙소 정산 구현순서 3-1 ~ 3-5
+-->
+<mapper namespace="com.petcare.petcare.admin.settlement.mapper.AdminSettlementMapper">
+
+    <select id="ping" resultType="int">
+        SELECT 1 FROM DUAL
+    </select>
+
+    <select id="countStaySettlements" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_SETTLEMENT
+         WHERE BIZ_TYPE = 'STAY'
+        <if test="bizNo != null">
+           AND BIZ_NO = #{bizNo}
+        </if>
+    </select>
+
+    <!-- 3-2 숙소 정산 목록 + 계좌 -->
+    <select id="selectStaySettlementList"
+            resultType="com.petcare.petcare.admin.settlement.vo.AdminStaySettlementVO">
+        SELECT  ST.SETTLE_ID      AS settleId,
+                ST.BIZ_NO         AS bizNo,
+                B.BIZ_NAME        AS bizName,
+                ST.SETTLE_MONTH   AS settleMonth,
+                ST.PERIOD_START   AS periodStart,
+                ST.PERIOD_END     AS periodEnd,
+                ST.TOTAL_SALES    AS totalSales,
+                ST.TOTAL_FEE      AS totalFee,
+                ST.SETTLE_AMOUNT  AS settleAmount,
+                ST.FEE_RATE       AS feeRate,
+                ST.SETTLE_STATUS  AS settleStatus,
+                ST.PAY_STATUS     AS payStatus,
+                ST.PAY_DATE       AS payDate,
+                ST.REQUEST_TYPE   AS requestType,
+                ST.REQUEST_SCOPE  AS requestScope,
+                B.SETTLE_BANK     AS settleBank,
+                B.SETTLE_ACCOUNT  AS settleAccount,
+                B.SETTLE_HOLDER   AS settleHolder
+          FROM  TB_SETTLEMENT ST
+          JOIN  TB_BUSINESS B
+            ON  B.BIZ_NO = ST.BIZ_NO
+         WHERE  ST.BIZ_TYPE = 'STAY'
+        <if test="statusCd == 'wait' or statusCd == 'pending'">
+           AND  NVL(ST.PAY_STATUS, 'WAIT') = 'WAIT'
+        </if>
+        <if test="statusCd == 'done'">
+           AND  ST.PAY_STATUS = 'DONE'
+        </if>
+        <if test="statusCd == 'fail'">
+           AND  ST.PAY_STATUS = 'FAIL'
+        </if>
+         ORDER BY ST.PERIOD_START DESC, ST.SETTLE_ID DESC
+    </select>
+
+    <!-- 지급 알림용 단건 -->
+    <select id="selectStaySettlementById"
+            resultType="com.petcare.petcare.admin.settlement.vo.AdminStaySettlementVO">
+        SELECT  ST.SETTLE_ID      AS settleId,
+                ST.BIZ_NO         AS bizNo,
+                B.BIZ_NAME        AS bizName,
+                ST.SETTLE_MONTH   AS settleMonth,
+                ST.PERIOD_START   AS periodStart,
+                ST.PERIOD_END     AS periodEnd,
+                ST.TOTAL_SALES    AS totalSales,
+                ST.TOTAL_FEE      AS totalFee,
+                ST.SETTLE_AMOUNT  AS settleAmount,
+                ST.FEE_RATE       AS feeRate,
+                ST.SETTLE_STATUS  AS settleStatus,
+                ST.PAY_STATUS     AS payStatus,
+                ST.PAY_DATE       AS payDate,
+                ST.REQUEST_TYPE   AS requestType,
+                ST.REQUEST_SCOPE  AS requestScope,
+                B.SETTLE_BANK     AS settleBank,
+                B.SETTLE_ACCOUNT  AS settleAccount,
+                B.SETTLE_HOLDER   AS settleHolder
+          FROM  TB_SETTLEMENT ST
+          JOIN  TB_BUSINESS B
+            ON  B.BIZ_NO = ST.BIZ_NO
+         WHERE  ST.SETTLE_ID = #{settleId}
+           AND  ST.BIZ_TYPE = 'STAY'
+    </select>
+
+    <!-- 3-3 상세 ITEM -->
+    <select id="selectStaySettlementItems"
+            resultType="com.petcare.petcare.settlement.vo.StaySettlementItemVO">
+        SELECT  SI.SETTLE_ITEM_ID AS settleItemId,
+                SI.SETTLE_ID      AS settleId,
+                NVL(SI.ITEM_TYPE, 'STAY') AS itemType,
+                SI.RESV_ID        AS resvId,
+                SI.ROOM_ID        AS roomId,
+                SI.CHECKIN_DATE   AS checkinDate,
+                SI.CHECKOUT_DATE  AS checkoutDate,
+                SI.RESV_AMOUNT    AS resvAmount,
+                SI.FEE_RATE       AS feeRate,
+                SI.FEE_AMOUNT     AS feeAmount,
+                SI.SETTLE_AMOUNT  AS settleAmount,
+                SI.STATUS_CD      AS statusCd,
+                R.RESV_NO         AS resvNo,
+                SR.NAME           AS roomName
+          FROM  TB_SETTLEMENT_ITEM SI
+          JOIN  TB_SETTLEMENT ST
+            ON  ST.SETTLE_ID = SI.SETTLE_ID
+           AND  ST.BIZ_TYPE = 'STAY'
+          LEFT JOIN TB_RESERVATION R
+            ON  R.RESV_ID = SI.RESV_ID
+          LEFT JOIN TB_STAY_ROOM SR
+            ON  SR.ROOM_ID = SI.ROOM_ID
+         WHERE  SI.SETTLE_ID = #{settleId}
+         ORDER BY SI.CHECKOUT_DATE ASC, SI.SETTLE_ITEM_ID ASC
+    </select>
+
+    <!-- 3-4 단건 더미/수동입금 완료 — WAIT·FAIL → DONE (2026/08/05 장우철 S12 FAIL 수동입금) -->
+    <update id="updateStaySettlementPaid">
+        UPDATE TB_SETTLEMENT
+           SET PAY_STATUS    = 'DONE',
+               SETTLE_STATUS = 'PAID',
+               PAY_DATE      = SYSDATE
+         WHERE SETTLE_ID = #{settleId}
+           AND BIZ_TYPE = 'STAY'
+           AND NVL(PAY_STATUS, 'WAIT') IN ('WAIT', 'FAIL')
+    </update>
+
+    <!-- 3-5 일괄 더미 지급 완료 — WAIT만 (자동지급용). FAIL은 관리자 단건 수동입금 -->
+    <update id="updateStaySettlementPaidBatch">
+        UPDATE TB_SETTLEMENT
+           SET PAY_STATUS    = 'DONE',
+               SETTLE_STATUS = 'PAID',
+               PAY_DATE      = SYSDATE
+         WHERE BIZ_TYPE = 'STAY'
+           AND NVL(PAY_STATUS, 'WAIT') = 'WAIT'
+           AND SETTLE_ID IN
+        <foreach collection="settleIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 2026/08/05 장우철 — S12 FAIL 표시 (실지급 실패 시·테스트용) -->
+    <update id="updateStaySettlementFail">
+        UPDATE TB_SETTLEMENT
+           SET PAY_STATUS = 'FAIL'
+         WHERE SETTLE_ID = #{settleId}
+           AND BIZ_TYPE = 'STAY'
+           AND NVL(PAY_STATUS, 'WAIT') = 'WAIT'
+    </update>
+
+    <!-- 2026/08/05 장우철 — S12 15일 자동지급: WAIT 전체 SETTLE_ID -->
+    <select id="selectStayWaitSettleIds" resultType="long">
+        SELECT SETTLE_ID
+          FROM TB_SETTLEMENT
+         WHERE BIZ_TYPE = 'STAY'
+           AND NVL(PAY_STATUS, 'WAIT') = 'WAIT'
+         ORDER BY SETTLE_ID
+    </select>
+
+    <!-- 4-3 중간정산 요청 대기 건수 -->
+    <select id="countStayRequestsRequested" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_SETTLEMENT_REQUEST R
+          JOIN TB_BUSINESS B ON B.BIZ_NO = R.BIZ_NO
+         WHERE R.STATUS_CD = 'REQUESTED'
+           AND B.BIZ_TYPE = 'STAY'
+    </select>
+
+    <!-- 4-3 중간정산 요청 목록 -->
+    <select id="selectStayRequestList"
+            resultType="com.petcare.petcare.admin.settlement.vo.AdminStayRequestVO">
+        SELECT  R.REQUEST_ID    AS requestId,
+                R.BIZ_NO        AS bizNo,
+                B.BIZ_NAME      AS bizName,
+                R.REQUEST_SCOPE AS requestScope,
+                R.ROOM_ID       AS roomId,
+                SR.NAME         AS roomName,
+                R.TARGET_START  AS targetStart,
+                R.TARGET_END    AS targetEnd,
+                R.STATUS_CD     AS statusCd,
+                R.REQUEST_MEMO  AS requestMemo,
+                R.REJECT_REASON AS rejectReason,
+                R.REQUESTED_AT  AS requestedAt,
+                R.APPROVED_AT   AS approvedAt,
+                R.REJECTED_AT   AS rejectedAt
+          FROM  TB_SETTLEMENT_REQUEST R
+          JOIN  TB_BUSINESS B
+            ON  B.BIZ_NO = R.BIZ_NO
+           AND  B.BIZ_TYPE = 'STAY'
+          LEFT JOIN TB_STAY_ROOM SR
+            ON  SR.ROOM_ID = R.ROOM_ID
+        <if test="statusCd == 'requested'">
+         WHERE  R.STATUS_CD = 'REQUESTED'
+        </if>
+        <if test="statusCd == 'approved'">
+         WHERE  R.STATUS_CD = 'APPROVED'
+        </if>
+        <if test="statusCd == 'rejected'">
+         WHERE  R.STATUS_CD = 'REJECTED'
+        </if>
+         ORDER BY R.REQUESTED_AT DESC, R.REQUEST_ID DESC
+    </select>
+
+    <!-- 2026/08/05 장우철 — S11 쇼핑 STORE -->
+    <select id="countStoreSettlements" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_SETTLEMENT
+         WHERE BIZ_TYPE = 'STORE'
+        <if test="bizNo != null">
+           AND BIZ_NO = #{bizNo}
+        </if>
+    </select>
+
+    <select id="selectStoreSettlementList"
+            resultType="com.petcare.petcare.admin.settlement.vo.AdminStaySettlementVO">
+        SELECT  ST.SETTLE_ID      AS settleId,
+                ST.BIZ_NO         AS bizNo,
+                B.BIZ_NAME        AS bizName,
+                ST.SETTLE_MONTH   AS settleMonth,
+                ST.PERIOD_START   AS periodStart,
+                ST.PERIOD_END     AS periodEnd,
+                ST.TOTAL_SALES    AS totalSales,
+                ST.TOTAL_FEE      AS totalFee,
+                ST.SETTLE_AMOUNT  AS settleAmount,
+                ST.FEE_RATE       AS feeRate,
+                ST.SETTLE_STATUS  AS settleStatus,
+                ST.PAY_STATUS     AS payStatus,
+                ST.PAY_DATE       AS payDate,
+                ST.REQUEST_TYPE   AS requestType,
+                ST.REQUEST_SCOPE  AS requestScope,
+                B.SETTLE_BANK     AS settleBank,
+                B.SETTLE_ACCOUNT  AS settleAccount,
+                B.SETTLE_HOLDER   AS settleHolder
+          FROM  TB_SETTLEMENT ST
+          JOIN  TB_BUSINESS B
+            ON  B.BIZ_NO = ST.BIZ_NO
+         WHERE  ST.BIZ_TYPE = 'STORE'
+        <if test="statusCd == 'wait' or statusCd == 'pending'">
+           AND  NVL(ST.PAY_STATUS, 'WAIT') = 'WAIT'
+        </if>
+        <if test="statusCd == 'done'">
+           AND  ST.PAY_STATUS = 'DONE'
+        </if>
+        <if test="statusCd == 'fail'">
+           AND  ST.PAY_STATUS = 'FAIL'
+        </if>
+         ORDER BY ST.PERIOD_START DESC, ST.SETTLE_ID DESC
+    </select>
+
+    <select id="selectStoreSettlementById"
+            resultType="com.petcare.petcare.admin.settlement.vo.AdminStaySettlementVO">
+        SELECT  ST.SETTLE_ID      AS settleId,
+                ST.BIZ_NO         AS bizNo,
+                B.BIZ_NAME        AS bizName,
+                ST.SETTLE_MONTH   AS settleMonth,
+                ST.PERIOD_START   AS periodStart,
+                ST.PERIOD_END     AS periodEnd,
+                ST.TOTAL_SALES    AS totalSales,
+                ST.TOTAL_FEE      AS totalFee,
+                ST.SETTLE_AMOUNT  AS settleAmount,
+                ST.FEE_RATE       AS feeRate,
+                ST.SETTLE_STATUS  AS settleStatus,
+                ST.PAY_STATUS     AS payStatus,
+                ST.PAY_DATE       AS payDate,
+                ST.REQUEST_TYPE   AS requestType,
+                ST.REQUEST_SCOPE  AS requestScope,
+                B.SETTLE_BANK     AS settleBank,
+                B.SETTLE_ACCOUNT  AS settleAccount,
+                B.SETTLE_HOLDER   AS settleHolder
+          FROM  TB_SETTLEMENT ST
+          JOIN  TB_BUSINESS B
+            ON  B.BIZ_NO = ST.BIZ_NO
+         WHERE  ST.SETTLE_ID = #{settleId}
+           AND  ST.BIZ_TYPE = 'STORE'
+    </select>
+
+    <select id="selectStoreSettlementItems"
+            resultType="com.petcare.petcare.settlement.vo.StoreSettlementItemVO">
+        SELECT  SI.SETTLE_ITEM_ID AS settleItemId,
+                SI.SETTLE_ID      AS settleId,
+                NVL(SI.ITEM_TYPE, 'ORDER_ITEM') AS itemType,
+                SI.ORDER_ID       AS orderId,
+                SI.ORDER_ITEM_ID  AS orderItemId,
+                SI.PRODUCT_ID     AS productId,
+                SI.CONFIRMED_AT   AS confirmedAt,
+                SI.ITEM_SALES_AMOUNT AS itemSalesAmount,
+                SI.DELIVERY_FEE_AMOUNT AS deliveryFeeAmount,
+                SI.FEE_RATE       AS feeRate,
+                SI.FEE_AMOUNT     AS feeAmount,
+                SI.SETTLE_AMOUNT  AS settleAmount,
+                SI.STATUS_CD      AS statusCd,
+                NVL(O.ORDER_NO, TO_CHAR(SI.ORDER_ID)) AS orderNo,
+                NVL(OI.PRODUCT_NAME, P.PRODUCT_NAME) AS productName
+          FROM  TB_SETTLEMENT_ITEM SI
+          JOIN  TB_SETTLEMENT ST
+            ON  ST.SETTLE_ID = SI.SETTLE_ID
+           AND  ST.BIZ_TYPE = 'STORE'
+          LEFT JOIN TB_ORDER O
+            ON  O.ORDER_ID = SI.ORDER_ID
+          LEFT JOIN TB_ORDER_ITEM OI
+            ON  OI.ORDER_ITEM_ID = SI.ORDER_ITEM_ID
+          LEFT JOIN TB_PRODUCT P
+            ON  P.PRODUCT_ID = SI.PRODUCT_ID
+         WHERE  SI.SETTLE_ID = #{settleId}
+         ORDER BY SI.CONFIRMED_AT ASC, SI.SETTLE_ITEM_ID ASC
+    </select>
+
+    <!-- 2026/08/05 장우철 — S12 WAIT·FAIL → DONE (수동입금 포함) -->
+    <update id="updateStoreSettlementPaid">
+        UPDATE TB_SETTLEMENT
+           SET PAY_STATUS    = 'DONE',
+               SETTLE_STATUS = 'PAID',
+               PAY_DATE      = SYSDATE
+         WHERE SETTLE_ID = #{settleId}
+           AND BIZ_TYPE = 'STORE'
+           AND NVL(PAY_STATUS, 'WAIT') IN ('WAIT', 'FAIL')
+    </update>
+
+    <!-- 2026/08/05 장우철 — S12 FAIL 표시 -->
+    <update id="updateStoreSettlementFail">
+        UPDATE TB_SETTLEMENT
+           SET PAY_STATUS = 'FAIL'
+         WHERE SETTLE_ID = #{settleId}
+           AND BIZ_TYPE = 'STORE'
+           AND NVL(PAY_STATUS, 'WAIT') = 'WAIT'
+    </update>
+
+    <!-- 2026/08/05 장우철 — S12 15일 자동지급 대상 -->
+    <select id="selectStoreWaitSettleIds" resultType="long">
+        SELECT SETTLE_ID
+          FROM TB_SETTLEMENT
+         WHERE BIZ_TYPE = 'STORE'
+           AND NVL(PAY_STATUS, 'WAIT') = 'WAIT'
+         ORDER BY SETTLE_ID
+    </select>
+
+    <select id="countStoreRequestsRequested" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_SETTLEMENT_REQUEST R
+          JOIN TB_BUSINESS B ON B.BIZ_NO = R.BIZ_NO
+         WHERE R.STATUS_CD = 'REQUESTED'
+           AND B.BIZ_TYPE = 'STORE'
+    </select>
+
+    <select id="selectStoreRequestList"
+            resultType="com.petcare.petcare.admin.settlement.vo.AdminStoreRequestVO">
+        SELECT  R.REQUEST_ID    AS requestId,
+                R.BIZ_NO        AS bizNo,
+                B.BIZ_NAME      AS bizName,
+                R.REQUEST_SCOPE AS requestScope,
+                R.PRODUCT_ID    AS productId,
+                P.PRODUCT_NAME  AS productName,
+                R.TARGET_START  AS targetStart,
+                R.TARGET_END    AS targetEnd,
+                R.STATUS_CD     AS statusCd,
+                R.REQUEST_MEMO  AS requestMemo,
+                R.REJECT_REASON AS rejectReason,
+                R.REQUESTED_AT  AS requestedAt,
+                R.APPROVED_AT   AS approvedAt,
+                R.REJECTED_AT   AS rejectedAt
+          FROM  TB_SETTLEMENT_REQUEST R
+          JOIN  TB_BUSINESS B
+            ON  B.BIZ_NO = R.BIZ_NO
+           AND  B.BIZ_TYPE = 'STORE'
+          LEFT JOIN TB_PRODUCT P
+            ON  P.PRODUCT_ID = R.PRODUCT_ID
+        <if test="statusCd == 'requested'">
+         WHERE  R.STATUS_CD = 'REQUESTED'
+        </if>
+        <if test="statusCd == 'approved'">
+         WHERE  R.STATUS_CD = 'APPROVED'
+        </if>
+        <if test="statusCd == 'rejected'">
+         WHERE  R.STATUS_CD = 'REJECTED'
+        </if>
+         ORDER BY R.REQUESTED_AT DESC, R.REQUEST_ID DESC
+    </select>
+
+</mapper>

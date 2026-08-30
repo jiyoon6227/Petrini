@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.admin.store.mapper.AdminStoreMapper">
+
+<!--
+  역할: AdminStoreMapper SQL 정의
+
+  쿼리 id 예시
+  - selectProductList
+  - selectProductDetail
+  - insertProduct
+  - updateProduct
+  - selectOrderList
+  - selectOrderDetail
+  - updateOrderStatus
+  - selectCategoryList
+  - insertCategory
+
+  테이블
+  - TB_PRODUCT
+  - TB_ORDER
+  - TB_ORDER_ITEM
+  - TB_CATEGORY
+-->
+
+<!-- 지윤 26.07.21 추가: 대기중(PENDING)인 사업자 리뷰 삭제요청 목록 - 리뷰 원본 + 상품명 + 사업자명까지 같이 조회 -->
+<select id="selectPendingReviewReports" resultType="com.petcare.petcare.admin.store.vo.AdminReviewReportVO">
+    SELECT  rr.REPORT_ID    AS reportId,
+            rr.REVIEW_ID    AS reviewId,
+            rr.REASON       AS reason,
+            rr.REG_DATE     AS regDate,
+            rr.BIZ_NO       AS bizNo,
+            b.BIZ_NAME      AS bizName,
+            p.PRODUCT_NAME  AS productName,
+            r.CONTENT       AS content,
+            r.RATING        AS rating,
+            m.NICKNAME      AS nickname
+      FROM  TB_REVIEW_REPORT rr
+      JOIN  TB_REVIEW r    ON r.REVIEW_ID = rr.REVIEW_ID
+      JOIN  TB_PRODUCT p   ON p.PRODUCT_ID = r.TARGET_ID
+      JOIN  TB_BUSINESS b  ON b.BIZ_NO = rr.BIZ_NO
+      JOIN  TB_MEMBER m    ON m.MEMBER_NO = r.MEMBER_NO
+     WHERE  rr.REPORTER_TYPE = 'BIZ'
+       AND  rr.STATUS_CD = 'PENDING'
+     ORDER BY rr.REG_DATE ASC
+</select>
+
+<!-- 지윤 26.07.21 추가: 승인 처리 - FK(TB_REVIEW_REPORT.REVIEW_ID -> TB_REVIEW.REVIEW_ID) 참조부터 끊어야
+     이후 TB_REVIEW DELETE할 때 ORA-02292(자식 레코드 발견) 안 남. adminNo는 jdbcType 명시 안 하면 null일 때 ORA-17004 남 -->
+<update id="updateReportApproved">
+    UPDATE TB_REVIEW_REPORT
+       SET STATUS_CD = 'DONE', ADMIN_NO = #{adminNo,jdbcType=NUMERIC}, REVIEW_ID = NULL
+     WHERE REPORT_ID = #{reportId}
+</update>
+
+<!-- 지윤 26.07.22 추가: 이 리뷰를 참조하는 "모든" 행(다른 유저신고/삭제요청 포함) REVIEW_ID 비우기 -->
+<update id="clearAllReportRefsByReviewId">
+    UPDATE TB_REVIEW_REPORT SET REVIEW_ID = NULL WHERE REVIEW_ID = #{reviewId}
+</update>
+
+<!-- 지윤 26.07.21 추가: 승인 - 원본 리뷰 실제 삭제 (clearAllReportRefsByReviewId로 FK 참조 다 끊은 다음에만 호출) -->
+<delete id="deleteReview">
+    DELETE FROM TB_REVIEW WHERE REVIEW_ID = #{reviewId}
+</delete>
+
+<!-- 지윤 26.07.21 추가: 반려 처리 완료 표시 (REVIEW_ID는 유지 - 블라인드 해제되어 그대로 노출됨) -->
+<update id="updateReportDone">
+    UPDATE TB_REVIEW_REPORT
+       SET STATUS_CD = 'DONE', ADMIN_NO = #{adminNo,jdbcType=NUMERIC}
+     WHERE REPORT_ID = #{reportId}
+</update>
+
+<!-- 2026/08/11 장우철 — 관리자: 전 사업자 상품 목록 (더미 JSP 제거) -->
+<sql id="adminProductFilter">
+    1 = 1
+    <if test="keyword != null and keyword != ''">
+        AND (
+            UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(b.BIZ_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+        )
+    </if>
+    <if test="statusCd != null and statusCd != ''">
+        AND p.STATUS_CD = #{statusCd}
+    </if>
+</sql>
+
+<select id="selectAdminProductList"
+        resultType="com.petcare.petcare.admin.store.vo.AdminStoreProductVO">
+    SELECT
+        p.PRODUCT_ID      AS productId,
+        p.PRODUCT_NAME    AS productName,
+        p.BIZ_NO          AS bizNo,
+        b.BIZ_NAME        AS bizName,
+        cp.CATEGORY_PATH  AS categoryName,
+        TO_NUMBER(p.PRICE) AS price,
+        TO_NUMBER(p.SALE_PRICE) AS salePrice,
+        NVL(os.STOCK_QTY, 0) AS stockQty,
+        p.STATUS_CD       AS statusCd,
+        f.FILE_URL        AS thumbnailUrl,
+        p.REG_DATE        AS regDate
+    FROM TB_PRODUCT p
+    JOIN TB_BUSINESS b ON b.BIZ_NO = p.BIZ_NO
+    <!-- 지윤 26.08.13 수정: 최하위 카테고리명만 나오던 문제 -> 동물종류 > 상품종류 > 나이대 전체 경로로 표시 -->
+    LEFT JOIN (
+        SELECT CATEGORY_ID,
+               SUBSTR(SYS_CONNECT_BY_PATH(CATEGORY_NAME, ' > '), 4) AS CATEGORY_PATH
+        FROM TB_PRODUCT_CATEGORY
+        WHERE DEPTH >= 2
+        START WITH DEPTH = 2
+        CONNECT BY PRIOR CATEGORY_ID = PARENT_ID
+    ) cp ON cp.CATEGORY_ID = p.CATEGORY_ID
+    LEFT JOIN (
+        SELECT PRODUCT_ID, SUM(STOCK_QTY) AS STOCK_QTY
+        FROM TB_PRODUCT_OPTION GROUP BY PRODUCT_ID
+    ) os ON os.PRODUCT_ID = p.PRODUCT_ID
+    LEFT JOIN (
+        SELECT REF_ID, FILE_URL, ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+        FROM TB_FILE WHERE REF_TYPE = 'PRODUCT'
+    ) f ON f.REF_ID = p.PRODUCT_ID AND f.RN = 1
+    WHERE <include refid="adminProductFilter"/>
+    ORDER BY p.PRODUCT_ID DESC
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+</select>
+
+<select id="selectAdminProductCount" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_PRODUCT p
+    JOIN TB_BUSINESS b ON b.BIZ_NO = p.BIZ_NO
+    WHERE <include refid="adminProductFilter"/>
+</select>
+
+<!-- 2026/08/11 장우철 — 관리자: 전 사업자 주문 목록 -->
+<sql id="adminOrderFilter">
+    1 = 1
+    <if test="keyword != null and keyword != ''">
+        AND (
+            UPPER(o.ORDER_NO) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(m.NICKNAME) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(m.MEMBER_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(b.BIZ_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+        )
+    </if>
+    <if test="statusCd != null and statusCd != ''">
+        AND o.ORDER_STATUS = #{statusCd}
+    </if>
+</sql>
+
+<select id="selectAdminOrderList"
+        resultType="com.petcare.petcare.admin.store.vo.AdminStoreOrderVO">
+    SELECT
+        o.ORDER_ID     AS orderId,
+        o.ORDER_NO     AS orderNo,
+        o.BIZ_NO       AS bizNo,
+        b.BIZ_NAME     AS bizName,
+        NVL(m.NICKNAME, m.MEMBER_NAME) AS buyerName,
+        (SELECT oi.PRODUCT_NAME FROM TB_ORDER_ITEM oi
+          WHERE oi.ORDER_ID = o.ORDER_ID AND ROWNUM = 1) AS firstProductName,
+        (SELECT COUNT(*) FROM TB_ORDER_ITEM oi WHERE oi.ORDER_ID = o.ORDER_ID) AS itemCount,
+        o.PAY_AMOUNT   AS payAmount,
+        p.PAY_METHOD   AS payMethod,
+        o.ORDER_STATUS AS orderStatus,
+        o.ORDER_DATE   AS orderDate
+    FROM TB_ORDER o
+    JOIN TB_MEMBER m ON m.MEMBER_NO = o.MEMBER_NO
+    JOIN TB_BUSINESS b ON b.BIZ_NO = o.BIZ_NO
+    LEFT JOIN TB_PAYMENT p ON p.ORDER_ID = o.ORDER_ID
+    WHERE <include refid="adminOrderFilter"/>
+    ORDER BY o.ORDER_ID DESC
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+</select>
+
+<select id="selectAdminOrderCount" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_ORDER o
+    JOIN TB_MEMBER m ON m.MEMBER_NO = o.MEMBER_NO
+    JOIN TB_BUSINESS b ON b.BIZ_NO = o.BIZ_NO
+    WHERE <include refid="adminOrderFilter"/>
+</select>
+
+<select id="selectAdminOrderDetail"
+        resultType="com.petcare.petcare.admin.store.vo.AdminStoreOrderVO">
+    SELECT
+        o.ORDER_ID     AS orderId,
+        o.ORDER_NO     AS orderNo,
+        o.BIZ_NO       AS bizNo,
+        b.BIZ_NAME     AS bizName,
+        NVL(m.NICKNAME, m.MEMBER_NAME) AS buyerName,
+        (SELECT oi.PRODUCT_NAME FROM TB_ORDER_ITEM oi
+          WHERE oi.ORDER_ID = o.ORDER_ID AND ROWNUM = 1) AS firstProductName,
+        (SELECT COUNT(*) FROM TB_ORDER_ITEM oi WHERE oi.ORDER_ID = o.ORDER_ID) AS itemCount,
+        o.PAY_AMOUNT   AS payAmount,
+        p.PAY_METHOD   AS payMethod,
+        o.ORDER_STATUS AS orderStatus,
+        o.ORDER_DATE   AS orderDate
+    FROM TB_ORDER o
+    JOIN TB_MEMBER m ON m.MEMBER_NO = o.MEMBER_NO
+    JOIN TB_BUSINESS b ON b.BIZ_NO = o.BIZ_NO
+    LEFT JOIN TB_PAYMENT p ON p.ORDER_ID = o.ORDER_ID
+    WHERE o.ORDER_ID = #{orderId}
+</select>
+
+</mapper>

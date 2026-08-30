@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <!--
+  역할: StayStayMapper SQL 정의
+
+  쿼리 id 예시
+  - selectStayList
+  - selectStayDetail
+  - insertReservation
+
+  테이블
+  - TB_STAY
+  - TB_RESERVATION
+-->
+
+<mapper namespace="com.petcare.petcare.stay.mapper.StayMapper">
+    <!-- 숙소 목록 (최저가 + 객실수 포함) -->
+    <select id="selectStayList" resultType="com.petcare.petcare.stay.vo.StayVO">
+        SELECT S.STAY_ID,
+               S.NAME,
+               S.ADDR,
+               S.LAT,
+               S.LNG,
+               S.FACILITIES,
+               (SELECT ROUND(AVG(R.RATING), 1)
+                  FROM TB_REVIEW R
+                 WHERE R.REVIEW_TYPE = 'STAY'
+                   AND R.TARGET_ID = S.STAY_ID) AS avgRating,
+               (SELECT COUNT(*)
+                  FROM TB_REVIEW R
+                 WHERE R.REVIEW_TYPE = 'STAY'
+                   AND R.TARGET_ID = S.STAY_ID) AS reviewCnt,
+               NVL(R.MIN_PRICE, 0) AS minPrice,
+               NVL(R.ROOM_CNT,  0) AS roomCount,
+               (SELECT   F.FILE_URL
+                FROM     TB_FILE F
+                WHERE    F.REF_TYPE = 'STAY'
+                AND      F.REF_ID   = S.STAY_ID
+                AND      ROWNUM     = 1
+               ) AS THUMB_PATH
+          FROM TB_STAY S
+          LEFT JOIN (
+               SELECT STAY_ID,
+                      MIN(PRICE_PER_NIGHT) AS MIN_PRICE,
+                      COUNT(*)             AS ROOM_CNT
+                 FROM TB_STAY_ROOM
+                WHERE STATUS_CD = 'APPROVE'
+                GROUP BY STAY_ID
+          ) R ON S.STAY_ID = R.STAY_ID
+         WHERE S.STATUS_CD IN ('ACTIVE', 'NORMAL')
+         <!-- 2026/08/13 장우철 — 기본 목록도 리뷰 많은 순 -->
+         ORDER BY NVL(reviewCnt, 0) DESC, NVL(avgRating, 0) DESC, S.STAY_ID DESC
+    </select>
+
+    <!-- 숙소 검색 목록 (필터 조건 적용) -->
+    <select id="selectStayListBySearch" parameterType="com.petcare.petcare.stay.vo.StayVO"
+            resultType="com.petcare.petcare.stay.vo.StayVO">
+        SELECT S.STAY_ID,
+               S.NAME,
+               S.ADDR,
+               S.LAT,
+               S.LNG,
+               S.FACILITIES,
+               (SELECT ROUND(AVG(R.RATING), 1)
+                  FROM TB_REVIEW R
+                 WHERE R.REVIEW_TYPE = 'STAY'
+                   AND R.TARGET_ID = S.STAY_ID) AS avgRating,
+               (SELECT COUNT(*)
+                  FROM TB_REVIEW R
+                 WHERE R.REVIEW_TYPE = 'STAY'
+                   AND R.TARGET_ID = S.STAY_ID) AS reviewCnt,
+               NVL(R.MIN_PRICE, 0) AS minPrice,
+               NVL(R.ROOM_CNT,  0) AS roomCount,
+               (SELECT   F.FILE_URL
+                FROM     TB_FILE F
+                WHERE    F.REF_TYPE = 'STAY'
+                AND      F.REF_ID   = S.STAY_ID
+                AND      ROWNUM     = 1
+               ) AS THUMB_PATH
+          FROM TB_STAY S
+          LEFT JOIN (
+               SELECT STAY_ID,
+                      MIN(PRICE_PER_NIGHT) AS MIN_PRICE,
+                      COUNT(*)             AS ROOM_CNT
+                 FROM TB_STAY_ROOM
+                WHERE STATUS_CD = 'APPROVE'
+                GROUP BY STAY_ID
+          ) R ON S.STAY_ID = R.STAY_ID
+         WHERE S.STATUS_CD IN ('ACTIVE', 'NORMAL')
+        <!-- 지역 필터 -->
+        <if test="region != null and region != '' and region != '전체'">
+           AND S.REGION = #{region}
+        </if>
+        <!-- 특화 조건 필터 (선택된 시설 코드 모두 포함) -->
+        <if test="facilityFilter != null and facilityFilter.length > 0">
+            <foreach collection="facilityFilter" item="fac">
+               AND S.FACILITIES LIKE '%' || #{fac} || '%'
+            </foreach>
+        </if>
+        <!-- 1박 최대 요금 필터 -->
+        <if test="maxPrice > 0 and maxPrice &lt; 300000">
+           AND NVL(R.MIN_PRICE, 0) &lt;= #{maxPrice}
+        </if>
+        <!-- 정렬 -->
+        <choose>
+            <when test="sort != null and sort == 'priceLow'">
+         ORDER BY NVL(R.MIN_PRICE, 999999999) ASC
+            </when>
+            <otherwise>
+         <!-- 2026/08/13 장우철 — 기본/리뷰순 (옛 recommend 포함): 리뷰수 → 평점 -->
+         ORDER BY NVL(reviewCnt, 0) DESC, NVL(avgRating, 0) DESC, S.STAY_ID DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 숙소 상세 1건 -->
+    <select id="selectStayById" parameterType="long"
+            resultType="com.petcare.petcare.stay.vo.StayVO">
+        SELECT STAY_ID,
+               BIZ_NO,
+               NAME,
+               ADDR,
+               LAT,
+               LNG,
+               PET_POLICY,
+               REFUND_POLICY,
+               FACILITIES,
+               STATUS_CD,
+               CHECK_IN,
+               CHECK_OUT,
+               DESCRIPTION,
+               PET_FEE,
+               (SELECT ROUND(AVG(R.RATING), 1)
+                  FROM TB_REVIEW R
+                 WHERE R.REVIEW_TYPE = 'STAY'
+                   AND R.TARGET_ID = STAY_ID) AS avgRating,
+               (SELECT COUNT(*)
+                  FROM TB_REVIEW R
+                 WHERE R.REVIEW_TYPE = 'STAY'
+                   AND R.TARGET_ID = STAY_ID) AS reviewCnt
+          FROM TB_STAY
+         WHERE STAY_ID = #{stayId}
+    </select>
+
+    <!-- 객실 목록 -->
+    <select id="selectRoomsByStayId" parameterType="long"
+            resultType="com.petcare.petcare.stay.vo.StayRoomVO">
+        SELECT ROOM_ID,
+               STAY_ID,
+               NAME,
+               PRICE_PER_NIGHT,
+               CAPACITY,
+               PET_LIMIT,
+               STATUS_CD
+          FROM TB_STAY_ROOM
+         WHERE STAY_ID = #{stayId}
+           AND STATUS_CD = 'APPROVE'
+         ORDER BY PRICE_PER_NIGHT
+    </select>
+
+    <select id="selectRoomById" parameterType="long"
+            resultType="com.petcare.petcare.stay.vo.StayRoomVO">
+        SELECT ROOM_ID,
+               STAY_ID,
+               NAME,
+               PRICE_PER_NIGHT,
+               CAPACITY,
+               PET_LIMIT,
+               STATUS_CD
+          FROM TB_STAY_ROOM
+         WHERE ROOM_ID = #{roomId}
+    </select>
+
+   <!-- 회원의 반려동물 목록 (예약 폼용) -->
+    <select id="selectPetListByMemberNo" parameterType="long"
+            resultType="com.petcare.petcare.stay.vo.StayPetVO">
+        SELECT  P.PET_ID   AS petId,
+                P.PET_NAME AS petName,
+                P.SPECIES  AS species,
+                P.BREED    AS breed,
+                P.AGE      AS age
+          FROM  TB_PET P
+         WHERE  P.MEMBER_NO = #{memberNo}
+           AND  NVL(P.DEL_YN, 'N') = 'N'
+         ORDER BY P.IS_REPRESENT DESC, P.PET_ID ASC
+    </select>
+
+    <!-- 숙소 예약 등록 -->
+    <!-- 2026/08/01 장우철 — SEQ_TB_RESERVATION 없음 → TOTAL_DATA SEQ_RESERVATION 사용 (병원과 동일) -->
+    <insert id="insertReservation" parameterType="com.petcare.petcare.stay.vo.ReservationVO">
+        <selectKey keyProperty="resvId" resultType="long" order="BEFORE">
+            SELECT SEQ_RESERVATION.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_RESERVATION (
+            CHECKIN_DATE, 
+            CHECKOUT_DATE, 
+            MEMBER_NO,
+            NIGHT_CNT,
+            PET_ID,
+            PET_CNT,
+            REG_DATE,
+            REQUEST_MEMO, 
+            RESV_ID, 
+            RESV_NO, 
+            RESV_TYPE,
+            RESV_DATE,
+            RESV_TIME, 
+            ROOM_ID,
+            STATUS_CD, 
+            TARGET_ID, 
+            TOTAL_AMOUNT
+        ) VALUES (
+            #{checkinDate}, 
+            #{checkoutDate}, 
+            #{memberNo}, 
+            #{nightCnt},
+            #{petId, jdbcType=NUMERIC},
+            NVL(#{petCnt, jdbcType=NUMERIC}, 1),
+            SYSDATE,
+            #{requestMemo, jdbcType=VARCHAR}, 
+            #{resvId}, 
+            #{resvNo}, 
+            #{resvType}, 
+            #{resvDate, jdbcType=DATE},
+            #{resvTime, jdbcType=DATE},
+            #{roomId},
+            #{statusCd}, 
+            #{targetId}, 
+            #{totalAmount}
+        )
+    </insert>
+
+    <!-- 예약 상세 (완료 화면용) -->
+    <select id="selectReservationById" parameterType="long"
+            resultType="com.petcare.petcare.stay.vo.ReservationVO">
+        SELECT  R.RESV_ID, 
+                R.RESV_NO, 
+                R.RESV_TYPE,
+                R.MEMBER_NO, 
+                R.PET_ID, 
+                R.TARGET_ID, 
+                R.ROOM_ID,
+                R.CHECKIN_DATE  AS checkinDate,
+                R.CHECKOUT_DATE AS checkoutDate,
+                R.NIGHT_CNT     AS nightCnt,
+                R.PET_CNT       AS petCnt,
+                R.REQUEST_MEMO  AS requestMemo,
+                R.TOTAL_AMOUNT  AS totalAmount,
+                R.MEMBER_COUPON_ID AS memberCouponId,
+                R.COUPON_DISCOUNT  AS couponDiscount,
+                R.POINT_USED       AS pointUsed,
+                R.STATUS_CD,
+                R.REG_DATE,
+                M.MEMBER_NAME   AS memberName,
+                P.PET_NAME      AS petName,
+                P.SPECIES       AS petSpecies,
+                P.BREED         AS petBreed,
+                S.NAME          AS stayName,
+                SR.NAME         AS serviceName
+        FROM    TB_RESERVATION R
+        JOIN    TB_MEMBER M    ON M.MEMBER_NO  = R.MEMBER_NO
+        JOIN    TB_PET P       ON P.PET_ID     = R.PET_ID
+        LEFT    JOIN TB_STAY S  ON S.STAY_ID    = TO_NUMBER(R.TARGET_ID)
+        LEFT    JOIN TB_STAY_ROOM SR ON SR.ROOM_ID = R.ROOM_ID
+        WHERE   R.RESV_ID = #{resvId}
+    </select>
+
+    <select id="selectStayReviews" parameterType="long"
+            resultType="com.petcare.petcare.stay.vo.StayReviewVO">
+        SELECT  R.REVIEW_ID   AS reviewId,
+                R.TARGET_ID   AS targetId,
+                R.MEMBER_NO   AS memberNo,
+                R.RESV_ID     AS resvId,
+                R.RATING      AS rating,
+                R.CONTENT     AS content,
+                R.BIZ_REPLY   AS bizReply,
+                R.REG_DATE    AS regDate,
+                M.NICKNAME    AS nickname,
+                P.PET_NAME    AS petName,
+                P.SPECIES     AS petSpecies
+          FROM  TB_REVIEW R
+          JOIN  TB_MEMBER M ON M.MEMBER_NO = R.MEMBER_NO
+          LEFT JOIN TB_RESERVATION RV ON RV.RESV_ID = R.RESV_ID
+          LEFT JOIN TB_PET P ON P.PET_ID = RV.PET_ID
+         WHERE  R.REVIEW_TYPE = 'STAY'
+           AND  R.TARGET_ID = #{stayId}
+         ORDER BY R.REG_DATE DESC, R.REVIEW_ID DESC
+    </select>
+
+    <!-- HYJ 26.07.20 객실 행 잠금 (비관적 락 — 동시 예약 방지) -->
+    <select id="selectRoomForUpdate" parameterType="long"
+            resultType="com.petcare.petcare.stay.vo.StayRoomVO">
+        SELECT ROOM_ID,
+               STAY_ID,
+               NAME,
+               PRICE_PER_NIGHT,
+               CAPACITY,
+               PET_LIMIT,
+               STATUS_CD
+          FROM TB_STAY_ROOM
+         WHERE ROOM_ID = #{roomId}
+           FOR UPDATE
+    </select>
+
+    <!-- HYJ 26.07.20 날짜 겹침 예약 건수 (가용성 체크) -->
+    <select id="countOverlappingReservation" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_RESERVATION
+         WHERE ROOM_ID       = #{roomId}
+           AND RESV_TYPE     = 'STAY'
+           AND STATUS_CD     IN ('PENDING', 'CONFIRMED')
+           AND CHECKIN_DATE  <![CDATA[<]]> #{checkoutDate}
+           AND CHECKOUT_DATE <![CDATA[>]]> #{checkinDate}
+    </select>
+
+    <!-- HYJ 26.07.20 예약 상태 변경 -->
+    <update id="updateReservationStatus" parameterType="map">
+        UPDATE TB_RESERVATION
+           SET STATUS_CD = #{statusCd}
+         WHERE RESV_ID   = #{resvId}
+    </update>
+
+    <!-- 지윤 26.08.07: 예약에 쿠폰·포인트 사용 내역 기록 (완료화면 정확한 결제금액 표시용) -->
+    <!-- 2026/08/10 장우철 — 쿠폰 미사용 시 memberCouponId null → Oracle ORA-17004 방지 (jdbcType 명시) -->
+    <update id="updateReservationPaymentInfo" parameterType="map">
+        UPDATE TB_RESERVATION
+           SET MEMBER_COUPON_ID = #{memberCouponId, jdbcType=NUMERIC},
+               COUPON_DISCOUNT  = #{couponDiscount, jdbcType=NUMERIC},
+               POINT_USED       = #{pointUsed, jdbcType=NUMERIC}
+         WHERE RESV_ID = #{resvId, jdbcType=NUMERIC}
+    </update>
+
+    <!-- HYJ 26.07.20 결제 정보 등록 -->
+    <insert id="insertPayment" parameterType="map">
+        <selectKey keyProperty="paymentId" resultType="long" order="BEFORE">
+            SELECT SEQ_PAYMENT.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_PAYMENT (
+            PAYMENT_ID, RESV_ID, PAY_TYPE, PAY_METHOD,
+            PAY_AMOUNT, TOSS_PAYMENT_KEY, TOSS_ORDER_ID,
+            PAY_STATUS, PAY_DATE
+        ) VALUES (
+            #{paymentId}, #{resvId}, 'RESERVATION', #{payMethod, jdbcType=VARCHAR},
+            #{payAmount}, #{tossPaymentKey}, #{tossOrderId},
+            #{payStatus}, SYSDATE
+        )
+    </insert>
+
+    <!-- HYJ 26.07.20 스케줄러 — 체크아웃 날짜 지난 CONFIRMED → DONE 일괄 변경 -->
+    <!-- 2026/07/31 장우철 — CHECKOUT → DONE (체크아웃일 다음날부터) -->
+    <update id="updateConfirmedToDone">
+        UPDATE TB_RESERVATION
+           SET STATUS_CD = 'DONE'
+         WHERE RESV_TYPE  = 'STAY'
+           AND STATUS_CD  = 'CHECKOUT'
+           AND CHECKOUT_DATE <![CDATA[<]]> TRUNC(SYSDATE)
+    </update>
+
+    <!-- 2026/08/07 장우철 — DONE 전환 대상 (알림용) -->
+    <select id="selectCheckoutDueForDone" resultType="com.petcare.petcare.stay.vo.ReservationVO">
+        SELECT R.RESV_ID     AS resvId,
+               R.MEMBER_NO   AS memberNo,
+               NVL(S.NAME, '숙소') AS stayName
+          FROM TB_RESERVATION R
+          LEFT JOIN TB_STAY S
+                 ON R.RESV_TYPE = 'STAY'
+                AND S.STAY_ID = TO_NUMBER(R.TARGET_ID)
+         WHERE R.RESV_TYPE = 'STAY'
+           AND R.STATUS_CD = 'CHECKOUT'
+           AND R.CHECKOUT_DATE <![CDATA[<]]> TRUNC(SYSDATE)
+    </select>
+
+    <!-- HYJ 26.07.21 회원 보유 포인트 조회 -->
+    <select id="selectMemberPointBalance" parameterType="long" resultType="long">
+        SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
+    </select>
+
+    <!-- 2026-07-28 박유정 — 숙소 소유 사업자 회원번호 (예약 알림용) -->
+    <select id="selectStayMemberNo" parameterType="long" resultType="long">
+        SELECT MEMBER_NO FROM TB_STAY WHERE STAY_ID = #{stayId}
+    </select>
+
+    <!-- HYJ 26.07.21 회원 포인트 차감 -->
+    <!-- 2026/07/27 장우철 — 보유분 이상 차감 불가 -->
+    <update id="deductMemberPointBalance" parameterType="map">
+        UPDATE TB_MEMBER
+           SET POINT_BALANCE = NVL(POINT_BALANCE, 0) - #{pointAmount}
+         WHERE MEMBER_NO = #{memberNo}
+           AND NVL(POINT_BALANCE, 0) >= #{pointAmount}
+    </update>
+
+    <!-- HYJ 26.07.21 포인트 사용 이력 INSERT -->
+    <insert id="insertPointHistory" parameterType="map">
+        INSERT INTO TB_POINT (
+            POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT,
+            BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE
+        ) VALUES (
+            (SELECT NVL(MAX(POINT_ID), 0) + 1 FROM TB_POINT),
+            #{memberNo},
+            'USE',
+            #{pointAmount},
+            #{balanceAfter},
+            'PAYMENT',
+            #{refType},
+            #{refId},
+            SYSDATE
+        )
+    </insert>
+
+    <!-- HYJ 26.07.28 스케줄러 — 15분 경과한 PENDING 예약 자동 취소 -->
+    <update id="cancelExpiredPending">
+    <![CDATA[
+        UPDATE TB_RESERVATION
+           SET STATUS_CD = 'CANCEL'
+         WHERE RESV_TYPE = 'STAY'
+           AND STATUS_CD = 'PENDING'
+           AND REG_DATE  < SYSDATE - INTERVAL '15' MINUTE
+    ]]>
+    </update>
+</mapper>

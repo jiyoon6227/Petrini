@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.mypage.point.mapper.MypagePointMapper">
+
+<!--
+  역할: MypagePointMapper SQL 정의
+
+  쿼리 id 예시
+  - selectPointBalance
+  - selectPointHistory
+
+  테이블
+  - TB_POINT
+  - TB_POINT_HISTORY
+-->
+
+<!-- 지윤 26.07.29 추가: 보유 포인트 잔액 -->
+<select id="selectPointBalance" resultType="int">
+    SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
+</select>
+
+<!-- 지윤 26.07.29 재수정: REG_DATE 저장 형식이 'YYYY-MM-DD'와 'YY/MM/DD' 두 가지로 섞여있는 걸 실제 데이터로 확인함
+     (INSERT하는 곳마다 SYSDATE 그대로 넣은 곳/TO_CHAR로 변환해서 넣은 곳이 달라서 생긴 문제)
+     -> 두 형식 다 이번 달로 인식되도록 OR 조건 추가 -->
+<select id="selectThisMonthEarnedPoint" resultType="int">
+    SELECT NVL(SUM(POINT_AMOUNT), 0)
+    FROM TB_POINT
+    WHERE MEMBER_NO = #{memberNo}
+      AND POINT_TYPE = 'EARN'
+      AND (
+            REG_DATE LIKE TO_CHAR(SYSDATE, 'YYYY-MM') || '%'   -- 2026-07-29 형식
+         OR REG_DATE LIKE TO_CHAR(SYSDATE, 'RR/MM') || '%'      -- 26/07/29 형식
+          )
+</select>
+
+<!-- 지윤 26.07.29 수정: REG_DATE에 TO_CHAR() 씌우던 것 제거 (이미 문자열이라 그대로 SELECT) -->
+<select id="selectPointHistory" resultType="com.petcare.petcare.mypage.point.vo.MypagePointVO">
+    SELECT
+        POINT_ID    AS pointId,
+        <!-- 지윤 26.07.29 추가: 'YY/MM/DD'(예: 26/07/29) 형식이면 'YYYY-MM-DD'(2026-07-29)로 변환, 이미 그 형식이면 그대로 -->
+        CASE
+            WHEN REG_DATE LIKE '__/__/__' THEN '20' || SUBSTR(REG_DATE,1,2) || '-' || SUBSTR(REG_DATE,4,2) || '-' || SUBSTR(REG_DATE,7,2)
+            ELSE REG_DATE
+        END AS regDate,
+        CASE REASON_CD
+            WHEN 'REVIEW'           THEN '리뷰 작성 적립'
+            WHEN 'PURCHASE_CONFIRM' THEN '구매확정 적립'
+            WHEN 'ORDER_CANCEL'     THEN '주문 취소 환급'
+            WHEN 'ORDER_USE'        THEN '주문 시 포인트 사용'
+            ELSE REASON_CD
+        END AS content,
+        POINT_TYPE  AS pointType,
+        POINT_AMOUNT AS pointAmount
+    FROM TB_POINT
+    WHERE MEMBER_NO = #{memberNo}
+    ORDER BY POINT_ID DESC
+</select>
+
+</mapper>

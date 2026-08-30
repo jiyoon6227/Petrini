@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  역할: 쇼핑 정산 대상 조회 + 저장 SQL
+  2026/08/04 장우철 — 쇼핑 정산 S8 (1-2 / 1-5 / 1-6)
+
+  규칙 요약
+  - 집계 기준일 = ORDER_ITEM.CONFIRMED_AT
+  - 대상: 구매확정 + 환불신청/진행/완료 아님 + CANCEL 주문 제외
+  - SETTLEMENT_ITEM 에 이미 있는 ORDER_ITEM_ID 제외
+  - 택배비: 같은 ORDER 에서 정산 대상 중 1건에만 부여 (이미 배송비가 잡힌 정산 ITEM 있으면 0)
+  - productId 있으면 해당 상품만 (중간정산 PRODUCT)
+  - 저장 시퀀스: SEQ_TB_SETTLEMENT / SEQ_TB_SETTLEMENT_ITEM
+  2026/08/05 장우철 — S9 요약/목록/상세 조회 추가
+-->
+<mapper namespace="com.petcare.petcare.settlement.mapper.StoreSettlementMapper">
+
+    <select id="selectUnsettleStoreTargets"
+            resultType="com.petcare.petcare.settlement.vo.StoreSettlementItemVO">
+        SELECT T.orderId,
+               T.orderItemId,
+               T.productId,
+               T.confirmedAt,
+               T.itemSalesAmount,
+               T.deliveryFeeAmount,
+               T.returnFeeAmount,
+               T.returnFeePayer,
+               T.feeRate,
+               T.itemType,
+               T.orderNo,
+               T.productName
+          FROM (
+                SELECT oi.ORDER_ID        AS orderId,
+                       oi.ORDER_ITEM_ID   AS orderItemId,
+                       oi.PRODUCT_ID      AS productId,
+                       oi.CONFIRMED_AT    AS confirmedAt,
+                       NVL(oi.TOTAL_PRICE, 0) AS itemSalesAmount,
+                       CASE
+                           WHEN ROW_NUMBER() OVER (
+                                    PARTITION BY oi.ORDER_ID
+                                    ORDER BY oi.ORDER_ITEM_ID
+                                ) = 1
+                            AND NOT EXISTS (
+                                    SELECT 1
+                                      FROM TB_SETTLEMENT_ITEM si2
+                                      JOIN TB_ORDER_ITEM oi2
+                                        ON oi2.ORDER_ITEM_ID = si2.ORDER_ITEM_ID
+                                     WHERE oi2.ORDER_ID = oi.ORDER_ID
+                                       AND NVL(si2.DELIVERY_FEE_AMOUNT, 0) &gt; 0
+                                       AND si2.STATUS_CD IN ('INCLUDED', 'HOLD', 'EXCLUDED', 'REFUNDED')
+                                )
+                           THEN NVL(o.DELIVERY_FEE, 0)
+                           ELSE 0
+                       END AS deliveryFeeAmount,
+                       CAST(NULL AS NUMBER) AS returnFeeAmount,
+                       CAST(NULL AS VARCHAR2(10)) AS returnFeePayer,
+                       NVL(b.FEE_RATE, 5) AS feeRate,
+                       'ORDER_ITEM'       AS itemType,
+                       o.ORDER_NO         AS orderNo,
+                       oi.PRODUCT_NAME    AS productName
+                  FROM TB_ORDER_ITEM oi
+                  JOIN TB_ORDER o
+                    ON o.ORDER_ID = oi.ORDER_ID
+                  JOIN TB_PRODUCT p
+                    ON p.PRODUCT_ID = oi.PRODUCT_ID
+                  JOIN TB_BUSINESS b
+                    ON b.BIZ_NO = NVL(o.BIZ_NO, p.BIZ_NO)
+                 WHERE NVL(o.BIZ_NO, p.BIZ_NO) = #{bizNo}
+                   AND oi.CONFIRMED_AT IS NOT NULL
+                   AND oi.CONFIRMED_AT &gt;= TRUNC(#{periodStart})
+                   AND oi.CONFIRMED_AT &lt;  TRUNC(#{periodEnd}) + 1
+                   AND o.ORDER_STATUS &lt;&gt; 'CANCEL'
+                   AND NVL(oi.RETURN_STATUS_CD, 'NONE') NOT IN ('REQUESTED', 'RETURNING', 'DONE')
+                   AND NOT EXISTS (
+                           SELECT 1
+                             FROM TB_SETTLEMENT_ITEM si
+                            WHERE si.ORDER_ITEM_ID = oi.ORDER_ITEM_ID
+                              AND si.STATUS_CD IN ('INCLUDED', 'HOLD', 'EXCLUDED', 'REFUNDED')
+                       )
+                <if test="productId != null">
+                   AND oi.PRODUCT_ID = #{productId}
+                </if>
+               ) T
+         ORDER BY T.confirmedAt ASC, T.orderItemId ASC
+    </select>
+
+    <select id="selectStoreFeeRate" resultType="java.lang.Double">
+        SELECT FEE_RATE
+          FROM TB_BUSINESS
+         WHERE BIZ_NO = #{bizNo}
+    </select>
+
+    <select id="selectAlreadySettledOrderItemIds" resultType="long">
+        SELECT SI.ORDER_ITEM_ID
+          FROM TB_SETTLEMENT_ITEM SI
+         WHERE SI.STATUS_CD IN ('INCLUDED', 'HOLD', 'EXCLUDED', 'REFUNDED')
+           AND SI.ORDER_ITEM_ID IN
+        <foreach collection="orderItemIds" item="orderItemId" open="(" separator="," close=")">
+            #{orderItemId}
+        </foreach>
+    </select>
+
+    <insert id="insertSettlement"
+            parameterType="com.petcare.petcare.settlement.vo.StoreSettlementVO">
+        <selectKey keyProperty="settleId" resultType="long" order="BEFORE">
+            SELECT SEQ_TB_SETTLEMENT.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_SETTLEMENT (
+            SETTLE_ID,
+            SETTLE_TYPE,
+            RESV_ID,
+            BIZ_NO,
+            PAY_AMOUNT,
+            FEE_RATE,
+            FEE_AMOUNT,
+            SETTLE_STATUS,
+            REG_DATE,
+            BIZ_TYPE,
+            SETTLE_MONTH,
+            TOTAL_SALES,
+            TOTAL_FEE,
+            SETTLE_AMOUNT,
+            PAY_STATUS,
+            PAY_DATE,
+            REQUEST_ID,
+            REQUEST_TYPE,
+            REQUEST_SCOPE,
+            ROOM_ID,
+            PRODUCT_ID,
+            PERIOD_START,
+            PERIOD_END,
+            REQUESTED_AT,
+            APPROVED_AT,
+            REJECT_REASON,
+            PRODUCT_SALES_AMOUNT,
+            DELIVERY_FEE_AMOUNT,
+            RETURN_FEE_AMOUNT
+        ) VALUES (
+            #{settleId},
+            #{settleType, jdbcType=VARCHAR},
+            #{resvId, jdbcType=NUMERIC},
+            #{bizNo},
+            #{payAmount, jdbcType=NUMERIC},
+            #{feeRate, jdbcType=NUMERIC},
+            #{feeAmount, jdbcType=NUMERIC},
+            #{settleStatus, jdbcType=VARCHAR},
+            SYSDATE,
+            #{bizType, jdbcType=VARCHAR},
+            #{settleMonth, jdbcType=VARCHAR},
+            #{totalSales, jdbcType=NUMERIC},
+            #{totalFee, jdbcType=NUMERIC},
+            #{settleAmount, jdbcType=NUMERIC},
+            #{payStatus, jdbcType=VARCHAR},
+            #{payDate, jdbcType=DATE},
+            #{requestId, jdbcType=NUMERIC},
+            #{requestType, jdbcType=VARCHAR},
+            #{requestScope, jdbcType=VARCHAR},
+            #{roomId, jdbcType=NUMERIC},
+            #{productId, jdbcType=NUMERIC},
+            #{periodStart, jdbcType=DATE},
+            #{periodEnd, jdbcType=DATE},
+            #{requestedAt, jdbcType=DATE},
+            #{approvedAt, jdbcType=DATE},
+            #{rejectReason, jdbcType=VARCHAR},
+            #{productSalesAmount, jdbcType=NUMERIC},
+            #{deliveryFeeAmount, jdbcType=NUMERIC},
+            #{returnFeeAmount, jdbcType=NUMERIC}
+        )
+    </insert>
+
+    <insert id="insertSettlementItem"
+            parameterType="com.petcare.petcare.settlement.vo.StoreSettlementItemVO">
+        <selectKey keyProperty="settleItemId" resultType="long" order="BEFORE">
+            SELECT SEQ_TB_SETTLEMENT_ITEM.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_SETTLEMENT_ITEM (
+            SETTLE_ITEM_ID,
+            SETTLE_ID,
+            ITEM_TYPE,
+            RESV_ID,
+            ROOM_ID,
+            CHECKIN_DATE,
+            CHECKOUT_DATE,
+            RESV_AMOUNT,
+            ORDER_ID,
+            ORDER_ITEM_ID,
+            PRODUCT_ID,
+            CONFIRMED_AT,
+            ITEM_SALES_AMOUNT,
+            DELIVERY_FEE_AMOUNT,
+            RETURN_FEE_AMOUNT,
+            RETURN_FEE_PAYER,
+            FEE_RATE,
+            FEE_AMOUNT,
+            SETTLE_AMOUNT,
+            STATUS_CD,
+            HOLD_REASON,
+            REG_DATE
+        ) VALUES (
+            #{settleItemId},
+            #{settleId},
+            NVL(#{itemType, jdbcType=VARCHAR}, 'ORDER_ITEM'),
+            #{resvId, jdbcType=NUMERIC},
+            #{roomId, jdbcType=NUMERIC},
+            #{checkinDate, jdbcType=DATE},
+            #{checkoutDate, jdbcType=DATE},
+            #{resvAmount, jdbcType=NUMERIC},
+            #{orderId, jdbcType=NUMERIC},
+            #{orderItemId, jdbcType=NUMERIC},
+            #{productId, jdbcType=NUMERIC},
+            #{confirmedAt, jdbcType=DATE},
+            #{itemSalesAmount, jdbcType=NUMERIC},
+            #{deliveryFeeAmount, jdbcType=NUMERIC},
+            #{returnFeeAmount, jdbcType=NUMERIC},
+            #{returnFeePayer, jdbcType=VARCHAR},
+            #{feeRate},
+            #{feeAmount},
+            #{settleAmount},
+            #{statusCd},
+            #{holdReason, jdbcType=VARCHAR},
+            SYSDATE
+        )
+    </insert>
+
+    <!--
+      2026/08/05 장우철 — S9 2-1 상단 요약
+      pending = 미정산 구매확정 실정산금 + PAY_STATUS=WAIT 정산마스터
+      paid    = 이번 달 PAY_STATUS=DONE
+      fee     = STORE 정산 누적 TOTAL_FEE
+    -->
+    <select id="selectStoreSettlementSummary"
+            resultType="com.petcare.petcare.settlement.vo.StoreSettlementSummaryVO">
+        SELECT
+            (
+                NVL((
+                    SELECT SUM(
+                               (NVL(T.itemSalesAmount, 0)
+                                - ROUND(NVL(T.itemSalesAmount, 0) * NVL(T.feeRate, 5) / 100))
+                               + NVL(T.deliveryFeeAmount, 0)
+                           )
+                      FROM (
+                            SELECT NVL(oi.TOTAL_PRICE, 0) AS itemSalesAmount,
+                                   CASE
+                                       WHEN ROW_NUMBER() OVER (
+                                                PARTITION BY oi.ORDER_ID
+                                                ORDER BY oi.ORDER_ITEM_ID
+                                            ) = 1
+                                        AND NOT EXISTS (
+                                                SELECT 1
+                                                  FROM TB_SETTLEMENT_ITEM si2
+                                                  JOIN TB_ORDER_ITEM oi2
+                                                    ON oi2.ORDER_ITEM_ID = si2.ORDER_ITEM_ID
+                                                 WHERE oi2.ORDER_ID = oi.ORDER_ID
+                                                   AND NVL(si2.DELIVERY_FEE_AMOUNT, 0) &gt; 0
+                                                   AND si2.STATUS_CD IN ('INCLUDED', 'HOLD', 'EXCLUDED', 'REFUNDED')
+                                            )
+                                       THEN NVL(o.DELIVERY_FEE, 0)
+                                       ELSE 0
+                                   END AS deliveryFeeAmount,
+                                   NVL(b.FEE_RATE, 5) AS feeRate
+                              FROM TB_ORDER_ITEM oi
+                              JOIN TB_ORDER o
+                                ON o.ORDER_ID = oi.ORDER_ID
+                              JOIN TB_PRODUCT p
+                                ON p.PRODUCT_ID = oi.PRODUCT_ID
+                              JOIN TB_BUSINESS b
+                                ON b.BIZ_NO = NVL(o.BIZ_NO, p.BIZ_NO)
+                             WHERE NVL(o.BIZ_NO, p.BIZ_NO) = #{bizNo}
+                               AND oi.CONFIRMED_AT IS NOT NULL
+                               AND o.ORDER_STATUS &lt;&gt; 'CANCEL'
+                               AND NVL(oi.RETURN_STATUS_CD, 'NONE') NOT IN ('REQUESTED', 'RETURNING', 'DONE')
+                               AND NOT EXISTS (
+                                       SELECT 1
+                                         FROM TB_SETTLEMENT_ITEM si
+                                        WHERE si.ORDER_ITEM_ID = oi.ORDER_ITEM_ID
+                                          AND si.STATUS_CD IN ('INCLUDED', 'HOLD', 'EXCLUDED', 'REFUNDED')
+                                   )
+                           ) T
+                ), 0)
+                +
+                NVL((
+                    SELECT SUM(ST.SETTLE_AMOUNT)
+                      FROM TB_SETTLEMENT ST
+                     WHERE ST.BIZ_NO = #{bizNo}
+                       AND ST.BIZ_TYPE = 'STORE'
+                       AND NVL(ST.PAY_STATUS, 'WAIT') = 'WAIT'
+                ), 0)
+            ) AS pendingAmount,
+            NVL((
+                SELECT SUM(ST.SETTLE_AMOUNT)
+                  FROM TB_SETTLEMENT ST
+                 WHERE ST.BIZ_NO = #{bizNo}
+                   AND ST.BIZ_TYPE = 'STORE'
+                   AND ST.PAY_STATUS = 'DONE'
+                   AND ST.PAY_DATE &gt;= TRUNC(SYSDATE, 'MM')
+                   AND ST.PAY_DATE &lt;  ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
+            ), 0) AS paidAmount,
+            NVL((
+                SELECT SUM(ST.TOTAL_FEE)
+                  FROM TB_SETTLEMENT ST
+                 WHERE ST.BIZ_NO = #{bizNo}
+                   AND ST.BIZ_TYPE = 'STORE'
+            ), 0) AS totalFeeAmount
+          FROM DUAL
+    </select>
+
+    <!-- 2026/08/05 장우철 — S9 2-2 정산 목록 -->
+    <select id="selectStoreSettlementList"
+            resultType="com.petcare.petcare.settlement.vo.StoreSettlementVO">
+        SELECT  ST.SETTLE_ID      AS settleId,
+                ST.BIZ_NO         AS bizNo,
+                ST.BIZ_TYPE       AS bizType,
+                ST.SETTLE_MONTH   AS settleMonth,
+                ST.PERIOD_START   AS periodStart,
+                ST.PERIOD_END     AS periodEnd,
+                ST.TOTAL_SALES    AS totalSales,
+                ST.TOTAL_FEE      AS totalFee,
+                ST.FEE_AMOUNT     AS feeAmount,
+                ST.SETTLE_AMOUNT  AS settleAmount,
+                ST.FEE_RATE       AS feeRate,
+                ST.SETTLE_STATUS  AS settleStatus,
+                ST.PAY_STATUS     AS payStatus,
+                ST.PAY_DATE       AS payDate,
+                ST.REQUEST_TYPE   AS requestType,
+                ST.REQUEST_SCOPE  AS requestScope,
+                ST.PRODUCT_ID     AS productId,
+                ST.REQUEST_ID     AS requestId,
+                ST.PRODUCT_SALES_AMOUNT AS productSalesAmount,
+                ST.DELIVERY_FEE_AMOUNT  AS deliveryFeeAmount,
+                ST.REG_DATE       AS regDate
+          FROM  TB_SETTLEMENT ST
+         WHERE  ST.BIZ_NO = #{bizNo}
+           AND  ST.BIZ_TYPE = 'STORE'
+        <if test="settleMonth != null and settleMonth != '' and settleMonth != 'all'">
+           AND  ST.SETTLE_MONTH = #{settleMonth}
+        </if>
+        <if test="statusCd == 'pending'">
+           AND  NVL(ST.PAY_STATUS, 'WAIT') = 'WAIT'
+        </if>
+        <if test="statusCd == 'fail'">
+           AND  ST.PAY_STATUS = 'FAIL'
+        </if>
+        <if test="statusCd == 'done'">
+           AND  ST.PAY_STATUS = 'DONE'
+        </if>
+         ORDER BY ST.PERIOD_START DESC, ST.SETTLE_ID DESC
+    </select>
+
+    <select id="selectStoreSettlementMonths" resultType="string">
+        SELECT DISTINCT ST.SETTLE_MONTH
+          FROM TB_SETTLEMENT ST
+         WHERE ST.BIZ_NO = #{bizNo}
+           AND ST.BIZ_TYPE = 'STORE'
+           AND ST.SETTLE_MONTH IS NOT NULL
+         ORDER BY ST.SETTLE_MONTH DESC
+    </select>
+
+    <!-- 2026/08/05 장우철 — S9 2-3 정산 상세 (주문상품 단위) -->
+    <select id="selectStoreSettlementItems"
+            resultType="com.petcare.petcare.settlement.vo.StoreSettlementItemVO">
+        SELECT  SI.SETTLE_ITEM_ID AS settleItemId,
+                SI.SETTLE_ID      AS settleId,
+                NVL(SI.ITEM_TYPE, 'ORDER_ITEM') AS itemType,
+                SI.ORDER_ID       AS orderId,
+                SI.ORDER_ITEM_ID  AS orderItemId,
+                SI.PRODUCT_ID     AS productId,
+                SI.CONFIRMED_AT   AS confirmedAt,
+                SI.ITEM_SALES_AMOUNT AS itemSalesAmount,
+                SI.DELIVERY_FEE_AMOUNT AS deliveryFeeAmount,
+                SI.RETURN_FEE_AMOUNT AS returnFeeAmount,
+                SI.RETURN_FEE_PAYER AS returnFeePayer,
+                SI.FEE_RATE       AS feeRate,
+                SI.FEE_AMOUNT     AS feeAmount,
+                SI.SETTLE_AMOUNT  AS settleAmount,
+                SI.STATUS_CD      AS statusCd,
+                SI.HOLD_REASON    AS holdReason,
+                SI.REG_DATE       AS regDate,
+                NVL(O.ORDER_NO, TO_CHAR(SI.ORDER_ID)) AS orderNo,
+                NVL(SI_PROD.PRODUCT_NAME, P.PRODUCT_NAME) AS productName
+          FROM  TB_SETTLEMENT_ITEM SI
+          JOIN  TB_SETTLEMENT ST
+            ON  ST.SETTLE_ID = SI.SETTLE_ID
+          LEFT JOIN TB_ORDER O
+            ON  O.ORDER_ID = SI.ORDER_ID
+          LEFT JOIN TB_ORDER_ITEM SI_PROD
+            ON  SI_PROD.ORDER_ITEM_ID = SI.ORDER_ITEM_ID
+          LEFT JOIN TB_PRODUCT P
+            ON  P.PRODUCT_ID = SI.PRODUCT_ID
+         WHERE  SI.SETTLE_ID = #{settleId}
+           AND  ST.BIZ_NO = #{bizNo}
+           AND  ST.BIZ_TYPE = 'STORE'
+         ORDER BY SI.CONFIRMED_AT ASC, SI.SETTLE_ITEM_ID ASC
+    </select>
+
+    <!-- 2026/08/05 장우철 — S10 중간정산 요청 -->
+    <select id="selectProductsByBiz"
+            resultType="com.petcare.petcare.biz.store.vo.BizProductVO">
+        SELECT PRODUCT_ID   AS productId,
+               PRODUCT_NAME AS productName,
+               BIZ_NO       AS bizNo,
+               STATUS_CD    AS statusCd
+          FROM TB_PRODUCT
+         WHERE BIZ_NO = #{bizNo}
+         ORDER BY PRODUCT_NAME ASC, PRODUCT_ID ASC
+    </select>
+
+    <select id="countProductOwnedByBiz" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_PRODUCT
+         WHERE BIZ_NO = #{bizNo}
+           AND PRODUCT_ID = #{productId}
+    </select>
+
+    <insert id="insertSettlementRequest"
+            parameterType="com.petcare.petcare.settlement.vo.StoreSettlementRequestVO">
+        <selectKey keyProperty="requestId" resultType="long" order="BEFORE">
+            SELECT SEQ_TB_SETTLEMENT_REQUEST.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_SETTLEMENT_REQUEST (
+            REQUEST_ID,
+            BIZ_NO,
+            REQUEST_SCOPE,
+            ROOM_ID,
+            PRODUCT_ID,
+            TARGET_START,
+            TARGET_END,
+            STATUS_CD,
+            REQUEST_MEMO,
+            REQUESTED_AT
+        ) VALUES (
+            #{requestId},
+            #{bizNo},
+            #{requestScope},
+            #{roomId, jdbcType=NUMERIC},
+            #{productId, jdbcType=NUMERIC},
+            #{targetStart},
+            #{targetEnd},
+            #{statusCd},
+            #{requestMemo, jdbcType=VARCHAR},
+            SYSDATE
+        )
+    </insert>
+
+    <select id="selectSettlementRequestById"
+            resultType="com.petcare.petcare.settlement.vo.StoreSettlementRequestVO">
+        SELECT  REQUEST_ID    AS requestId,
+                BIZ_NO        AS bizNo,
+                REQUEST_SCOPE AS requestScope,
+                ROOM_ID       AS roomId,
+                PRODUCT_ID    AS productId,
+                TARGET_START  AS targetStart,
+                TARGET_END    AS targetEnd,
+                STATUS_CD     AS statusCd,
+                REQUEST_MEMO  AS requestMemo,
+                REJECT_REASON AS rejectReason,
+                REQUESTED_AT  AS requestedAt,
+                APPROVED_AT   AS approvedAt,
+                REJECTED_AT   AS rejectedAt
+          FROM  TB_SETTLEMENT_REQUEST
+         WHERE  REQUEST_ID = #{requestId}
+    </select>
+
+    <select id="countRequestedByBiz" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_SETTLEMENT_REQUEST
+         WHERE BIZ_NO = #{bizNo}
+           AND STATUS_CD = 'REQUESTED'
+    </select>
+
+    <select id="countSamePeriodScopeRequest" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_SETTLEMENT_REQUEST
+         WHERE BIZ_NO = #{bizNo}
+           AND STATUS_CD IN ('REQUESTED', 'APPROVED')
+           AND REQUEST_SCOPE = #{requestScope}
+           AND TRUNC(TARGET_START) = TRUNC(#{targetStart})
+           AND TRUNC(TARGET_END)   = TRUNC(#{targetEnd})
+        <choose>
+            <when test="productId != null">
+           AND PRODUCT_ID = #{productId}
+            </when>
+            <otherwise>
+           AND PRODUCT_ID IS NULL
+            </otherwise>
+        </choose>
+    </select>
+
+    <update id="updateSettlementRequestApproved">
+        UPDATE TB_SETTLEMENT_REQUEST
+           SET STATUS_CD   = 'APPROVED',
+               APPROVED_AT = SYSDATE,
+               REJECT_REASON = NULL,
+               REJECTED_AT = NULL
+         WHERE REQUEST_ID = #{requestId}
+           AND STATUS_CD = 'REQUESTED'
+    </update>
+
+    <update id="updateSettlementRequestRejected">
+        UPDATE TB_SETTLEMENT_REQUEST
+           SET STATUS_CD     = 'REJECTED',
+               REJECT_REASON = #{rejectReason, jdbcType=VARCHAR},
+               REJECTED_AT   = SYSDATE
+         WHERE REQUEST_ID = #{requestId}
+           AND STATUS_CD = 'REQUESTED'
+    </update>
+
+    <select id="selectMemberNoByBizNo" resultType="long">
+        SELECT M.MEMBER_NO
+          FROM TB_BUSINESS B
+          JOIN TB_MEMBER M ON M.MEMBER_ID = B.BIZ_ID
+         WHERE B.BIZ_NO = #{bizNo}
+    </select>
+
+    <select id="selectBizNameByBizNo" resultType="string">
+        SELECT BIZ_NAME
+          FROM TB_BUSINESS
+         WHERE BIZ_NO = #{bizNo}
+    </select>
+
+    <!-- 2026/08/05 장우철 — S12 월정산 배치: 승인 쇼핑 사업자 -->
+    <select id="selectApprovedStoreBizNos" resultType="long">
+        SELECT B.BIZ_NO
+          FROM TB_BUSINESS B
+         WHERE B.BIZ_TYPE = 'STORE'
+           AND B.STATUS_CD = 'APPROVED'
+         ORDER BY B.BIZ_NO
+    </select>
+
+    <!-- 2026/08/05 장우철 — S12: 동일 월 REGULAR 월정산 중복 방지 -->
+    <select id="countRegularByBizAndMonth" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_SETTLEMENT
+         WHERE BIZ_NO = #{bizNo}
+           AND BIZ_TYPE = 'STORE'
+           AND NVL(REQUEST_TYPE, 'REGULAR') = 'REGULAR'
+           AND SETTLE_MONTH = #{settleMonth}
+    </select>
+
+</mapper>

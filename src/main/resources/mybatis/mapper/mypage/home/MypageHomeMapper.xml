@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.mypage.home.mapper.MypageHomeMapper">
+
+<!--
+  역할: MypageHomeMapper SQL 정의
+
+  2026/07/08 장우철 — 마이페이지 B단계
+  - 이용중인 쿠폰: TB_MEMBER_COUPON (STATUS_CD = UNUSED)
+  - 관심상품: TB_FAVORITE (FAV_TYPE = PRODUCT)
+-->
+
+    <!-- 2026/07/08 장우철 — 마이홈 이용중인 쿠폰 수 (미사용 1회성 쿠폰) -->
+    <select id="countUsableCoupon" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_MEMBER_COUPON
+         WHERE MEMBER_NO = #{memberNo}
+           AND STATUS_CD = 'UNUSED'
+    </select>
+
+    <!-- 2026/07/08 장우철 — 마이홈 관심상품 수 (상품 찜만, TB_FAVORITE) -->
+    <select id="countFavoriteProduct" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+          FROM TB_FAVORITE
+         WHERE MEMBER_NO = #{memberNo}
+           AND FAV_TYPE = 'PRODUCT'
+    </select>
+
+</mapper>

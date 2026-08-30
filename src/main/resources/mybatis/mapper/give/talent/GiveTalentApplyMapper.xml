@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.give.talent.mapper.GiveTalentApplyMapper">
+
+<!--
+  역할: GiveTalentApplyMapper SQL 정의
+  - 박유정 / 2026-08-10 — STEP 2
+
+  테이블: TB_TALENT_APPLY, TB_MEMBER, TB_TALENT, TB_BUSINESS
+  시퀀스: SEQ_TB_TALENT_APPLY
+
+  [STATUS_CD] PENDING / CONFIRMED / CANCELLED
+-->
+
+  <sql id="applyColumns">
+    A.APPLY_ID     AS applyId,
+    A.TALENT_ID    AS talentId,
+    A.MEMBER_NO    AS memberNo,
+    A.MESSAGE      AS message,
+    A.STATUS_CD    AS statusCd,
+    A.REG_DATE     AS regDate,
+    A.CONFIRM_DATE AS confirmDate
+  </sql>
+
+  <sql id="applyWithMemberColumns">
+    <include refid="applyColumns"/>,
+    M.NICKNAME     AS nickname,
+    M.MEMBER_NAME  AS memberName,
+    M.PHONE        AS phone,
+    T.TITLE        AS talentTitle
+  </sql>
+
+  <!-- 2026-08-10 박유정 — 일반 회원 참여 신청 INSERT -->
+  <insert id="insertApply"
+          parameterType="com.petcare.petcare.give.talent.vo.GiveTalentApplyVO">
+    <selectKey keyProperty="applyId" resultType="long" order="BEFORE">
+      SELECT SEQ_TB_TALENT_APPLY.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TB_TALENT_APPLY (
+      APPLY_ID,
+      TALENT_ID,
+      MEMBER_NO,
+      MESSAGE,
+      STATUS_CD,
+      REG_DATE
+    ) VALUES (
+      #{applyId},
+      #{talentId},
+      #{memberNo},
+      #{message, jdbcType=VARCHAR},
+      NVL(#{statusCd}, 'PENDING'),
+      SYSDATE
+    )
+  </insert>
+
+  <!-- 2026-08-10 박유정 — 중복 신청 방지 (CANCELLED 제외하고 이미 있으면 막음) -->
+  <select id="countByTalentAndMember" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_TALENT_APPLY
+    WHERE TALENT_ID = #{talentId}
+      AND MEMBER_NO = #{memberNo}
+      AND STATUS_CD &lt;&gt; 'CANCELLED'
+  </select>
+
+  <!-- 2026-08-10 박유정 — 상세 화면: 내 신청 여부 -->
+  <select id="selectByTalentAndMember"
+          resultType="com.petcare.petcare.give.talent.vo.GiveTalentApplyVO">
+    SELECT
+    <include refid="applyColumns"/>
+    FROM TB_TALENT_APPLY A
+    WHERE A.TALENT_ID = #{talentId}
+      AND A.MEMBER_NO = #{memberNo}
+      AND A.STATUS_CD &lt;&gt; 'CANCELLED'
+      AND ROWNUM = 1
+  </select>
+
+  <!-- 2026-08-10 박유정 — 병원: 한 글의 신청자 목록 -->
+  <select id="selectAppliesByTalentId"
+          resultType="com.petcare.petcare.give.talent.vo.GiveTalentApplyVO">
+    SELECT
+    <include refid="applyWithMemberColumns"/>
+    FROM TB_TALENT_APPLY A
+    JOIN TB_MEMBER M ON M.MEMBER_NO = A.MEMBER_NO
+    JOIN TB_TALENT T ON T.TALENT_ID = A.TALENT_ID
+    WHERE A.TALENT_ID = #{talentId}
+    ORDER BY A.REG_DATE DESC
+  </select>
+
+  <!-- 2026-08-10 박유정 — 병원: 내 사업자 글에 달린 신청 전체 -->
+  <select id="selectAppliesByBizId"
+          resultType="com.petcare.petcare.give.talent.vo.GiveTalentApplyVO">
+    SELECT
+    <include refid="applyWithMemberColumns"/>
+    FROM TB_TALENT_APPLY A
+    JOIN TB_MEMBER M ON M.MEMBER_NO = A.MEMBER_NO
+    JOIN TB_TALENT T ON T.TALENT_ID = A.TALENT_ID
+    JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+    WHERE B.BIZ_ID = #{bizId}
+    ORDER BY A.REG_DATE DESC
+  </select>
+
+  <!-- 2026-08-10 박유정 — 병원 [확인] 버튼 -->
+  <update id="updateApplyConfirmed">
+    UPDATE TB_TALENT_APPLY
+    SET STATUS_CD = 'CONFIRMED',
+        CONFIRM_DATE = SYSDATE
+    WHERE APPLY_ID = #{applyId}
+      AND STATUS_CD = 'PENDING'
+  </update>
+
+  <!-- 2026-08-10 박유정 — 신청 시 모집 인원 카운트 증가 -->
+  <update id="incrementTalentCurrentCnt">
+    UPDATE TB_TALENT
+    SET CURRENT_CNT = NVL(CURRENT_CNT, 0) + 1
+    WHERE TALENT_ID = #{talentId}
+  </update>
+
+  <!-- 2026-08-10 박유정 — 병원 [확인] 권한: 신청 건이 내 BIZ_ID 글인지 -->
+  <select id="countApplyOwnedByBiz" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_TALENT_APPLY A
+    JOIN TB_TALENT T ON T.TALENT_ID = A.TALENT_ID
+    JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+    WHERE A.APPLY_ID = #{applyId}
+      AND B.BIZ_ID = #{bizId}
+  </select>
+
+  <!-- 2026-08-10 박유정 — 사업자 사이드바 뱃지: 확인 대기(PENDING) 건수 -->
+  <select id="countPendingAppliesByBizId" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_TALENT_APPLY A
+    JOIN TB_TALENT T ON T.TALENT_ID = A.TALENT_ID
+    JOIN TB_BUSINESS B ON B.BIZ_NO = T.BIZ_NO
+    WHERE B.BIZ_ID = #{bizId}
+      AND A.STATUS_CD = 'PENDING'
+  </select>
+
+  <!-- 2026-08-10 박유정 — 확인 알림용 신청 1건 조회 -->
+  <select id="selectApplyById"
+        resultType="com.petcare.petcare.give.talent.vo.GiveTalentApplyVO">
+  SELECT
+  <include refid="applyWithMemberColumns"/>
+  FROM TB_TALENT_APPLY A
+  JOIN TB_MEMBER M ON M.MEMBER_NO = A.MEMBER_NO
+  JOIN TB_TALENT T ON T.TALENT_ID = A.TALENT_ID
+  WHERE A.APPLY_ID = #{applyId}
+</select>
+
+  <!-- 2026-08-10 박유정 — 회원 신청 취소 (PENDING만) -->
+  <update id="updateApplyCancelled">
+    UPDATE TB_TALENT_APPLY
+    SET STATUS_CD = 'CANCELLED'
+    WHERE APPLY_ID = #{applyId}
+      AND MEMBER_NO = #{memberNo}
+      AND STATUS_CD = 'PENDING'
+  </update>
+
+  <!-- 2026-08-10 박유정 — 취소 시 TB_TALENT.CURRENT_CNT -1 -->
+  <update id="decrementTalentCurrentCnt">
+    UPDATE TB_TALENT
+    SET CURRENT_CNT = GREATEST(NVL(CURRENT_CNT, 0) - 1, 0)
+    WHERE TALENT_ID = #{talentId}
+  </update>
+
+</mapper>

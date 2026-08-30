@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.member.find.mapper.MemberFindMapper">
+
+<!-- 아이디 찾기: 이름 + 전화번호 → 이메일(아이디) -->
+<select id="selectByNameAndPhone" resultType="com.petcare.petcare.member.find.vo.MemberFindVO">
+    SELECT MEMBER_NO   AS memberNo,
+           MEMBER_ID   AS memberId,
+           EMAIL        AS email,
+           MEMBER_NAME AS memberName
+      FROM TB_MEMBER
+     WHERE MEMBER_NAME = #{memberName}
+       AND PHONE       = #{phone}
+       AND STATUS_CD   NOT IN ('WITHDRAWN', 'SUSPENDED')
+     FETCH FIRST 1 ROWS ONLY
+</select>
+
+<!-- 비밀번호 찾기: 이메일 + 이름 → 회원번호 -->
+<select id="selectByEmailAndName" resultType="com.petcare.petcare.member.find.vo.MemberFindVO">
+    SELECT MEMBER_NO   AS memberNo,
+           MEMBER_ID   AS memberId,
+           EMAIL        AS email,
+           MEMBER_NAME AS memberName
+      FROM TB_MEMBER
+     WHERE (EMAIL = #{email} OR MEMBER_ID = #{email})
+       AND MEMBER_NAME = #{memberName}
+       AND STATUS_CD   NOT IN ('WITHDRAWN', 'SUSPENDED')
+     FETCH FIRST 1 ROWS ONLY
+</select>
+
+<!-- 비밀번호 변경 (암호화된 임시 비밀번호 저장) -->
+<update id="updatePassword">
+    UPDATE TB_MEMBER
+       SET MEMBER_PWD = #{newPassword}
+     WHERE MEMBER_NO  = #{memberNo}
+</update>
+
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petcare.petcare.file.mapper.FileMapper">
+    <!-- 2026-07-09 장우철 — [변경 후] SEQ_TB_FILE 사용
+         이유: 커뮤니티·제보(GiveReport)와 동일 PK 시퀀스. SEQ_FILE 은 별도 시퀀스라
+               이미 TB_FILE 에 있는 FILE_ID 와 겹쳐 ORA-00001(PK_TB_FILE) 발생 -->
+    <!-- 2026-07-10 장우철 — FILE_ID 컬럼 누락 수정 (ORA-01400)
+         selectKey 로 fileId 를 받아도 INSERT 에 안 넣으면 NULL 삽입됨 -->
+    <insert id="insertFile" parameterType="com.petcare.petcare.file.vo.FileVO">
+        <selectKey keyProperty="fileId" resultType="long" order="BEFORE">
+            SELECT SEQ_TB_FILE.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_FILE (
+                                FILE_ID,
+                                REF_TYPE, 
+                                REF_ID, 
+                                FILE_URL, 
+                                DRIVE_FILE_ID,
+                                ORIGIN_NAME,
+                                REG_DATE
+                            )
+        VALUES              (
+                                #{fileId},
+                                #{refType}, 
+                                #{refId}, 
+                                #{fileUrl}, 
+                                #{driveFileId, jdbcType=VARCHAR},
+                                <!--#{fileOrder}, --> 
+                                #{originName, jdbcType=VARCHAR},
+                                SYSDATE
+                            )
+    </insert>
+
+    <select id="selectFileList" parameterType="com.petcare.petcare.file.vo.FileVO" resultType="com.petcare.petcare.file.vo.FileVO">
+        SELECT      FILE_ID, 
+                    REF_TYPE, 
+                    REF_ID, 
+                    FILE_URL, 
+                    <!--FILE_ORDER, --> 
+                    REG_DATE
+        FROM        TB_FILE
+        WHERE       REF_TYPE = #{refType}
+        AND         REF_ID   = #{refId}
+        --ORDER BY    FILE_ORDER ASC
+    </select>
+
+    <!-- 파일 1건 조회 (삭제 전 경로 확인용) -->
+    <select id="selectFile" parameterType="long" resultType="com.petcare.petcare.file.vo.FileVO">
+        SELECT      FILE_ID,
+                    REF_TYPE,
+                    REF_ID,
+                    FILE_URL,
+                    ORIGIN_NAME,
+                    REG_DATE
+        FROM        TB_FILE
+        WHERE       FILE_ID = #{fileId}
+    </select>
+    
+    <!-- 파일 1건 삭제 -->
+    <delete id="deleteFile" parameterType="long">
+        DELETE FROM TB_FILE
+        WHERE       FILE_ID = #{fileId}
+    </delete>
+
+    <delete id="deleteFilesByRefId" parameterType="com.petcare.petcare.file.vo.FileVO">
+        DELETE FROM     TB_FILE
+        WHERE           REF_TYPE = #{refType}
+        AND             REF_ID   = #{refId}
+    </delete>
+</mapper>
