@@ -50,11 +50,11 @@ public class KakaoOAuthService {
     }
 
     public String buildAuthorizeUrl(String state) {
-        String url = "https://kauth.kakao.com/oauth/authorize"
-                + "?client_id=" + clientId
-                + "&redirect_uri=" + redirectUri
-                + "&response_type=code"
-                + "&scope=talk_message";
+    String url = "https://kauth.kakao.com/oauth/authorize"
+            + "?client_id=" + clientId
+            + "&redirect_uri=" + redirectUri
+            + "&response_type=code";
+    // scope=talk_message 는 로그인/가입 시 요청하지 않음 (이용 중 동의 항목이라 초기 authorize에 넣으면 거부됨)
         if (state != null && !state.isBlank()) {
             url += "&state=" + URLEncoder.encode(state, StandardCharsets.UTF_8);
         }
