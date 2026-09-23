@@ -36,6 +36,8 @@ public interface GiveTalentMapper {
 
     List<GiveTalentVO> selectApprovedTalentList(@Param("talentType") String talentType);
 
+    int selectApprovedTalentCount();
+
     GiveTalentVO selectTalentDetail(@Param("talentId") long talentId);
 
     // ── 관리자 승인 (2026-07-13) ───────────────────────────────────

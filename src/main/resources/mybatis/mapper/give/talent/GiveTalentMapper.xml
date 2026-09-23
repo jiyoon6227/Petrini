@@ -87,10 +87,19 @@
     <if test="talentType != null and talentType != ''">
       AND T.TALENT_TYPE = #{talentType}
     </if>
-    ORDER BY T.APPROVE_DATE DESC NULLS LAST, T.REG_DATE DESC
+    
+        ORDER BY T.APPROVE_DATE DESC NULLS LAST, T.REG_DATE DESC
+  </select>
+
+  <!-- 2026-09-23 곽지윤 — 가족찾기 탭 재능나눔 건수 (목록 노출 기준과 동일) -->
+  <select id="selectApprovedTalentCount" resultType="int">
+    SELECT COUNT(*)
+    FROM TB_TALENT
+    WHERE STATUS_CD IN ('APPROVED', 'DONE')
   </select>
 
   <select id="selectTalentDetail"
+
           resultType="com.petcare.petcare.give.talent.vo.GiveTalentVO">
     SELECT
     <include refid="talentColumns"/>

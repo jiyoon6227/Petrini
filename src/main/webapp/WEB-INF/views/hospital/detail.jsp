@@ -12,6 +12,11 @@
   .hdetail-photos{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:24px;border-radius:var(--radius-md);overflow:hidden}
   .hdetail-photos img{width:100%;height:200px;object-fit:cover;display:block}
   .hdetail-photos img:first-child{height:100%;grid-row:span 2}
+  
+  .hdetail-photos > .swiper-slide:only-child {
+    grid-column: 1 / -1;
+}
+
   .hdetail-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
   .hdetail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
   .hdtag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}

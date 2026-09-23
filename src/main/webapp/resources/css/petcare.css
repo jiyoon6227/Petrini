@@ -533,43 +533,42 @@ ul, ol { list-style: none; }
 .hero-float.f3 { width: 44px; height: 44px; bottom: 60px; right: 0; animation-delay: 1.6s; }
 @keyframes floatBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
-/* 슬라이드 컨트롤 */
+/* 슬라이드 좌우 화살표 */
 .hero-controls {
     position: absolute;
-    bottom: 22px;
-    left: 48px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
 }
-.slide-indicator {
-    font-size: 12px;
-    color: var(--text-sub);
-    font-weight: 600;
-}
-.slide-dots { display: flex; gap: 6px; }
-.slide-dot {
-    width: 6px; height: 6px;
-    border-radius: 3px;
-    background: rgba(0,0,0,.2);
-    cursor: pointer;
-    transition: all .3s;
-}
-.slide-dot.active { width: 18px; background: var(--primary); }
 .slide-nav-btn {
-    width: 28px; height: 28px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: rgba(255,255,255,.8);
+    border: 1px solid rgba(255,255,255,.55);
+    background: rgba(255,255,255,.78);
+    color: #444;
+    font-size: 22px;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--text-sub);
-    transition: var(--transition);
+    box-shadow: 0 3px 12px rgba(0,0,0,.16);
     cursor: pointer;
+    pointer-events: auto;
+    transition: background .2s, color .2s, transform .2s;
 }
-.slide-nav-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.slide-nav-btn.btn-prev { left: 16px; }
+.slide-nav-btn.btn-next { right: 16px; }
+.slide-nav-btn:hover {
+    background: rgba(255,255,255,.96);
+    color: var(--primary-dark);
+}
+.slide-nav-btn:active {
+    transform: translateY(-50%) scale(.95);
+}
 
 /* =============================================
    QUICK LINKS

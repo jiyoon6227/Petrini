@@ -33,13 +33,10 @@
             </div>
         </div>
 
-        <%-- 슬라이드 컨트롤 (DB 배너 2개 이상일 때만 표시) --%>
+        <%-- 슬라이드 좌우 화살표 (DB 배너 2개 이상일 때만 표시) --%>
         <div class="hero-controls" id="heroControls" style="display:none">
-            <span class="slide-indicator"></span>
-            <div class="slide-dots"></div>
-            <button class="slide-nav-btn btn-prev" aria-label="이전">&#8249;</button>
-            <button class="slide-nav-btn btn-pause" aria-label="일시정지">❚❚</button>
-            <button class="slide-nav-btn btn-next" aria-label="다음">&#8250;</button>
+            <button type="button" class="slide-nav-btn btn-prev" aria-label="이전 배너">&#10094;</button>
+            <button type="button" class="slide-nav-btn btn-next" aria-label="다음 배너">&#10095;</button>
         </div>
     </div>
 
@@ -340,18 +337,9 @@
     slider.appendChild(div);
 }
 
-        // 2) 슬라이드 컨트롤 (2개 이상일 때만 표시)
+        // 2) 슬라이드 좌우 화살표 (2개 이상일 때만 표시)
         if (list.length > 1 && heroControls) {
             heroControls.style.display = '';
-            var dotsWrap = document.querySelector('.slide-dots');
-            if (dotsWrap) {
-                dotsWrap.innerHTML = '';
-                for (var d = 0; d < list.length; d++) {
-                    var dot = document.createElement('span');
-                    dot.className = 'slide-dot' + (d === 0 ? ' active' : '');
-                    dotsWrap.appendChild(dot);
-                }
-            }
         } else if (heroControls) {
             heroControls.style.display = 'none';
         }
