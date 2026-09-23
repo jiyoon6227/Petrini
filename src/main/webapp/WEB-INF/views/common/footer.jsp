@@ -4,9 +4,9 @@
 
 <footer class="pc-footer">
     <div class="footer-inner">
-        <div class="footer-left">
+        <div class="footer-brand">
             <a href="${contextPath}/" class="footer-logo">
-                <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
                     <ellipse cx="16" cy="20" rx="9" ry="8" fill="#2BAB82"/>
                     <ellipse cx="8"  cy="12" rx="3.2" ry="3.8" fill="#2BAB82"/>
                     <ellipse cx="13" cy="9.5" rx="3.2" ry="3.8" fill="#2BAB82"/>
@@ -16,37 +16,34 @@
                 </svg>
                 <span>펫린이</span>
             </a>
+            <p class="footer-tagline">반려동물과 함께, 더 행복한 일상</p>
             <p class="footer-copy">© 2024 펫린이. All rights reserved.</p>
         </div>
 
-        <div class="footer-right">
-    <div class="footer-team">
-        <div class="footer-member">
-            <p class="footer-member-name">하예주</p>
-            <p><span class="footer-info-label">연락처</span> 010-0000-0000</p>
-            <p><span class="footer-info-label">이메일</span> <a class="footer-info-value" href="mailto:yeju@example.com">example@example.com</a></p>
-            <p><span class="footer-info-label">주소</span> 대전 서구 대덕대로 182</p>
+        <div class="footer-nav-simple" aria-label="푸터 메뉴">
+            <span>이용약관</span>
+            <span class="footer-divider">|</span>
+            <span>개인정보처리방침</span>
+            <span class="footer-divider">|</span>
+            <a href="${contextPath}/member/cs">고객센터</a>
         </div>
-        <div class="footer-member">
-            <p class="footer-member-name">박유정</p>
-            <p><span class="footer-info-label">연락처</span> 010-0000-0000</p>
-            <p><span class="footer-info-label">이메일</span> <a class="footer-info-value" href="mailto:yujeong@example.com">example@example.com</a></p>
-            <p><span class="footer-info-label">주소</span> 대전 서구 대덕대로 182</p>
+
+        <div class="footer-visual" aria-hidden="true">
+            <div class="footer-social-simple">
+                <span class="footer-social-circle">◎</span>
+                <span class="footer-social-circle">▶</span>
+                <span class="footer-social-circle footer-social-n">N</span>
+            </div>
+            <svg class="footer-pets" viewBox="0 0 150 82" fill="none">
+                <path d="M29 67c-4-15-2-32 9-44 8-9 19-12 28-8 8 4 12 13 11 24-1 9-4 18-1 28H29Z" fill="currentColor" opacity=".72"/>
+                <circle cx="47" cy="18" r="12" fill="currentColor" opacity=".72"/>
+                <path d="M37 10c-8-10-13-4-9 7 3 7 8 9 13 6" fill="currentColor" opacity=".72"/>
+                <path d="M79 67c1-16 4-27 14-34 8-6 19-6 26 1 7 6 10 17 9 33H79Z" fill="currentColor" opacity=".58"/>
+                <path d="M91 31l5-12 8 9m10 1 9-10 2 14" fill="currentColor" opacity=".58"/>
+                <path d="M127 54c13-1 18-10 15-18" stroke="currentColor" stroke-width="6" stroke-linecap="round" opacity=".58"/>
+                <path d="M123 8c4-7 14-5 14 3 0 8-14 17-14 17s-14-9-14-17c0-8 10-10 14-3Z" fill="currentColor" opacity=".38"/>
+            </svg>
         </div>
-        <div class="footer-member">
-            <p class="footer-member-name">장우철</p>
-            <p><span class="footer-info-label">연락처</span> 010-0000-0000</p>
-            <p><span class="footer-info-label">이메일</span> <a class="footer-info-value" href="mailto:woochul@example.com">example@example.com</a></p>
-            <p><span class="footer-info-label">주소</span> 대전 서구 대덕대로 182</p>
-        </div>
-        <div class="footer-member">
-            <p class="footer-member-name">곽지윤</p>
-            <p><span class="footer-info-label">연락처</span> 010-0000-0000</p>
-            <p><span class="footer-info-label">이메일</span> <a class="footer-info-value" href="mailto:jiyoon@example.com">example@example.com</a></p>
-            <p><span class="footer-info-label">주소</span> 대전 서구 대덕대로 182</p>
-        </div>
-    </div>
-</div>
     </div>
 </footer>
 <script>window.__CONTEXT_PATH__ = '${contextPath}';</script>
