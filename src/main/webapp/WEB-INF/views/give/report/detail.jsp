@@ -28,6 +28,9 @@
   .rd-photos img{width:100%;object-fit:cover;display:block}
   .rd-photos img:first-child{height:260px;grid-row:span 2}
   .rd-photos img:not(:first-child){height:127px}
+  
+  /* 2026-09-23 곽지윤 — 사진 1장일 때 전체 폭 사용 + 원본 비율 유지 (잘림/한쪽 모서리만 둥근 문제) */
+  .rd-photos img:only-child{grid-column:1 / -1;height:auto;max-height:480px}
   .rd-status-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
   .rd-status{font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px}
   .rds-finding{background:#FFF8E1;color:#F59E0B}

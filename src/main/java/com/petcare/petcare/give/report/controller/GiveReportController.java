@@ -87,7 +87,6 @@ public class GiveReportController extends GiveBaseController {
             @RequestParam(defaultValue = "") String status,
             Model model) {
         model.addAttribute("list", giveReportService.getReportList(status));
-        model.addAttribute("reportCount", giveReportService.getReportCount());
         model.addAttribute("status", status != null ? status.trim() : "");
         return "give/report/list";
     }
