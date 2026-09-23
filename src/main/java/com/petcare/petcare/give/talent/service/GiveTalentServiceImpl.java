@@ -48,8 +48,13 @@ public class GiveTalentServiceImpl implements GiveTalentService {
     // ── 사용자 목록·상세 (2026-07-13) ─────────────────────────────
 
     @Override
-    public List<GiveTalentVO> getApprovedTalentList(String talentType) {
+        public List<GiveTalentVO> getApprovedTalentList(String talentType) {
         return giveTalentMapper.selectApprovedTalentList(talentType);
+    }
+
+    @Override
+    public int getApprovedTalentCount() {
+        return giveTalentMapper.selectApprovedTalentCount();
     }
 
     @Override

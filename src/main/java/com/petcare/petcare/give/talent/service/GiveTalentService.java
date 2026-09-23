@@ -34,6 +34,8 @@ public interface GiveTalentService {
 
     List<GiveTalentVO> getApprovedTalentList(String talentType);
 
+    int getApprovedTalentCount();
+
     GiveTalentVO getTalentDetail(long talentId);
 
     // ── 관리자 승인 화면 (2026-07-13) ─────────────────────────────
