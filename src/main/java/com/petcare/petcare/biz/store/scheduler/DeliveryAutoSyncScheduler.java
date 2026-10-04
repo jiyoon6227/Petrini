@@ -1,5 +1,6 @@
 /**
  * 지윤 26.07.28 추가: 배송상태 자동 폴링 스케줄러
+ * 지윤 26.10.05 수정: System.out.println -> @Slf4j 로그로 변경 (레벨/시각/클래스 기록, 실패 시 스택트레이스 포함)
  *
  * 역할: SHIPPING(또는 PAID/READY인데 송장이 이미 등록된) 주문들을 주기적으로 돌면서
  *      스마트택배 API로 실제 배송상태를 확인하고, 자동으로 DB 상태를 갱신함
@@ -30,7 +31,10 @@ import com.petcare.petcare.biz.store.mapper.BizStoreMapper;
 import com.petcare.petcare.biz.store.service.BizStoreService;
 import com.petcare.petcare.common.external.service.SmartTrackerService;
 
+import lombok.extern.slf4j.Slf4j;
+
 // 지윤 26.07.28: 테스트할 때만 아래 줄 주석 풀기! 평소엔 반드시 주석 상태로 유지 (API 100건/월 제한 보호)
+@Slf4j
  //@Component //TEST시 이거 주석처리or해제 -> 실시간 변경
 public class DeliveryAutoSyncScheduler {
 
@@ -48,7 +52,10 @@ public class DeliveryAutoSyncScheduler {
     @Scheduled(fixedDelay = 30 * 1000)
     public void syncDeliveryStatus() {
         List<Map<String, Object>> targets = bizStoreMapper.selectOrdersNeedingSync();
-        System.out.println("===== 배송상태 자동동기화 시작: 대상 " + targets.size() + "건 =====");
+        log.info("배송상태 자동동기화 시작: 대상 {}건", targets.size());
+
+        int successCount = 0;
+        int failCount = 0;
 
         for (Map<String, Object> t : targets) {
             Long orderId = ((Number) t.get("ORDER_ID")).longValue();
@@ -66,11 +73,13 @@ public class DeliveryAutoSyncScheduler {
                 } else if (level >= 2) {
                     bizStoreService.autoElevateToShippingIfNeeded(orderId, bizNo);
                 }
+                successCount++;
             } catch (Exception e) {
                 //한 건 실패해도 나머지 건 계속 처리되게 여기서 잡고 다음 건으로 넘어감
-                System.out.println("===== 배송상태 자동동기화 실패 (orderId=" + orderId + "): " + e.getMessage() + " =====");
+                failCount++;
+                log.error("배송상태 자동동기화 실패 orderId={}, courierCode={}, trackingNo={}", orderId, courierCode, trackingNo, e);
             }
         }
-        System.out.println("===== 배송상태 자동동기화 종료 =====");
+        log.info("배송상태 자동동기화 종료: 성공 {}건, 실패 {}건", successCount, failCount);
     }
 }
