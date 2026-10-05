@@ -57,6 +57,26 @@
 > 데모 주문의 결제키 · 송장번호는 더미 값이라 **취소 승인(토스 취소)과 배송조회(택배 API)는 동작하지 않습니다.**
 > 이 흐름은 새로 주문(토스 **테스트** 카드 결제, 실제 출금 없음)한 뒤 확인해 주세요.
 
+### 배포 구성
+
+```text
+사용자
+  ↓ HTTPS
+petrini.kr
+  ↓
+Nginx :443
+  ↓
+Apache Tomcat 10 :8080
+  ↓
+ROOT.war (Spring Boot)
+  ↓
+Oracle XE :1521
+```
+
+- GCP Compute Engine Windows VM에서 Nginx와 Tomcat을 운영합니다.
+- Nginx가 HTTPS 요청을 받아 Tomcat의 `127.0.0.1:8080`으로 리버스 프록시합니다.
+- 애플리케이션은 같은 VM의 Oracle XE에 `127.0.0.1:1521`로 연결합니다.
+
 ---
 ## 주요 기능
 ### 사용자 서비스
@@ -392,7 +412,8 @@ UPDATE TB_COUPON
 | View | **JSP**, JSTL |
 | Persistence | **MyBatis** (spring-boot-starter 3.0.4), **Oracle** |
 | Build | **Maven** (WAR) |
-| Server | Embedded **Tomcat** |
+| Server | **Apache Tomcat 10** (WAR 배포) |
+| Infra | **GCP Compute Engine**, **Nginx**, HTTPS |
 | Security | BCrypt, Lucy XSS, Jasypt, CSRF |
 | Cache | Spring Cache |
 | Mail | Spring Mail (Google SMTP) |
@@ -416,7 +437,7 @@ UPDATE TB_COUPON
 | **공공데이터** | 유기동물 · 반려동물 동반여행 |
 | **스마트택배(Sweet&nbsp;Tracker)** | 택배 배송 조회 |
 
-> API 키는 `application.properties`, DB 접속 정보는 `application-local` / `application-prod.properties`에 설정합니다. (**Git에 커밋하지 않음**)
+> API 키는 `application.properties`, DB 접속 정보는 `application-local.properties` / `application-prod.properties`에 설정합니다. (**Git에 커밋하지 않음**)
 
 ---
 ## 프로젝트 구조
@@ -522,12 +543,12 @@ spring.datasource.password=
 **application-prod.properties** — 서버 배포용 (DB · 운영 주소)
 ```properties
 spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-spring.datasource.url=jdbc:oracle:thin:@//127.0.0.1:1521/서비스명
+spring.datasource.url=jdbc:oracle:thin:@//127.0.0.1:1521/xe
 spring.datasource.username=
 spring.datasource.password=
 
-app.base-url=https://운영도메인
-kakao.redirect-uri=https://운영도메인/oauth/kakao/callback
+app.base-url=https://petrini.kr
+kakao.redirect-uri=https://petrini.kr/oauth/kakao/callback
 ```
 
 > 로컬 실행은 `spring.profiles.active=local`, 서버 배포 시에는 `spring.profiles.active=prod`로 변경합니다.
