@@ -26,7 +26,7 @@
 - [기술 스택](#기술-스택)
 - [외부 연동 API](#외부-연동-api)
 - [프로젝트 구조](#프로젝트-구조)
-- [실행 방법](#실행-방법)
+- [로컬 실행 방법](#로컬-실행-방법)
 
 ---
 ## 프로젝트 소개
@@ -40,14 +40,8 @@
 ---
 ## 배포 및 테스트 계정
 
-### Live Service
+**https://petrini.kr** 에 접속한 뒤 아래 테스트 계정으로 사용자 · 쇼핑 사업자 · 관리자 기능을 바로 확인할 수 있습니다.
 
-- **서비스 URL**: **https://petrini.kr**
-- **GitHub**: https://github.com/jiyoon6227/Petrini
-
-> 채용 담당자는 위 배포 URL에 접속한 뒤 아래 테스트 계정으로 사용자 · 쇼핑 사업자 · 관리자 기능을 바로 확인할 수 있습니다.
-
-### Demo Account
 
 | 구분 | ID | PW | 주요 확인 기능 |
 |---|---|---|---|
@@ -58,7 +52,10 @@
 | **숙소 사업자** | `stay01` | `1234` | 숙소 사업자센터 |
 
 > 테스트 계정은 시연용이며 실제 개인정보를 사용하지 않습니다.
-> 쇼핑 모듈은 `user01`과 `store01` 계정으로 주요 사용자/사업자 흐름을 빠르게 확인할 수 있습니다.
+> 쇼핑 모듈은 `user01`(구매자)과 `store01`(사업자)로 확인할 수 있으며, 데모 주문이 배송준비 · 배송중 · 구매확정 상태로 1건씩 들어 있습니다.
+>
+> 데모 주문의 결제키 · 송장번호는 더미 값이라 **취소 승인(토스 취소)과 배송조회(택배 API)는 동작하지 않습니다.**
+> 이 흐름은 새로 주문(토스 **테스트** 카드 결제, 실제 출금 없음)한 뒤 확인해 주세요.
 
 ---
 ## 주요 기능
@@ -298,6 +295,7 @@
 - 0건 갱신이면 그 사이 다른 요청이 소진한 것으로 보고 예외를 던져, 앞서 INSERT한 회원 쿠폰까지 **트랜잭션 롤백**
 
 ```sql
+-- CouponMapper.xml updateCouponIssued (핵심 조건만 발췌, 실제 쿼리는 예산 조건 · 소진 상태 전환 포함)
 UPDATE TB_COUPON
    SET ISSUED_QTY = NVL(ISSUED_QTY, 0) + 1
  WHERE COUPON_ID = #{couponId}
@@ -307,6 +305,7 @@ UPDATE TB_COUPON
 
 **결과**
 10장 한정 쿠폰에 100명 동시 요청 → **10건만 발급, 90건 거절**
+- 검증: [`CouponConcurrencyTest`](src/test/java/com/petcare/petcare/CouponConcurrencyTest.java) — 100개 스레드 동시 요청 후 성공 · 실패 건수, 실제 발급 행 수, `ISSUED_QTY`, `EXHAUSTED` 전환을 assert로 확인
 
 ### 2. 여러 사업자 상품이 섞인 장바구니 결제
 **문제**
@@ -346,7 +345,7 @@ UPDATE TB_COUPON
 **해결**
 - **사용자 · 사업자가 배송조회를 할 때 그 결과로 주문 상태를 동기화**하는 방식을 기본으로 사용
   - 배송 단계 2~5(이동 중) → `SHIPPING`, 6(배송완료) → `DONE`
-- 주기 동기화 스케줄러도 구현해 두고, 호출 한도 때문에 기본 비활성 (운영 환경에서 주기만 늘려 활성화 가능)
+- 주기 동기화 스케줄러(`DeliveryAutoSyncScheduler`)도 구현했지만, 호출 한도 보호를 위해 빈 등록(`@Component`)을 꺼둔 상태
 - 상태 변경 UPDATE에 **현재 상태 조건을 포함**해, 이미 진행된 주문이 뒤로 돌아가거나 완료 시각이 중복 기록되지 않도록 처리
 - 송장번호를 입력하고 주문 상태를 바꾸지 않은 채 저장해도, 주문 상태와 배송 상태가 어긋나지 않도록 자동으로 `SHIPPING` 보정
 
@@ -356,7 +355,7 @@ UPDATE TB_COUPON
 | 스케줄러 | 실행 | 내용 |
 |----------|------|------|
 | `AutoConfirmPurchaseScheduler` | 매일 03:00 | 배송완료 후 7일이 지난 미확정 주문을 자동 구매확정하고 포인트 적립. 한 건이 실패해도 나머지는 계속 처리 |
-| `DeliveryAutoSyncScheduler` | 기본 비활성 | 송장이 등록된 미완료 주문의 배송 상태를 택배 API로 일괄 동기화. 구현 완료, 무료 플랜 호출 한도(월 100건)로 기본 비활성 |
+| `DeliveryAutoSyncScheduler` | 비활성 | 송장이 등록된 미완료 주문의 배송 상태를 택배 API로 일괄 동기화. 구현 완료, 무료 플랜 호출 한도(월 100건) 보호를 위해 `@Component`를 꺼둠 |
 
 ---
 ## 주문 · 배송 상태 흐름
@@ -391,7 +390,7 @@ UPDATE TB_COUPON
 | Language | **Java 21** |
 | Framework | **Spring Boot 3.5** |
 | View | **JSP**, JSTL |
-| Persistence | **MyBatis 3.0.4**, **Oracle** |
+| Persistence | **MyBatis** (spring-boot-starter 3.0.4), **Oracle** |
 | Build | **Maven** (WAR) |
 | Server | Embedded **Tomcat** |
 | Security | BCrypt, Lucy XSS, Jasypt, CSRF |
@@ -399,7 +398,7 @@ UPDATE TB_COUPON
 | Mail | Spring Mail (Google SMTP) |
 | Cloud | Google Cloud Storage (선택) |
 | Utils | Lombok, Jackson, org.json |
-| Test | JUnit 5 |
+| Test | JUnit 5 (쿠폰 동시 발급 테스트) |
 | Frontend | CSS (`petcare.css`, `biz.css`, `admin.css`), JavaScript |
 
 ---
@@ -443,7 +442,9 @@ src/main/resources/mybatis/mapper/   # MyBatis XML
 ```
 
 ---
-## 실행 방법
+## 로컬 실행 방법
+
+> 내 PC에서 직접 실행하는 방법입니다. 배포된 서비스는 [https://petrini.kr](https://petrini.kr)에서 바로 확인할 수 있습니다.
 
 ### 요구 사항
 - JDK 21
@@ -518,12 +519,15 @@ spring.datasource.username=
 spring.datasource.password=
 ```
 
-**application-prod.properties** — 서버 배포용 DB
+**application-prod.properties** — 서버 배포용 (DB · 운영 주소)
 ```properties
 spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-spring.datasource.url=jdbc:oracle:thin:@//운영DB호스트:1521/서비스명
+spring.datasource.url=jdbc:oracle:thin:@//127.0.0.1:1521/서비스명
 spring.datasource.username=
 spring.datasource.password=
+
+app.base-url=https://운영도메인
+kakao.redirect-uri=https://운영도메인/oauth/kakao/callback
 ```
 
 > 로컬 실행은 `spring.profiles.active=local`, 서버 배포 시에는 `spring.profiles.active=prod`로 변경합니다.
@@ -531,28 +535,21 @@ spring.datasource.password=
 ### 2. DB 초기화
 `src/main/resources/sql/petrini.sql`을 Oracle에서 실행합니다.
 (테이블 · 시퀀스 생성 + 데모 데이터 입력. **기존 테이블과 데이터는 삭제됩니다.**)
+계정은 [테스트 계정](#배포-및-테스트-계정)과 같고, 구매자 계정 `user02`가 하나 더 있습니다.
 
-| 구분 | ID | PW |
-|------|----|----|
-| 관리자 | `admin` | `1234` |
-| 일반회원 | `user01`, `user02` | `1234` |
-| 사업자(쇼핑) | `store01` | `1234` |
-| 사업자(병원) | `hospital01` | `1234` |
-| 사업자(숙소) | `stay01` | `1234` |
-
-> 테스트 계정은 시연용이며 실제 개인정보를 사용하지 않습니다.
->
-> 쇼핑 모듈은 `store01`(사업자)과 `user01` · `user02`(구매자)로 확인할 수 있습니다. 데모 주문이 배송준비 · 배송중 · 구매확정 상태로 1건씩 들어 있습니다.
-
-### 3. 빌드 & 실행
+### 3. 실행
 ```bash
 git clone https://github.com/jiyoon6227/Petrini.git
 cd Petrini
-mvn clean package
 mvn spring-boot:run
 ```
 
-### 4. 접속
+> 쿠폰 동시성 테스트는 설정한 DB에 테스트 데이터를 넣었다가 삭제하므로, DB 초기화 후 따로 실행합니다.
+> ```bash
+> mvn test -Dtest=CouponConcurrencyTest
+> ```
+
+### 4. 접속 (로컬)
 - 사용자: `http://localhost:8080`
 - 쇼핑 사업자센터: `/biz/store` (store01 로그인)
 - 관리자: `/admin/login`
