@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,10 @@ public class BillingCardController {
 
     private final BillingCardService billingCardService;
     private final TossBillingService tossBillingService;
+
+    // 배포 환경별 사이트 주소 (값이 없으면 기존처럼 요청 정보로 생성)
+    @Value("${app.base-url:}")
+    private String appBaseUrl;
 
     public BillingCardController(BillingCardService billingCardService,
                                  TossBillingService tossBillingService) {
@@ -338,6 +343,10 @@ public class BillingCardController {
 
     private String buildBaseUrl(HttpServletRequest request) {
         String ctx = request.getContextPath() == null ? "" : request.getContextPath();
+        // 운영(Nginx 뒤)에서는 요청 정보가 127.0.0.1:8080으로 들어오므로 설정값 사용
+        if (appBaseUrl != null && !appBaseUrl.isBlank()) {
+            return appBaseUrl + ctx;
+        }
         return request.getScheme() + "://" + request.getServerName()
                 + (request.getServerPort() == 80 || request.getServerPort() == 443
                 ? "" : ":" + request.getServerPort())

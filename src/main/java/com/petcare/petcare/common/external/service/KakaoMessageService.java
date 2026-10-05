@@ -27,12 +27,17 @@ import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value; 
 import org.springframework.stereotype.Service;
 
 @Service
 public class KakaoMessageService {
 
     private static final Logger log = LoggerFactory.getLogger(KakaoMessageService.class);
+
+    // 배포 환경별 사이트 주소 (local 기본값: http://localhost:8080 / prod: https://petrini.kr)
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
 
     // 나에게 보내기 API URL
     private static final String MEMO_SEND_URL = "https://kapi.kakao.com/v2/api/talk/memo/default/send";
@@ -84,8 +89,8 @@ public class KakaoMessageService {
             + "\"object_type\":\"text\","
             + "\"text\":\"" + escapeJson(text.toString()) + "\","
             + "\"link\":{"
-            +   "\"web_url\":\"http://localhost:8080/mypage/reserve\","
-            +   "\"mobile_web_url\":\"http://localhost:8080/mypage/reserve\""
+            +   "\"web_url\":\"" + baseUrl + "/mypage/reserve\","
+            +   "\"mobile_web_url\":\"" + baseUrl + "/mypage/reserve\""
             + "},"
             + "\"button_title\":\"예약 내역 보기\""
             + "}";
