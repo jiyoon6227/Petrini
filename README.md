@@ -75,7 +75,8 @@ Oracle XE :1521
 
 - GCP Compute Engine Windows VM에서 Nginx와 Tomcat을 운영합니다.
 - Nginx가 HTTPS 요청을 받아 Tomcat의 `127.0.0.1:8080`으로 리버스 프록시합니다.
-- 애플리케이션은 같은 VM의 Oracle XE에 `127.0.0.1:1521`로 연결합니다.
+- 애플리케이션은 같은 GCP VM의 Oracle XE에 내부 IP `10.178.0.2:1521`로 연결합니다.
+- `10.178.0.2`는 VM 내부 사설 IP이므로 외부 IP가 변경되어도 애플리케이션 DB 설정은 수정하지 않습니다.
 
 ---
 ## 주요 기능
@@ -543,7 +544,7 @@ spring.datasource.password=
 **application-prod.properties** — 서버 배포용 (DB · 운영 주소)
 ```properties
 spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-spring.datasource.url=jdbc:oracle:thin:@//127.0.0.1:1521/xe
+spring.datasource.url=jdbc:oracle:thin:@//10.178.0.2:1521/xe
 spring.datasource.username=
 spring.datasource.password=
 
