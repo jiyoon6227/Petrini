@@ -388,7 +388,7 @@
     WHEN MATCHED THEN UPDATE SET d.${column} = NVL(d.${column}, SYSDATE)
     WHEN NOT MATCHED THEN INSERT (DELIVERY_ID, ORDER_ID, BIZ_NO, DELIVERY_STATUS, DELIVERY_FEE, ${column})
         VALUES (
-            (SELECT NVL(MAX(DELIVERY_ID),0)+1 FROM TB_ORDER_DELIVERY),
+            SEQ_ORDER_DELIVERY.NEXTVAL,
             #{orderId}, #{bizNo}, 'READY',
             NVL((SELECT o.DELIVERY_FEE FROM TB_ORDER o WHERE o.ORDER_ID = #{orderId}), 0),
             SYSDATE
@@ -402,7 +402,7 @@
         DELIVERY_STATUS, DELIVERY_FEE, REGISTERED_AT
     )
     VALUES (
-        (SELECT NVL(MAX(DELIVERY_ID),0)+1 FROM TB_ORDER_DELIVERY),
+        SEQ_ORDER_DELIVERY.NEXTVAL,
         #{orderId}, #{bizNo}, #{courierName}, #{courierCode}, #{trackingNo}, #{deliveryStatus},
         NVL((SELECT o.DELIVERY_FEE FROM TB_ORDER o WHERE o.ORDER_ID = #{orderId}), 0),
         SYSDATE

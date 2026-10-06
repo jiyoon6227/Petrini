@@ -443,9 +443,9 @@ SELECT
     )
 </insert>
 
-<!-- 지윤 26.07.29 추가: 주문번호 뒷자리로 쓸 다음 ORDER_ID 미리 조회 (프로젝트 공통 PK 채번 규칙 재사용) -->
+<!-- 지윤 26.10.06 수정: MAX+1 → SEQ_ORDER (동시 주문 시 PK 중복 방지) -->
 <select id="selectNextOrderId" resultType="Long">
-    SELECT NVL(MAX(ORDER_ID), 0) + 1 FROM TB_ORDER
+    SELECT SEQ_ORDER.NEXTVAL FROM DUAL
 </select>
 
 <select id="selectOrderIdByOrderNo" resultType="Long">
@@ -457,7 +457,7 @@ SELECT
         ORDER_ITEM_ID, ORDER_ID, PRODUCT_ID, OPTION_ID, OPTION_COLOR, OPTION_SIZE,
         PRODUCT_NAME, QTY, UNIT_PRICE, TOTAL_PRICE
     ) VALUES (
-        (SELECT NVL(MAX(ORDER_ITEM_ID), 0) + 1 FROM TB_ORDER_ITEM), #{orderId}, #{productId},
+        SEQ_ORDER_ITEM.NEXTVAL, #{orderId}, #{productId},
         #{optionId, jdbcType=NUMERIC}, #{optionColor, jdbcType=VARCHAR}, #{optionSize, jdbcType=VARCHAR},
         #{productName}, #{qty}, #{unitPrice}, #{totalPrice}
     )
