@@ -133,7 +133,7 @@ public interface StoreShopMapper {
                   @Param("addr1") String addr1, @Param("addr2") String addr2, @Param("bizNo") Long bizNo,
                   @Param("deliveryMemo") String deliveryMemo, @Param("memberCouponId") Long memberCouponId);
 
-//지윤 26.07.29 추가: 주문번호(ORDER_NO) 뒷자리로 쓸 다음 ORDER_ID를 미리 조회 (PK라 절대 안 겹침)
+// 지윤 26.07.29 추가: 주문번호(ORDER_NO) 생성에 사용할 다음 ORDER_ID를 시퀀스로 조회
 Long selectNextOrderId();
 
     //지윤 26.07.13 방금 저장한 주문의 ORDER_ID 조회 (ORDER_NO는 UNIQUE라 이걸로 되짚어 조회)

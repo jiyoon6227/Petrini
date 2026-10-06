@@ -285,7 +285,7 @@ public String completeOrder(OrderTempVO p, String tossPaymentKey, String tossOrd
         int groupFinalTotal = Math.max(0, groupSubtotal + groupDeliveryFee - groupDiscountAmount);
 
         //지윤 26.07.29 수정: 밀리초 나머지(ts % 10000) 방식은 10초마다 값이 반복되어 ORDER_NO(UNIQUE 제약)가 겹칠 위험이 있었음
-        //-> 뒷자리를 "실제 PK가 될 ORDER_ID"로 교체 (MAX+1 방식, 이 프로젝트 공통 채번 규칙이라 절대 안 겹침)
+        // 실제 PK가 될 ORDER_ID를 시퀀스로 먼저 발급하여 주문번호 생성
         Long orderId = storeShopMapper.selectNextOrderId();
         String datePart = new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date());
         String orderNo = "ORD" + datePart + "-" + String.format("%06d", orderId);
