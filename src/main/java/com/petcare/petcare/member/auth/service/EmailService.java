@@ -1,18 +1,4 @@
-/**
- * 회원가입 이메일 인증
- *
- * 역할: Google SMTP 로 인증번호 발송 (@Service)
- *
- * 흐름
- * 1. Controller 가 이메일 주소 전달
- * 2. 6자리 인증번호 생성 → 메일 발송
- * 3. 인증번호를 반환 → Controller 가 세션에 저장
- * 4. 사용자가 입력한 인증번호와 세션 값 비교 → 일치하면 인증 완료
- *
- * 연결
- * - 호출: MemberAuthController (POST /join/send-code, POST /join/verify-code)
- * - 설정: application.properties (spring.mail.*)
- */
+/** 인증번호 6자리 생성·발송 후 반환 (Controller가 세션에 저장해 비교), 설정: spring.mail.* */
 package com.petcare.petcare.member.auth.service;
 
 import java.util.Properties;

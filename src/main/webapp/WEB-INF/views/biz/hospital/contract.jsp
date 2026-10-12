@@ -8,7 +8,7 @@
 <%@ include file="/WEB-INF/views/biz/common/sidebar_hospital.jsp" %>
 
 <style>
-    /* ── 사업자(병원) 계약 관리 파트 ── */
+    /* 사업자(병원) 계약 관리 파트 */
     .contract-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;

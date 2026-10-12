@@ -1,14 +1,3 @@
-/**
- * 역할: 관리자 공통 사이드바용 모델 속성
- *
- * 사업자 승인 대기(PENDING) 건수 배지
- * 재능나눔 승인 대기 배지
- * 사업자 리뷰 삭제 요청 대기 배지
- * 배너 신청 대기 배지
- * 쿠폰 승인 대기 배지
- * 숙소 환불신청·1:1 문의 대기 배지
- */
-
 package com.petcare.petcare.admin.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;

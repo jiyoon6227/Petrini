@@ -1,21 +1,14 @@
-<%--
-    태그추가 , 인기상품 하드코딩 -> DB반복출력
-    커뮤니티 -> 6개 호출 -> 최신 3개를 DB에서 호출하는식으로 변경
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %> <%-- DB salePrice 숫자 → 천단위 콤마 포맷 --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId" value="home" />
 
-<%-- ===== HEADER ===== --%>
+<%-- HEADER --%>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <main>
-    <%-- ===================================================
-         HERO BANNER SLIDER
-    ===================================================== --%>
+    <%-- HERO BANNER SLIDER --%>
     <div class="hero-section inner" id="heroSection">
         <div class="hero-slides" id="heroSlides">
             <%-- DB 배너 없을 때 기본 히어로 배너 --%>
@@ -130,7 +123,7 @@
 
 </main>
 
-<%-- ===== FOOTER ===== --%>
+<%-- FOOTER --%>
 <jsp:include page="/WEB-INF/views/common/footer.jsp" />
 
 <script src="${contextPath}/resources/js/main.js"></script>
@@ -152,7 +145,7 @@
         if (heroFallback) heroFallback.remove();
         if (heroSection) heroSection.style.display = '';
 
-  // 1) 슬라이드 DOM 추가
+  // 슬라이드 DOM 추가
   for (var i = 0; i < list.length; i++) {
     var banner = list[i];
     var div = document.createElement('div');
@@ -181,7 +174,7 @@
     slider.appendChild(div);
 }
 
-        // 2) 슬라이드 좌우 화살표 (2개 이상일 때만 표시)
+        // 슬라이드 좌우 화살표 (2개 이상일 때만 표시)
         if (list.length > 1 && heroControls) {
             heroControls.style.display = '';
         } else if (heroControls) {

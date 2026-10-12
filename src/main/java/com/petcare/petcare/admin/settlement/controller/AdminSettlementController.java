@@ -1,14 +1,3 @@
-/**
- * 역할: 관리자 정산 관리 화면
- * STORE 탭 UI 더미
- * STAY 탭 실데이터
- * STORE 탭 실데이터
- *
- * - GET  /admin/settlement
- * - GET  /admin/settlement/stay/items | /store/items
- * - POST /admin/settlement/stay|store/pay · pay-bulk
- * - POST /admin/settlement/stay|store/request/approve · reject
- */
 package com.petcare.petcare.admin.settlement.controller;
 
 import java.util.HashMap;
@@ -158,7 +147,7 @@ public class AdminSettlementController extends AdminBaseController {
         return rejectRequest(session, body, true);
     }
 
-    // ===== STORE =====
+    // STORE
 
     @GetMapping("/store/items")
     @ResponseBody
@@ -299,7 +288,7 @@ public class AdminSettlementController extends AdminBaseController {
         return result;
     }
 
-    // ===== 배치 / FAIL =====
+    // 배치 / FAIL
 
     /** 월정산 생성 — body: { settleMonth: "2026-07" } 없으면 전월 */
     @PostMapping("/batch/monthly-create")

@@ -1,17 +1,4 @@
-/**
- * 역할: 반려동물 프로필 데이터 객체
- *
- * - TB_PET 기본 필드
- * - FUR_COLOR, NEUTER_YN, TRAITS, MEMO
- *
- * 참고 테이블: TB_PET
- *
- * [SPECIES]
- * - DOG / CAT / ETC
- *
- * [NEUTER_YN]
- * - Y / N / U (미확인)
- */
+/** SPECIES: DOG / CAT / ETC, NEUTER_YN: Y / N / U(미확인) */
 
 package com.petcare.petcare.pet.profile.vo;
 
@@ -25,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class PetProfileVO {
 
-    // ── TB_PET 컬럼 ────────────────────────────────────────────
+    // TB_PET 컬럼
 
     private Long petId;             // PET_ID — 반려동물 번호 (PK)
     private Long memberNo;          // MEMBER_NO — 보호자 회원 FK
@@ -45,7 +32,7 @@ public class PetProfileVO {
     private String delYn;           // DEL_YN — 삭제 여부 (Y=소프트삭제)
     private LocalDateTime regDate;  // REG_DATE — 등록일
 
-    // ── 폼 전용 (DB 미저장) ────────────────────────────────────
+    // 폼 전용 (DB 미저장)
 
     private String kind;            // (폼) — 화면용 종 (dog/cat → DOG/CAT 변환)
 }

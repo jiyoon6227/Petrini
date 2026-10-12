@@ -70,7 +70,7 @@
     
   <div class="pf-wrap">
 
-    <!-- ─── 1. 입퇴실 시간 ─── -->
+    <!-- 1. 입퇴실 시간 -->
     <div class="pf-section">
       <div class="pf-stitle">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    <!-- ─── 2. 숙소 소개 ─── -->
+    <!-- 2. 숙소 소개 -->
     <div class="pf-section">
       <div class="pf-stitle">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -108,7 +108,7 @@
       </div>
     </div>
 
-    <!-- ─── 3. 반려동물 정책 ─── -->
+    <!-- 3. 반려동물 정책 -->
     <div class="pf-section">
       <div class="pf-stitle">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><circle cx="4" cy="8" r="2"/><path d="M12 10c-1.5 2-3 3.5-3 5a3 3 0 006 0c0-1.5-1.5-3-3-5z"/></svg>
@@ -130,7 +130,7 @@
       </div>
     </div>
 
-    <!-- ─── 4. 환불 정책 ─── -->
+    <!-- 4. 환불 정책 -->
     <div class="pf-section">
       <div class="pf-stitle">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
@@ -143,7 +143,7 @@
       </div>
     </div>
 
-    <!-- ─── 5. 편의시설 ─── -->
+    <!-- 5. 편의시설 -->
     <div class="pf-section">
       <div class="pf-stitle">
         <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -158,7 +158,7 @@
       </div>
     </div>
 
-    <!-- ─── 6. 숙소 이미지 ─── -->
+    <!-- 6. 숙소 이미지 -->
     <div class="pf-section">
       <div class="pf-stitle">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>

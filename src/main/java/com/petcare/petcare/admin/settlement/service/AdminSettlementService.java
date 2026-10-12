@@ -1,10 +1,3 @@
-/**
- * 역할: 관리자 정산 비즈니스 로직 (interface)
- * 숙소 STAY
- * 쇼핑 STORE
- *
- * 담당 화면: admin/settlement/list.jsp
- */
 package com.petcare.petcare.admin.settlement.service;
 
 import java.util.List;
@@ -40,7 +33,7 @@ public interface AdminSettlementService {
 
     void rejectStayMidRequest(Long requestId, String rejectReason);
 
-    // ===== STORE =====
+    // STORE
     int countStoreSettlements(Long bizNo);
 
     List<AdminStaySettlementVO> getStoreSettlementList(String statusCd);
@@ -59,7 +52,7 @@ public interface AdminSettlementService {
 
     void rejectStoreMidRequest(Long requestId, String rejectReason);
 
-    // ===== S12 배치 / FAIL =====
+    // 배치 / FAIL
     SettlementBatchResultVO createMonthlySettlements(String settleMonth);
 
     SettlementBatchResultVO autoPayWaitingSettlements();

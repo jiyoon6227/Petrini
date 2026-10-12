@@ -1,8 +1,3 @@
-/**
- * 역할: 관리자 정산 서비스 구현체
- * 숙소
- * 쇼핑 STORE
- */
 package com.petcare.petcare.admin.settlement.service;
 
 import java.text.SimpleDateFormat;
@@ -159,7 +154,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
         staySettlementService.rejectMidSettlementRequest(requestId, rejectReason);
     }
 
-    // ===== STORE =====
+    // STORE
 
     @Override
     public int countStoreSettlements(Long bizNo) {
@@ -259,7 +254,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
         storeSettlementService.rejectMidSettlementRequest(requestId, rejectReason);
     }
 
-    // ===== S12 =====
+    // 배치 / FAIL
 
     @Override
     public SettlementBatchResultVO createMonthlySettlements(String settleMonth) {

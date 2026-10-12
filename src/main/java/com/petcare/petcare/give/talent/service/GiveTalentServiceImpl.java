@@ -1,12 +1,3 @@
-/**
- * 역할: GiveTalentService 구현체 (@Service)
- *
- * - 일반 회원 참여 신청·모집마감·병원 확인·취소·이미지
- *
- * 연결
- * - DB: GiveTalentMapper, GiveTalentApplyMapper
- */
-
 package com.petcare.petcare.give.talent.service;
 
 import java.util.LinkedHashMap;
@@ -44,7 +35,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         this.fileService = fileService;
     }
 
-    // ── 사용자 목록·상세 ─────────────────────────────
+    // 사용자 목록·상세
 
     @Override
         public List<GiveTalentVO> getApprovedTalentList(String talentType) {
@@ -61,7 +52,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return giveTalentMapper.selectTalentDetail(talentId);
     }
 
-    // ── 관리자 승인 화면 ─────────────────────────────
+    // 관리자 승인 화면
 
     @Override
     public List<GiveTalentVO> getTalentListByStatus(String statusCd) {
@@ -102,7 +93,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         giveTalentMapper.updateTalentStatus(vo);
     }
 
-    // ── 사업자 신청 ( — 병원) ───────────────────
+    // 사업자 신청 (병원)
 
     @Override
     public List<GiveTalentVO> getTalentListByBizId(String bizId) {
@@ -160,7 +151,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         }
     }
 
-    // ── 일반 회원 참여 신청  ───────────────────
+    // 일반 회원 참여 신청
 
     // 모집 중 조건: 관리자 승인(APPROVED) + 인원 여유 + DONE 아님
     @Override
@@ -228,7 +219,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return giveTalentApplyMapper.selectByTalentAndMember(talentId, memberNo);
     }
 
-    // ── 병원 사업자 신청자 확인  ─────────────
+    // 병원 사업자 신청자 확인
 
     @Override
     public List<GiveTalentApplyVO> getAppliesByBizId(String bizId) {

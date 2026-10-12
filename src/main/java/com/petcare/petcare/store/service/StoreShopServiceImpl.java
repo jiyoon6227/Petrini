@@ -1,18 +1,3 @@
-/**
- * 역할: StoreShopService 구현체 (@Service)
- *
- * 구현 내용
- * - Controller에서 넘어온 요청 처리
- * - Mapper 호출하여 DB 조회·수정
- * - 비즈니스 규칙 검증 및 결과 반환
- *
- * 연결
- * - implements: StoreShopService
- * - 사용: StoreShopMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- */
-
 package com.petcare.petcare.store.service;
 
 import java.util.List;
@@ -239,13 +224,13 @@ public String completeOrder(OrderTempVO p, String tossPaymentKey, String tossOrd
     }
     final String resolvedPayMethod = payMethod.trim().toUpperCase();
 
-    //1) 상품을 사업자(BIZ_NO)별로 묶음 (LinkedHashMap이라 처음 등장한 순서 유지)
+    // 사업자(BIZ_NO)별 그룹 (LinkedHashMap으로 등장 순서 유지)
     java.util.Map<Long, java.util.List<CartItemVO>> groups = new java.util.LinkedHashMap<>();
     for (CartItemVO item : p.getOrderItems()) {
         groups.computeIfAbsent(item.getBizNo(), k -> new java.util.ArrayList<>()).add(item);
     }
 
-    //2) 포인트를 상품금액 비례로 배분할 때 반올림 오차를 마지막 그룹이 흡수하도록 미리 계산
+    // 포인트는 상품금액 비례 배분, 반올림 오차는 마지막 그룹이 흡수
     int totalProductAmt = p.getProductTotal();
     int remainingPoint = p.getPointUsed() != null ? p.getPointUsed() : 0;
     int groupIndex = 0;
@@ -313,17 +298,16 @@ public String completeOrder(OrderTempVO p, String tossPaymentKey, String tossOrd
             // 재고수량 lock
             if (item.getOptionId() != null) {
                 if (item.getOptionId() != null) {
-                    // 1) 재고를 조회하면서 행 잠금 (다른 주문은 여기서 대기)
+                    // 재고 행 잠금 조회 (동시 주문은 여기서 대기)
                     Integer currentStock = storeShopMapper.selectOptionStockForUpdate(item.getOptionId());
                 
-                    // 2) 재고가 부족하면 예외 발생 → @Transactional이 전체 롤백
+                    // 재고 부족 시 예외로 전체 롤백
                     if (currentStock == null || currentStock < item.getQty()) {
                         throw new RuntimeException(
                             "'" + item.getProductName() + "' 상품의 재고가 부족합니다. (남은 재고: "
                             + (currentStock != null ? currentStock : 0) + "개)");
                     }
                 
-                    // 3) 재고 충분하면 차감
                     storeShopMapper.updateOptionStock(item.getOptionId(), item.getQty());
                 }
             }

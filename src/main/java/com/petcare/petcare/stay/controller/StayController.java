@@ -1,13 +1,3 @@
-/**
- * 역할: 펫호텔 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: StayStayService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.stay.controller;
 
 import java.text.SimpleDateFormat;
@@ -120,7 +110,7 @@ public class StayController {
         return "stay/reserve";
     }
 
-    // ── 가용성 체크 API (AJAX) ──
+    // 가용성 체크 API (AJAX)
     @GetMapping("/checkAvailability")
     @ResponseBody
     public Map<String, Object> checkAvailability(@RequestParam("roomId") Long roomId,
@@ -143,7 +133,7 @@ public class StayController {
     }
 
         
-    // ── 예약 저장 → 결제 페이지로 이동──
+    // 예약 저장 → 결제 페이지로 이동
     // 다펫: petIds → 대표 petId + petCnt
     @PostMapping("/reserve")
     public String saveReserve(@ModelAttribute ReservationVO vo,
@@ -177,7 +167,7 @@ public class StayController {
         }
     }
 
-    // ── 결제 페이지 ──
+    // 결제 페이지
     @GetMapping("/payment")
     public String payment(@RequestParam("resvId") Long resvId,
                             HttpSession session,
@@ -211,7 +201,7 @@ public class StayController {
         return "stay/payment";
     }
 
-    // ── 결제 성공 콜백 (Toss → 여기로 리다이렉트) ──
+    // 결제 성공 콜백 (Toss → 여기로 리다이렉트)
     @GetMapping("/payment/success")
     public String paymentSuccess(@RequestParam("orderId") String orderId,
                                     @RequestParam("paymentKey") String paymentKey,
@@ -372,7 +362,7 @@ public class StayController {
         }
     }
 
-    // ── 전액 포인트 결제 (Toss 없이 직접 처리) ──
+    // 전액 포인트 결제 (Toss 없이 직접 처리)
     @GetMapping("/payment/point-only")
     public String paymentPointOnly(@RequestParam("resvId") Long resvId,
                                     @RequestParam("usedPoint") Long usedPoint,
@@ -398,7 +388,7 @@ public class StayController {
         }
     }
 
-    // ── 결제 실패 콜백 ──
+    // 결제 실패 콜백
     @GetMapping("/payment/fail")
     public String paymentFail(@RequestParam(required = false) String code,
                                 @RequestParam(required = false) String message,

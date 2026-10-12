@@ -3,19 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.member.cs.mapper.MemberCsMapper">
 
-<!--
-  역할: MemberCsMapper SQL 정의
-
-  쿼리 id 예시
-  - selectNoticeList
-  - selectNoticeDetail
-  - selectFaqList
-
-  테이블
-  - TB_NOTICE
-  - TB_FAQ
--->
-
     <!-- 고객센터 노출 FAQ (VISIBLE_YN = Y) -->
     <select id="selectVisibleFaqList" resultType="com.petcare.petcare.admin.cms.vo.FaqVO">
         SELECT F.FAQ_ID      AS faqId,

@@ -1,7 +1,3 @@
-<%--
-  역할: 고객센터 메인
-  - 정지 회원 접근 허용 화면 (스타일은 petcare.css)
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>

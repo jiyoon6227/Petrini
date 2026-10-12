@@ -52,7 +52,7 @@ public class PetmapMapController extends CommonConfigController {
 
         List<PetMapVO> places = new ArrayList<>();
 
-        // ── 필터 상태를 JSP로 전달 (검색 전/후 모두) ──
+        // 필터 상태를 JSP로 전달 (검색 전/후 모두)
         model.addAttribute("contentTypeId", contentTypeId != null ? contentTypeId : "");
         model.addAttribute("areaCode", areaCode != null ? areaCode : "");
         model.addAttribute("cat1", cat1 != null ? cat1 : "");
@@ -60,7 +60,7 @@ public class PetmapMapController extends CommonConfigController {
         model.addAttribute("searched", search);
         model.addAttribute("typeLabels", TYPE_LABELS);
 
-        // ★ [조회] 안 눌렀으면 API 호출 스킵 → 페이지 즉시 로딩
+        // [조회] 전에는 API 호출 생략 (페이지 즉시 로딩)
         if (!search) {
             model.addAttribute("places", places);
             model.addAttribute("totalCount", 0);
@@ -71,7 +71,7 @@ public class PetmapMapController extends CommonConfigController {
             return "petmap/list";
         }
 
-        // ── [조회] 눌렀을 때만 API 호출 ──
+        // [조회] 눌렀을 때만 API 호출
         try {
             StringBuilder sb = new StringBuilder(listUrl);
             sb.append("?serviceKey=").append(URLEncoder.encode(apiService.publicServiceApiKey, "UTF-8"));

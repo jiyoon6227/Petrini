@@ -1,16 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 사업자(병원) 재능나눔 신청 (biz/hospital/talent)
-
-
-  [화면 흐름]
-  1. GET /biz/hospital/talent → ${talentList} 이력 + 신청 폼
-  2. POST /biz/hospital/talent → GiveTalentService.applyTalent (PENDING)
-  3. flash msg / errorMsg — 신청 결과 안내
-  4. 승인 후 admin/biz/talent → APPROVED → /give/talent/list 노출
-
-  참고: 미용 등 다른 사업자 talent.jsp 는 더미(alert) — 병원만 DB 연동
---%>
+<%-- 미용 등 다른 사업자 talent.jsp는 더미(alert), 병원만 DB 연동 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath"  value="${pageContext.request.contextPath}" />
 <c:set var="bizTypeLabel" value="동물병원" />

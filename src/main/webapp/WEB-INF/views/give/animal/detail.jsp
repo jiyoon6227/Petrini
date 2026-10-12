@@ -1,13 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 유기동물 상세 화면 (give/animal/detail)
-
-
-  [상세 화면 흐름]
-  1. 사용자가 /give/animal/detail?desertionNo=번호 로 들어옴
-  2. giveAnimalService.getAnimalDetail() 에 맡김
-  3. 받은 유기견 1마리 정보(animal)를 이 JSP 에 보여줌
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId"      value="give" />

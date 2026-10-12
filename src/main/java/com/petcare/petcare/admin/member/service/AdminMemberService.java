@@ -1,26 +1,3 @@
-/**
- * 역할: 관리자 회원 관리 비즈니스 로직 (interface)
- *
- * 담당 화면
- * - admin/member/list.jsp     회원 목록
- * - admin/member/detail.jsp   회원 상세
- *
- * 구현 기능
- * - 회원 목록 조회 (검색·필터·페이징)
- * - 회원 상세 조회 (기본정보 + 활동현황 통계)
- * - 회원 상태 변경 — 정지·복구·강제탈퇴 (STEP 7)
- *
- * 연결
- * - 구현: AdminMemberServiceImpl
- * - 호출: AdminMemberController
- * - DB: AdminMemberMapper
- *
- * 참고 테이블
- * - TB_MEMBER
- * - TB_ORDER, TB_RESERVATION, TB_POST, TB_POST_REPORT (STEP 8 활동현황)
- * - TB_MEMBER_COUPON, TB_FAVORITE, TB_PET (STEP 8 활동현황)
- */
-
 package com.petcare.petcare.admin.member.service;
 
 import java.util.List;

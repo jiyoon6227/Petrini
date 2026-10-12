@@ -1,9 +1,3 @@
-/**
- * 역할: 병원 예약 데이터 객체 (TB_RESERVATION + 조회용 JOIN 필드)
- *
- * 참고 테이블: TB_RESERVATION, TB_MEMBER, TB_PET, TB_HOSPITAL
- */
-
 package com.petcare.petcare.hospital.vo;
 
 import java.util.Date;

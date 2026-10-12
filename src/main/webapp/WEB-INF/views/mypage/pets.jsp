@@ -103,7 +103,7 @@
 </div><%-- /mypage-content --%>
 </div><%-- /mypage-wrap --%>
 
-<%-- ── 반려동물 등록/수정 모달 ── --%>
+<%-- 반려동물 등록/수정 모달 --%>
 <style>
   .pet-modal-bg {
       display: none; position: fixed; inset: 0;

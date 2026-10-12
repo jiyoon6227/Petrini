@@ -1,6 +1,3 @@
-/**
- * 역할: 월정산 생성·15일 자동지급 배치 결과
- */
 package com.petcare.petcare.settlement.vo;
 
 import lombok.Getter;

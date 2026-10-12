@@ -1,7 +1,3 @@
-/**
- * 역할: HospitalHospitalService 구현체 (@Service)
- */
-
 package com.petcare.petcare.hospital.service;
 
 import java.time.LocalDate;

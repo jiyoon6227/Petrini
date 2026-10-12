@@ -3,21 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.admin.member.mapper.AdminMemberMapper">
 
-<!--
-  역할: AdminMemberMapper SQL 정의
-
-
-  쿼리 id
-  - selectAdminMemberList / selectAdminMemberCount
-  - selectAdminMemberDetail
-  - updateMemberStatus (STEP 7 — STATUS_CD: NORMAL/SUSPENDED/WITHDRAWN)
-  - selectAdminMemberActivityStats (STEP 8 — DUAL + 서브쿼리 COUNT)
-
-  테이블
-  - TB_MEMBER, TB_BUSINESS
-  - TB_ORDER, TB_RESERVATION, TB_POST, TB_POST_REPORT
-  - TB_MEMBER_COUPON, TB_FAVORITE, TB_PET
--->
   <!-- 관리자 회원 목록 -->
   <select id="selectAdminMemberList"
           resultType="com.petcare.petcare.admin.member.vo.AdminMemberVO">

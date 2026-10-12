@@ -1,13 +1,6 @@
 /**
- * 금결원 오픈뱅킹 (계좌실명조회)
- *
- * - mock=true  : 입력값으로 인증 성공 연출 (시뮬레이터 권한 없을 때)
- * - mock=false : testapi 토큰(oob) + /v2.0/inquiry/real_name 실호출
- *
- * properties
- * - kftc.openbanking.mock
- * - kftc.openbanking.base-url
- * - kftc.openbanking.client-id / client-secret
+ * mock=true: 입력값으로 인증 성공 처리 (시뮬레이터 권한 없을 때), false: testapi 토큰(oob) + /v2.0/inquiry/real_name 호출
+ * 설정: kftc.openbanking.mock / base-url / client-id / client-secret
  */
 package com.petcare.petcare.common.external.service;
 

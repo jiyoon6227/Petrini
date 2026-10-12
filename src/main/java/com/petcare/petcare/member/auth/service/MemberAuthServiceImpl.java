@@ -1,11 +1,3 @@
-/**
- * 역할: MemberAuthService 구현체 (@Service)
- *
- * - 정지 회원 로그인 허용·세션 status 세팅·탈퇴 이메일 재가입 차단
- *
- * 연결: MemberAuthMapper, PasswordEncoder
- */
-
 package com.petcare.petcare.member.auth.service;
 
 import org.slf4j.Logger;
@@ -59,10 +51,9 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 기간 정지 만료 회원 자동 복구 (로그인 시)
         memberAuthMapper.releaseExpiredSuspensions();
 
-        // [1] 먼저 일반 회원 조회 (이메일 = MEMBER_ID 또는 EMAIL)
+        // 일반 회원 먼저 조회 (이메일 = MEMBER_ID 또는 EMAIL)
         MemberAuthVO found = memberAuthMapper.selectMemberByLoginId(id);
 
-        // [2] 회원이면 기존 회원 로그인 처리 (role=USER)
         if (found != null) {
 
             // [2-1] 정상 회원만 로그인 허용 (STATUS_CD = NORMAL)
@@ -112,7 +103,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             return sessionMember;
         }
 
-        // [3] 회원이 아니면 관리자(TB_ADMIN) 조회 (ADMIN_ID 는 이메일 형식 아님)
+        // 회원이 아니면 관리자(TB_ADMIN) 조회 (ADMIN_ID는 이메일 형식 아님)
         AdminAuthVO admin = memberAuthMapper.selectAdminByLoginId(id);
         if (admin == null) {
             return null; // 회원도 관리자도 아님 → 로그인 실패
@@ -158,8 +149,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     /**
      * 카카오 로그인 처리
      * MEMBER_ID = 카카오 고유 ID 이므로 selectMemberByLoginId 로 바로 조회
-     * [1] MEMBER_ID 로 기존 회원 조회 → 있으면 로그인
-     * [2] 없으면 null 반환 → Controller 에서 회원가입 페이지로 안내
+     * 없으면 null (Controller에서 회원가입 안내)
      */
     @Override
     @Transactional
@@ -170,10 +160,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 기간 정지 만료 회원 자동 복구
         memberAuthMapper.releaseExpiredSuspensions();
 
-        // [1] MEMBER_ID = 카카오ID 인 회원 조회
         MemberAuthVO found = memberAuthMapper.selectMemberByLoginId(kakaoId);
 
-        // [2] 가입된 회원이 아님 → null 반환 (회원가입 필요)
         if (found == null) {
             return null;
         }
@@ -183,10 +171,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw new MemberLoginBlockedException(found.getStatusCd());
         }
 
-        // [3] 로그인 성공 → 최종 로그인 일시 갱신
         memberAuthMapper.updateLastLoginDate(found.getMemberNo());
 
-        // [4] 세션용 MemberVO 변환
         MemberVO sessionMember = new MemberVO();
         sessionMember.setMemberNo(found.getMemberNo());
         sessionMember.setMemberId(found.getMemberId());
@@ -271,7 +257,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     /**
      * join — register
-     * 흐름: 검증 → 중복재확인 → BCrypt → TB_MEMBER → TB_MEMBER_AGREEMENT → (선택) TB_PET
      * @Transactional : 중간 실패 시 INSERT 전부 롤백
      */
     @Override
@@ -281,7 +266,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             return "invalid";
         }
 
-        // [1] 서버 측 유효성 검증 (join.jsp 우회 방지)
+        // join.jsp 우회 대비 서버 측 재검증
         String validateError = validateRegister(vo);
         if (validateError != null) {
             return validateError;
@@ -294,7 +279,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             return "withdrawn_email";
         }
 
-        // [2] 아이디 중복 재확인
         String memberId = vo.getMemberId() != null ? vo.getMemberId().trim() : null;
         if (memberId == null || memberId.isBlank()) {
             return "id";
@@ -308,23 +292,23 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             return "duplicate";
         }
 
-        // [3] 평문 비밀번호 → BCrypt 해시 (로그인 때와 동일 PasswordEncoder 사용)
+        // BCrypt 해시 (로그인과 같은 PasswordEncoder)
         vo.setPassword(passwordEncoder.encode(vo.getPassword()));
 
-        // [4] 마케팅 Y/N — TB_MEMBER.MARKETING_YN + 약관 행에 사용
+        // 마케팅 Y/N은 TB_MEMBER.MARKETING_YN과 약관 행에 함께 사용
         vo.setAgreeMarketing(toYn(vo.getAgreeMarketing()));
 
-        // [5] TB_MEMBER INSERT — memberNo 는 XML selectKey 로 vo 에 세팅됨
+        // memberNo는 XML selectKey로 vo에 세팅됨
         memberAuthMapper.insertMember(vo);
         Long memberNo = vo.getMemberNo();
 
-        // [6] TB_MEMBER_AGREEMENT — 필수·선택 약관 각 1행 (AGREE_ID 는 전역 시퀀스)
+        // 필수·선택 약관 각 1행 (AGREE_ID는 전역 시퀀스)
         saveAgreement(memberNo, "SERVICE", vo.getAgreeService());
         saveAgreement(memberNo, "PRIVACY", vo.getAgreePrivacy());
         saveAgreement(memberNo, "LOCATION", vo.getAgreeLocation());
         saveAgreement(memberNo, "MARKETING", vo.getAgreeMarketing());
 
-        // [7] TB_PET — petName 이 있을 때만 (없으면 Step3 스킵과 동일)
+        // petName 있을 때만 TB_PET 등록 (없으면 Step3 스킵과 동일)
         // GENDER·PHOTO_URL 저장 (사진은 INSERT 후 업로드)
         if (hasPetInfo(vo)) {
             vo.setPetType(mapPetSpecies(vo.getPetType()));
@@ -333,7 +317,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             savePetPhoto(vo.getPetId(), memberNo, petPhoto);
         }
 
-        // [8] 카카오 로그인 → 회원가입 흐름이면 SOCIAL_ID 연동
+        // 카카오 로그인 → 회원가입 흐름이면 SOCIAL_ID 연동
         //     같은 트랜잭션 안에서 처리 → 실패 시 TB_MEMBER INSERT 도 함께 롤백
         vo.setMemberNo(memberNo);
         if (vo.getSocialId() != null && !vo.getSocialId().isBlank()) {
@@ -376,7 +360,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
     }
 
-    // ── join(회원가입) private 헬퍼 ──
+    // join(회원가입) private 헬퍼
 
     /** 가입 폼 전체 검증 — 문제 있으면 오류 코드, 없으면 null */
     private String validateRegister(MemberRegisterVO vo) {

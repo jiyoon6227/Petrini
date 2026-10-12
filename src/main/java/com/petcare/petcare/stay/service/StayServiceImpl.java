@@ -1,18 +1,3 @@
-/**
- * 역할: StayStayService 구현체 (@Service)
- *
- * 구현 내용
- * - Controller에서 넘어온 요청 처리
- * - Mapper 호출하여 DB 조회·수정
- * - 비즈니스 규칙 검증 및 결과 반환
- *
- * 연결
- * - implements: StayStayService
- * - 사용: StayStayMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- */
-
 package com.petcare.petcare.stay.service;
 
 import java.text.SimpleDateFormat;
@@ -126,7 +111,6 @@ public class StayServiceImpl implements StayService {
             throw new RuntimeException("반려동물을 선택해 주세요. 등록된 반려동물이 없으면 마이페이지에서 등록 후 이용해 주세요.");
         }
 
-        // 1. 객실 행 잠금
         StayRoomVO room = stayMapper.selectRoomForUpdate(vo.getRoomId());
         if (room == null) {
             throw new RuntimeException("존재하지 않는 객실입니다.");
@@ -146,7 +130,6 @@ public class StayServiceImpl implements StayService {
         }
         vo.setPetCnt(petCnt);
 
-        // 2. 날짜 겹침 확인
         Map<String, Object> param = new HashMap<>();
         param.put("roomId", vo.getRoomId());
         param.put("checkinDate", vo.getCheckinDate());
@@ -156,7 +139,7 @@ public class StayServiceImpl implements StayService {
             throw new RuntimeException("해당 날짜에 이미 예약이 있습니다.");
         }
 
-        // 3. 금액 계산 (서버에서 재계산) — 객실가×박 + max(0,펫수-1)×PET_FEE×박
+        // 금액은 서버에서 재계산: 객실가×박 + max(0,펫수-1)×PET_FEE×박
         int nightCnt = vo.getNightCnt();
         if (nightCnt <= 0) {
             throw new RuntimeException("숙박 일수가 올바르지 않습니다.");
@@ -167,7 +150,6 @@ public class StayServiceImpl implements StayService {
         long extraPetAmount = Math.max(0, petCnt - 1) * petFeeAmt * nightCnt;
         vo.setTotalAmount(roomAmount + extraPetAmount);
 
-        // 4. PENDING 상태로 예약 INSERT
         vo.setResvType("STAY");
         vo.setStatusCd("PENDING");
         vo.setResvNo("S" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));

@@ -1,16 +1,3 @@
-/**
- * 역할: 회원 인증(로그인·회원가입) 비즈니스 로직 (interface)
- *
- * 담당 화면
- * - member/login.jsp          로그인
- * - member/join.jsp           회원가입
- *
- * 연결
- * - 구현: MemberAuthServiceImpl
- * - 호출: MemberAuthController
- * - DB: MemberAuthMapper
- */
-
 package com.petcare.petcare.member.auth.service;
 
 import com.petcare.petcare.member.auth.vo.EmailCheckResultVO;

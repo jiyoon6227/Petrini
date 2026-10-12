@@ -1,11 +1,3 @@
-/**
- * 역할: MypageNotifyService 구현체 (@Service)
- *
- * 연결
- * - implements: MypageNotifyService
- * - 사용: MypageNotifyMapper
- */
-
 package com.petcare.petcare.mypage.notify.service;
 
 import java.util.Collections;
@@ -24,16 +16,14 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
     @Autowired
     private MypageNotifyMapper mypageNotifyMapper;
 
-    // =====================================================================
     // 알림 메서드 도메인별 정리
     // 병원 → 쇼핑 → 숙소 → 커뮤니티 → 기타(공통/관리자)
-    // =====================================================================
 
-    // ========== 1. 병원 (HOSPITAL) ==========
+    // 1. 병원 (HOSPITAL)
 
-    // ----- 1-1. 유저 → 사업자 -----
+    // 1-1. 유저 → 사업자
 
-    // ── 미구현 알림 보강 ──
+    // 미구현 알림 보강
 
     @Override
     @Transactional
@@ -78,7 +68,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ----- 1-2. 사업자 → 유저 -----
+    // 1-2. 사업자 → 유저
 
     // 병원 예약 확정 알림
     @Override
@@ -311,9 +301,9 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ========== 2. 쇼핑 (STORE) ==========
+    // 2. 쇼핑 (STORE)
 
-    // ----- 2-1. 유저/시스템 → 사업자 -----
+    // 2-1. 유저/시스템 → 사업자
 
      // 신규 주문 알림 (알림함 "주문" 탭은 NOTI_TYPE='ORDER' 기준으로 필터링됨)
     @Override
@@ -404,7 +394,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ----- 2-2. 사업자 → 유저 -----
+    // 2-2. 사업자 → 유저
 
     @Override
     @Transactional
@@ -525,7 +515,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ----- 2-3. 관리자 → 사업자 (정산) -----
+    // 2-3. 관리자 → 사업자 (정산)
 
     // 쇼핑 중간정산 승인 알림
     @Override
@@ -610,9 +600,9 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ========== 3. 숙소 (STAY) ==========
+    // 3. 숙소 (STAY)
 
-    // ----- 3-1. 유저/시스템 → 사업자 -----
+    // 3-1. 유저/시스템 → 사업자
 
     // 숙소 예약 결제 완료 → 사업자 알림
     @Override
@@ -661,7 +651,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ----- 3-2. 사업자/스케줄/취소 → 유저 -----
+    // 3-2. 사업자/스케줄/취소 → 유저
 
     // 숙소 예약 확정 알림 (병원 알림과 문구 분리)
     @Override
@@ -811,7 +801,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ----- 3-3. 관리자 → 사업자 (정산) -----
+    // 3-3. 관리자 → 사업자 (정산)
 
     // 숙소 중간정산 승인 알림 (사이트 내, 이메일 아님)
     @Override
@@ -896,9 +886,9 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ========== 4. 커뮤니티 ==========
+    // 4. 커뮤니티
 
-    // ----- 관리자 → 유저 -----
+    // 관리자 → 유저
 
     @Override
     @Transactional
@@ -940,9 +930,9 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ========== 5. 기타 (병원/쇼핑/숙소/커뮤니티 외) ==========
+    // 5. 기타 (병원/쇼핑/숙소/커뮤니티 외)
 
-    // ----- 관리자 → 신청자(유저) : 사업자 등록 -----
+    // 관리자 → 신청자(유저) : 사업자 등록
 
     // 사업자 승인 알림 TB_NOTIFICATION INSERT
     // 이유: approveBiz 트랜잭션 안에서 해당 MEMBER_NO 에만 등록 (이메일/푸시는 후속)
@@ -999,7 +989,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ----- 관리자 → 사업자 : 리뷰삭제 -----
+    // 관리자 → 사업자 : 리뷰삭제
 
     // 리뷰 삭제 요청 승인 알림 (사업자)
     @Override
@@ -1044,7 +1034,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ----- 관리자 → 사업자 : 배너 -----
+    // 관리자 → 사업자 : 배너
 
     // 배너 신청 승인 알림 (사업자)
     @Override
@@ -1126,7 +1116,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // ========== 6. 알림함 조회/읽음/삭제 (CRUD) ==========
+    // 6. 알림함 조회/읽음/삭제 (CRUD)
 
     // 알림함 목록 (TB_NOTIFICATION)
     @Override
@@ -1183,7 +1173,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         return mypageNotifyMapper.countUnreadNotifications(memberNo);
     }
 
-    // ========== private helpers ==========
+    // private helpers
 
     private String formatResvWhen(java.util.Date resvDate, String resvTime) {
         String datePart = "-";

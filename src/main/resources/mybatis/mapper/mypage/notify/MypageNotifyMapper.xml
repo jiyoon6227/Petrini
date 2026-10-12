@@ -3,13 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.mypage.notify.mapper.MypageNotifyMapper">
 
-<!--
-  역할: MypageNotifyMapper SQL 정의
-  테이블: TB_NOTIFICATION (DATABASE_TABLE.sql)
--->
-
-  <!-- 알림 1건 등록
-       이유: 사업자 반려 시 유저 알림함에 제목·반려사유 전달 (3번 알림함 UI 연동 전 INSERT 선행) -->
+  <!-- 알림 1건 등록 (사업자 반려 시 제목·반려사유 전달) -->
   <insert id="insertNotification" parameterType="com.petcare.petcare.mypage.notify.vo.MypageNotifyVO">
     <selectKey keyProperty="notiId" resultType="long" order="BEFORE">
       SELECT NVL(MAX(NOTI_ID), 0) + 1 FROM TB_NOTIFICATION

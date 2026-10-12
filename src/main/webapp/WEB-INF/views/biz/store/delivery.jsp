@@ -7,12 +7,6 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%--
-     Controller: BizStoreController.storeDelivery() / bulkDelivery()
-     Service: BizStoreService.getDeliveryList / getDeliverySummary / bulkRegisterDelivery
-     개별 "송장수정" 저장은 새로 안 만들고, 주문관리(orders.jsp) 때 만든
-     POST /biz/store/orders/{id}/status API를 그대로 재사용함
-     화면 레이아웃(CSS, HTML 뼈대)은 원본 그대로 유지 --%>
 <style>
   .dlv-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
   .dlv-summary-card{background:#fff;border:1px solid var(--biz-border);border-radius:12px;padding:16px 18px}

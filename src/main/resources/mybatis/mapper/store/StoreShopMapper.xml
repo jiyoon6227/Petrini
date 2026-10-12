@@ -3,21 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.store.mapper.StoreShopMapper">
 
-<!--
-  역할: StoreShopMapper SQL 정의
-
-  쿼리 id 예시
-  - selectProductList
-  - selectProductDetail
-  - selectCartItems
-  - insertOrder
-
-  테이블
-  - TB_PRODUCT
-  - TB_CART
-  - TB_ORDER
--->
-
 <sql id="productFilter">
     p.STATUS_CD = 'NORMAL'
 <!-- 하위 카테고리까지 조회 -->

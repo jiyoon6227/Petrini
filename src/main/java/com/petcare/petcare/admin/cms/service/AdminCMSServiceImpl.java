@@ -1,23 +1,3 @@
-/**
- * 역할: AdminCMSService 구현체 (@Service)
- *
- * 구현 내용
- * - Controller에서 넘어온 요청 처리
- * - Mapper 호출하여 DB 조회·수정
- * - 비즈니스 규칙 검증 및 결과 반환
- *
- * 연결
- * - implements: AdminCMSService
- * - 사용: AdminCMSMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- *
- * 배너 관리 확장
- * - 탭(현재광고/광고대기/승인/승인대기/반려) + 대분류(메인/숙소/쇼핑/병원) 필터
- * - 승인·대기(HOLD)·반려 + 사업자 알림
- * - 광고 올리기/내리기, 기간 변경, 종료일 자동 만료 연동
- */
-
 package com.petcare.petcare.admin.cms.service;
 
 import java.time.LocalDate;
@@ -65,7 +45,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
     @Autowired
     private FileService fileService;
     
-    // ── 관리자: 탭·대분류별 배너 목록 ──
+    // 관리자: 탭·대분류별 배너 목록
     @Override
     public List<MainBannerVO> getBannerListByTabAndCategory(String tab, String category) {
         String safeTab = normalizeTab(tab);
@@ -314,7 +294,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         adminCMSMapper.deleteBanner(bannerId);
     }
 
-    // ── 관리자: PENDING 건수 (사이드바 배지용) ──
+    // 관리자: PENDING 건수 (사이드바 배지용)
     @Override
     public int getPendingBannerCount() {
         return adminCMSMapper.selectPendingBannerCount();

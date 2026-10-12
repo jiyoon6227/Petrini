@@ -1,18 +1,4 @@
-/**
- * 역할: 재능나눔 참여 신청 데이터 객체
- *
- * - 일반 회원 → TB_TALENT_APPLY
- *
- * 참고 테이블
- * - TB_TALENT_APPLY
- * - TB_MEMBER (JOIN — nickname, memberName, phone)
- * - TB_TALENT (JOIN — title)
- *
- * [STATUS_CD]
- * - PENDING   신청함 (병원 확인 대기)
- * - CONFIRMED 병원 확인 완료
- * - CANCELLED 취소
- */
+/** STATUS_CD: PENDING 신청(병원 확인 대기) / CONFIRMED 병원 확인 / CANCELLED 취소 */
 
 package com.petcare.petcare.give.talent.vo;
 
@@ -25,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class GiveTalentApplyVO {
 
-    // ── TB_TALENT_APPLY 컬럼 ─────────────────────────────────────
+    // TB_TALENT_APPLY 컬럼
 
     private Long applyId;           // APPLY_ID — 신청 번호 (PK)
     private Long talentId;          // TALENT_ID — 재능나눔 글 FK
@@ -35,7 +21,7 @@ public class GiveTalentApplyVO {
     private LocalDateTime regDate;  // REG_DATE — 신청일
     private LocalDateTime confirmDate; // CONFIRM_DATE — 병원 확인일
 
-    // ── 조회 전용 (JOIN) ─────────────────────────────────────────
+    // 조회 전용 (JOIN)
 
     private String nickname;        // TB_MEMBER.NICKNAME
     private String memberName;      // TB_MEMBER.MEMBER_NAME

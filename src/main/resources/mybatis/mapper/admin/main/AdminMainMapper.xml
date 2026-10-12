@@ -3,18 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.admin.main.mapper.AdminMainMapper">
 
-<!--
-  역할: AdminMainMapper SQL 정의
-
-  - 대시보드 통계·차트
-  - 차트·업종·지난달 SQL
-
-  테이블
-  - TB_MEMBER
-  - TB_ORDER
-  - TB_RESERVATION
-  - TB_BUSINESS
--->
   <!-- 오늘 신규 가입자 (JOIN_DATE = SYSDATE 날짜) -->
   <select id="countTodayNewMembers" resultType="int">
     SELECT COUNT(*)

@@ -1,9 +1,3 @@
-/**
- * 역할: 마이페이지 예약 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/mypage/reserve/MypageReserveMapper.xml
- */
-
 package com.petcare.petcare.mypage.reserve.mapper;
 
 import java.util.List;

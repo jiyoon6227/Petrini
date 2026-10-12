@@ -1,12 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 이벤트/혜택 메인 — 받을 수 있는 쿠폰 목록 + 발급 (event/list)
-
-  [model]
-  - availableCoupons : 받을 수 있는 쿠폰 (APPROVED + ACTIVE + 기간 내)
-    └ alreadyClaimed : 로그인 사용자가 이미 받았으면 true
-  소진(EXHAUSTED) 쿠폰은 「쿠폰 소진」 표시, 다운 버튼 없음
---%>
+<%-- 소진(EXHAUSTED) 쿠폰은 「쿠폰 소진」 표시, 다운 버튼 없음 --%>
 <%@ taglib prefix="c"   uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

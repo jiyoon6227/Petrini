@@ -1,22 +1,3 @@
-/**
- * 역할: 숙소 정산 조회·저장 (MyBatis)
- * 숙소 정산
- *
- * 쿼리
- * - selectUnsettleStayTargets : 월정산 / 중간정산(ALL) / 객실별(ROOM) 공용
- * - selectStayFeeRate         : 사업자 수수료율 조회
- * - insertSettlement          : TB_SETTLEMENT 저장 (SEQ_TB_SETTLEMENT)
- * - insertSettlementItem      : TB_SETTLEMENT_ITEM 저장 (SEQ_TB_SETTLEMENT_ITEM)
- * - insertSettlementRequest   : TB_SETTLEMENT_REQUEST 저장 (4-2)
- * - selectSettlementRequestById / countRequestedByBiz / countRoomOwnedByBiz
- * - updateSettlementRequestApproved / Rejected (4-3)
- *
- * 참고 테이블
- * - TB_RESERVATION, TB_STAY, TB_STAY_ROOM, TB_BUSINESS
- * - TB_SETTLEMENT, TB_SETTLEMENT_ITEM, TB_SETTLEMENT_REQUEST
- *
- * SQL은 XML에만 작성 (@Select 미사용)
- */
 package com.petcare.petcare.settlement.mapper;
 
 import java.util.Date;

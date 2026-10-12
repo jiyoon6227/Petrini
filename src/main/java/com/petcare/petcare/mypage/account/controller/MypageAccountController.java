@@ -1,15 +1,3 @@
-/**
- * 역할: 마이페이지 회원정보 URL 처리 → Service 호출 → JSP 반환
- *
- * - 프로필 사진 업로드 POST /mypage/edit/profile-image
- *
- * 연결
- * - Service: MypageAccountService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.mypage.account.controller;
 
 import java.util.LinkedHashMap;

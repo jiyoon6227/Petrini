@@ -54,7 +54,7 @@
         <c:if test="${not empty errorMsg}">
             <div style="background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px">${errorMsg}</div>
         </c:if>
-        <%-- ── 사업자 등록 신청 ── --%>
+        <%-- 사업자 등록 신청 --%>
         <div class="mp-section active">
             <h2 class="mp-title">사업자 등록 신청</h2>
             <p class="mp-desc">PetCare 파트너가 되어 더 많은 반려인에게 서비스를 알리세요.</p>

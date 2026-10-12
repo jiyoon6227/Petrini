@@ -1,14 +1,6 @@
 package com.petcare.petcare.common.util;
 
-/**
- * TB_FILE.FILE_URL → 브라우저에서 열 수 있는 공개 URL로 변환
- *
- * 저장 형식 예:
- * - banner/12/uuid.jpg           (FileService)
- * - /upload/give/report/...      (분실신고·커뮤니티 등)
- *
- * 배너 API·목록 이미지 URL 통일
- */
+/** TB_FILE.FILE_URL을 브라우저 공개 URL로 변환 (저장 형식 혼재: banner/12/uuid.jpg, /upload/give/report/...) */
 public final class UploadUrlUtil {
 
     private UploadUrlUtil() {

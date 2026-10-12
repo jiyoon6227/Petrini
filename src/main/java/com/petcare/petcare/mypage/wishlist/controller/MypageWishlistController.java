@@ -1,6 +1,3 @@
-/**
- * 관심상품 목록 + 찜 토글 API
- */
 package com.petcare.petcare.mypage.wishlist.controller;
 
 import java.util.HashMap;

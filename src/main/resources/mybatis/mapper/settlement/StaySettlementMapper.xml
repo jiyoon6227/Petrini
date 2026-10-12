@@ -2,15 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--
-  역할: 숙소 정산 대상 조회 + 저장 SQL
-  숙소 정산
-
-  규칙 요약
-  - 정산 기준일 = CHECKOUT_DATE (결제일/체크인일 아님)
-  - 대상 상태 = DONE 만 (CANCEL/PENDING/CONFIRMED/REJECTED 제외) — 5-1
-  - ITEM STATUS INCLUDED/HOLD/EXCLUDED/REFUNDED 인 예약 제외 — 5-1
-  - roomId 있으면 해당 객실만 (중간정산 ROOM), 없으면 전체 (월정산/중간 ALL)
-  - 저장 시퀀스: SEQ_TB_SETTLEMENT / SEQ_TB_SETTLEMENT_ITEM / SEQ_TB_SETTLEMENT_REQUEST
+  정산 기준일 = CHECKOUT_DATE, 대상 상태 = DONE만, 이미 정산 ITEM에 잡힌 예약 제외
+  roomId 있으면 해당 객실만 (중간정산 ROOM), 없으면 전체 (월정산·중간정산 ALL)
 -->
 <mapper namespace="com.petcare.petcare.settlement.mapper.StaySettlementMapper">
 

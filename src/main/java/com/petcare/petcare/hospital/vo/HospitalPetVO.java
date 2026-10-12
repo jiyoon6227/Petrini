@@ -1,9 +1,3 @@
-/**
- * 역할: 병원 예약 화면용 반려동물 목록 VO
- *
- * 참고 테이블: TB_PET
- */
-
 package com.petcare.petcare.hospital.vo;
 
 import lombok.Getter;

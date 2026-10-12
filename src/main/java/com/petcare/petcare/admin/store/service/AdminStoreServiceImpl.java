@@ -1,11 +1,3 @@
-/**
- * 역할: AdminStoreService 구현체 (@Service)
- *
- * 연결
- * - implements: AdminStoreService
- * - 사용: AdminStoreMapper
- */
-
 package com.petcare.petcare.admin.store.service;
 
 import java.util.List;

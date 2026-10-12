@@ -1,13 +1,4 @@
-/**
- * 역할: 로그인 시 TB_MEMBER 조회 결과를 담는 VO
- *
- * 사용 위치
- * - MemberAuthMapper → MemberAuthServiceImpl
- *
- * 참고 테이블: TB_MEMBER
- *
- * ※ 세션(memberInfo)에는 MemberVO를 사용하고, 이 VO는 DB 조회·비밀번호 검증 단계에서만 사용
- */
+/** DB 조회·비밀번호 검증 전용 (세션에는 MemberVO 사용) */
 
 package com.petcare.petcare.member.auth.vo;
 

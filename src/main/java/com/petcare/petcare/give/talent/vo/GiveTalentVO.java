@@ -1,20 +1,6 @@
 /**
- * 역할: 재능나눔 데이터 객체
- *
- * - 팀 DDL 기준 (TB_TALENT — TB_POST SHARE 와 별도)
- *
- * 참고 테이블
- * - TB_TALENT
- * - TB_BUSINESS (JOIN — bizId, bizName, bizType)
- *
- * [TALENT_TYPE]
- * - GROOMING / HOSPITAL / PHOTO / TRANSPORT / ETC
- *
- * [STATUS_CD]
- * - PENDING   승인 대기
- * - APPROVED  게시 중 (가족찾기 노출)
- * - REJECTED  반려
- * - DONE      진행 종료
+ * TALENT_TYPE: GROOMING / HOSPITAL / PHOTO / TRANSPORT / ETC
+ * STATUS_CD: PENDING 승인 대기 / APPROVED 게시 중(가족찾기 노출) / REJECTED 반려 / DONE 진행 종료
  */
 
 package com.petcare.petcare.give.talent.vo;
@@ -28,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class GiveTalentVO {
 
-    // ── TB_TALENT 컬럼 ───────────────────────────────────────
+    // TB_TALENT 컬럼
 
     private Long talentId;         // TALENT_ID — 재능나눔 ID
     private Long bizNo;            // BIZ_NO — 사업자 번호
@@ -48,7 +34,7 @@ public class GiveTalentVO {
     private LocalDateTime regDate; // REG_DATE — 등록일
     private LocalDateTime approveDate; // APPROVE_DATE — 승인일
 
-    // ── 조회 전용 (TB_BUSINESS JOIN) ─────────────────────────
+    // 조회 전용 (TB_BUSINESS JOIN)
 
     private String bizId;          // BIZ_ID — 사업자 ID (이메일)
     private String bizName;        // BIZ_NAME — 업체명

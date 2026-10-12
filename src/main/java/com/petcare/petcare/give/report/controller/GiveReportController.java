@@ -1,39 +1,3 @@
-/**
- * 역할: 유기동물 제보 URL 처리 → Service 호출 → JSP 반환
- *
- * [등록 화면 흐름]
- * 1. GET /give/report/write → 로그인 확인 후 write.jsp
- * 2. POST /give/report/write → giveReportService.insertReport(vo, member, photos)
- * 3. TB_POST INSERT + 사진 로컬 저장(C:/upload/) + TB_FILE INSERT
- * 4. 상세 페이지로 redirect
- *
- * [목록 화면 흐름]
- * 1. GET /give/report/list → giveReportService.getReportList()
- * 2. TB_POST 조회 + TB_FILE 첫 사진을 thumbUrl 로 세팅
- * 3. list.jsp 에 표시
- *
- * [상세 화면 흐름]
- * 1. GET /give/report/detail?id=번호 → giveReportService.getReportDetail()
- * 2. TB_POST + TB_FILE photoUrls 조회
- * 3. detail.jsp 에 표시
- * 
- * 4. POST /give/report/status → 상태 변경
- *
- * [댓글]
- * 1. GET detail → comments 목록 조회 (대댓글 포함)
- * 2. POST /give/report/comment → TB_POST_COMMENT INSERT (parentId → 대댓글)
- * 3. POST /give/report/comment/delete → IS_DELETED='Y' (작성자 본인)
- * 4. POST /give/report/comment/update → BODY 수정 (작성자 본인)
- *
- * - 발견 위치 카카오맵 (write·detail, KakaoMapService)
- *
- * 연결
- * - Service: GiveReportService
- * - 상속: GiveBaseController
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- */
-
 package com.petcare.petcare.give.report.controller;
 
 import org.slf4j.Logger;

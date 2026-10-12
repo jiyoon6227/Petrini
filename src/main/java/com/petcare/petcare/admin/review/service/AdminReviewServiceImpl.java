@@ -1,9 +1,3 @@
-/**
- * 역할: AdminReviewService 구현체 (@Service)
- *
- * - 쇼핑(TB_REVIEW_REPORT) 삭제요청 통합 처리
- */
-
 package com.petcare.petcare.admin.review.service;
 
 import java.util.List;

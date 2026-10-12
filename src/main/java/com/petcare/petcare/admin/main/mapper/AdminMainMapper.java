@@ -1,20 +1,3 @@
-/**
- * 역할: 관리자 대시보드 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/admin/main/AdminMainMapper.xml
- * namespace: com.petcare.petcare.admin.main.mapper.AdminMainMapper
- *
- * - 상단 통계 카드 COUNT/SUM
- * - 최근주문·회원·매출차트
- * - 이번 달 통계 요약
- * - 차트 / 지난 달 조회
- *
- * 참고 테이블
- * - TB_MEMBER
- * - TB_ORDER
- * - TB_RESERVATION
- */
-
 package com.petcare.petcare.admin.main.mapper;
 
 import org.apache.ibatis.annotations.Mapper;

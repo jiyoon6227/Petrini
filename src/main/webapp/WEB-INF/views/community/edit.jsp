@@ -1,17 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  - 커뮤니티 게시글 수정 화면
-
-  [수정 화면 흐름]
-  1. GET /community/edit?id=번호 → CommunityPostController.editForm()
-  2. 본인 글 확인 후 ${post} 로 기존 데이터 표시
-  3. POST /community/edit → updatePost() → 상세 redirect + successMessage
-  4. 실패 → ?error=save / ?error=forbidden
-  기존 사진 X 삭제 + 새 사진 추가 (전체 5장上限)
-
-  [model]
-  - post (기존 게시글 데이터), post.photoUrls
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId" value="community" />

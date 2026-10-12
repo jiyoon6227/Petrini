@@ -1,9 +1,3 @@
-<%--
-  - GET  /admin/review/list   삭제 요청 목록
-  - POST /admin/review/approve 승인(리뷰 삭제)
-  - POST /admin/review/reject  반려(사유 입력 + 사업자 알림)
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>

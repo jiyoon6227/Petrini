@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <%-- ── 요약 카드 ── --%>
+  <%-- 요약 카드 --%>
   <section class="summary-grid">
     <div class="summary-card">
       <div class="summary-icon green">📅</div>
@@ -74,7 +74,7 @@
     </div>
   </section>
 
-  <%-- ── 차트 + 도넛 ── --%>
+  <%-- 차트 + 도넛 --%>
   <section class="dashboard-grid">
     <div class="dash-card chart-card">
       <div class="card-head">
@@ -107,7 +107,7 @@
     </div>
   </section>
 
-  <%-- ── 오늘 체크인 + 최근 리뷰 ── --%>
+  <%-- 오늘 체크인 + 최근 리뷰 --%>
   <section class="bottom-grid">
     <div class="dash-card">
       <div class="card-head">

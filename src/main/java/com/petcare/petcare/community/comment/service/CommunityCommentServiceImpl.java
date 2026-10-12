@@ -1,28 +1,3 @@
-/**
- * 역할: CommunityCommentService 구현체 (@Service)
- *
- * [getCommentList — 댓글 목록]
- * 1. TB_POST_COMMENT 전체 조회 (일반 + 대댓글)
- * 2. PARENT_ID 가 null → 최상위 댓글, 나머지는 replies 에 묶음
- *
- * [insertComment — 댓글·대댓글 등록]
- * 1. 로그인 확인 + 본문 검증
- * 2. parentId 있으면 → 같은 글의 일반댓글인지 검증
- * 3. LIFE(수의사 상담) 권한 검증 — 병원 사업자 / 질문자 대댓글
- * 4. TB_POST_COMMENT INSERT (PARENT_ID)
- *
- * [deleteComment — 댓글 삭제]
- * 1. 작성자 본인 확인 (memberNo)
- * 2. softDeleteComment → IS_DELETED='Y' (대댓글은 유지, 화면은 '삭제된 댓글입니다')
- *
- * [updateComment — 댓글 수정]
- * 1. 작성자 본인 확인 (memberNo)
- * 2. updateCommentBody → BODY 갱신
- *
- * [getFirstTopComment — LIFE 답변 미리보기]
- * 1. selectCommentList → PARENT_ID IS NULL 첫 1건 반환
- */
-
 package com.petcare.petcare.community.comment.service;
 
 import java.util.ArrayList;

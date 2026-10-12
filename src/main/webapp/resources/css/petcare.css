@@ -1,9 +1,6 @@
-/* =============================================
-   PetCare - Main CSS
-   Color: #2BAB82 (primary green), #F4FBF8 (bg), #1A1A2E (text)
-   ============================================= */
+/* PetCare 메인 CSS — Color: #2BAB82 (primary green), #F4FBF8 (bg), #1A1A2E (text) */
 
-/* ---------- Reset & Base ---------- */
+/* Reset & Base */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -44,7 +41,7 @@ ul, ol { list-style: none; }
 
 .inner { max-width: var(--inner-width); margin: 0 auto; padding: 0 20px; }
 
-/* ---------- Header ---------- */
+/* Header */
 /* 정지 회원 상단 안내 배너 (common/header.jsp) */
 .suspended-banner {
     display: block;
@@ -342,9 +339,7 @@ ul, ol { list-style: none; }
 .gnb-item:hover, .gnb-item.active { color: var(--primary); }
 .gnb-item:hover::after, .gnb-item.active::after { width: calc(100% - 24px); }
 
-/* =============================================
-   HERO BANNER
-   ============================================= */
+/* HERO BANNER */
 .hero-section {
     background: linear-gradient(135deg, #EAF7F2 0%, #D4F0E6 40%, #C2E8DA 100%);
     border-radius: var(--radius-lg);
@@ -561,9 +556,7 @@ ul, ol { list-style: none; }
 .slide-nav-btn.btn-next { right: 16px; }
 .slide-nav-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-/* =============================================
-   QUICK LINKS
-   ============================================= */
+/* QUICK LINKS */
 .quick-section {
     max-width: var(--inner-width);
     margin: 0 auto 32px;
@@ -606,9 +599,7 @@ ul, ol { list-style: none; }
 .quick-item:nth-child(6) .quick-icon { background: #FDF5E8; }
 .quick-label { font-size: 13px; font-weight: 500; color: var(--text-main); }
 
-/* =============================================
-   PROMO BANNERS
-   ============================================= */
+/* PROMO BANNERS */
 .promo-section {
     max-width: var(--inner-width);
     margin: 0 auto 40px;
@@ -672,9 +663,7 @@ ul, ol { list-style: none; }
     width: 90px; height: 60px;
 }
 
-/* =============================================
-   SECTION COMMON
-   ============================================= */
+/* SECTION COMMON */
 .section-wrap {
     max-width: var(--inner-width);
     margin: 0 auto 48px;
@@ -775,9 +764,7 @@ ul, ol { list-style: none; }
 }
 .section-more::after { content: '›'; font-size: 16px; }
 
-/* =============================================
-   CATEGORY
-   ============================================= */
+/* CATEGORY */
 .category-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -811,9 +798,7 @@ ul, ol { list-style: none; }
     color: var(--text-main);
 }
 
-/* =============================================
-   HOSPITAL CARDS
-   ============================================= */
+/* HOSPITAL CARDS */
 .hospital-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -909,9 +894,7 @@ ul, ol { list-style: none; }
     font-weight: 500;
 }
 
-/* =============================================
-   COMMUNITY LIST
-   ============================================= */
+/* COMMUNITY LIST */
 .community-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -975,9 +958,7 @@ ul, ol { list-style: none; }
     gap: 3px;
 }
 
-/* =============================================
-   FOOTER
-   ============================================= */
+/* FOOTER */
 .pc-footer {
     background: #fff;
     border-top: 1px solid var(--border);
@@ -1076,9 +1057,7 @@ ul, ol { list-style: none; }
     .footer-pets { width: 96px; }
 }
 
-/* =============================================
-   RESPONSIVE (기본)
-   ============================================= */
+/* RESPONSIVE (기본) */
 @media (max-width: 1024px) {
     .category-grid { grid-template-columns: repeat(3, 1fr); }
     .hospital-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1116,9 +1095,7 @@ ul, ol { list-style: none; }
 }
 
 
-/* =============================================
-   MEMBER PAGES (로그인 / 회원가입)
-   ============================================= */
+/* MEMBER PAGES (로그인 / 회원가입) */
 
 /* 멤버 페이지 공통 레이아웃 */
 .member-page {

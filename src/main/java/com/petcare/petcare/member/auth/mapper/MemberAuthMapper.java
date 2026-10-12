@@ -1,12 +1,3 @@
-/**
- * 역할: 회원 인증 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/member/auth/MemberAuthMapper.xml
- * namespace: com.petcare.petcare.member.auth.mapper.MemberAuthMapper
- *
- * SQL은 XML에만 작성 (@Select 등 어노테이션 사용 X)
- */
-
 package com.petcare.petcare.member.auth.mapper;
 
 import org.apache.ibatis.annotations.Mapper;

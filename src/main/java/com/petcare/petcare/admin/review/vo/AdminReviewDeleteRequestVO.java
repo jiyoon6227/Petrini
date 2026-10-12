@@ -1,11 +1,3 @@
-/**
- * 역할: 관리자 리뷰 삭제 요청 목록·상세 표시용 VO
- *
- * 참고 테이블
- * - TB_REVIEW_DELETE_REQUEST
- * - TB_REVIEW, TB_HOSPITAL, TB_BUSINESS, TB_MEMBER (JOIN)
- */
-
 package com.petcare.petcare.admin.review.vo;
 
 import java.util.Date;
@@ -17,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class AdminReviewDeleteRequestVO {
 
-    // ── TB_REVIEW_DELETE_REQUEST ──────────────────────────────
+    // TB_REVIEW_DELETE_REQUEST
 
     private Long requestId;       // REQUEST_ID — 요청 번호
     private Long reviewId;        // REVIEW_ID — 대상 리뷰 번호
@@ -31,7 +23,7 @@ public class AdminReviewDeleteRequestVO {
     private Date processDate;     // PROCESS_DATE — 처리일
     private String rejectReason;  // REJECT_REASON — 관리자 반려 사유
 
-    // ── 조회 전용 (JOIN) ─────────────────────────────────────
+    // 조회 전용 (JOIN)
 
     private String hospitalName;     // 대상명 — 병원/숙소/상품명
     private String bizName;          // B.BIZ_NAME — 사업자명

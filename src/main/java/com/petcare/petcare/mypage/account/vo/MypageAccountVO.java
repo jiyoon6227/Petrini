@@ -1,13 +1,3 @@
-/**
- * 역할: 마이페이지 회원정보 데이터 객체
- *
- * - 회원정보 수정 화면 DB 조회용
- * - 프로필 사진 URL
- *
- * 참고 테이블
- * - TB_MEMBER
- */
-
 package com.petcare.petcare.mypage.account.vo;
 
 import lombok.Getter;
@@ -17,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class MypageAccountVO {
 
-    // ── TB_MEMBER 컬럼 ─────────────────────────────────────────
+    // TB_MEMBER 컬럼
 
     private Long memberNo;          // MEMBER_NO — 회원번호 (PK)
     private String memberId;        // MEMBER_ID — 아이디

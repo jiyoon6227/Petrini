@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component("memberVO")
 public class MemberVO {
 
-    // ── 로그인·세션에서 사용 (TB_MEMBER 기준) ──
+    // 로그인·세션에서 사용 (TB_MEMBER 기준)
     private Long memberNo;          // 회원번호 (PK) — TB_MEMBER.MEMBER_NO
     private String memberId;        // 로그인 ID (이메일) — TB_MEMBER.MEMBER_ID
     private String email;           // 이메일 — TB_MEMBER.EMAIL
@@ -29,7 +29,7 @@ public class MemberVO {
     private LocalDate birthDate;    // 생년월일 (join.jsp용, TB_MEMBER 컬럼 없음 — 추후 확장)
     private String gender;          // 성별 M/F (join.jsp용, TB_MEMBER 컬럼 없음 — 추후 확장)
 
-    // ── 권한·역할 (세션에서 화면 분기용) ──
+    // 권한·역할 (세션에서 화면 분기용)
     private String role;            // USER / BIZ / ADMIN
     private String bizType;         // 사업자 유형 HOSPITAL, STAY, STORE 등 (BIZ일 때)
     private Long   adminNo;         // 관리자번호 (role=ADMIN일 때, TB_ADMIN.ADMIN_NO)

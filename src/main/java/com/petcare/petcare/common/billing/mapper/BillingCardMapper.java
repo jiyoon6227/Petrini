@@ -1,17 +1,3 @@
-/**
- * TB_BILLING_CARD DB 접근 (MyBatis)
- *
- * XML: resources/mybatis/mapper/common/billing/BillingCardMapper.xml
- * namespace: com.petcare.petcare.common.billing.mapper.BillingCardMapper
- *
- * 쿼리
- * - selectBillingCardList   : 소유자 활성 카드 목록
- * - selectBillingCard       : PK 단건 조회
- * - insertBillingCard       : 카드(빌링키) 등록
- * - deleteBillingCard       : 논리삭제 (STATUS_CD=DELETED)
- *
- * SQL은 XML에만 작성 (@Select 등 어노테이션 사용 X)
- */
 package com.petcare.petcare.common.billing.mapper;
 
 import java.util.List;

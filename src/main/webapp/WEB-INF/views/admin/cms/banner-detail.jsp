@@ -1,9 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 관리자 배너 광고 상세
-  - 기간 변경, 광고 올리기/내리기, 승인·대기·반려
-  - 배너 정보 수정 (제목·링크·이미지), 미리보기 URL 분기
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

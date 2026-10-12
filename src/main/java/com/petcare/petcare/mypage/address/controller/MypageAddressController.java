@@ -1,7 +1,4 @@
-/**
- * 역할: 마이페이지 배송지록 URL 처리 (AJAX 전용, JSON 응답)
- * 주문서(order.jsp)의 "배송지 목록" 모달에서 호출
- */
+/** AJAX 전용 (주문서 배송지 목록 모달에서 호출) */
 package com.petcare.petcare.mypage.address.controller;
 
 import java.util.List;

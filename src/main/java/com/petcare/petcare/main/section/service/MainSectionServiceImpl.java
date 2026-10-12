@@ -26,7 +26,6 @@ public class MainSectionServiceImpl implements MainSectionService {
         this.communityPostMapper = communityPostMapper;
     }
 
-    // DB 조회 -> 각 상품마다 할인율 계산 -> 리스트 반환
     @Override
     public List<MainPopularProductVO> getPopularProducts(int limit) {
         List<MainPopularProductVO> products = mainSectionMapper.selectPopularProducts(limit);

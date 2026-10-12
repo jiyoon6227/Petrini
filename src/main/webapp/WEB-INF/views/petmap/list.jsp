@@ -10,7 +10,7 @@
   .pm-hero p{font-size:14px;opacity:.85;margin:0}
   .pm-wrap{max-width:var(--inner-width);margin:28px auto 80px;padding:0 20px}
 
-  /* ── 검색 카드 (give/animal 패턴) ── */
+  /* 검색 카드 (give/animal 패턴) */
   .search-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;margin-bottom:20px}
   .search-title{font-size:14px;font-weight:700;color:var(--text-main);margin:0 0 14px;display:flex;align-items:center;gap:7px}
   .search-title svg{width:15px;height:15px;stroke:#14B8A6;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -23,14 +23,14 @@
   .btn-search:hover{background:#0F766E}
   .btn-search svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-  /* ── 하위 카테고리 행 ── */
+  /* 하위 카테고리 행 */
   .sub-filter{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
   .sub-label{font-size:12px;font-weight:600;color:var(--text-muted);margin-right:4px}
   .sub-chip{padding:5px 14px;border:1.5px solid var(--border);border-radius:50px;font-size:12px;font-weight:600;color:var(--text-sub);cursor:pointer;background:var(--bg-card);text-decoration:none;display:inline-block}
   .sub-chip:hover{border-color:#14B8A6;color:#0F766E}
   .sub-chip.on{border-color:#14B8A6;background:#14B8A6;color:#fff}
 
-  /* ── 본문: 지도 + 목록 ── */
+  /* 본문: 지도 + 목록 */
   .pm-body{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:flex-start}
   .pm-map-wrap{position:sticky;top:20px}
   .pm-map{width:100%;height:520px;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border)}
@@ -79,7 +79,7 @@
 
 <div class="pm-wrap">
 
-  <%-- ═══════════ 검색 카드 (give/animal 패턴) ═══════════ --%>
+  <%-- 검색 카드 (give/animal 패턴) --%>
   <div class="search-card">
     <div class="search-title">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -155,7 +155,7 @@
     </c:if>
   </div>
 
-  <%-- ═══════════ 결과 영역 ═══════════ --%>
+  <%-- 결과 영역 --%>
 
   <%-- 로딩 인디케이터 --%>
   <div id="searchLoading" class="search-loading">
@@ -254,7 +254,7 @@
 </div>
 
 <script>
-/* ═══ 필터 URL 빌더 (search=true 항상 포함) ═══ */
+/* 필터 URL 빌더 (search=true 항상 포함) */
 function buildUrl(param, value) {
     var filters = {
         contentTypeId: '${contentTypeId}',
@@ -279,7 +279,7 @@ function buildUrl(param, value) {
     location.href = url;
 }
 
-/* ═══ 로딩 표시 ═══ */
+/* 로딩 표시 */
 function showLoading() {
     var el = document.getElementById('searchLoading');
     if (el) el.classList.add('is-show');
@@ -290,7 +290,7 @@ if (form) {
     form.addEventListener('submit', showLoading);
 }
 
-/* ═══ 지도 인터랙션 ═══ */
+/* 지도 인터랙션 */
 var PLACES = [
   <c:if test="${searched}">
   <c:forEach items="${places}" var="p" varStatus="st">

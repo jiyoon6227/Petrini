@@ -1,8 +1,8 @@
-/* ================================================================
-   관리자 전용 CSS  /admin/**
-================================================================ */
+/* 관리자 전용 CSS (/admin/**) */
 
-/* ── 전체 페이지 ── */
+body { margin: 0; }
+
+/* 전체 페이지 */
 .adm-page {
     display: flex;
     flex-direction: column;
@@ -11,9 +11,7 @@
     font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* ================================================================
-   관리자 헤더
-================================================================ */
+/* 관리자 헤더 */
 .adm-header {
     height: 56px;
     background: #1E2130;
@@ -122,14 +120,10 @@
 }
 .adm-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-/* ================================================================
-   본문 래퍼 (사이드바 + 메인)
-================================================================ */
+/* 본문 래퍼 (사이드바 + 메인) */
 .adm-body { display: flex; flex: 1; }
 
-/* ================================================================
-   사이드바
-================================================================ */
+/* 사이드바 */
 .adm-sidebar {
     width: 220px;
     flex-shrink: 0;
@@ -183,9 +177,7 @@
     padding: 1px 7px; border-radius: 20px; min-width: 18px; text-align: center;
 }
 
-/* ================================================================
-   메인 콘텐츠
-================================================================ */
+/* 메인 콘텐츠 */
 .adm-main { flex: 1; min-width: 0; padding: 28px 32px 60px; }
 
 /* 페이지 헤더 */
@@ -199,9 +191,7 @@
 .adm-page-desc  { font-size: 14px; color: #999; margin: 0; }
 .adm-page-actions { display: flex; gap: 10px; }
 
-/* ================================================================
-   통계 카드
-================================================================ */
+/* 통계 카드 */
 .adm-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
 .adm-stat-card {
     background: #fff; border: 1px solid #E4E6ED;
@@ -225,9 +215,7 @@
 .adm-stat-diff.up   { color: #16A34A; }
 .adm-stat-diff.down { color: #DC2626; }
 
-/* ================================================================
-   카드 컨테이너
-================================================================ */
+/* 카드 컨테이너 */
 .adm-card {
     background: #fff; border: 1px solid #E4E6ED;
     border-radius: 12px; overflow: hidden; margin-bottom: 20px;
@@ -240,9 +228,7 @@
 .adm-card-head-sub   { font-size: 12px; color: #999; }
 .adm-card-body { padding: 20px; }
 
-/* ================================================================
-   테이블
-================================================================ */
+/* 테이블 */
 .adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .adm-table th {
     background: #FAFBFC; color: #999; font-weight: 600; font-size: 12px;
@@ -258,9 +244,7 @@
 .adm-table-wrap { overflow-x: auto; }
 
 
-/* ================================================================
-   검색/필터 바
-================================================================ */
+/* 검색/필터 바 */
 .adm-filter-bar {
     display: flex; gap: 10px; align-items: center;
     margin-bottom: 16px; flex-wrap: wrap;
@@ -289,9 +273,7 @@
 .adm-filter-btn.outline { background: #fff; color: #555; border: 1px solid #E4E6ED; }
 .adm-filter-btn.outline:hover { border-color: #3B5BDB; color: #3B5BDB; }
 
-/* ================================================================
-   뱃지/상태
-================================================================ */
+/* 뱃지/상태 */
 .adm-badge {
     display: inline-block; padding: 3px 10px;
     border-radius: 20px; font-size: 12px; font-weight: 600;
@@ -307,9 +289,7 @@
 .adm-badge.danger  { background: #FEE2E2; color: #DC2626; }
 .adm-badge.inactive { background: #F3F4F6; color: #6B7280; }
 
-/* ================================================================
-   버튼
-================================================================ */
+/* 버튼 */
 .adm-btn {
     padding: 5px 14px; border-radius: 6px;
     font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
@@ -332,9 +312,7 @@ a.adm-btn { text-decoration: none; }
     align-items: center;
 }
 
-/* ================================================================
-   페이지네이션
-================================================================ */
+/* 페이지네이션 */
 .adm-pagination { display: flex; justify-content: center; gap: 5px; margin-top: 24px; }
 .adm-page-btn {
     width: 34px; height: 34px; border-radius: 8px;
@@ -346,15 +324,11 @@ a.adm-btn { text-decoration: none; }
 .adm-page-btn.active { background: #3B5BDB; border-color: #3B5BDB; color: #fff; font-weight: 700; }
 .adm-page-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* ================================================================
-   그리드 레이아웃 유틸
-================================================================ */
+/* 그리드 레이아웃 유틸 */
 .adm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .adm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 
-/* ================================================================
-   폼 요소
-================================================================ */
+/* 폼 요소 */
 .adm-form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
 .adm-form-group label { font-size: 13px; font-weight: 600; color: #555; }
 .adm-form-group label .req { color: #DC2626; margin-left: 2px; }
@@ -371,9 +345,7 @@ a.adm-btn { text-decoration: none; }
 .adm-form-group textarea:focus { border-color: #3B5BDB; }
 .adm-form-group textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
 
-/* ================================================================
-   토글 스위치
-================================================================ */
+/* 토글 스위치 */
 .adm-toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
 .adm-toggle input { opacity: 0; width: 0; height: 0; }
 .adm-toggle-slider {
@@ -388,9 +360,7 @@ a.adm-btn { text-decoration: none; }
 .adm-toggle input:checked + .adm-toggle-slider { background: #3B5BDB; }
 .adm-toggle input:checked + .adm-toggle-slider:before { transform: translateX(18px); }
 
-/* ================================================================
-   빈 상태
-================================================================ */
+/* 빈 상태 */
 .adm-empty {
     display: flex; flex-direction: column;
     align-items: center; gap: 12px; padding: 60px 20px; text-align: center;

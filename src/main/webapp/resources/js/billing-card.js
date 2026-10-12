@@ -1,16 +1,6 @@
 /**
- * 토스 빌링 카드등록 공통 JS (Ajax)
- *
- * 사용
- * - join.jsp / mypage/edit.jsp / admin header.jsp
- * - PetcareBilling.openRegister(returnPath)  → prepare Ajax → requestBillingAuth
- * - PetcareBilling.loadCards()               → list Ajax
- * - PetcareBilling.deleteCard(id|pending)    → delete Ajax
- *
- * 공부 포인트
- * 1) /billing/card/prepare 로 clientKey·customerKey·successUrl 받기
- * 2) TossPayments(clientKey).payment({customerKey}).requestBillingAuth({method:'CARD',...})
- * 3) 토스가 successUrl 로 리다이렉트 → 서버가 빌링키 발급 (JS가 직접 secret 호출 금지)
+ * 토스 빌링 카드등록 공통 JS: /billing/card/prepare로 clientKey·customerKey 받기 → requestBillingAuth
+ * successUrl 리다이렉트 후 서버가 빌링키 발급 (JS에서 secret 호출 금지)
  */
 (function (global) {
   'use strict';

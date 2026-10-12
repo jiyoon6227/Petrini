@@ -1,34 +1,3 @@
-/**
- * 역할: CommunityPostService 구현체 (@Service)
- *
- * - 사진 저장/삭제 gcs.enabled 분기 (로컬 ↔ GCS)
- *
- * [getPostList — 목록]
- * 1. boardType·keyword·page 로 TB_POST 조회 (5건/페이지)
- * 2. 각 글의 첫 사진 URL → thumbUrl
- * 3. LIFE + ANSWERED → 첫 일반댓글 답변 미리보기
- *
- * [getPostDetail — 상세]
- * 1. increaseViewCount() → VIEW_COUNT +1
- * 2. TB_POST 1건 + photoUrls 목록
- *
- * [insertPost — 등록]
- * 1. 로그인 회원 → MEMBER_NO
- * 2. TB_POST INSERT (SEQ_TB_POST)
- * 3. 사진 저장(로컬 또는 GCS) + TB_FILE INSERT (최대 5장)
- * 4. LIFE 등록 시 TAGS = WAITING
- *
- * [deletePhotosByPostId — 글 사진 삭제]
- * - 관리자 글 삭제 시 버킷/로컬 + TB_FILE 정리
- *
- * [markLifeAnswered — LIFE 답변완료]
- * 1. BOARD_TYPE = LIFE 인지 확인
- * 2. updatePostTags(postId, "ANSWERED")
- *
- * 참고 테이블
- * - TB_POST, TB_FILE (REF_TYPE = 'POST')
- */
-
 package com.petcare.petcare.community.post.service;
 
 import java.io.IOException;
@@ -426,9 +395,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     /**
      * 게시글 수정 (본인 글만)
-     * 1. 로그인 확인 → MEMBER_NO 매칭
-     * 2. UPDATE TB_POST SET TITLE, BODY WHERE POST_ID AND MEMBER_NO
-     * 3. 기존 사진 선택 삭제 + 새 사진 추가 (전체 5장上限)
+     * 기존 사진 선택 삭제 + 새 사진 추가 (전체 5장 상한)
      */
     @Override
     @Transactional

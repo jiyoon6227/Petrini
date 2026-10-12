@@ -1,17 +1,3 @@
-/**
- * 역할: 재능나눔 URL 처리 → JSP 반환 (가족찾기 Give 모듈)
- *
- * 담당 화면
- * - give/talent/list.jsp   APPROVED 재능나눔 목록
- * - give/talent/detail.jsp APPROVED 재능나눔 상세
- *
- * 연결
- * - Service: GiveTalentService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.give.talent.controller;
 
 import org.springframework.stereotype.Controller;

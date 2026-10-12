@@ -1,17 +1,6 @@
 /**
- * 역할: 숙소 정산 계산·저장 구현체
- * 숙소 정산
- *
- * 규칙
- * - 수수료는 상품(예약) 원금에만 적용
- * - 기본 수수료율 10% (TB_BUSINESS.FEE_RATE 없으면)
- * - 월정산/중간정산 동일 계산식
- * - 저장: SETTLEMENT 1건 후 ITEM 다건 (실패 시 전체 롤백)
- * - 중복 방지: 조회 NOT EXISTS + 저장 직전 RESV_ID 재검사 + UNIQUE INDEX
- *
- * 연결
- * - implements: StaySettlementService
- * - 사용: StaySettlementMapper
+ * 수수료는 예약 원금에만 적용, 기본 10% (TB_BUSINESS.FEE_RATE 없을 때)
+ * 중복 방지: 조회 NOT EXISTS + 저장 직전 RESV_ID 재검사 + UNIQUE INDEX
  */
 package com.petcare.petcare.settlement.service;
 
@@ -195,10 +184,8 @@ public class StaySettlementServiceImpl implements StaySettlementService {
         }
 
         try {
-            // 1) 마스터 저장 → settleId 발급
             staySettlementMapper.insertSettlement(master);
 
-            // 2) 상세 다건 저장
             for (StaySettlementItemVO item : master.getItems()) {
                 item.setSettleId(master.getSettleId());
                 fillItemAmounts(item);

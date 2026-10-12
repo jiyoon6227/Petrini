@@ -1,12 +1,3 @@
-/**
- * 역할: 관리자 컨트롤러 공통 헬퍼 (세션·권한 체크)
- *
- * 연결
- * - 상속: AdminCMSController, AdminMemberController 등 관리자 Controller
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
 package com.petcare.petcare.admin.controller;
 
 import com.petcare.petcare.member.vo.MemberVO;

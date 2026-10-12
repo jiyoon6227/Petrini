@@ -1,6 +1,3 @@
-/**
- * 역할: MypageAddressService 구현체
- */
 package com.petcare.petcare.mypage.address.service;
 
 import java.util.List;

@@ -1,15 +1,4 @@
-/**
- * 역할: 전역 예외 처리 (@ControllerAdvice)
- *
- * [예외 처리 흐름]
- * 1. Ajax API 요청 (/like/toggle 등) → JSON "error" 반환
- * 2. 일반 페이지 요청 → redirect (커뮤니티는 /community?error=server)
- * 3. favicon / .well-known → 404 무시
- *
- * 수정 이유
- * - 기존: 모든 예외를 "error" 문자열로 반환 → 로그인 후 화면에 error 만 표시됨
- * - 변경: API 와 페이지 요청 분리 처리
- */
+/** Ajax API 요청은 JSON "error", 일반 페이지 요청은 redirect (favicon·.well-known 404는 무시) */
 
 package com.petcare.petcare.common.exception;
 

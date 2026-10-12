@@ -1,8 +1,3 @@
-/**
- * 역할: 관리자 숙소 관리 URL
- * - GET /admin/stay/list
- * - GET /admin/stay/detail
- */
 package com.petcare.petcare.admin.stay.controller;
 
 import java.util.List;

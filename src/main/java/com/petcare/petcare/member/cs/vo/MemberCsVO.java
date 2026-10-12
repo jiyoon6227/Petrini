@@ -1,13 +1,4 @@
-/**
- * 역할: 고객센터 공통 VO (레거시 placeholder)
- *
- * - 실제 구현은 전용 VO 사용
- *   · FAQ    → FaqVO (admin.cms.vo)
- *   · 공지   → NoticeVO (admin.cms.vo)
- *
- * 참고 테이블
- * - TB_NOTICE, TB_FAQ
- */
+/** 레거시 placeholder (실제 구현은 admin.cms.vo의 FaqVO·NoticeVO) */
 
 package com.petcare.petcare.member.cs.vo;
 

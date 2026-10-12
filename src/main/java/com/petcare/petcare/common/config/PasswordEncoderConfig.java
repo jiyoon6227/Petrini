@@ -5,10 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/**
- * BCrypt 비밀번호 처리용 설정
- * 비밀번호 보안을위해 사용
- */
 @Configuration
 public class PasswordEncoderConfig {
 

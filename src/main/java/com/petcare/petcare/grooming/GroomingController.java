@@ -15,14 +15,14 @@ import com.petcare.petcare.common.util.controller.CommonUtilController;
 @RequestMapping("/grooming")
 public class GroomingController extends CommonUtilController {
 
-    // ── 애견미용실 목록 ─────────────────────────────────────
+    // 애견미용실 목록
     @GetMapping({"", "/"})
     public String list(Model model) throws JsonMappingException, JsonProcessingException {
         
         return "grooming/list";
     }
 
-    // ── 애견미용실 상세 ─────────────────────────────────────
+    // 애견미용실 상세
     @GetMapping("/detail")
     public String detail(@RequestParam(defaultValue = "1") String id, Model model) {
         model.addAttribute("id", id);
@@ -30,14 +30,14 @@ public class GroomingController extends CommonUtilController {
         return "grooming/detail";
     }
 
-    // ── 미용 예약 ───────────────────────────────────────────
+    // 미용 예약
     @GetMapping("/reserve")
     public String reserve(@RequestParam(defaultValue = "1") String id, Model model) {
         model.addAttribute("id", id);
         return "grooming/reserve";
     }
 
-    // ── 예약 완료 ───────────────────────────────────────────
+    // 예약 완료
     @GetMapping("/complete")
     public String complete() {
         return "grooming/complete";

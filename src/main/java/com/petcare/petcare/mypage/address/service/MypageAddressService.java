@@ -1,6 +1,3 @@
-/**
- * 역할: 마이페이지 배송지록 비즈니스 로직 (interface)
- */
 package com.petcare.petcare.mypage.address.service;
 
 import java.util.List;

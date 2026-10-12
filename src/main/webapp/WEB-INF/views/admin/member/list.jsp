@@ -1,11 +1,3 @@
-<%--
-  - POST /admin/member/bulk-suspend  — 선택 일괄 정지 (suspendType)
-  - POST /admin/member/bulk-restore  — 선택 일괄 복구
-  - POST /admin/member/bulk-withdraw   — 선택 일괄 탈퇴
-  - GET /admin/member/export — Excel(CSV)보내기
-  - 정지/복구는 상세 페이지에서만 처리
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

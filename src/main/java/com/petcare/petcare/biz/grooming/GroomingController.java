@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/biz/grooming")
 public class GroomingController extends BizBaseController {
 
-    // ── 사업자 공통 (GROOMING) ─────────────────────────────────────
+    // 사업자 공통 (GROOMING)
     @GetMapping({"", "/"})
     public String groomingDashboard(HttpSession session) {
         if (getBizMember(session) == null)
@@ -61,7 +61,7 @@ public class GroomingController extends BizBaseController {
         return "biz/grooming/settlement";
     }
 
-    // ── 미용실 개별(GROOMING) ─────────────────────────────────────
+    // 미용실 개별(GROOMING)
     @GetMapping("/services")
     public String groomingServices(HttpSession session) {
         if (getBizMember(session) == null)

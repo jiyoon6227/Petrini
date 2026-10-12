@@ -1,30 +1,3 @@
-/**
- * 역할: 게시글 댓글 비즈니스 로직 (interface)
- *
- * [getCommentList]
- * - 일반댓글 목록 + 각 댓글의 replies(대댓글)
- *
- * [insertComment]
- * - parentId null → 일반댓글
- * - parentId 있음 → 대댓글 (PARENT_ID INSERT)
- *
- * [deleteComment]
- * - 작성자 본인 → IS_DELETED='Y'
- *
- * [updateComment]
- * - 작성자 본인 → BODY UPDATE
- *
- * [getFirstTopComment]
- * - LIFE 목록 vet-answer 미리보기용 첫 일반댓글 1건
- *
- * 담당 화면
- * - community/detail.jsp      커뮤니티 게시글 상세 댓글
- * - give/report/detail.jsp   분실·보호 신고 상세 댓글
- *
- * 참고 테이블
- * - TB_POST_COMMENT
- */
-
 package com.petcare.petcare.community.comment.service;
 
 import java.util.List;

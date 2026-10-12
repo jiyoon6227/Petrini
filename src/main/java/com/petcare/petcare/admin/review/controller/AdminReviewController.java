@@ -1,7 +1,3 @@
-/**
- * 역할: 관리자 리뷰 삭제 요청 URL 처리 → Service 호출 → JSP 반환
- */
-
 package com.petcare.petcare.admin.review.controller;
 
 import org.slf4j.Logger;

@@ -1,8 +1,3 @@
-/**
- * join(회원가입) 이메일 중복 확인 응답 VO
- *
- * GET /join/check-email → join.jsp [중복 확인] Ajax 에 JSON 으로 반환
- */
 package com.petcare.petcare.member.auth.vo;
 
 import lombok.AllArgsConstructor;

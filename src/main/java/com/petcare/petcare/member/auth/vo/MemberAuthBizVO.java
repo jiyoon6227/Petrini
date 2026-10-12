@@ -1,11 +1,3 @@
-/**
- * 역할: 로그인 시 TB_BUSINESS 승인 여부 조회용 VO
- *
- * 연결
- * - MemberAuthMapper.selectApprovedBusinessByBizId
- * - MemberAuthServiceImpl.enrichSessionWithApprovedBiz
- */
-
 package com.petcare.petcare.member.auth.vo;
 
 import lombok.Getter;

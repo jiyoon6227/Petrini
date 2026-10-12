@@ -2,18 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-  <!--
-  ??븷: BizHospitalMapper SQL ?뺤쓽
-
-  荑쇰━ id ?덉떆
-  - selectReservationList
-  - updateReservationStatus
-  - selectMedicalRecords
-
-  ?뚯씠釉?  - TB_RESERVATION
-  - TB_MEDICAL_RECORD
-  - TB_REVIEW
--->
 <mapper namespace="com.petcare.petcare.biz.hospital.mapper.BizHospitalMapper">
     <!-- ?뚯썝ID濡?議고쉶 -->
     <select id="selectHospitalByBizId" parameterType="string" resultType="com.petcare.petcare.hospital.vo.HospitalVO">
@@ -464,9 +452,7 @@
          ORDER BY DR.REQ_DATE DESC, DR.REQUEST_ID DESC
     </select>
 
-    <!-- =========================================================
-         병원 스케줄 (유형·의사·규칙·예외)
-         ========================================================= -->
+    <!-- 병원 스케줄 (유형·의사·규칙·예외) -->
 
     <select id="selectTreatTypeList"
             resultType="com.petcare.petcare.hospital.vo.HospitalTreatTypeVO">
@@ -689,9 +675,7 @@
            AND EXC_ID = #{excId}
     </delete>
 
-    <!-- ══════════════════════════════════════════════
-        대시보드 집계 쿼리
-    ══════════════════════════════════════════════ -->
+    <!-- 대시보드 집계 쿼리 -->
 
     <!-- 특정 날짜 예약 건수 -->
    <select id="countResvByDate" resultType="int">

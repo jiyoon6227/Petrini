@@ -3,13 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.mypage.home.mapper.MypageHomeMapper">
 
-<!--
-  역할: MypageHomeMapper SQL 정의
-
-  - 이용중인 쿠폰: TB_MEMBER_COUPON (STATUS_CD = UNUSED)
-  - 관심상품: TB_FAVORITE (FAV_TYPE = PRODUCT)
--->
-
     <!-- 마이홈 이용중인 쿠폰 수 (미사용 1회성 쿠폰) -->
     <select id="countUsableCoupon" parameterType="long" resultType="int">
         SELECT COUNT(*)

@@ -1,7 +1,4 @@
-/**
- * 역할: 관리자 숙소 환불(1:1) 승인/거절
- * B: STATUS APPROVED/REJECTED + 승인 시 보상숙박(예약 유지)
- */
+/** 승인 시 보상숙박 처리 (예약 유지) */
 package com.petcare.petcare.admin.inquiry.service;
 
 import java.util.Collections;

@@ -18,16 +18,7 @@ public class CsrfTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, 
                              HttpServletResponse response,
                              Object handler) throws Exception {
-        /*
-        GET  → 조회만 한다.
-        POST → 등록한다.
-        PUT  → 수정한다.
-        DELETE → 삭제한다.
-        Spring Security는 "개발자가 HTTP 규칙을 지킨다"는 전제를 가지고 있습니다.
-        이 규칙을 지킨다고 가정하기 때문에 GET은 CSRF 검사를 생략합니다.
-         */
-
-        // GET, HEAD, OPTIONS 는 검증 불필요
+        // GET, HEAD, OPTIONS는 조회 전용이라 CSRF 검증 생략
         String method = request.getMethod();
         if ("GET".equalsIgnoreCase(method) ||
             "HEAD".equalsIgnoreCase(method) ||

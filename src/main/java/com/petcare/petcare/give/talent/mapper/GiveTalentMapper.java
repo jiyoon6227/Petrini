@@ -1,11 +1,3 @@
-/**
- * 역할: 재능나눔 DB 접근 (MyBatis interface)
- *
- * - 팀 DDL: TB_TALENT (BIZ_NO FK, ADMIN_NO, STATUS_CD + DONE)
- *
- * XML: resources/mybatis/mapper/give/talent/GiveTalentMapper.xml
- */
-
 package com.petcare.petcare.give.talent.mapper;
 
 import java.util.List;
@@ -18,7 +10,7 @@ import com.petcare.petcare.give.talent.vo.GiveTalentVO;
 @Mapper
 public interface GiveTalentMapper {
 
-    // ── 사업자 신청  ───────────────────────────
+    // 사업자 신청
 
     int insertTalent(GiveTalentVO vo);
 
@@ -31,7 +23,7 @@ public interface GiveTalentMapper {
     /** 사업자 본인 이력 — biz/hospital/talent.jsp */
     List<GiveTalentVO> selectTalentListByBizId(@Param("bizId") String bizId);
 
-    // ── 사용자 목록·상세 ─────────────────────────────
+    // 사용자 목록·상세
 
     List<GiveTalentVO> selectApprovedTalentList(@Param("talentType") String talentType);
 
@@ -39,7 +31,7 @@ public interface GiveTalentMapper {
 
     GiveTalentVO selectTalentDetail(@Param("talentId") long talentId);
 
-    // ── 관리자 승인 ───────────────────────────────────
+    // 관리자 승인
 
     List<GiveTalentVO> selectTalentListByStatus(@Param("statusCd") String statusCd);
 

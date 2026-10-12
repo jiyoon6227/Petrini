@@ -1,20 +1,4 @@
-/**
- * 역할: CommunityReactionService 구현체 (@Service)
- *
- * [isLiked — 좋아요 여부 조회]
- * 1. TB_POST_LIKE 에 해당 postId + memberNo 존재 여부 확인
- * 2. DB 실패 시 세션 폴백 (communityLikedPosts:{memberNo})
- *
- * [toggleLike — 좋아요 토글]
- * 1. 로그인 + MEMBER_NO 확인
- * 2. 이미 좋아요 → DELETE + LIKE_CNT -1
- * 3. 미좋아요 → INSERT + LIKE_CNT +1
- * 4. DB 실패 시 세션 Set 으로 폴백 (LIKE_CNT 는 DB 갱신)
- *
- * 참고 테이블
- * - TB_POST_LIKE (SEQ_TB_POST_LIKE)
- * - TB_POST.LIKE_CNT
- */
+/** DB 실패 시 좋아요 상태는 세션 Set으로 폴백 (LIKE_CNT는 DB 갱신) */
 
 package com.petcare.petcare.community.reaction.service;
 

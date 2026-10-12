@@ -1,14 +1,3 @@
-/**
- * 역할: 관리자 쇼핑몰 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: AdminStoreService
- * - 상속: AdminBaseController (관리자 로그인 체크)
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.admin.store.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +50,7 @@ public class AdminStoreController extends AdminBaseController {
         return "redirect:/admin/review/list?statusCd=REJECTED";
     }
 
-    // ── 상품 관리 (전 사업자 실데이터) ──
+    // 상품 관리 (전 사업자)
     @GetMapping("/product-list")
     public String productList(
             @RequestParam(required = false) String keyword,
@@ -87,7 +76,7 @@ public class AdminStoreController extends AdminBaseController {
         return "admin/store/product-list";
     }
 
-    // ── 주문 관리 (전 사업자 실데이터) ──
+    // 주문 관리 (전 사업자)
     @GetMapping("/order-list")
     public String orderList(
             @RequestParam(required = false) String keyword,

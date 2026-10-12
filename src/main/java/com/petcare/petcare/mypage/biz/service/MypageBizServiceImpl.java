@@ -1,7 +1,3 @@
-/**
- * 역할: MypageBizService 구현체 (@Service)
- */
-
 package com.petcare.petcare.mypage.biz.service;
 
 import java.util.HashMap;

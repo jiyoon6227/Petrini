@@ -1,10 +1,3 @@
-/**
- * 역할: 쇼핑 정산 계산·저장 (interface)
- * 쇼핑 정산
- * 사업자 요약/목록/상세 · 중간요청
- *
- * 구현: StoreSettlementServiceImpl
- */
 package com.petcare.petcare.settlement.service;
 
 import java.util.Date;

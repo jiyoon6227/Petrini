@@ -1,17 +1,6 @@
 /**
- * 토스 자동결제(빌링) API 연동
- *
- * 키
- * - toss.billing.client-key / toss.billing.secret-key  (API 개별 연동 키)
- * - 결제위젯 키(toss.client-key / toss.secret-key) 와 섞지 않음
- *
- * API
- * - 빌링키 발급: POST /v1/billing/authorizations/issue
- * - 자동결제 승인: POST /v1/billing/{billingKey}
- *
- * 이후 Ajax
- * - 카드등록 콜백 → issueBillingKey → BillingCardService.registerCard
- * - 등록카드 결제 → approveBilling (결제창 없이)
+ * 빌링 키(toss.billing.*)는 결제위젯 키(toss.client-key / toss.secret-key)와 분리
+ * API: 빌링키 발급 POST /v1/billing/authorizations/issue, 자동결제 승인 POST /v1/billing/{billingKey}
  */
 package com.petcare.petcare.common.external.service;
 

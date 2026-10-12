@@ -1,14 +1,3 @@
-/**
- * 역할: 사업자 쇼핑몰 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: BizStoreService
- * - 상속: BizBaseController (사업자 로그인 체크)
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.biz.store.controller;
 
 import java.time.LocalDate;
@@ -764,9 +753,7 @@ return json;
         }
     }
 
-    // ─────────────────────────────────────────────
 // 쇼핑 배너 (stay/hospital 공용 BizStayService)
-// ─────────────────────────────────────────────
 @GetMapping({"/banner", "/banner/"})
 public String bannerList(HttpSession session, Model model) {
     MemberVO member = getBizMember(session);
@@ -845,9 +832,7 @@ public String bannerSubmit(@RequestParam String title,
         return "biz/store/contract";
     }
 
-    // ─────────────────────────────────────────────
 // 쇼핑몰 사업자 쿠폰 관리
-// ─────────────────────────────────────────────
 
 /**
  * 쇼핑몰 사업자 쿠폰 목록
@@ -1060,8 +1045,8 @@ public String deleteCoupon(
 /**
  * 쇼핑몰 사업자 쿠폰 조기 마감
  *
- * 관리자 재승인 없이 사업자가 직접 마감한다.
- * 기존에 발급된 회원 쿠폰은 변경하지 않는다.
+ * 관리자 재승인 없이 사업자가 직접 마감
+ * 기존에 발급된 회원 쿠폰은 변경 없음
  */
 @PostMapping("/coupon/close")
 public String closeCoupon(

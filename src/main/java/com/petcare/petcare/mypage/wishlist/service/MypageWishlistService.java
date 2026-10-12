@@ -1,7 +1,3 @@
-/**
- * 역할: 찜 목록·토글
- * TB_FAVORITE
- */
 package com.petcare.petcare.mypage.wishlist.service;
 
 import java.util.List;

@@ -1,17 +1,4 @@
-/**
- * 구매확정 자동처리 스케줄러
- Slf4j 로그 사용 (레벨/시각/클래스 기록, 실패 시 스택트레이스 포함)
- *
- * 역할: 배송완료(DONE) 후 7일이 지나도록 유저가 구매확정 버튼을 안 눌렀으면
- *      자동으로 구매확정 처리하고 포인트를 적립해줌
- *
- * 매일 새벽 3시에 1회 실행 (부하 적은 시간대)
- * @EnableScheduling은 PetcareApplication에 이미 켜져있음
- *
- * 연결
- * - Mapper: MypageOrderMapper.selectOrdersNeedingAutoConfirm()
- * - Service: MypageOrderService.confirmPurchase() (구매확정 버튼 눌렀을 때와 동일 로직 재사용)
- */
+/** 배송완료(DONE) 후 7일 지난 미확정 주문 자동 구매확정 (구매확정 버튼과 같은 confirmPurchase 사용) */
 package com.petcare.petcare.mypage.order.scheduler;
 
 import java.util.List;

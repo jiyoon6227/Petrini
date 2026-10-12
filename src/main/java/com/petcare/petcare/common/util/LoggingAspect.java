@@ -8,46 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/*
- * 역할: AOP 로 컨트롤러·서비스 메서드의 실행 정보를 자동 로깅
- * 
- * [AOP(Aspect-Oriented Programming) 란]
- * 여러 클래스에 공통으로 적용되는 기능(로깅, 트랜잭션, 보안 등)을
- * 각 클래스에 코드를 넣지 않고, 별도 클래스에서 한 번에 처리하는 기법
- * 
- * [왜 AOP 로깅을 하는가]
- * - System.out.println 은 콘솔에만 출력되고, 로그 파일에 남지 않음
- * - 로그 레벨(DEBUG/INFO/WARN/ERROR) 구분이 안 됨
- * - 운영 환경에서 System.out 은 성능 저하 원인 (동기 I/O)
- * - SLF4J + Logback 은 로그 파일 자동 분할, 레벨별 필터링, 비동기 처리 지원
- * 
- * [이 클래스가 하는 일]
- * 1. 모든 Controller 메서드 호출 시 → 어떤 메서드가 어떤 파라미터로 호출됐는지 로깅
- * 2. 메서드 실행 완료 시 → 실행 시간(ms) 로깅
- * 3. 예외 발생 시 → 에러 로그 자동 기록
- *
- * [적용 범위 — Pointcut]
- * - com.petcare.petcare.*.controller..* → 모든 도메인의 컨트롤러
- * - com.petcare.petcare..*.controller..* → 하위 패키지의 컨트롤러도 포함
- *   (예: store.controller, community.post.controller 등)
- */
+/* 컨트롤러 메서드 호출 파라미터·실행 시간·예외를 SLF4J로 자동 로깅 (System.out 대신 레벨·파일 관리) */
 @Aspect
 @Component
 public class LoggingAspect {
     private static final Logger log = LoggerFactory.getLogger(LoggingAspect.class);
 
-    /*
-     * 모든 컨트롤러 메서드에 적용
-     * execution(* com.petcare.petcare..controller..*(..))
-     *         │  └─ 패키지 경로 (.. = 하위 패키지 포함)
-     *         └─ 반환 타입 (* = 모든 타입)
-     * 
-     * 매칭 예시:
-     *   ✅ StoreShopController.addToCart()
-     *   ✅ CommunityPostController.writeSubmit()
-     *   ✅ AdminMemberController.list()
-     *   ❌ StoreShopServiceImpl.addToCart() → service 는 매칭 안 됨
-     */
+    /* 모든 컨트롤러 메서드 (..controller.. 하위 패키지 포함, service 패키지는 제외) */
     @Pointcut("execution(* com.petcare.petcare..controller..*(..))")
     public void controllerMethod(){}
 
@@ -60,10 +27,10 @@ public class LoggingAspect {
     @Pointcut("execution(* com.petcare.petcare..service..*(..))")
     public void serviceMethod(){}
 
-    // Around pointcut 이름은 controllerMethod
+    // @Around pointcut 이름은 controllerMethod
     @Around("controllerMethod()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        // ── 메서드 정보 추출 ──
+        // 메서드 정보 추출
         String className = joinPoint.getTarget().getClass().getSimpleName();
         // 예: "StoreShopController"
 
@@ -73,16 +40,16 @@ public class LoggingAspect {
         Object[] args = joinPoint.getArgs();
         // 예: [42, "7", 1, 15000, HttpSession@xxx]
 
-        // ── 실행 전 로깅 ──
+        // 실행 전 로깅
         log.info("[요청] {}.{}() | 파라미터: {}",
                 className, methodName, summarizeArgs(args));
 
         long startTime = System.currentTimeMillis();
         try {
-            // ── 실제 메서드 실행 ──
+            // 실제 메서드 실행
             Object result = joinPoint.proceed();
 
-            // ── 실행 후 로깅 ──
+            // 실행 후 로깅
             long elapsed = System.currentTimeMillis() - startTime;
             log.info("[응답] {}.{}() | {}ms",
                     className, methodName, elapsed);
@@ -90,7 +57,7 @@ public class LoggingAspect {
             return result;
         } 
         catch (Exception e) {
-            // ── 예외 발생 시 로깅 ──
+            // 예외 발생 시 로깅
             long elapsed = System.currentTimeMillis() - startTime;
             log.error("[에러] {}.{}() | {}ms | {}",
                     className, methodName, elapsed, e.getMessage());

@@ -2,9 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.file.mapper.FileMapper">
-    <!-- SEQ_TB_FILE 사용
-         이유: 커뮤니티·제보(GiveReport)와 동일 PK 시퀀스. SEQ_FILE 은 별도 시퀀스라
-               이미 TB_FILE 에 있는 FILE_ID 와 겹쳐 ORA-00001(PK_TB_FILE) 발생 -->
+    <!-- SEQ_TB_FILE 사용 (SEQ_FILE은 기존 FILE_ID와 겹쳐 ORA-00001 발생) -->
     <!-- FILE_ID 컬럼 포함 (ORA-01400 방지)
          selectKey 로 fileId 를 받아도 INSERT 에 안 넣으면 NULL 삽입됨 -->
     <insert id="insertFile" parameterType="com.petcare.petcare.file.vo.FileVO">

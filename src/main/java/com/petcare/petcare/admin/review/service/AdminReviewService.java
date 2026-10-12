@@ -1,15 +1,3 @@
-/**
- * 역할: 관리자 리뷰 삭제 요청 비즈니스 로직 (interface)
- *
- * 담당 화면
- * - admin/review/list.jsp  삭제 요청 목록
- *
- * 연결
- * - 구현: AdminReviewServiceImpl
- * - 호출: AdminReviewController
- * - DB: AdminReviewMapper
- */
-
 package com.petcare.petcare.admin.review.service;
 
 import java.util.List;

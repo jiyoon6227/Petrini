@@ -1,13 +1,3 @@
-/**
- * 역할: 커뮤니티 게시글 신고 데이터 객체
- *
- * 담당 화면
- * - community/detail.jsp   게시글 신고 팝업
- *
- * 참고 테이블
- * - TB_POST_REPORT
- */
-
 package com.petcare.petcare.community.report.vo;
 
 import java.time.LocalDateTime;

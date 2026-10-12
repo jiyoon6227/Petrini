@@ -1,9 +1,6 @@
-/* ═══════════════════════════════════════════
-   PetCare - register.css
-   login.css 폼 토큰 100% 재사용 + 회원가입 전용 스타일
-   ═══════════════════════════════════════════ */
+/* 회원가입 전용 스타일 (login.css 폼 토큰 재사용) */
 
-/* ── 히어로 (login-hero와 동일 구조) ── */
+/* 히어로 (login-hero와 동일 구조) */
 .join-hero {
   background: #E8F7F2;
   position: relative;
@@ -54,13 +51,13 @@
 .paw-deco.p1 { top: 20px; right: 340px; width: 66px; }
 .paw-deco.p2 { bottom: 10px; right: 290px; width: 44px; transform: rotate(15deg); }
 
-/* ── 본문 래퍼 ── */
+/* 본문 래퍼 */
 .join-body {
   background: #F7F8FA;
   padding-bottom: 64px;
 }
 
-/* ── 스텝 인디케이터 (petcare.css .step-item 과 충돌 방지 — .join-body 스코프) ── */
+/* 스텝 인디케이터 (petcare.css .step-item 과 충돌 방지 — .join-body 스코프) */
 .join-body .step-wrap {
   display: flex;
   justify-content: center;
@@ -131,7 +128,7 @@
 .join-body .step-item.active .step-label { color: var(--primary); font-weight: 700; }
 .join-body .step-item.done  .step-label { color: var(--primary-dark); }
 
-/* ── 카드 (login-card와 동일) ── */
+/* 카드 (login-card와 동일) */
 .join-card-wrap {
   display: flex;
   justify-content: center;
@@ -156,7 +153,7 @@
   text-align: center; margin-bottom: 30px;
 }
 
-/* ── 폼 필드 (login.css .form-field와 동일) ── */
+/* 폼 필드 (login.css .form-field와 동일) */
 .form-field {
   position: relative;
   margin-bottom: 14px;
@@ -315,7 +312,7 @@
 .pw-toggle:hover { color: var(--primary); }
 .pw-toggle svg { width: 18px; height: 18px; }
 
-/* ── 약관 섹션 (Step 1) ── */
+/* 약관 섹션 (Step 1) */
 .terms-box {
   border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
@@ -367,7 +364,7 @@
 }
 .terms-view:hover { color: var(--primary); }
 
-/* ── 반려동물 카드 (Step 3) ── */
+/* 반려동물 카드 (Step 3) */
 .pet-type-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -435,7 +432,7 @@
 .btn-photo-upload svg { width: 16px; height: 16px; }
 .btn-photo-upload:hover { border-color: var(--primary); color: var(--primary); }
 
-/* ── 네비게이션 버튼 ── */
+/* 네비게이션 버튼 */
 .join-nav {
   display: flex; gap: 10px; margin-top: 28px;
 }
@@ -464,7 +461,7 @@
 .btn-next:active, .btn-submit:active { transform: scale(.98); }
 .btn-next svg, .btn-submit svg, .btn-prev svg { width: 18px; height: 18px; }
 
-/* ── join Step3 넘어가기 + 가입완료 2분할 ── */
+/* join Step3 넘어가기 + 가입완료 2분할 */
 .join-nav-submit-row {
   display: flex;
   flex: 2;
@@ -492,7 +489,7 @@
 .btn-submit-half:active { transform: scale(.98); }
 .btn-submit-half svg { width: 18px; height: 18px; }
 
-/* ── 완료 화면 ── */
+/* 완료 화면 */
 .join-done {
   display: flex; flex-direction: column;
   align-items: center; padding: 40px 0 20px;
@@ -529,7 +526,7 @@
 }
 .join-done-btns .btn-go-home:hover { border-color: var(--primary); color: var(--primary); }
 
-/* ── 이미 계정 있음 ── */
+/* 이미 계정 있음 */
 .login-link {
   display: flex; align-items: center; justify-content: center;
   height: 52px;
@@ -543,7 +540,7 @@
 .login-link:hover { background: var(--primary-light); }
 .login-link strong { color: var(--primary); font-weight: 700; }
 
-/* ── 반응형 ── */
+/* 반응형 */
 @media (max-width: 768px) {
   .join-hero-inner { padding: 0 20px; }
   .join-hero-img   { width: 150px; }

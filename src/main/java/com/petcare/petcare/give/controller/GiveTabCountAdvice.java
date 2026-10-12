@@ -1,7 +1,3 @@
-/**
- * 역할: 가족찾기(Give) 탭바 건수 공통 주입 (give/index.jsp)
- * - 재능나눔 탭 건수
- */
 package com.petcare.petcare.give.controller;
 
 import org.springframework.ui.Model;

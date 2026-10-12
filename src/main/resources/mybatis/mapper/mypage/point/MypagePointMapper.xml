@@ -3,18 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.mypage.point.mapper.MypagePointMapper">
 
-<!--
-  역할: MypagePointMapper SQL 정의
-
-  쿼리 id 예시
-  - selectPointBalance
-  - selectPointHistory
-
-  테이블
-  - TB_POINT
-  - TB_POINT_HISTORY
--->
-
 <!-- 보유 포인트 잔액 -->
 <select id="selectPointBalance" resultType="int">
     SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}

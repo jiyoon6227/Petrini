@@ -1,18 +1,3 @@
-/**
- * 역할: 숙소 정산 계산·저장 (interface)
- * 숙소 정산
- *
- * 담당
- * - 건별 수수료/실정산금 계산
- * - 대상 조회(1-3) + 합산 → 정산 마스터 초안(저장 전)
- * - 마스터 + ITEM 트랜잭션 저장
- * - 중복 정산 방지(저장 직전 RESV_ID 재검사) → 4-5 월정산 제외도 동일 경로
- * - 중간정산 요청 등록(4-2) / 승인 시 부분정산 생성(4-4)
- *
- * 구현: StaySettlementServiceImpl
- * 호출: BizStayController / AdminSettlementService
- * DB: StaySettlementMapper
- */
 package com.petcare.petcare.settlement.service;
 
 import java.util.Date;

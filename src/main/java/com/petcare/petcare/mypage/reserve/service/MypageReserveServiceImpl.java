@@ -1,11 +1,3 @@
-/**
- * 역할: MypageReserveService 구현체 (@Service)
- *
- * 마이페이지 예약 목록·상세
- * - addStayReview 후 TB_STAY AVG_RATING·REVIEW_CNT 갱신
- * - 재능나눔 참여 신청 예약내역 통합·취소
- */
-
 package com.petcare.petcare.mypage.reserve.service;
 
 import java.util.ArrayList;
@@ -183,7 +175,7 @@ public class MypageReserveServiceImpl implements MypageReserveService {
         StayCancelFeeCalculator.Result fee =
                 StayCancelFeeCalculator.calculate(payAmount, detail.getCheckinDate());
 
-        // 1) 토스 부분/전액 환불 (환불액 0이면 스킵) + 결제 REFUND
+        // 환불액 0이면 토스 환불 생략
         if (payment != null) {
             if (fee.getRefundAmt() > 0 && payment.get("tossPaymentKey") != null) {
                 String paymentKey = String.valueOf(payment.get("tossPaymentKey"));
@@ -213,14 +205,13 @@ public class MypageReserveServiceImpl implements MypageReserveService {
                     "STAY_CANCEL");
         }
 
-        // 2) 예약 CANCEL + 위약금/환불액 저장
         int updated = mypageReserveMapper.updateStayUserCancel(
                 resvId, memberNo, reason, fee.getCancelFeeAmt(), fee.getRefundAmt());
         if (updated == 0) {
             throw new IllegalStateException("예약을 취소할 수 없습니다. 상태를 확인해 주세요.");
         }
 
-        // 3) 알림 (본인) — 숙소 전용 취소 알림 (병원 문구 분리)
+        // 숙소 전용 취소 알림 (병원 문구와 분리)
         String stayName = detail.getHospitalName() != null ? detail.getHospitalName() : "숙소";
         // 숙소 전용 취소 알림 (checkin~checkout 기간 표시)
         mypageNotifyService.sendStayReserveCancelNotification(

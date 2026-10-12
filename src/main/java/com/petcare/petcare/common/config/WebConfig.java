@@ -1,10 +1,4 @@
-/**
- * 역할: 정적 리소스 + 로컬 업로드 파일 URL 매핑, Interceptor 등록
- *
- * - /upload/** → file.upload-dir (give/report 사진 서빙)
- * - SuspendedMemberInterceptor 등록 (정지 회원 고객센터 외 차단)
- * - gcs.enabled=true 이면 /upload/** 는 UploadFileController(GCS)가 처리
- */
+/** /upload/** → file.upload-dir 매핑 (gcs.enabled=true면 UploadFileController가 처리) */
 
 package com.petcare.petcare.common.config;
 

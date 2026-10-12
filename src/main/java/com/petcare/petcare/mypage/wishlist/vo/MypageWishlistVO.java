@@ -1,7 +1,3 @@
-/**
- * 역할: 마이페이지 찜 목록 표시용
- * TB_FAVORITE (PRODUCT/HOSPITAL/LODGE)
- */
 package com.petcare.petcare.mypage.wishlist.vo;
 
 import java.util.Date;

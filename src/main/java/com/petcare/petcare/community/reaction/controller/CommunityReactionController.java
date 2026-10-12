@@ -1,19 +1,3 @@
-/**
- * 역할: 커뮤니티 좋아요 Ajax API 처리
- *
- * [좋아요 토글 화면 흐름]
- * 1. detail.jsp 에서 fetch POST /community/like/toggle (postId)
- * 2. communityReactionService.toggleLike() 호출
- * 3. JSON { liked, likeCnt } 반환 → 버튼·숫자 갱신
- *
- * 연결
- * - Service: CommunityReactionService
- * - 화면: community/detail.jsp
- *
- * 참고 테이블
- * - TB_POST_LIKE, TB_POST.LIKE_CNT
- */
-
 package com.petcare.petcare.community.reaction.controller;
 
 import org.slf4j.Logger;

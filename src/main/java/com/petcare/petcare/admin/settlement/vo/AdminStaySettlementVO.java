@@ -1,9 +1,3 @@
-/**
- * 역할: 관리자 숙소 정산 목록/상세 표시용 VO
- * 숙소 정산
- *
- * TB_SETTLEMENT + TB_BUSINESS(상호·정산계좌) JOIN 결과
- */
 package com.petcare.petcare.admin.settlement.vo;
 
 import java.util.Date;

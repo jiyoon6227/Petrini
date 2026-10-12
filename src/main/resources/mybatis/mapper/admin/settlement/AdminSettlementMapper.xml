@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!--
-  역할: 관리자 정산 SQL (사업자 settlement 매퍼와 분리)
-  숙소 정산
--->
 <mapper namespace="com.petcare.petcare.admin.settlement.mapper.AdminSettlementMapper">
 
     <select id="ping" resultType="int">

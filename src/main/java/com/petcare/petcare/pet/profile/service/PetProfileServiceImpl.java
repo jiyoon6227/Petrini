@@ -1,8 +1,3 @@
-/**
- * PetProfileService 구현
- * 대표사진 Multipart 업로드 → TB_PET.PHOTO_URL
- */
-
 package com.petcare.petcare.pet.profile.service;
 
 import java.time.LocalDate;

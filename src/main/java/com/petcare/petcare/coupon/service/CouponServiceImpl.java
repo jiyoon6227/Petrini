@@ -54,13 +54,11 @@ public List<StoreShopVO> getCouponProducts(
 @Override
 @Transactional
 public void claimCoupon(Long memberNo, Long couponId) {
-        // 1) 이미 받았는지 체크 (중복발급 방지)
         int already = eventCouponMapper.countMemberCoupon(memberNo, couponId);
         if (already > 0) {
             throw new IllegalStateException("ALREADY_CLAIMED");
         }
 
-        // 2) 쿠폰 존재 및 발급 가능 상태 확인
         CouponVO coupon = eventCouponMapper.selectCouponById(couponId);
         if (coupon == null) {
             throw new IllegalArgumentException("COUPON_NOT_FOUND");
@@ -104,15 +102,13 @@ public void claimCoupon(Long memberNo, Long couponId) {
             }
         }
         
-        // 3) TB_MEMBER_COUPON INSERT
         // 만료일(useEndDate) 조건 + 조건부 INSERT(중복발급 방지)
         int inserted = eventCouponMapper.insertMemberCoupon(memberNo, couponId, coupon.getUseEndDate());
         if (inserted == 0) {
             throw new IllegalStateException("ALREADY_CLAIMED");
         }
 
-        // 4) TB_COUPON 발급수량·예산 갱신
-        // 동시요청으로 그 사이 소진됐으면 0건 갱신 → 트랜잭션 롤백(2번 INSERT도 취소)
+        // 동시요청으로 그 사이 소진됐으면 0건 갱신 → 트랜잭션 롤백 (TB_MEMBER_COUPON INSERT도 취소)
         int updated = eventCouponMapper.updateCouponIssued(couponId, budgetUnit);
         if (updated == 0) {
             throw new IllegalStateException("COUPON_EXHAUSTED");

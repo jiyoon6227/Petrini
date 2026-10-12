@@ -1,31 +1,4 @@
-/**
- * 역할: GiveReportService 구현체 (@Service)
- *
- * - insertReport 주소 geocode → LOST_LAT/LNG (Kakao REST)
- * - 사진 저장/삭제 gcs.enabled 분기 (로컬 ↔ GCS)
- *
- * [insertReport — 등록]
- * 1. 세션 회원 → TB_MEMBER 조회 후 MEMBER_NO 세팅
- * 2. 폼 값 조합(제목·본문·특징·태그) → TB_POST INSERT
- * 3. savePhotos() → 로컬 또는 GCS 저장 + TB_FILE INSERT
- *
- * [getReportList — 목록]
- * 1. TB_POST 목록 조회 (BOARD_TYPE='LOST', STATUS_CD='ACTIVE')
- * 2. 각 글마다 TB_FILE 첫 사진 → thumbUrl
- *
- * [getReportDetail — 상세]
- * 1. TB_POST 1건 조회
- * 2. TB_FILE 사진 URL 목록 → photoUrls
- *
- * [deletePhotosByPostId]
- * - 글/관리자 삭제 시 물리 파일 + TB_FILE 정리 (호출부 연결용)
- *
- * 연결
- * - implements: GiveReportService
- * - 사용: GiveReportMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- */
+/** 등록 시 주소를 Kakao REST로 geocode해 LOST_LAT/LNG 저장 */
 
 package com.petcare.petcare.give.report.service;
 
@@ -80,7 +53,6 @@ public class GiveReportServiceImpl implements GiveReportService {
 
     private static final int MAX_PHOTOS = 5; // write.jsp 최대 5장과 동일
 
-    // 2. 생성자 주입 
     public GiveReportServiceImpl(GiveReportMapper giveReportMapper) {
         this.giveReportMapper = giveReportMapper;
     }
@@ -88,10 +60,9 @@ public class GiveReportServiceImpl implements GiveReportService {
     @Override
     public void insertReport(GiveReportVO vo, MemberVO loginMember, MultipartFile[] photos) {
         resolveMemberNo(vo, loginMember);
-        // 1) DB에 꼭 필요한 고정값
+        // DB 필수 고정값
         vo.setBoardType("LOST");
         vo.setStatusCd("ACTIVE");
-        // 2) 제목·본문·특징 등 조합 
         vo.setTitle(buildTitle(vo));
         vo.setBody(buildBody(vo));
         vo.setLostFeature(truncate(buildLostFeature(vo), 500));
@@ -112,12 +83,10 @@ public class GiveReportServiceImpl implements GiveReportService {
         if (vo.getLostLng() == null) {
             vo.setLostLng(126.9780);
         }
-        // 4) DB INSERT
         giveReportMapper.insertReport(vo);
-        // 5) 사진 로컬 저장 + TB_FILE
         savePhotos(vo.getPostId(), photos);
     }
-    // ── 아래는 private 헬퍼 메서드 (같은 클래스 안에 추가) ──
+    // private 헬퍼
     private String buildTitle(GiveReportVO vo) {
         String kind = "FOUND".equals(vo.getReportKind()) ? "발견" : "분실";
         String species = toSpeciesLabel(vo.getLostSpecies());
@@ -422,29 +391,25 @@ public class GiveReportServiceImpl implements GiveReportService {
 
     @Override
     public void updateFindingStatus(long postId, String findingStatus, MemberVO loginMember) {
-    // 1) 로그인 확인
     if (loginMember == null) {
         throw new IllegalStateException("LOGIN_REQUIRED");
     }
 
-    // 2) 허용된 상태값인지 확인
     if (findingStatus == null || !FINDING_STATUS_CODES.contains(findingStatus)) {
         throw new IllegalArgumentException("INVALID_STATUS");
     }
 
-    // 3) 글 조회
     GiveReportVO report = giveReportMapper.selectReportDetail(postId);
     if (report == null) {
         throw new IllegalStateException("REPORT_NOT_FOUND");
     }
 
-    // 4) 작성자 본인만 변경 가능
     Long loginMemberNo = lookupMemberNo(loginMember);
     if (loginMemberNo == null || !loginMemberNo.equals(report.getMemberNo())) {
         throw new IllegalStateException("FORBIDDEN");
     }
 
-    // 5) 기존 tags에서 진행상태만 교체 (FOUND/LOST/TEMP_CARE 는 유지)
+    // 기존 tags에서 진행상태만 교체 (FOUND/LOST/TEMP_CARE는 유지)
     String newTags = replaceFindingStatus(report.getTags(), findingStatus);
 
     GiveReportVO updateVo = new GiveReportVO();

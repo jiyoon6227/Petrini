@@ -1,7 +1,4 @@
-/**
- * 역할: 관리자 스케줄러 수동 실행 (QA·디버깅)
- * ADMIN + CSRF, 정산 2건은 정산관리 버튼 사용
- */
+/** QA용 스케줄러 수동 실행 (정산 2건은 정산관리 화면 버튼 사용) */
 package com.petcare.petcare.admin.scheduler.controller;
 
 import java.util.HashMap;

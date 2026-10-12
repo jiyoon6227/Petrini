@@ -1,10 +1,3 @@
-/**
- * 반려동물 프로필 DB 접근
- *
- * XML: resources/mybatis/mapper/pet/profile/PetProfileMapper.xml
- * 참고 테이블: TB_PET
- */
-
 package com.petcare.petcare.pet.profile.mapper;
 
 import java.util.List;

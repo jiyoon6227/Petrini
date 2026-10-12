@@ -1,11 +1,3 @@
-/**
- * 역할: 관리자 사업자 승인·재능나눔 승인 비즈니스 로직 (interface)
- *
- * 담당 화면
- * - admin/biz/list.jsp      사업자 승인 목록
- * - admin/biz/detail.jsp    사업자 신청 상세
- */
-
 package com.petcare.petcare.admin.biz.service;
 
 import java.util.List;

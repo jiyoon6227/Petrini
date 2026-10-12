@@ -1,9 +1,3 @@
-/**
- * 역할: 진료기록(TB_MEDICAL_RECORD) 데이터 객체
- *
- * 사업자 진료완료 모달·진료기록관리
- */
-
 package com.petcare.petcare.hospital.vo;
 
 import java.util.Date;

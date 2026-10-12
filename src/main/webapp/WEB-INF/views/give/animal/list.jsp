@@ -1,15 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 유기동물 목록 화면 (give/animal/list)
-
-  - 파일 안에서 API 를 직접 호출했는데, Service 로 옮김
-
-  [목록 화면 흐름] (조건 선택 후 조회)
-  1. 사용자가 /give/animal/list 주소로 들어옴 → API 안 부름, 안내만 표시 (searched=false)
-  2. 조건 고르고 [조회] 클릭 → hidden search=true 와 함께 Controller 호출
-  3. giveAnimalService.getAnimalList() (캐시 적용)
-  4. 받은 결과(animals, totalCount 등)를 이 JSP 에 표시
---%>
 <%@ taglib prefix="c"   uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn"  uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

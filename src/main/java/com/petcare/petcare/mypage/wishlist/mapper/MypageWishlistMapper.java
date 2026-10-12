@@ -1,6 +1,3 @@
-/**
- * 역할: 마이페이지 찜 DB (TB_FAVORITE)
- */
 package com.petcare.petcare.mypage.wishlist.mapper;
 
 import java.util.List;

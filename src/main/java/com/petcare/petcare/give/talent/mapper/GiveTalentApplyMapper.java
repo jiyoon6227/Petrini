@@ -1,12 +1,3 @@
-/**
- * 역할: 재능나눔 참여 신청 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/give/talent/GiveTalentApplyMapper.xml
- *
- * 테이블: TB_TALENT_APPLY
- * 시퀀스: SEQ_TB_TALENT_APPLY
- */
-
 package com.petcare.petcare.give.talent.mapper;
 
 import java.util.List;

@@ -1,24 +1,3 @@
-/**
- * 역할: 커뮤니티 게시글 비즈니스 로직 (interface)
- *
- * [markLifeAnswered — LIFE 답변완료]
- * - 일반 댓글 등록 시 TAGS = ANSWERED (Controller 에서 호출)
- *
- * 담당 화면
- * - community/list.jsp        게시글 목록 (탭·검색·페이징)
- * - community/detail.jsp      게시글 상세 (조회수·좋아요·댓글)
- * - community/write.jsp       게시글 작성
- *
- * 연결
- * - 구현: CommunityPostServiceImpl
- * - 호출: CommunityPostController
- * - DB: CommunityPostMapper
- *
- * 참고 테이블
- * - TB_POST (BOARD_TYPE = TOWN / SHARE / LIFE)
- * - TB_FILE (사진, REF_TYPE = 'POST')
- */
-
 package com.petcare.petcare.community.post.service;
 
 import java.util.List;

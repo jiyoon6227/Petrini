@@ -9,16 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * 역할: 정지 회원 URL 접근 제어 (Interceptor)
- *
- * [동작]
- * 1. 세션 memberInfo.status = SUSPENDED 이면
- * 2. /member/cs/**, /member/logout, 정적 리소스만 허용
- * 3. 그 외 URL → /member/cs?restricted=1 리다이렉트
- *
- * 연결: WebConfig.addInterceptors() 에서 등록
- */
+/** 정지 회원은 /member/cs/**, 로그아웃, 정적 리소스만 허용 (그 외 /member/cs?restricted=1) */
 @Component
 public class SuspendedMemberInterceptor implements HandlerInterceptor {
 

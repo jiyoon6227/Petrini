@@ -12,7 +12,7 @@
 <%@ include file="/WEB-INF/views/mypage/sidebar.jsp" %>
 <div class="mypage-content">
 
-<%-- ── 마이홈 ── --%>
+<%-- 마이홈 --%>
 <div class="mp-section active">
     <h2 class="mp-title">마이홈</h2>
     <%-- 인사말: 세션 memberInfo.memberName (로그인 시 TB_MEMBER) --%>

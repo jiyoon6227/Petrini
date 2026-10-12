@@ -1,17 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 관리자 재능나눔 승인 관리 (admin/biz/talent)
-
-
-  [화면 흐름]
-  1. GET /admin/biz/talent?status=PENDING|APPROVED|REJECTED
-  2. ${list} + ${statusCounts} — TB_TALENT 상태별 목록
-  3. PENDING 카드 → POST /admin/biz/talent/approve | /reject
-  4. APPROVED 승인 시 /give/talent/list 자동 노출
-
-  [model]
-  - list, status, statusCounts, successMsg, errorMsg
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="adminPage"   value="biz-talent" />
@@ -19,7 +6,7 @@
 <%@ include file="/WEB-INF/views/admin/common/sidebar.jsp" %>
 
 <style>
-/* ── 탭 ── */
+/* 탭 */
 .talent-tab-bar {
     display:flex; gap:0; align-items:flex-end;
     border-bottom:2px solid #E4E6ED; margin-bottom:20px;
@@ -37,7 +24,7 @@
 .talent-tab:hover { color:#3B5BDB; }
 .talent-tab.on { color:#3B5BDB; border-bottom-color:#3B5BDB; font-weight:700; }
 
-/* ── 신청 카드 ── */
+/* 신청 카드 */
 .ta-card {
     background:#fff; border:1px solid #E4E6ED;
     border-radius:12px; overflow:hidden;

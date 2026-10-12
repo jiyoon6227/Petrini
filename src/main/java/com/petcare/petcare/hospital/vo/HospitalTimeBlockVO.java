@@ -1,6 +1,3 @@
-/**
- * 역할: 예약·선점 점유 구간 (가능시간 계산용)
- */
 package com.petcare.petcare.hospital.vo;
 
 import lombok.Getter;

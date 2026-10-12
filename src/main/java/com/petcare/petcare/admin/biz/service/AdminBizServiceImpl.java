@@ -1,11 +1,3 @@
-/**
- * 역할: AdminBizService 구현체 (@Service)
- *
- * 연결
- * - implements: AdminBizService
- * - 사용: AdminBizMapper, FileMapper
- */
-
 package com.petcare.petcare.admin.biz.service;
 
 import java.util.HashMap;

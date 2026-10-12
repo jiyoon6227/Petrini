@@ -1,22 +1,6 @@
 /**
- * 역할: 공지사항 데이터 객체
- *
- * - 공지사항 CMS (관리자 등록 · 회원 고객센터 노출)
- *
- * 참고 테이블
- * - TB_NOTICE
- *
- * [NOTICE_TYPE_CD]
- * - NOTICE  공지 (뱃지: 공지)
- * - INFO    안내 (뱃지: 안내)
- *
- * [PIN_YN]
- * - Y  상단 고정
- * - N  일반
- *
- * [VISIBLE_YN]
- * - Y  노출
- * - N  숨김
+ * NOTICE_TYPE_CD: NOTICE 공지 / INFO 안내
+ * PIN_YN: Y 상단 고정 / N 일반, VISIBLE_YN: Y 노출 / N 숨김
  */
 
 package com.petcare.petcare.admin.cms.vo;
@@ -30,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class NoticeVO {
 
-    // ── TB_NOTICE 컬럼 ─────────────────────────────────────────
+    // TB_NOTICE 컬럼
 
     private Long noticeId;        // NOTICE_ID — 공지 번호 (PK)
     private String noticeTypeCd;  // NOTICE_TYPE_CD — 유형 (NOTICE/INFO)

@@ -1,27 +1,3 @@
-/**
- * 역할: 커뮤니티 게시글 DB 접근 (MyBatis interface)
- *
- * - give/report 의 GiveReportMapper 패턴 참고
- *
- * XML: resources/mybatis/mapper/community/post/CommunityPostMapper.xml
- *
- * 쿼리
- * - selectPostList / selectPostCount   목록·페이징·검색
- * - selectPostDetail                   상세 1건
- * - insertPost / insertFile            글·사진 등록
- * - selectFileUrlsByPostId             사진 URL 목록
- * - increaseViewCount                  조회수 +1
- * - increaseLikeCnt / decreaseLikeCnt  좋아요 수 증감
- * - selectMemberNoByMemberId/Email     로그인 → MEMBER_NO
- * - updatePostTags                     TAGS 변경 (LIFE WAITING→ANSWERED)
- *
- * 참고 테이블
- * - TB_POST (BOARD_TYPE = TOWN / SHARE / LIFE)
- * - TB_FILE (REF_TYPE = 'POST')
- *
- * SQL은 XML에만 작성
- */
-
 package com.petcare.petcare.community.post.mapper;
 
 import java.util.List;

@@ -6,28 +6,12 @@ import java.time.format.DateTimeFormatter;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 역할: 배너 광고 데이터 객체
- *
- * - HOLD(노출예정), effectiveStatusLabel, displayScheduleNote
- *
- * 참고 테이블
- * - TB_BANNER
- * - TB_BUSINESS (JOIN — bizName, bizType)
- * - TB_FILE (JOIN — imageUrl)
- *
- * [STATUS_CD]
- * - PENDING   심사중
- * - HOLD      노출예정
- * - ACTIVE    노출중
- * - REJECTED  반려
- * - EXPIRED   미노출
- */
+/** STATUS_CD: PENDING 심사중 / HOLD 노출예정 / ACTIVE 노출중 / REJECTED 반려 / EXPIRED 미노출 */
 @Getter
 @Setter
 public class MainBannerVO {
 
-    // ── TB_BANNER 컬럼 ─────────────────────────────────────────
+    // TB_BANNER 컬럼
 
     private Long bannerId;          // BANNER_ID — 배너 번호 (PK)
     private Long bizNo;             // BIZ_NO — 사업자 번호 (FK)
@@ -42,7 +26,7 @@ public class MainBannerVO {
     private String rejectReason;    // REJECT_REASON — 반려·대기(HOLD) 사유
     private java.util.Date regDate; // REG_DATE — 등록일
 
-    // ── 조회 전용 (JOIN) ─────────────────────────────────────
+    // 조회 전용 (JOIN)
 
     private String bizName;         // B.BIZ_NAME — 업체명
     private String bizType;         // B.BIZ_TYPE — 업종 (알림 링크용)

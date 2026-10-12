@@ -1,13 +1,3 @@
-/**
- * 역할: 사업자·재능나눔 승인 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: AdminBizService, GiveTalentService
- * - 상속: AdminBaseController (관리자 로그인 체크)
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- */
-
 package com.petcare.petcare.admin.biz.controller;
 
 import java.util.List;
@@ -58,7 +48,7 @@ public class AdminBizController extends AdminBaseController {
     private MemberAuthMapper memberAuthMapper;
 
 
-    // ── ADMIN-03 사업자 승인 ───────────────────────────────
+    // 사업자 승인
     @GetMapping("/list")
     public String bizList(HttpSession session,
                           @RequestParam(defaultValue = "PENDING") String status,
@@ -77,8 +67,8 @@ public class AdminBizController extends AdminBaseController {
         return "admin/biz/list";
     }
 
-    // ── 재능나눔 승인 ─────────────────────────────
-    // 이유: biz/hospital/talent.jsp 신청(PENDING) → 관리자 검토 → APPROVED 시 /give/talent/list 노출
+    // 재능나눔 승인
+    // 이유: 사업자 신청(PENDING)은 관리자 승인(APPROVED) 후 /give/talent/list에 노출
     @GetMapping("/talent")
     public String cmsTalent(HttpSession session,
                             @RequestParam(defaultValue = "PENDING") String status,
@@ -241,7 +231,7 @@ public class AdminBizController extends AdminBaseController {
     }
 
     // 쿠폰관리
-    // ── 쿠폰 승인 목록 ──
+    // 쿠폰 승인 목록
     @GetMapping("/coupon/list")
     public String couponList(HttpSession session,
                              @RequestParam(defaultValue = "review") String tab,
@@ -273,7 +263,7 @@ public class AdminBizController extends AdminBaseController {
         return "admin/biz/coupon";
     }
 
-    // ── 쿠폰 승인 POST ──
+    // 쿠폰 승인 POST
     @PostMapping("/coupon/approve")
     public String approveCoupon(HttpSession session,
                                 @RequestParam Long couponId,
@@ -297,7 +287,7 @@ return "redirect:/admin/biz/coupon/list?tab=published";
         return "redirect:/admin/biz/coupon/list?tab=review&status=PENDING";
     }
 
-    // ── 쿠폰 반려 POST ──
+    // 쿠폰 반려 POST
     @PostMapping("/coupon/reject")
     public String rejectCoupon(HttpSession session,
                                 @RequestParam Long couponId,

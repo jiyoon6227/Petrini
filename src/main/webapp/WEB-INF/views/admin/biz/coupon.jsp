@@ -1,14 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 관리자 쿠폰 승인 관리 (/admin/biz/coupon/list)
-
-  [model]
-  - list, tab, status, tabCounts, successMsg, errorMsg
-  1. GET ?tab=review&status=PENDING|REJECTED
-  2. GET ?tab=published (게시중 ACTIVE)
-  3. GET ?tab=exhausted (예산·수량 소진 EXHAUSTED)
-  3탭 분리 (승인대기 / 게시중 / 소진)
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -17,7 +7,7 @@
 <%@ include file="/WEB-INF/views/admin/common/sidebar.jsp" %>
 
 <style>
-    /* ── 탭 ── */
+    /* 탭 */
     .cpn-tab-bar {
         display:flex; gap:0; align-items:flex-end;
         border-bottom:2px solid #E4E6ED; margin-bottom:20px;
@@ -34,7 +24,7 @@
     .cpn-tab:hover { color:#3B5BDB; }
     .cpn-tab.on { color:#3B5BDB; border-bottom-color:#3B5BDB; font-weight:700; }
 
-    /* ── 쿠폰 카드 ── */
+    /* 쿠폰 카드 */
     .cpn-card {
         background:#fff; border:1px solid #E4E6ED;
         border-radius:12px; overflow:hidden;
@@ -75,7 +65,7 @@
     }
     .cpn-reject-input:focus { border-color:#3B5BDB; }
 
-    /* ── 예산 프로그레스 ── */
+    /* 예산 프로그레스 */
     .cpn-progress-bar {
         background:#F1F3F7; border-radius:4px; height:5px; margin-top:4px; overflow:hidden;
     }
@@ -149,7 +139,7 @@
         </div>
     </c:if>
 
-    <%-- ========== 승인 대기 (PENDING) ========== --%>
+    <%-- 승인 대기 (PENDING) --%>
     <c:if test="${tab eq 'review' and status eq 'PENDING'}">
         <c:choose>
             <c:when test="${empty list}">
@@ -262,7 +252,7 @@
         </c:choose>
     </c:if>
 
-    <%-- ========== 승인 (게시 중) ========== --%>
+    <%-- 승인 (게시 중) --%>
     <c:if test="${tab eq 'published'}">
         <c:choose>
             <c:when test="${empty list}">
@@ -326,7 +316,7 @@
         </c:choose>
     </c:if>
 
-    <%-- ========== 예산 소진 (EXHAUSTED) ========== --%>
+    <%-- 예산 소진 (EXHAUSTED) --%>
     <c:if test="${tab eq 'exhausted'}">
         <c:choose>
             <c:when test="${empty list}">
@@ -390,7 +380,7 @@
         </c:choose>
     </c:if>
 
-    <%-- ========== 반려 (REJECTED) ========== --%>
+    <%-- 반려 (REJECTED) --%>
     <c:if test="${tab eq 'review' and status eq 'REJECTED'}">
         <c:choose>
             <c:when test="${empty list}">

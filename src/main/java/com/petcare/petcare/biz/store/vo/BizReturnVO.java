@@ -1,6 +1,3 @@
-/**
- * 역할: 사업자 환불신청 목록/상세용 VO (ORDER + ORDER_ITEM JOIN)
- */
 package com.petcare.petcare.biz.store.vo;
 
 import java.util.Date;

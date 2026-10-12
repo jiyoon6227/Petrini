@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/biz/common/sidebar_hospital.jsp" %>
 
 <style>
-    /* ── 진료기록 목록 전용 ── */
+    /* 진료기록 목록 전용 */
     .rec-search-bar {
         display: flex;
         gap: 10px;
@@ -174,7 +174,7 @@
         stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    /* ── 진료기록 작성/수정 모달 ── */
+    /* 진료기록 작성/수정 모달 */
     .rm-modal-bg {
         display: none; position: fixed; inset: 0;
         background: rgba(0,0,0,.5); z-index: 1000;
@@ -375,7 +375,7 @@
 
 </main>
 
-<%-- ── 진료기록 작성/상세 모달 (저장 연동) ── --%>
+<%-- 진료기록 작성/상세 모달 (저장 연동) --%>
 <div class="rm-modal-bg" id="recordModalBg" onclick="if(event.target===this) closeRecordModal()">
   <div class="rm-modal">
     <div class="rm-header">

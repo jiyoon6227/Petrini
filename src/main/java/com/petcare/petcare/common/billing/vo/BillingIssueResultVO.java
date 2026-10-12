@@ -1,10 +1,4 @@
-/**
- * 토스 빌링키 발급 API 응답 요약 VO
- *
- * 역할
- * - POST /v1/billing/authorizations/issue 성공 시 billingKey·카드정보 전달
- * - BillingCardService 가 TB_BILLING_CARD INSERT 전에 사용
- */
+/** 토스 빌링키 발급(POST /v1/billing/authorizations/issue) 응답 요약 */
 package com.petcare.petcare.common.billing.vo;
 
 import lombok.Getter;

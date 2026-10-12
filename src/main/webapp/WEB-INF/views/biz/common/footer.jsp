@@ -16,9 +16,6 @@
  *   변경: csrfFetch('/store/cart/add', { method: 'POST', body: ... })
  *
  * [동작]
- * 1. <meta name="_csrf"> 에서 토큰 값을 읽음
- * 2. 요청 headers 에 'X-CSRF-TOKEN' 을 자동 추가
- * 3. 원래 fetch 를 호출
  */
 window.csrfFetch = function(url, options) {
     options = options || {};

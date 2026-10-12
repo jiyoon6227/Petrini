@@ -1,9 +1,3 @@
-/**
- * 역할: 마이페이지 알림 데이터 객체
- *
- * 참고 테이블: TB_NOTIFICATION
- */
-
 package com.petcare.petcare.mypage.notify.vo;
 
 import java.util.Date;

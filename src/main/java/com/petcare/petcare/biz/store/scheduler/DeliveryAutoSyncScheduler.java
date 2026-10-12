@@ -1,20 +1,6 @@
 /**
- * 배송상태 자동 폴링 스케줄러
- Slf4j 로그 사용 (레벨/시각/클래스 기록, 실패 시 스택트레이스 포함)
- *
- * 역할: SHIPPING(또는 PAID/READY인데 송장이 이미 등록된) 주문들을 주기적으로 돌면서
- *      스마트택배 API로 실제 배송상태를 확인하고, 자동으로 DB 상태를 갱신함
- *      (배송관리 화면에서 사람이 [배송조회]를 직접 눌러야만 동기화되던 것을, 스케줄러가 대신 해주는 버전)
- *
- * ⚠️ 기본값: 비활성화 상태 (@Component 주석처리됨)
- *    이유: 스마트택배 무료 플랜은 월 100건 제한이라, 이 스케줄러를 켜두면
- *          API 호출이 자동으로 계속 발생해서 순식간에 할당량을 다 씀.
- *    테스트하고 싶을 때만 아래 @Component 주석을 풀고 재기동 -> 테스트 끝나면 반드시 다시 주석처리 후 재기동.
- *    (@EnableScheduling은 PetcareApplication에서 이미 활성화)
- *
- * 연결
- * - Mapper: BizStoreMapper.selectOrdersNeedingSync()
- * - Service: SmartTrackerService.getTrackingInfo(), BizStoreService.autoElevateToShippingIfNeeded()/autoCompleteDeliveryIfDone()
+ * 배송상태 자동 동기화 스케줄러 (기본 비활성: @Component 주석 처리)
+ * 스마트택배 무료 플랜 월 100건 제한 — 테스트 때만 @Component 활성화 후 재기동
  */
 package com.petcare.petcare.biz.store.scheduler;
 

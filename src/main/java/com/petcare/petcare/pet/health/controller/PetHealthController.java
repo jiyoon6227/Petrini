@@ -1,12 +1,3 @@
-/**
- * 역할: 마이페이지 건강수첩 URL 처리
- *
- * URL: /mypage/health
- * 화면: mypage/health.jsp
- *
- * TB_MEDICAL_RECORD 조회
- */
-
 package com.petcare.petcare.pet.health.controller;
 
 import java.util.List;

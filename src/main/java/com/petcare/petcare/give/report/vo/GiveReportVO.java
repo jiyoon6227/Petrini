@@ -1,13 +1,3 @@
-/**
- * 역할: 분실/보호 제보 데이터 객체
- *
- * 참고 테이블
- * - TB_POST (BOARD_TYPE = 'LOST')
- * - TB_FILE (REF_TYPE = 'POST', 사진 메타)
- *
- * DB 컬럼명은 팀 VO 규칙(camelCase)에 맞게 작성
- */
-
 package com.petcare.petcare.give.report.vo;
 
 import java.time.LocalDateTime;
@@ -22,7 +12,7 @@ import lombok.Setter;
 @Component("giveReportVO")
 public class GiveReportVO {
 
-    // ── TB_POST 컬럼 ──────────────────────────────────────────
+    // TB_POST 컬럼
                    
     private Long postId;           // POST_ID — 게시글 ID
     private Long memberNo;         // MEMBER_NO — 작성자 회원번호
@@ -43,7 +33,7 @@ public class GiveReportVO {
 
     
 
-    // ── write.jsp 폼 전용 (DB 컬럼 없음 → Service에서 조합) ──
+    // write.jsp 폼 전용 (DB 컬럼 없음 → Service에서 조합)
 
     private String reportKind;     // (폼) — 신고 유형, TAGS 조합용 (LOST/FOUND)
     private String animalSize;     // (폼) — 추정 크기, LOST_FEATURE 조합용
@@ -55,7 +45,7 @@ public class GiveReportVO {
     private String description;    // (폼) — 상황 설명, BODY 보조
     private String tempCare;       // (폼) — 임시보호 여부 (Y/N), TAGS 조합용
 
-    // ── 조회 전용 (TB_FILE) ──
+    // 조회 전용 (TB_FILE)
 
     private String thumbUrl;           // FILE_URL — 목록 썸네일 (TB_FILE 첫 사진)
     private java.util.List<String> photoUrls; // FILE_URL — 상세 사진 URL 목록 (TB_FILE)

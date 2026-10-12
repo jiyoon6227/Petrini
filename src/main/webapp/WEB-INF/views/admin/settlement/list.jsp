@@ -1,9 +1,3 @@
-  <%--
-  역할: 관리자 정산 관리 UI
-  - STAY 탭 + 중간요청
-  - STORE 탭
-  - 월정산·15일더미지급·FAIL 수동입금 UI
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -596,7 +590,7 @@
     });
   }
 
-  // ===== STAY 탭 실데이터 (3-2~3-5 / 4-3~4-4) =====
+  // STAY 탭
   // 중간정산 요청 승인/거절
   document.getElementById('stayRequestBody') && document.getElementById('stayRequestBody').addEventListener('click', function (e) {
     var approveBtn = e.target.closest('.stay-req-approve');
@@ -780,7 +774,7 @@
     return;
   }
 
-  // ===== STORE 탭 실데이터 (S11) =====
+  // STORE 탭
   if (tab !== 'STORE') return;
 
   document.getElementById('storeRequestBody') && document.getElementById('storeRequestBody').addEventListener('click', function (e) {

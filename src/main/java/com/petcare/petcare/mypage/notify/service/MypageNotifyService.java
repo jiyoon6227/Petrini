@@ -1,23 +1,3 @@
-/**
- * 역할: 마이페이지 알림 비즈니스 로직 (interface)
- *
- * 담당 화면
- * - mypage/notifications.jsp  알림 목록
- * - mypage/notification-detail.jsp 알림 상세
- *
- * 구현할 기능 예시
- * - 알림 목록·상세 조회
- * - 읽음 처리
- *
- * 연결
- * - 구현: MypageNotifyServiceImpl
- * - 호출: MypageNotifyController
- * - DB: MypageNotifyMapper
- *
- * 참고 테이블
- * - TB_NOTIFICATION
- */
-
 package com.petcare.petcare.mypage.notify.service;
 
 import java.util.List;
@@ -26,14 +6,12 @@ import com.petcare.petcare.mypage.notify.vo.MypageNotifyVO;
 
 public interface MypageNotifyService {
 
-    // =====================================================================
     // 알림 메서드 도메인별 정리
     // 병원 → 쇼핑 → 숙소 → 커뮤니티 → 기타(공통/관리자)
-    // =====================================================================
 
-    // ========== 1. 병원 (HOSPITAL) ==========
+    // 1. 병원 (HOSPITAL)
 
-    // ----- 1-1. 유저 → 사업자 -----
+    // 1-1. 유저 → 사업자
 
     // 미구현 알림 보강 (쿠폰·공지/FAQ·이메일/FCM·커뮤니티 댓글 제외)
 
@@ -45,7 +23,7 @@ public interface MypageNotifyService {
     void sendHospitalReviewToBizNotification(Long bizMemberNo, String hospitalName,
                                              String reviewerNickname, Double rating, Long resvId);
 
-    // ----- 1-2. 사업자 → 유저 -----
+    // 1-2. 사업자 → 유저
 
     // 병원 예약 확정/취소 알림 (NOTI_TYPE=RESERVE)
     // resvId: 3차에서 상세 이동용 linkUrl 에 사용 (2차 상세 URL 미리 연결)
@@ -78,9 +56,9 @@ public interface MypageNotifyService {
     void sendHospitalReviewReplyNotification(Long memberNo, String hospitalName,
                                              Long resvId, Long hospitalId);
 
-    // ========== 2. 쇼핑 (STORE) ==========
+    // 2. 쇼핑 (STORE)
 
-    // ----- 2-1. 유저/시스템 → 사업자 -----
+    // 2-1. 유저/시스템 → 사업자
 
     // 신규 주문 알림 → 사업자 회원 알림함 "주문" 탭
     void sendNewOrderNotification(Long bizMemberNo, String orderNo, String productName, int itemCount);
@@ -94,7 +72,7 @@ public interface MypageNotifyService {
     // 상품 환불 신청 알림 → 사업자 (환불신청 페이지)
     void sendRefundRequestNotification(Long bizMemberNo, String orderNo, String productName, String reasonCd);
 
-    // ----- 2-2. 사업자 → 유저 -----
+    // 2-2. 사업자 → 유저
 
     /** 주문취소 승인/거절 → 구매자 */
     void sendCancelApproveToBuyerNotification(Long memberNo, String orderNo);
@@ -113,7 +91,7 @@ public interface MypageNotifyService {
 
     void sendRefundDoneToBuyerNotification(Long memberNo, String orderNo, String productName, int refundAmount);
 
-    // ----- 2-3. 관리자 → 사업자 (정산) -----
+    // 2-3. 관리자 → 사업자 (정산)
 
     /**
      * 쇼핑 중간정산 승인/거절 · 더미 지급 알림
@@ -130,9 +108,9 @@ public interface MypageNotifyService {
                                              String periodStart, String periodEnd,
                                              String requestType, Long settleAmount);
 
-    // ========== 3. 숙소 (STAY) ==========
+    // 3. 숙소 (STAY)
 
-    // ----- 3-1. 유저/시스템 → 사업자 -----
+    // 3-1. 유저/시스템 → 사업자
 
     // 숙소 예약 결제 완료 → 사업자 알림
     void sendStayReserveToBizNotification(Long bizMemberNo, String stayName,
@@ -143,7 +121,7 @@ public interface MypageNotifyService {
     void sendStayReviewToBizNotification(Long bizMemberNo, String stayName,
                                          String reviewerNickname, Double rating, Long resvId);
 
-    // ----- 3-2. 사업자/스케줄/취소 → 유저 -----
+    // 3-2. 사업자/스케줄/취소 → 유저
 
     // 숙소 예약 확정/취소 알림 (병원 메서드와 문구 분리)
     void sendStayReserveConfirmNotification(Long memberNo, String stayName, java.util.Date resvDate,
@@ -166,7 +144,7 @@ public interface MypageNotifyService {
     void sendStayReviewReplyNotification(Long memberNo, String stayName,
                                      Long resvId, Long stayId);
 
-    // ----- 3-3. 관리자 → 사업자 (정산) -----
+    // 3-3. 관리자 → 사업자 (정산)
 
     /**
      * 숙소 중간정산 승인/거절 사이트 알림
@@ -187,25 +165,25 @@ public interface MypageNotifyService {
                                             String periodStart, String periodEnd,
                                             String requestType, Long settleAmount);
 
-    // ========== 4. 커뮤니티 ==========
+    // 4. 커뮤니티
 
-    // ----- 관리자 → 유저 -----
+    // 관리자 → 유저
 
     /** 커뮤니티 신고 조치(숨김/삭제) → 작성자 */
     void sendCommunityPostHiddenNotification(Long memberNo, String postTitle, Long postId);
 
     void sendCommunityPostDeletedNotification(Long memberNo, String postTitle);
 
-    // ========== 5. 기타 (병원/쇼핑/숙소/커뮤니티 외) ==========
+    // 5. 기타 (병원/쇼핑/숙소/커뮤니티 외)
 
-    // ----- 관리자 → 신청자(유저) : 사업자 등록 -----
+    // 관리자 → 신청자(유저) : 사업자 등록
 
     // 사업자 승인 알림 INSERT (문구는 ServiceImpl 에서 수정 가능)
     void sendBizApproveNotification(Long memberNo, String bizName, String bizType);
 
     void sendBizRejectNotification(Long memberNo, String bizName, String rejectReason);
 
-    // ----- 관리자 → 사업자 : 리뷰삭제 -----
+    // 관리자 → 사업자 : 리뷰삭제
 
     // 리뷰 삭제 요청 승인 알림 (사업자)
     void sendReviewDeleteApproveNotification(Long bizMemberNo, String targetName,
@@ -215,7 +193,7 @@ public interface MypageNotifyService {
     void sendReviewDeleteRejectNotification(Long bizMemberNo, String targetName,
                                             String rejectReason, String linkUrl);
 
-    // ----- 관리자 → 사업자 : 배너 -----
+    // 관리자 → 사업자 : 배너
 
     // 배너 신청 승인 알림 (사업자)
     void sendBannerApproveNotification(Long memberNo, String bannerTitle, String positionLabel, String linkUrl);
@@ -234,7 +212,7 @@ public interface MypageNotifyService {
     void sendTalentApplyConfirmNotification(Long memberNo, String talentTitle,
                                             String bizName, String linkUrl);
 
-    // ========== 6. 알림함 조회/읽음/삭제 (CRUD) ==========
+    // 6. 알림함 조회/읽음/삭제 (CRUD)
 
     // 알림함 목록·상세 (DB only, 이메일/FCM 은 후속 API)
     List<MypageNotifyVO> getNotificationList(Long memberNo);

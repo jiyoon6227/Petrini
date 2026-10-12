@@ -1,11 +1,3 @@
-/**
- * 역할: TB_HOSPITAL_RESV_HOLD 만료 행 주기 삭제
- * hold 만료 배치
- *
- * 연결
- * - HospitalService.cleanupExpiredHolds()
- * - PetcareApplication @EnableScheduling
- */
 package com.petcare.petcare.hospital.scheduler;
 
 import org.springframework.beans.factory.annotation.Autowired;

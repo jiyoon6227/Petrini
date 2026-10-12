@@ -1,10 +1,3 @@
-/**
- * 역할: 관리자 정산 DB 접근 (MyBatis) — 사업자 SettlementMapper 와 분리
- * 숙소 정산
- * 쇼핑 STORE 탭
- *
- * XML: resources/mybatis/mapper/admin/settlement/AdminSettlementMapper.xml
- */
 package com.petcare.petcare.admin.settlement.mapper;
 
 import java.util.List;
@@ -44,7 +37,7 @@ public interface AdminSettlementMapper {
 
     List<AdminStayRequestVO> selectStayRequestList(@Param("statusCd") String statusCd);
 
-    // ===== STORE (S11) =====
+    // STORE
     int countStoreSettlements(@Param("bizNo") Long bizNo);
 
     List<AdminStaySettlementVO> selectStoreSettlementList(@Param("statusCd") String statusCd);

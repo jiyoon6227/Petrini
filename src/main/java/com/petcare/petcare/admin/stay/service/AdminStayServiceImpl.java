@@ -1,6 +1,3 @@
-/**
- * 역할: 관리자 숙소 관리 Service 구현
- */
 package com.petcare.petcare.admin.stay.service;
 
 import java.util.Collections;

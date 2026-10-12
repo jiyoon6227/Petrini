@@ -8,11 +8,6 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%--
-  쇼핑 정산 내역
-  - 2-1 상단 요약 / 2-2 목록 / 2-3·2-4 상세
-  - S10 중간정산 요청 버튼·폼
---%>
 <style>
   .settle-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
   .settle-summary-card{background:#fff;border:1px solid var(--biz-border);border-radius:12px;padding:16px 18px}

@@ -1,7 +1,3 @@
-/**
- * 역할: 사업자 정산 상단 요약 3칸 (예정/완료/수수료)
- * 숙소 정산
- */
 package com.petcare.petcare.settlement.vo;
 
 import lombok.Getter;

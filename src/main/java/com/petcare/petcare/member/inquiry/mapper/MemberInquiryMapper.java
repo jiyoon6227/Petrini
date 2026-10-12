@@ -1,6 +1,3 @@
-/**
- * 역할: TB_INQUIRY MyBatis
- */
 package com.petcare.petcare.member.inquiry.mapper;
 
 import java.util.List;

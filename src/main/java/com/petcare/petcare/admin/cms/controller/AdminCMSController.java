@@ -1,19 +1,3 @@
-/**
- * 역할: 관리자 CMS URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: AdminCMSService
- * - 상속: AdminBaseController (관리자 로그인 체크)
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- *
- * 배너 관리 API 확장
- * - GET  /banner?tab=&category=  목록(대분류+중분류)
- * - POST /banner/hold             대기(노출예정)
- * - POST /banner/period|activate|deactivate|delete
- */
-
 package com.petcare.petcare.admin.cms.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +27,7 @@ public class AdminCMSController extends AdminBaseController {
     @Autowired
     private AdminCMSService adminCMSService;
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     //  관리자: 배너 목록 (기존 AdminCMSController의 /admin/cms/banner 대체)
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // 배너 목록 (대분류 category + 중분류 tab)
     @GetMapping("/banner")
     public String adminBannerList(@RequestParam(defaultValue = "pending") String tab,
@@ -63,9 +45,7 @@ public class AdminCMSController extends AdminBaseController {
         return "admin/cms/banner";
     }
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     //  관리자: 배너 승인
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     @PostMapping("/banner/approve")
     @ResponseBody
     public String adminBannerApprove(@RequestParam Long bannerId,
@@ -79,9 +59,7 @@ public class AdminCMSController extends AdminBaseController {
         }
     }
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     //  관리자: 배너 반려
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     @PostMapping("/banner/reject")
     @ResponseBody
     public String adminBannerReject(@RequestParam Long bannerId,

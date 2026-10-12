@@ -8,11 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import com.petcare.petcare.store.vo.CouponVO;
 import com.petcare.petcare.store.vo.StoreShopVO;
 
-/**
- * 사용자 이벤트/쿠폰 페이지 DB 접근
- *
- * XML: resources/mybatis/mapper/coupon/CouponMapper.xml
- */
 @Mapper
 public interface CouponMapper {
 

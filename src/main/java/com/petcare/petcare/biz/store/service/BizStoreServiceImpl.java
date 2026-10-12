@@ -1,18 +1,3 @@
-/**
- * 역할: BizStoreService 구현체 (@Service)
- *
- * 구현 내용
- * - Controller에서 넘어온 요청 처리
- * - Mapper 호출하여 DB 조회·수정
- * - 비즈니스 규칙 검증 및 결과 반환
- *
- * 연결
- * - implements: BizStoreService
- * - 사용: BizStoreMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- */
-
 package com.petcare.petcare.biz.store.service;
 
 import java.util.List;
@@ -147,9 +132,8 @@ public class BizStoreServiceImpl implements BizStoreService {
     }
 
     // 상품수정 전용 옵션 저장 로직 (OPTION_ID 기준 upsert)
-    //1) optionId 있는 옵션 -> 그 OPTION_ID로 정확히 찍어서 UPDATE (지우지 않음, 색상/사이즈 이름 바꿔도 같은 옵션으로 인식)
-    //2) optionId 없는 옵션(새로 추가한 행) -> INSERT
-    //3) 원래 있었는데 이번 제출 목록에서 빠진 옵션 -> 주문 이력 없으면 진짜 DELETE, 있으면 재고 0으로만 처리 (화면엔 숨겨지되 데이터/주문이력은 보존)
+    // optionId 있는 옵션은 OPTION_ID 기준 UPDATE, 새 행은 INSERT
+    // 제출에서 빠진 옵션: 주문 이력 있으면 삭제 대신 재고 0 (주문이력 보존)
     private void saveOptionsForUpdate(Long productId, List<OptionVO> options) {
         for (OptionVO opt : options) {
             String color = (opt.getOptionColor() == null || opt.getOptionColor().isBlank()) ? "기본" : opt.getOptionColor();
@@ -449,7 +433,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
     }
 
-    // 송장 일괄등록: 한 줄씩 파싱 → 주문번호로 ORDER_ID 조회 → updateOrderStatus 재사용 저장
+    // 송장 일괄등록 (줄 단위 파싱, updateOrderStatus 재사용)
     @Override
     public java.util.Map<String, Object> bulkRegisterDelivery(Long bizNo, String bulkText) {
         java.util.List<String> validCarriers = java.util.List.of("cj", "hanjin", "lotte", "post");
@@ -639,7 +623,7 @@ public class BizStoreServiceImpl implements BizStoreService {
     }
 
     /**
-     * 회수완료 → 토스 부분환불 → DB DONE + 재고복구
+     * 회수완료 처리 (토스 부분환불 후 DONE·재고복구)
      * 환불액 = 이 상품 실결제 (+ 상품이상이면 반송 3,000, 카드 잔액 한도)
      */
     @Override
@@ -748,8 +732,8 @@ public class BizStoreServiceImpl implements BizStoreService {
     /**
      * 쇼핑몰 사업자 쿠폰 조기 마감
      *
-     * 관리자 승인을 받은 ACTIVE 쿠폰만 조기 마감할 수 있다.
-     * 회원이 이미 발급받은 쿠폰은 변경하지 않는다.
+     * 관리자 승인을 받은 ACTIVE 쿠폰만 조기 마감 가능
+     * 회원이 이미 발급받은 쿠폰은 변경 없음
      */
     @Override
     public void closeCoupon(Long bizNo, Long couponId) {

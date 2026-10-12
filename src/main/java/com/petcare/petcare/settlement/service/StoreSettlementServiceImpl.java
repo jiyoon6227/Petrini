@@ -1,14 +1,6 @@
 /**
- * 역할: 쇼핑 정산 계산·저장 구현체
- * 쇼핑 정산
- *
- * 규칙
- * - 수수료는 상품매출에만 적용, 택배비는 패스스루
- * - 기본 수수료율 5% (TB_BUSINESS.FEE_RATE 없으면)
- * - 월정산/중간정산 동일 계산식
- * - 저장: SETTLEMENT 1건 후 ITEM 다건 (실패 시 전체 롤백)
- * - 중복 방지: 조회 NOT EXISTS + 저장 직전 ORDER_ITEM_ID 재검사 + UNIQUE INDEX
- * 사업자 요약/목록/상세
+ * 수수료는 상품매출에만 적용 (택배비 제외), 기본 5% (FEE_RATE 없을 때)
+ * 중복 방지: 조회 NOT EXISTS + 저장 직전 ORDER_ITEM_ID 재검사 + UNIQUE INDEX
  */
 package com.petcare.petcare.settlement.service;
 

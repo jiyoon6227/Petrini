@@ -1,15 +1,4 @@
-/**
- * 역할: SearchResultService 구현체 (@Service)
- *
- * 구현 내용
- * - 키워드 통합 검색 (상품·병원·숙소·커뮤니티)
- * - 자동완성 (영역별 최대 3건씩)
- * - 결과 페이지 (영역별 최대 20건씩)
- *
- * 연결
- * - 호출: SearchResultController
- * - 사용: SearchResultMapper
- */
+/** 자동완성은 영역별 최대 3건, 결과 페이지는 20건 */
 
 package com.petcare.petcare.search.result.service;
 
@@ -63,7 +52,7 @@ public class SearchResultServiceImpl implements SearchResultService {
         return total;
     }
 
-    // ── 내부 메서드 ──
+    // 내부 메서드
 
     /**
      * 4개 영역(상품·병원·숙소·커뮤니티)을 검색하여

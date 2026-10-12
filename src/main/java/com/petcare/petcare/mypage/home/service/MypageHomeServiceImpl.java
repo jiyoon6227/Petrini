@@ -1,9 +1,3 @@
-/**
- * 역할: MypageHomeService 구현체 (@Service)
- *
- * - Controller 요청 → Mapper COUNT 조회 → JSP 전달
- */
-
 package com.petcare.petcare.mypage.home.service;
 
 import com.petcare.petcare.mypage.home.mapper.MypageHomeMapper;

@@ -9,9 +9,7 @@
 <link rel="stylesheet" href="${contextPath}/resources/css/join.css?v=4">
 
 <main>
-  <!-- ══════════════════════════════════════
-       ② 스텝 인디케이터 + 폼 카드
-  ══════════════════════════════════════ -->
+  <!-- ② 스텝 인디케이터 + 폼 카드 -->
   <div class="join-body">
 
     <!-- 스텝 인디케이터 -->
@@ -44,9 +42,7 @@
       <div class="join-card">
 
 
-        <!-- ════════════════════════════
-             STEP 1 : 약관 동의
-        ════════════════════════════ -->
+        <!-- STEP 1 : 약관 동의 -->
         <div id="step1" style="${joinFromCard ? 'display:none;' : ''}">
           <h2 class="join-card-title">약관 동의</h2>
           <p class="join-card-sub">서비스 이용을 위해 약관에 동의해 주세요.</p>
@@ -128,9 +124,7 @@
         <%-- /step1 --%>
 
 
-        <!-- ════════════════════════════
-             STEP 2 : 기본 정보 입력
-        ════════════════════════════ -->
+        <!-- STEP 2 : 기본 정보 입력 -->
         <div id="step2" style="${joinFromCard ? '' : 'display:none;'}">
           <h2 class="join-card-title">기본 정보 입력</h2>
           <p class="join-card-sub">회원 정보를 입력해 주세요.</p>
@@ -312,9 +306,7 @@
         <%-- /step2 --%>
 
 
-        <!-- ════════════════════════════
-             STEP 3 : 반려동물 등록 (선택)
-        ════════════════════════════ -->
+        <!-- STEP 3 : 반려동물 등록 (선택) -->
         <div id="step3" style="display:none;">
           <h2 class="join-card-title">반려동물 등록</h2>
           <p class="join-card-sub">나중에 마이페이지에서 언제든 추가할 수 있어요.</p>
@@ -501,9 +493,7 @@
         <%-- /step3 --%>
 
 
-        <!-- ════════════════════════════
-             STEP 4 : 가입 완료
-        ════════════════════════════ -->
+        <!-- STEP 4 : 가입 완료 -->
         <div id="step4" style="display:none;">
           <div class="join-done">
             <div class="join-done-icon">
@@ -535,9 +525,7 @@
 </main>
 
 
-<!-- ══════════════════════════════════════
-     회원가입 스크립트
-══════════════════════════════════════ -->
+<!-- 회원가입 스크립트 -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <%-- 토스 빌링 SDK + 카드등록 Ajax --%>
 <script src="https://js.tosspayments.com/v2/standard"></script>
@@ -548,7 +536,7 @@
 <script>
 (function () {
 
-  /* ── 현재 스텝 상태 ── */
+  /* 현재 스텝 상태 */
   // 토스 복귀면 Step2 부터
   var cur = ${joinFromCard ? 2 : 1};
   var idChecked = false;      // id 중복확인
@@ -556,7 +544,7 @@
   var emailVerified = false;
   var timerInterval = null;
 
-  /* ── 카카오 → 회원가입 흐름: 세션에 카카오 정보가 있으면 자동 입력 ── */
+  /* 카카오 → 회원가입 흐름: 세션에 카카오 정보가 있으면 자동 입력 */
   var kakaoNickname = '${sessionScope.kakaoUserInfo.nickname}';
   var kakaoEmail = '${sessionScope.kakaoUserInfo.email}';
   var kakaoId = '${sessionScope.kakaoUserInfo.kakaoId}';
@@ -569,7 +557,7 @@
     document.querySelector("input[name='id']").readOnly = true;
   }
 
-  /* ── 유틸 ── */
+  /* 유틸 */
   function show(id) { document.getElementById(id).style.display = ''; }
   function hide(id) { document.getElementById(id).style.display = 'none'; }
   function showEl(el) { el.style.display = ''; }
@@ -581,7 +569,7 @@
     if(okId) document.getElementById(okId).classList.remove('show');
   }
 
-  /* ── 스텝 인디케이터 갱신 ── */
+  /* 스텝 인디케이터 갱신 */
   function updateStep(step) {
     for (var i = 1; i <= 3; i++) {
       var item   = document.getElementById('stepItem'   + i);
@@ -622,9 +610,7 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /* ──────────────────────────────
-     STEP 1 : 약관 동의
-  ────────────────────────────── */
+  /* STEP 1 : 약관 동의 */
   var agreeAll     = document.getElementById('agreeAll');
   var reqAgrees    = document.querySelectorAll('.req-agree');
   var allCheckboxes= document.querySelectorAll('#step1 input[type="checkbox"]');
@@ -649,9 +635,7 @@
     goStep(2);
   });
 
-  /* ──────────────────────────────
-     STEP 2 : 기본 정보 입력
-  ────────────────────────────── */
+  /* STEP 2 : 기본 정보 입력 */
     // id 중복체크
     document.getElementById('btnCheckId').addEventListener('click', function () {
       var id = document.getElementById('id');
@@ -733,9 +717,7 @@
     else            err('errPwConfirm', 'okPwConfirm');
   });
 
-  /* ── join(회원가입) 이메일 중복 확인 Ajax ──
-   * GET /join/check-email → EmailCheckResultVO JSON
-   */
+  /* join(회원가입) 이메일 중복 확인 Ajax GET /join/check-email → EmailCheckResultVO JSON */
   document.getElementById('btnCheckEmail').addEventListener('click', function () {
     var emailEl = document.getElementById('email');
     var v = emailEl.value.trim();
@@ -770,7 +752,7 @@
       });
   });
 
-  /* ── 이메일 인증번호 발송 ── */
+  /* 이메일 인증번호 발송 */
   function sendVerificationCode(email) {
     var ctx = '${contextPath}';
     var fd = new FormData();
@@ -795,7 +777,7 @@
       });
   }
 
-  /* ── 타이머 (5분) ── */
+  /* 타이머 (5분) */
   function startTimer() {
     var remaining = 300; // 5분 = 300초
     var timerEl = document.getElementById('emailTimer');
@@ -816,7 +798,7 @@
     }, 1000);
   }
 
-  /* ── 인증번호 확인 ── */
+  /* 인증번호 확인 */
   document.getElementById('btnVerifyCode').addEventListener('click', function () {
     var email = document.getElementById('email').value.trim();
     var code  = document.getElementById('emailCode').value.trim();
@@ -858,7 +840,7 @@
       });
   });
 
-  /* ── 인증번호 재발송 ── */
+  /* 인증번호 재발송 */
   document.getElementById('btnResendCode').addEventListener('click', function () {
     var email = document.getElementById('email').value.trim();
     sendVerificationCode(email);
@@ -1162,10 +1144,7 @@
     if (validateStep2()) goStep(3);
   });
 
-  /* ──────────────────────────────
-     STEP 3 : 반려동물 등록
-     서버 연동(POST /join), 넘어가기 버튼
-  ────────────────────────────── */
+  /* STEP 3 : 반려동물 등록 서버 연동(POST /join), 넘어가기 버튼 */
 
   /* 동물 종류 버튼 */
   /* 종류 선택 시 품종 select 갱신 (pet-breeds.js) */
@@ -1193,7 +1172,7 @@
     reader.readAsDataURL(this.files[0]);
   });
 
-  /* ── join(회원가입) POST /join 공통 처리 ──
+  /* join(회원가입) POST /join 공통 처리
    * skipPet=true  → 반려동물 필드 미전송 (넘어가기) — Service 가 TB_PET INSERT 스킵
    * skipPet=false → 펫 필드 전송 — petName 있을 때만 TB_PET INSERT (백엔드 hasPetInfo)
    * Java 수정 불필요: MemberAuthServiceImpl.register() 가 petName 빈 값이면 펫 등록 안 함

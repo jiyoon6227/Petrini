@@ -3,13 +3,10 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.coupon.mapper.CouponMapper">
 
-<!--
-  역할: 사용자 이벤트/쿠폰 페이지 SQL
-  테이블: TB_COUPON, TB_MEMBER_COUPON, TB_BUSINESS
--->
-
-  <!-- 전체 쿠폰 목록 (APPROVED 전체 — 기간·수량 필터 없음)
-       로그인 시 이미 받았는지 체크 (alreadyClaimed) -->
+  <!--
+    받을 수 있는 쿠폰 목록 (APPROVED, 조기마감 제외, 사용기간 내 / 소진 쿠폰 포함)
+    로그인 시 이미 받았는지 체크 (alreadyClaimed)
+  -->
   <select id="selectAvailableCoupons"
           resultType="com.petcare.petcare.store.vo.CouponVO">
     SELECT C.COUPON_ID,

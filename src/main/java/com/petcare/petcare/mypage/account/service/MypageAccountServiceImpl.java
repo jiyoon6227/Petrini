@@ -1,9 +1,4 @@
-/**
- * 역할: MypageAccountService 구현체 (@Service)
- *
- * - 프로필 사진 로컬 저장 (C:/upload/member/profile/) + DB URL UPDATE
- * - gcs.enabled 분기 (로컬 ↔ GCS)
- */
+/** 프로필 사진: gcs.enabled 분기 (로컬 file.upload-dir 또는 GCS), DB에는 /upload/ 경로 저장 */
 
 package com.petcare.petcare.mypage.account.service;
 
@@ -78,7 +73,6 @@ public class MypageAccountServiceImpl implements MypageAccountService {
     @Transactional
     public String updateProfileImage(Long memberNo, MultipartFile file) {
 
-    // [1] 회원번호·파일 기본 검증
     if (memberNo == null) {
         throw new IllegalArgumentException("회원 정보가 없습니다.");
     }
@@ -86,13 +80,12 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         throw new IllegalArgumentException("업로드할 사진을 선택해 주세요.");
     }
 
-    // [2] 이미지 MIME 타입 검증
     String contentType = file.getContentType();
     if (contentType == null || !contentType.startsWith("image/")) {
         throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
     }
 
-    // [3] 저장 (분실신고와 동일 경로 패턴)
+    // 분실신고와 동일한 경로 패턴으로 저장
     // gcs.enabled 분기
     String savedName = UUID.randomUUID() + resolveExtension(file.getOriginalFilename());
     String objectPath = "member/profile/" + memberNo + "/" + savedName;
@@ -124,7 +117,6 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         }
     }
 
-    // [4] TB_MEMBER.PROFILE_IMG_URL UPDATE
     // updateProfileImageUrl 로 분리 (회원정보 UPDATE 와 구분)
     MypageAccountVO vo = new MypageAccountVO();
     vo.setMemberNo(memberNo);
@@ -155,10 +147,9 @@ public class MypageAccountServiceImpl implements MypageAccountService {
             return "전화번호를 입력해 주세요.";
         }
 
-        // [1] TB_MEMBER 업데이트
         mypageAccountMapper.updateMemberProfile(vo);
 
-        // [2] 주소가 입력되었으면 기본배송지 동기화
+        // 주소 입력 시 기본배송지도 동기화
         if (vo.getZipcode() != null && !vo.getZipcode().isBlank()) {
             syncDefaultAddress(vo);
         }
@@ -204,8 +195,6 @@ public class MypageAccountServiceImpl implements MypageAccountService {
 
     /**
      * 비밀번호 변경
-     * [1] 현재 비밀번호 확인
-     * [2] 새 비밀번호 암호화 후 저장
      */
     @Override
     @Transactional
@@ -239,10 +228,6 @@ public class MypageAccountServiceImpl implements MypageAccountService {
 
     /**
      * 회원 탈퇴
-     * [1] DB 에서 암호화된 비밀번호 조회
-     * [2] 입력된 비밀번호와 비교
-     * [3] 일치하면 STATUS_CD = 'WITHDRAWN'
-     * [4] INSERT INTO TB_MEMBER_WITHDRAW
      */
     @Override
     @Transactional

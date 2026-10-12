@@ -1,12 +1,3 @@
-/**
- * 역할: 마이페이지 사업자 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/mypage/biz/MypageBizMapper.xml
- * namespace: com.petcare.petcare.mypage.biz.mapper.MypageBizMapper
- *
- * 참고 테이블: TB_BUSINESS, TB_BUSINESS_AUTH
- */
-
 package com.petcare.petcare.mypage.biz.mapper;
 
 import org.apache.ibatis.annotations.Mapper;

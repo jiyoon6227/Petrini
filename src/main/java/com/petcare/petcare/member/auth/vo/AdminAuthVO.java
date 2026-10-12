@@ -1,19 +1,4 @@
-/**
- * 역할: 로그인 시 TB_ADMIN 조회 결과를 담는 VO
- *
- * 생성 이유:
- * - 관리자도 유저 홈(/login)에서 동일하게 로그인하도록 확장하면서,
- *   TB_MEMBER 와는 컬럼이 다른 TB_ADMIN 조회 결과를 따로 담기 위해 생성.
- * - 관리자 로그인 ID(ADMIN_ID)는 이메일 형식이 아니라 일반 아이디(admin).
- *
- * 사용 위치
- * - MemberAuthMapper(selectAdminByLoginId) → MemberAuthServiceImpl(login)
- *
- * 참고 테이블: TB_ADMIN
- *
- * ※ 세션(memberInfo)에는 MemberVO(role=ADMIN)를 사용하고,
- *   이 VO는 DB 조회·비밀번호 검증 단계에서만 사용
- */
+/** TB_ADMIN 조회 결과용 (TB_MEMBER와 컬럼이 다름), 세션에는 MemberVO(role=ADMIN) 사용 */
 
 package com.petcare.petcare.member.auth.vo;
 

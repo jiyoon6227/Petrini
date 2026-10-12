@@ -1,6 +1,3 @@
-/**
- * 역할: 관리자 숙소 관리 목록·상세 VO
- */
 package com.petcare.petcare.admin.stay.vo;
 
 import lombok.Getter;

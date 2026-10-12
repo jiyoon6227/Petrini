@@ -1,18 +1,6 @@
 /**
- * 역할: 카카오톡 메시지 "나에게 보내기" REST API 연동 (@Service)
- *
- * 구현 내용
- * - 예약 완료 시 사용자 본인의 카카오톡으로 예약 정보 메시지 발송
- * - POST https://kapi.kakao.com/v2/api/talk/memo/default/send
- * - 사용자 Access Token 기반 (Admin Key 아님) → 권한 신청 없이 사용 가능
- *
- * 연결
- * - 호출: StayServiceImpl (결제 확정 후)
- * - 참고: KakaoOAuthService, KakaoMapService 와 동일한 HttpURLConnection 패턴
- *
- * 사전 설정
- * - 카카오디벨로퍼스 > 동의항목 > "카카오톡 메시지 전송" 설정 필요
- * - 카카오 로그인 시 scope에 "talk_message" 포함 필요
+ * 카카오톡 "나에게 보내기" (POST https://kapi.kakao.com/v2/api/talk/memo/default/send)
+ * 사용자 Access Token 기반, 카카오 로그인 scope에 talk_message 필요
  */
 
 package com.petcare.petcare.common.external.service;

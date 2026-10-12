@@ -9,16 +9,16 @@ import com.nhncorp.lucy.security.xss.XssPreventer;
 
 public class XssRequestWrapper extends HttpServletRequestWrapper {
 //#region
-    // ── 사전 컴파일된 정규식 패턴 (성능 최적화) ──
+    // 사전 컴파일된 정규식 패턴 (성능 최적화)
     // Pattern.CASE_INSENSITIVE: 대소문자 무시 (<SCRIPT>, <Script> 등 모두 매칭)
     // Pattern.DOTALL: . 이 개행문자도 포함 (여러 줄에 걸친 스크립트 태그 대응)
 
-    // [1] <script>...</script> 및 <script src="..."/> 제거
+    // <script>...</script> 및 <script src="..."/> 제거
     private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("<script[^>]*>.*?</script>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern SCRIPT_SELF_CLOSE_PATTERN = Pattern.compile("<script[^>]*/>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern SCRIPT_OPEN_PATTERN = Pattern.compile("<script[^>]*>", Pattern.CASE_INSENSITIVE);
 
-    // [2] <iframe>, <object>, <embed>, <form>, <input> 제거 — 클릭재킹, 피싱 방지
+    // <iframe>, <object>, <embed>, <form>, <input> 제거 — 클릭재킹, 피싱 방지
     private static final Pattern IFRAME_PATTERN = Pattern.compile("<iframe[^>]*>.*?</iframe>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern IFRAME_SELF_PATTERN = Pattern.compile("<iframe[^>]*/>", Pattern.CASE_INSENSITIVE);
     private static final Pattern OBJECT_PATTERN = Pattern.compile("<object[^>]*>.*?</object>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -27,17 +27,17 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
     private static final Pattern FORM_PATTERN = Pattern.compile("<form[^>]*>.*?</form>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern INPUT_PATTERN = Pattern.compile("<input[^>]*>", Pattern.CASE_INSENSITIVE);
 
-    // [3] javascript: 프로토콜 제거 — <a href="javascript:alert()"> 방지
+    // javascript: 프로토콜 제거 — <a href="javascript:alert()"> 방지
     private static final Pattern JAVASCRIPT_PROTOCOL_PATTERN = Pattern.compile("javascript\\s*:", Pattern.CASE_INSENSITIVE);
 
-    // [4] vbscript: 프로토콜 제거 (IE 대응)
+    // vbscript: 프로토콜 제거 (IE 대응)
     private static final Pattern VBSCRIPT_PROTOCOL_PATTERN = Pattern.compile("vbscript\\s*:", Pattern.CASE_INSENSITIVE);
 
-    // [5] on이벤트 속성 제거 — onclick="...", onerror="...", onload="..." 등
+    // on이벤트 속성 제거 — onclick="...", onerror="...", onload="..." 등
     //     \\s+ : 공백 뒤에 on으로 시작하는 속성만 매칭 (button 같은 단어의 on은 제외)
     private static final Pattern ON_EVENT_PATTERN = Pattern.compile("\\s+on\\w+\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|[^\\s>]+)", Pattern.CASE_INSENSITIVE);
 
-    // [6] expression() CSS 함수 제거 (IE expression XSS)
+    // expression() CSS 함수 제거 (IE expression XSS)
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile("expression\\s*\\(", Pattern.CASE_INSENSITIVE);
 //#endregion   
 
@@ -47,7 +47,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      * @RequestParam 으로 받는 단일 파라미터 값 필터
-     * 예: @RequestParam String question → cleanXss() 거쳐서 전달
+     * 예: @RequestParam String question → XssPreventer.escape() 거쳐서 전달
      */
     @Override
     public String getParameter(String name) {
@@ -111,7 +111,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 
         String clean = value;
 
-        // ── 1단계 (직접 구현): 위험한 태그 제거 ──
+        // 1단계 (직접 구현): 위험한 태그 제거
         clean = SCRIPT_TAG_PATTERN.matcher(clean).replaceAll("");
         clean = SCRIPT_SELF_CLOSE_PATTERN.matcher(clean).replaceAll("");
         clean = SCRIPT_OPEN_PATTERN.matcher(clean).replaceAll("");
@@ -123,13 +123,13 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         clean = FORM_PATTERN.matcher(clean).replaceAll("");
         clean = INPUT_PATTERN.matcher(clean).replaceAll("");
 
-        // ── 1단계 (직접 구현): 위험한 프로토콜/속성 제거 ──
+        // 1단계 (직접 구현): 위험한 프로토콜/속성 제거
         clean = JAVASCRIPT_PROTOCOL_PATTERN.matcher(clean).replaceAll("");
         clean = VBSCRIPT_PROTOCOL_PATTERN.matcher(clean).replaceAll("");
         clean = ON_EVENT_PATTERN.matcher(clean).replaceAll("");
         clean = EXPRESSION_PATTERN.matcher(clean).replaceAll("(");
 
-        // ── 2단계 (lucy-xss): 남은 특수문자 엔티티 변환 ──
+        // 2단계 (lucy-xss): 남은 특수문자 엔티티 변환
         // XssPreventer.escape() → < > " ' & 를 &lt; &gt; &quot; &#39; &amp; 로 변환
         // 네이버 실서비스에서 검증된 변환 로직 사용
         clean = XssPreventer.escape(clean);

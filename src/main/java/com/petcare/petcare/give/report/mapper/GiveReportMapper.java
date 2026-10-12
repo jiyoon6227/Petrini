@@ -1,20 +1,3 @@
-/**
- * 역할: 유기동물 제보 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/give/report/GiveReportMapper.xml
- * namespace: com.petcare.petcare.give.report.mapper.GiveReportMapper
- *
- * 쿼리
- * - insertReport / selectReportList / selectReportDetail / selectReportCount
- * - insertFile / selectFileUrlsByPostId (사진)
- *
- * 참고 테이블
- * - TB_POST (BOARD_TYPE = 'LOST')
- * - TB_FILE (REF_TYPE = 'POST')
- *
- * SQL은 XML에만 작성 (@Select 등 어노테이션 사용 X)
- */
-
 package com.petcare.petcare.give.report.mapper;
 
 import java.util.List;

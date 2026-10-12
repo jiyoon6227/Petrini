@@ -1,14 +1,3 @@
-/**
- * 역할: 종료일 경과 배너 자동 만료 (스케줄)
- *
- * 종료일 경과 배너 자동 EXPIRED 처리 (매일 자정)
- * - STATUS_CD = 'ACTIVE' 이고 END_DATE < 오늘 인 배너 → EXPIRED
- *
- * 연결
- * - BannerExpiryService.expirePastEndDateBanners()
- * - PetcareApplication @EnableScheduling
- */
-
 package com.petcare.petcare.main.banner.scheduler;
 
 import org.slf4j.Logger;

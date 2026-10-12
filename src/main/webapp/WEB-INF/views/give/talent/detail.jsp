@@ -1,13 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 사용자 재능나눔 상세 (give/talent/detail)
-
-  - 모집중/마감, 참여 신청 폼
-  2. ${talent} — APPROVED(모집중) 또는 DONE(모집마감) 노출
-  [화면 흐름]
-  1. GET /give/talent/detail?id=번호
-  2. ${talent} — APPROVED 글만 노출 (미승인·반려 시 목록 redirect)
---%>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -331,7 +322,7 @@
     <%-- 참여 신청 UI --%>
     <c:choose>
 
-      <%-- 1) 이미 신청함 --%>
+      <%-- 이미 신청함 --%>
       <c:when test="${not empty myApply}">
         <div class="tac-alert info">
           <c:choose>
@@ -345,7 +336,7 @@
         </div>
       </c:when>
 
-      <%-- 2) 모집중 + 아직 신청 안 함 --%>
+      <%-- 모집중 + 아직 신청 안 함 --%>
       <c:when test="${recruitmentOpen}">
         <c:choose>
           <c:when test="${isLoggedIn}">
@@ -365,7 +356,7 @@
         </c:choose>
       </c:when>
 
-      <%-- 3) 모집마감 --%>
+      <%-- 모집마감 --%>
       <c:otherwise>
         <div class="tac-alert err">모집이 마감되었습니다.</div>
       </c:otherwise>

@@ -1,10 +1,3 @@
-/**
- * 마이페이지 반려동물 관리
- *
- * URL: /mypage/pets
- * 화면: mypage/pets.jsp
- */
-
 package com.petcare.petcare.pet.profile.controller;
 
 import java.util.HashMap;

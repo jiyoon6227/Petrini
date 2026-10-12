@@ -3,27 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.admin.store.mapper.AdminStoreMapper">
 
-<!--
-  역할: AdminStoreMapper SQL 정의
-
-  쿼리 id 예시
-  - selectProductList
-  - selectProductDetail
-  - insertProduct
-  - updateProduct
-  - selectOrderList
-  - selectOrderDetail
-  - updateOrderStatus
-  - selectCategoryList
-  - insertCategory
-
-  테이블
-  - TB_PRODUCT
-  - TB_ORDER
-  - TB_ORDER_ITEM
-  - TB_CATEGORY
--->
-
 <!-- 대기중(PENDING)인 사업자 리뷰 삭제요청 목록 - 리뷰 원본 + 상품명 + 사업자명까지 같이 조회 -->
 <select id="selectPendingReviewReports" resultType="com.petcare.petcare.admin.store.vo.AdminReviewReportVO">
     SELECT  rr.REPORT_ID    AS reportId,

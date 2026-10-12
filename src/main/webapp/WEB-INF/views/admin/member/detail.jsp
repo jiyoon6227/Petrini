@@ -1,12 +1,3 @@
-<%--
-  - GET  /admin/member/detail?id= → ${member}, ${pointList}, ${orderList}
-  - STEP 7: POST 정지·복구·강제탈퇴 (위험 영역)
-  - STEP 8: 활동 현황 DB 연동
-  - STEP 9: 등급 변경 POST /admin/member/grade
-  - STEP 10: 포인트 지급·차감 POST /admin/member/point
-  - STEP 11: 최근 주문 내역 ${orderList}
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -15,7 +6,7 @@
 <%@ include file="/WEB-INF/views/admin/common/sidebar.jsp" %>
 
 <style>
-    /* ── 회원 상세 전용 ── */
+    /* 회원 상세 전용 */
     .mem-profile-card {
         background:#fff; border:1px solid #E4E6ED; border-radius:12px;
         padding:28px; display:flex; gap:24px; align-items:flex-start;

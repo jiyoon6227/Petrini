@@ -3,12 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.mypage.reserve.mapper.MypageReserveMapper">
 
-<!--
-  역할: MypageReserveMapper SQL 정의
-  마이페이지 예약 내역·상세
-  테이블: TB_RESERVATION, TB_HOSPITAL, TB_PET
--->
-
   <!-- 숙소 환불 UI 상태 (문의 STATUS_CD로 구분, 예약은 유지)
        PENDING / APPROVED / REJECTED
        레거시: DONE+살아있는예약=거절, DONE+CANCEL=승인으로 보지 않고 상세는 CANCEL 뱃지 -->

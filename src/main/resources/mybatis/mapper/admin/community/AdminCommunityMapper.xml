@@ -3,19 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.admin.community.mapper.AdminCommunityMapper">
 
-<!--
-  역할: AdminCommunityMapper SQL 정의
-
-  쿼리 id 예시
-  - selectPostList
-  - selectPostDetail
-  - updatePostStatus
-  - deletePost
-
-  테이블
-  - TB_COMMUNITY_POST
-  - TB_POST_REPORT
--->
   <!-- 관리자 게시글 목록 (전체 상태 + 신고 건수) -->
   <select id="selectAdminPostList"
           resultType="com.petcare.petcare.community.post.vo.CommunityPostVO">

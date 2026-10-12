@@ -1,15 +1,3 @@
-/**
- * join(회원가입)
- *
- * 역할
- * - join.jsp 가입 폼 → Controller(POST /join) → Service 로 넘기는 전용 객체
- * - 로그인용 MemberVO / MemberAuthVO 와 분리 (가입 시에만 쓰는 필드가 많음)
- *
- * 연결 테이블
- * - TB_MEMBER            (회원 기본 정보)
- * - TB_MEMBER_AGREEMENT  (약관 동의 이력)
- * - TB_PET               (Step3 반려동물 — 선택)
- */
 package com.petcare.petcare.member.auth.vo;
 
 import lombok.Getter;
@@ -19,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class MemberRegisterVO {
 
-    // ── TB_MEMBER ──
+    // TB_MEMBER
 
     private Long memberNo;           // 회원번호 — SEQ_MEMBER, 가입할 때마다 1씩 증가 (TB_MEMBER.MEMBER_NO)
     private String memberId;         // 회원 아이디 — 카카오:카카오ID / 일반:직접입력 (TB_MEMBER.MEMBER_ID)
@@ -35,14 +23,14 @@ public class MemberRegisterVO {
     private String birthDate;        // BIRTH_DATE — 생년월일 (yyyy-MM-dd)
     private String gender;           // GENDER — 성별 (M/F, 선택)
 
-    // ── TB_MEMBER_AGREEMENT + MARKETING_YN ──
+    // TB_MEMBER_AGREEMENT + MARKETING_YN
 
     private String agreeService;     // 서비스 이용약관 — 필수 (TERMS_TYPE=SERVICE)
     private String agreePrivacy;     // 개인정보 동의 — 필수 (TERMS_TYPE=PRIVACY)
     private String agreeLocation;    // 위치기반 서비스 — 선택 (TERMS_TYPE=LOCATION)
     private String agreeMarketing;   // 마케팅 수신 — 선택, Y 이면 TB_MEMBER.MARKETING_YN 도 Y
 
-    // ── TB_PET (Step3 선택) ──
+    // TB_PET (Step3 선택)
 
     private String petType;          // 반려동물 종 — dog/cat/etc → DOG/CAT/ETC (TB_PET.SPECIES)
     private String petName;          // 반려동물 이름 — 비어 있으면 펫 등록 안 함 (TB_PET.PET_NAME)

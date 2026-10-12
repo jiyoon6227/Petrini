@@ -1,6 +1,3 @@
-/**
- * 역할: 마이페이지 배송지록(TB_MEMBER_ADDRESS) DB 접근 (MyBatis interface)
- */
 package com.petcare.petcare.mypage.address.mapper;
 
 import java.util.List;

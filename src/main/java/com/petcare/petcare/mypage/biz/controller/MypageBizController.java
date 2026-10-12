@@ -1,13 +1,3 @@
-/**
- * 역할: 마이페이지 사업자 URL 처리 → Service 호출 → JSP/리다이렉트 반환
- *
- * 연결
- * - Service: MypageBizService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.mypage.biz.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -250,7 +240,6 @@ public class MypageBizController extends CommonConfigController {
         }
 
         try {
-            // 1) 파일을 로컬 또는 GCS에 저장 + FileVO 목록 준비
             String subDir = "biz/" + vo.getBizId();
             List<FileVO> fileList = new ArrayList<>();
 
@@ -276,7 +265,7 @@ public class MypageBizController extends CommonConfigController {
                 fileList.add(fv);
             }
 
-            // 2) DB 작업은 Service에서 한 트랜잭션으로 처리
+            // DB 작업은 Service에서 한 트랜잭션으로 처리
             mypageBizService.applyBusiness(vo, fileList);
            
             redirectAttr.addFlashAttribute("bizName", vo.getBizName());

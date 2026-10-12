@@ -1,7 +1,3 @@
-/**
- * 역할: 1:1 문의 URL 처리
- * memberNo 기준 DB 연동 + 숙소 환불 작성 프리필
- */
 package com.petcare.petcare.member.inquiry.controller;
 
 import java.util.Optional;

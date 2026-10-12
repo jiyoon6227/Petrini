@@ -1,22 +1,3 @@
-/**
- * 역할: AdminMainService 구현체 (@Service)
- *
- * 구현 내용
- * - Controller에서 넘어온 요청 처리
- * - Mapper 호출하여 DB 조회·수정
- * - 비즈니스 규칙 검증 및 결과 반환
- *
- * 연결
- * - implements: AdminMainService
- * - 사용: AdminMainMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- *
- * - 승인 대기 사업자 목록
- * - 대시보드 통계·차트 / 통계
- * - 통계 (차트·전월대비·CSV)
- */
-
 package com.petcare.petcare.admin.main.service;
 
 import java.util.List;
@@ -144,7 +125,7 @@ public class AdminMainServiceImpl implements AdminMainService {
     public AdminStatsVO getStatsSummary() {
         AdminStatsVO stats = new AdminStatsVO();
 
-        // ── Phase 1: 이번 달 요약 카드 4종 ──
+        // 이번 달 요약 카드 4종
         // 이번 달 총 매출 (원, 취소 제외)
         stats.setMonthSalesAmount(adminMainMapper.sumMonthSalesAmount());
         // 이번 달 신규 가입 (TB_MEMBER.JOIN_DATE)
@@ -154,7 +135,7 @@ public class AdminMainServiceImpl implements AdminMainService {
         // 이번 달 주문 수 (TB_ORDER.ORDER_DATE, 취소 포함)
         stats.setMonthOrderCount(adminMainMapper.countMonthOrders());
 
-        // ── Phase 5-A: 전월 대비 증감률 (지난 달 vs 이번 달) ──
+        // 전월 대비 증감률 (지난 달 vs 이번 달)
         // 지난 달 4지표 조회
         long prevSales = adminMainMapper.sumPrevMonthSalesAmount();
         int prevMembers = adminMainMapper.countPrevMonthNewMembers();
@@ -167,7 +148,7 @@ public class AdminMainServiceImpl implements AdminMainService {
         stats.setMonthReservationChangeRate(calcChangeRate(stats.getMonthReservationCount(), prevReservations));
         stats.setMonthOrderChangeRate(calcChangeRate(stats.getMonthOrderCount(), prevOrders));
 
-        // ── Phase 2: 월별 매출 추이 (최근 6개월 line chart) ──
+        // 월별 매출 추이 (최근 6개월 line chart)
         // DB 월별 SUM → Map(YYYY-MM → 원)
         List<AdminMainSalesDayVO> salesFromDb = adminMainMapper.selectLast6MonthsSales();
 
@@ -195,7 +176,7 @@ public class AdminMainServiceImpl implements AdminMainService {
 
         stats.setMonthlySalesTrendList(monthlySalesTrendList);
 
-        // ── Phase 3: 월별 신규 가입자 (최근 6개월 bar chart) ──
+        // 월별 신규 가입자 (최근 6개월 bar chart)
         // DB 월별 COUNT → Map(YYYY-MM → 명)
         List<AdminMainSalesDayVO> membersFromDb = adminMainMapper.selectLast6MonthsNewMembers();
 
@@ -222,7 +203,7 @@ public class AdminMainServiceImpl implements AdminMainService {
 
         stats.setMonthlyMemberTrendList(monthlyMemberTrendList);
 
-        // ── Phase 4: 업종별 예약/주문 (병원·숙소=예약, 쇼핑=주문) ──
+        // 업종별 예약/주문 (병원·숙소=예약, 쇼핑=주문)
         // UNION ALL 3행, Service 패딩 없음
         stats.setCategoryResvOrderList(adminMainMapper.selectMonthCategoryResvOrderStats());
         return stats;

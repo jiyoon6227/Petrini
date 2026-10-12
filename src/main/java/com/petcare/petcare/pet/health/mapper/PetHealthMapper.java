@@ -1,11 +1,3 @@
-/**
- * 역할: 마이페이지 건강수첩 DB 접근 (MyBatis)
- *
- * XML: resources/mybatis/mapper/pet/health/PetHealthMapper.xml
- *
- * TB_MEDICAL_RECORD 회원·반려견별 조회
- */
-
 package com.petcare.petcare.pet.health.mapper;
 
 import java.util.List;

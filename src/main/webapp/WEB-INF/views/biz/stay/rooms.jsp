@@ -30,7 +30,7 @@
     <div style="margin:0 0 12px;padding:12px 16px;background:#FEF2F2;color:#B91C1C;border-radius:8px;font-size:14px;font-weight:600">${errorMsg}</div>
   </c:if>
 
-  <%-- ═══ 객실 목록 ═══ --%>
+  <%-- 객실 목록 --%>
   <div class="biz-card" style="margin-bottom:16px">
     <div class="room-table-head">
       <div class="biz-card-head" style="padding:20px 0 12px">
@@ -103,7 +103,7 @@
     </table>
   </div>
 
-  <%-- ═══ 등록/수정 폼 ═══ --%>
+  <%-- 등록/수정 폼 --%>
   <div class="biz-card" id="formCard" style="display:none">
     <div class="biz-card-head"><span id="formTitle">객실 등록</span></div>
     <form id="roomForm" action="${contextPath}/biz/stay/rooms" method="post"

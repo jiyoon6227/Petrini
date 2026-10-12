@@ -1,22 +1,6 @@
 <%--
-  common/kakaomap.jsp — 카카오맵 공통 초기화 (compile-time <%@ include %> 전용)
-
-  ※ <%@ page %> / <%@ taglib %> 선언 없음
-     — 포함하는 JSP 페이지가 이미 선언하고 있으므로 중복 선언 불필요
-     — 중복 선언 시 JSP 컴파일 오류(Whitelabel Error) 발생
-
-  컨테이너 div :  id="kakao-map"  (고정)
-
-  Model 에서 읽는 값 (KakaoMapService 로 세팅):
-    kakaoJsApiKey   Kakao JS API 키
-    mapLat       초기 중심 위도
-    mapLng       초기 중심 경도
-    bizName      있으면 → 단일 마커 + 인포윈도우 (서비스 상세/목록 페이지)
-                 없으면 → 마커 생략   (petmap 등 다중 마커 페이지)
-
-  include 후 JS 전역:
-    window.kakaoMap  – kakao.maps.Map
-    window.kakaoPs   – kakao.maps.services.Places  (장소 검색 등에 사용)
+  include 전용: page/taglib 선언 없음 (포함하는 JSP와 중복 선언 시 컴파일 오류)
+  Model: kakaoJsApiKey, mapLat, mapLng, bizName(있으면 단일 마커+인포윈도우) / 전역: window.kakaoMap, window.kakaoPs
 --%>
 <script type="text/javascript"
   src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}&autoload=true&libraries=services">

@@ -3,15 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.give.talent.mapper.GiveTalentApplyMapper">
 
-<!--
-  역할: GiveTalentApplyMapper SQL 정의
-
-  테이블: TB_TALENT_APPLY, TB_MEMBER, TB_TALENT, TB_BUSINESS
-  시퀀스: SEQ_TB_TALENT_APPLY
-
-  [STATUS_CD] PENDING / CONFIRMED / CANCELLED
--->
-
   <sql id="applyColumns">
     A.APPLY_ID     AS applyId,
     A.TALENT_ID    AS talentId,

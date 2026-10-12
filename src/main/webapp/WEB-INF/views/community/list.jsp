@@ -1,27 +1,10 @@
-<%-- community/list.jsp — 커뮤니티 게시판 목록 --%>
-<%--
-  - STEP 3: 목록 DB 연동 (작성자·페이징·검색·총 개수)
-  - LIFE ANSWERED 시 vet-answer 답변 미리보기
-
-  [목록 화면 흐름]
-  1. GET /community?boardType=... → CommunityPostController.list()
-  2. Service → TB_POST 조회 + thumbUrl(첫 사진)
-  3. 아래 <c:forEach items="${list}"> 로 카드 표시
-  4. 탭 클릭은 index.jsp 의 <a href> 로 URL 이동 (JS 필터 X)
-
-  [탭 ↔ boardType]
-  - 전체 /community
-  - 집사생활 ?boardType=TOWN
-  - 무료나눔 ?boardType=SHARE
-  - 수의사 상담 ?boardType=LIFE
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId" value="community" />
 <%@ include file="/WEB-INF/views/community/index.jsp" %>
-  <%-- ── 일반 게시판 영역 ─────────────────────────────── --%>
+  <%-- 일반 게시판 영역 --%>
   <div id="normalBoard" style="${boardType eq 'LIFE' ? 'display:none' : ''}">
     <c:if test="${not empty successMessage}">
       <div style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:18px;font-size:14px;color:#166534">
@@ -128,7 +111,7 @@
   </c:if>
   </div><%-- end #normalBoard --%>
 
-  <%-- ── 수의사 상담 탭 영역 ──────────────────────────── --%>
+  <%-- 수의사 상담 탭 영역 --%>
   <div id="vetBoard" style="${boardType eq 'LIFE' ? '' : 'display:none'}">
     <c:if test="${not empty successMessage}">
       <div style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:18px;font-size:14px;color:#166534">

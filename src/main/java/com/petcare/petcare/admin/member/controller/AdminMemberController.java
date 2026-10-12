@@ -1,21 +1,3 @@
-/**
- * 역할: 관리자 회원 URL 처리 → Service 호출 → JSP 반환
- *
- * [화면 흐름]
- * 1. GET  /admin/member/list   → list.jsp (검색·필터·페이징)
- * 2. GET  /admin/member/detail → detail.jsp (기본정보 + 활동현황)
- * 3. POST /admin/member/suspend  → STATUS_CD = SUSPENDED (STEP 7)
- * 4. POST /admin/member/restore  → STATUS_CD = NORMAL     (STEP 7)
- * 5. POST /admin/member/withdraw → STATUS_CD = WITHDRAWN   (STEP 7)
- *
- * 연결
- * - Service: AdminMemberService
- * - 상속: AdminBaseController (관리자 로그인 체크)
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.admin.member.controller;
 
 import org.springframework.stereotype.Controller;

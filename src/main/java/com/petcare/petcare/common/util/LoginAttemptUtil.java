@@ -2,19 +2,7 @@ package com.petcare.petcare.common.util;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
-/*
- * [왜 DB가 아니라 메모리(Map)에 저장하나요?]
- * 로그인 시도 횟수는 일시적인 데이터라서 DB에 저장하면 매 시도마다 
- * INSERT/UPDATE가 발생해 부하가 큽니다. 
- * 메모리가 훨씬 빠르고, 서버 재시작 시 초기화되어도 
- * 보안 문제는 없습니다.
- * 
- * [ConcurrentHashMap을 쓴 이유는?]
- * 여러 사용자가 동시에 로그인을 시도할 수 있어서 Thread-safe한 
- * 자료구조가 필요합니다. 일반 HashMap은 동시 접근 시 
- * 데이터가 꼬일 수 있지만, ConcurrentHashMap은 내부적으로 
- * 세그먼트 잠금을 사용해 안전합니다.
- */
+/* 로그인 실패 횟수는 메모리에 보관 (일시 데이터라 DB 부하 회피, 재시작 시 초기화 무방), 동시 접근 대비 ConcurrentHashMap */
 public class LoginAttemptUtil {
     /** 최대 허용 실패 횟수 — 5회 초과 시 잠금 */
     private static final int MAX_ATTEMPTS = 5;

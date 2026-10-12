@@ -1,13 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 분실/보호 신고 작성 (give/report/write)
-
-
-  [등록 화면 흐름]
-  1. 로그인 후 이 페이지 진입
-  2. 폼 작성 + 사진 최대 5장 (name="photos", multipart/form-data)
-  3. POST /give/report/write → Service → TB_POST + TB_FILE + C:/upload/ 저장
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId"      value="give" />

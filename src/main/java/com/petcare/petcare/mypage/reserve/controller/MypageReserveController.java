@@ -1,9 +1,3 @@
-/**
- * 역할: 마이페이지 예약 URL 처리 → Service 호출 → JSP 반환
- *
- * 예약 내역·상세
- */
-
 package com.petcare.petcare.mypage.reserve.controller;
 
 import java.util.List;

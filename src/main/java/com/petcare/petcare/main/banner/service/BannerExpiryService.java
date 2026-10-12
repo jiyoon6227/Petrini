@@ -1,13 +1,4 @@
-/**
- * 역할: 배너 종료일 경과 자동 만료 처리
- *
- * - END_DATE < 오늘 인 ACTIVE 배너 → STATUS_CD = EXPIRED
- * - 조회 시점(목록/API) 및 스케줄러에서 호출
- *
- * 연결
- * - MainBannerMapper.expirePastEndDateBanners()
- * - BannerExpiryScheduler (매일 자정)
- */
+/** 조회 시점(목록/API)과 스케줄러(매일 자정) 양쪽에서 호출 */
 
 package com.petcare.petcare.main.banner.service;
 

@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="${contextPath}/resources/css/mypage.css">
 
 <style>
-/* ── 건강수첩 전용 ── */
+/* 건강수첩 전용 */
 .health-pet-tabs {
     display: flex;
     gap: 10px;

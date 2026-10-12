@@ -1,10 +1,4 @@
-/**
- * BillingCardService 구현체
- *
- * - TB_BILLING_CARD CRUD
- * - 삭제는 STATUS_CD=DELETED (물리 삭제 안 함)
- * - billingKey 는 화면/Ajax JSON 응답에 넣지 않도록 Controller 에서 마스킹 권장
- */
+/** billingKey는 화면/Ajax 응답에 노출하지 않도록 Controller에서 마스킹 */
 package com.petcare.petcare.common.billing.service;
 
 import java.util.Collections;

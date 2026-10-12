@@ -43,7 +43,7 @@ class CouponConcurrencyTest {
         // 이전 실행에서 남은 데이터가 있으면 먼저 정리
         cleanUp();
 
-        // 1) 수량 10장짜리 쿠폰 생성 (승인완료 + 게시중 + 정액 1,000원 + 기간 넉넉하게)
+        // 수량 10장짜리 쿠폰 생성 (승인완료 + 게시중 + 정액 1,000원 + 기간 넉넉하게)
         jdbcTemplate.update(
             "INSERT INTO TB_COUPON (COUPON_ID, COUPON_CODE, COUPON_NAME, COUPON_TYPE, DISCOUNT_VALUE, "
           + "MIN_ORDER_AMT, STATUS_CD, TOTAL_BUDGET, ISSUED_BUDGET, TOTAL_QTY, ISSUED_QTY, "
@@ -54,7 +54,7 @@ class CouponConcurrencyTest {
           + "TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'))",
             COUPON_ID, TOTAL_QTY);
 
-        // 2) 테스트 회원 100명 생성 (TB_MEMBER_COUPON.MEMBER_NO FK 때문에 실제 회원이 있어야 함)
+        // 테스트 회원 100명 생성 (TB_MEMBER_COUPON.MEMBER_NO FK 때문에 실제 회원 필요)
         for (long memberNo = MEMBER_START; memberNo <= MEMBER_END; memberNo++) {
             jdbcTemplate.update(
                 "INSERT INTO TB_MEMBER (MEMBER_NO, MEMBER_ID, MEMBER_NAME, NICKNAME, EMAIL, STATUS_CD, JOIN_DATE) "
@@ -108,16 +108,16 @@ class CouponConcurrencyTest {
         assertTrue(done.await(60, TimeUnit.SECONDS), "60초 안에 모든 요청이 끝나지 않았습니다.");
         pool.shutdown();
 
-        // 1) 요청 결과 검증: 수량만큼만 성공, 나머지는 전부 실패
+        // 요청 결과 검증: 수량만큼만 성공, 나머지는 실패
         assertEquals(TOTAL_QTY, success.get(), "성공 건수는 쿠폰 수량과 같아야 합니다.");
         assertEquals(USERS - TOTAL_QTY, fail.get(), "나머지 요청은 모두 거절되어야 합니다.");
 
-        // 2) DB 실제 발급 행수 검증: 초과 발급이 없어야 함
+        // DB 실제 발급 행수 검증: 초과 발급 없음
         Integer issuedRows = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM TB_MEMBER_COUPON WHERE COUPON_ID = ?", Integer.class, COUPON_ID);
         assertEquals(TOTAL_QTY, issuedRows, "TB_MEMBER_COUPON 발급 행수가 쿠폰 수량과 같아야 합니다.");
 
-        // 3) 쿠폰 마스터 검증: 발급수량 10, 상태 EXHAUSTED
+        // 쿠폰 마스터 검증: 발급수량 10, 상태 EXHAUSTED
         Integer issuedQty = jdbcTemplate.queryForObject(
             "SELECT ISSUED_QTY FROM TB_COUPON WHERE COUPON_ID = ?", Integer.class, COUPON_ID);
         assertEquals(TOTAL_QTY, issuedQty, "TB_COUPON.ISSUED_QTY가 쿠폰 수량과 같아야 합니다.");

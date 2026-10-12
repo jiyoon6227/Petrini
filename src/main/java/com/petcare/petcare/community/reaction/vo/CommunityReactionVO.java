@@ -1,10 +1,3 @@
-/**
- * 역할: 커뮤니티 좋아요 데이터 객체
- *
- * 참고 테이블
- * - TB_POST_LIKE
- */
-
 package com.petcare.petcare.community.reaction.vo;
 
 import java.time.LocalDateTime;

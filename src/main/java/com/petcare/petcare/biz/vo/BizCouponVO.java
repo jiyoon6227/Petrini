@@ -5,10 +5,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
-/**
- * 쿠폰 마스터 VO (TB_COUPON)
- * 사업자 쿠폰 신청 / 관리자 승인 화면에서 공용 사용
- */
 @Getter @Setter
 @ToString
 @NoArgsConstructor

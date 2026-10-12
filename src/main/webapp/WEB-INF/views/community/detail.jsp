@@ -1,20 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  - 커뮤니티 게시글 상세
-
-  [상세 화면 흐름]
-  1. GET /community/detail?id=번호 → CommunityPostController.detail()
-  2. ${post} 표시 + 조회수 진입 시 +1
-  3. 좋아요 Ajax → POST /community/like/toggle
-  4. 댓글 목록 ${comments} + POST /community/comment (parentId → 대댓글)
-  5. POST /community/comment/delete — 본인 댓글 삭제
-  6. POST /community/comment/update — 본인 댓글 수정
-  7. POST /community/report — 게시글 신고
-  8. LIFE + ANSWERED → vet-answer 답변 박스 표시
-
-  [model]
-  - post, comments, commentCount, liked, isLoggedIn, successMessage(flash)
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

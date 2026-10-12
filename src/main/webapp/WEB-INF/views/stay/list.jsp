@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <style>
-  /* ── 히어로 ── */
+  /* 히어로 */
   .stay-hero {
       background:linear-gradient(135deg,#1A1A2E 0%,#2D2D5E 60%,#4F6BC4 100%);
       padding: 48px 0 0; color: #fff; text-align: center;
@@ -209,7 +209,6 @@
     </div>
 
     <div class="stay-grid">
-      <%-- ★ DB 데이터로 카드 반복 생성 --%>
       <c:choose>
         <c:when test="${not empty stayList}">
           <c:forEach var="s" items="${stayList}">
@@ -291,7 +290,7 @@
 </div>
 
 <script>
-/* ── 검색 폼 제출 ── */
+/* 검색 폼 제출 */
 function submitSearch() {
     var form = document.getElementById('searchForm');
 
@@ -312,7 +311,7 @@ function submitSearch() {
     form.submit();
 }
 
-/* ── 칩 클릭 (지역 / 반려동물 크기) ── */
+/* 칩 클릭 (지역 / 반려동물 크기) */
 function selChipSearch(el, value) {
     var parent   = el.closest('.sfc-chips');
     var targetId = parent.getAttribute('data-target');
@@ -327,13 +326,13 @@ function selChipSearch(el, value) {
     submitSearch();
 }
 
-/* ── 정렬 클릭 ── */
+/* 정렬 클릭 */
 function selSortSearch(sortValue) {
     document.getElementById('hSort').value = sortValue;
     submitSearch();
 }
 
-/* ── 가격 슬라이더 ── */
+/* 가격 슬라이더 */
 (function() {
     var slider = document.getElementById('priceRange');
     var label  = document.getElementById('priceLabel');

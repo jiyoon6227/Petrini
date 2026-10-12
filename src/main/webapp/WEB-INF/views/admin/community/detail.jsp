@@ -1,11 +1,3 @@
-<%--
-  - GET /admin/community/detail?id= → ${post}
-  - POST 숨김·삭제·복구 (상태별 버튼 분기)
-  - 신고 건수·내역확인 모달·신고 기각 연동
-  - 댓글·대댓글 읽기 전용 표시
---%>
-
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>

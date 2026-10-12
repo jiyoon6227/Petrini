@@ -1,9 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 관리자 배너 관리 목록
-  - 대분류(메인/숙소/쇼핑/병원) + 중분류 탭(현재광고/광고대기/승인/승인대기/반려)
-  - 승인·대기·반려 AJAX, 상세 링크
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
@@ -14,7 +9,7 @@
 
 <style>
     /* 대분류(세그먼트) / 중분류(밑줄 탭) 필터 UI */
-    /* ── 필터 영역 전체 ── */
+    /* 필터 영역 전체 */
     .banner-filter-wrap{
         background:#fff;border:1px solid #E4E6ED;border-radius:12px;
         padding:20px 22px 8px;margin-bottom:20px
@@ -26,7 +21,7 @@
         text-transform:uppercase;color:#9CA3AF;margin-bottom:10px
     }
 
-    /* ── 대분류: 노출 영역 (세그먼트 카드) ── */
+    /* 대분류: 노출 영역 (세그먼트 카드) */
     .banner-category-bar{
         display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
         background:#F3F4F6;border-radius:10px;padding:5px
@@ -48,7 +43,7 @@
     }
     .banner-category-btn.on .banner-category-count{background:rgba(255,255,255,.18)}
 
-    /* ── 중분류: 광고 상태 (밑줄 탭) ── */
+    /* 중분류: 광고 상태 (밑줄 탭) */
     .banner-status-bar{
         display:flex;flex-wrap:wrap;gap:0;align-items:flex-end;
         border-bottom:2px solid #E4E6ED

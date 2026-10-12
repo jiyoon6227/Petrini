@@ -1,6 +1,3 @@
-/**
- * 역할: TB_INQUIRY 매핑 VO (회원·관리자 공통)
- */
 package com.petcare.petcare.member.inquiry.vo;
 
 import java.util.Date;

@@ -1,24 +1,3 @@
-/**
- * 역할: 관리자 회원 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/admin/member/AdminMemberMapper.xml
- * namespace: com.petcare.petcare.admin.member.mapper.AdminMemberMapper
- *
- * 쿼리 id
- * - selectAdminMemberList / selectAdminMemberCount
- * - selectAdminMemberDetail
- * - updateMemberStatus (STEP 7)
- * - selectAdminMemberActivityStats (STEP 8)
- *
- * 참고 테이블
- * - TB_MEMBER, TB_BUSINESS (역할 판별)
- * - TB_ORDER, TB_RESERVATION, TB_POST, TB_POST_REPORT (STEP 8)
- * - TB_MEMBER_COUPON, TB_FAVORITE, TB_PET (STEP 8)
- *
- * SQL은 XML에만 작성 (@Select 등 어노테이션 사용 X)
- * 메서드명은 Service에서 호출하는 이름과 동일하게
- */
-
 package com.petcare.petcare.admin.member.mapper;
 
 import org.apache.ibatis.annotations.Mapper;

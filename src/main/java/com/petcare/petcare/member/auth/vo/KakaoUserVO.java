@@ -1,9 +1,3 @@
-/**
- * 카카오 로그인
- *
- * 역할: 카카오 API 에서 받은 사용자 정보를 담는 VO
- * 사용 위치: KakaoOAuthService → MemberAuthController
- */
 package com.petcare.petcare.member.auth.vo;
 
 import lombok.Getter;

@@ -12,7 +12,7 @@
 <%@ include file="/WEB-INF/views/mypage/sidebar.jsp" %>
 <div class="mypage-content">
 
-<%-- ── 포인트/쿠폰 ── --%>
+<%-- 포인트/쿠폰 --%>
 <div class="mp-section active">
     <h2 class="mp-title">포인트 / 쿠폰</h2>
     <p class="mp-desc">포인트 적립·사용 내역과 보유 쿠폰을 관리하세요.</p>

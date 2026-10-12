@@ -1,8 +1,3 @@
-/**
- * 역할: 병원 예약 임시 선점 (TB_HOSPITAL_RESV_HOLD)
- *
- * 참고 테이블: TB_HOSPITAL_RESV_HOLD
- */
 package com.petcare.petcare.hospital.vo;
 
 import java.util.Date;

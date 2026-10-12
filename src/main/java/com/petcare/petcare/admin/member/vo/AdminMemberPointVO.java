@@ -1,15 +1,6 @@
 /**
- * 역할: 관리자 회원 상세 — 포인트 이력 1건
- *
- * 참고 테이블: TB_POINT
- *
- * [POINT_TYPE]
- * - EARN  적립
- * - USE   사용
- *
- * [REASON_CD]
- * - ADMIN_GRANT   관리자 지급
- * - ADMIN_DEDUCT  관리자 차감
+ * POINT_TYPE: EARN 적립 / USE 사용
+ * REASON_CD: ADMIN_GRANT 관리자 지급 / ADMIN_DEDUCT 관리자 차감
  */
 
 package com.petcare.petcare.admin.member.vo;
@@ -21,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class AdminMemberPointVO {
 
-    // ── TB_POINT 컬럼 ──────────────────────────────────────────
+    // TB_POINT 컬럼
 
     private Long pointId;         // POINT_ID — 포인트 이력 번호 (PK)
     private String pointType;     // POINT_TYPE — 유형 (EARN/USE)

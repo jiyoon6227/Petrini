@@ -1,9 +1,3 @@
-/**
- * 역할: PetHealthService 구현체
- *
- * 건강수첩 = TB_MEDICAL_RECORD 회원 조회 + MEMO 태그 파싱
- */
-
 package com.petcare.petcare.pet.health.service;
 
 import java.util.List;

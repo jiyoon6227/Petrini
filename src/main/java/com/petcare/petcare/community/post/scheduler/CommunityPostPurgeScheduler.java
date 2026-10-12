@@ -1,15 +1,4 @@
-/**
- * 역할: STATUS_CD='DELETED' 후 7일 경과 LIFE 게시글 자동 물리 삭제
- *
- * [동작]
- * - 매일 새벽 3시 실행 (cron)
- * - DELETE_DATE 기준 7일 경과한 STATUS_CD='DELETED' LIFE 게시글 조회
- * - 댓글 → 파일 → 게시글 순으로 물리 삭제
- *
- * 연결
- * - CommunityPostService.purgeExpiredDeletedPosts()
- * - PetcareApplication @EnableScheduling
- */
+/** DELETE_DATE 7일 경과 LIFE 게시글 물리 삭제 (FK 순서: 댓글 → 파일 → 게시글) */
 package com.petcare.petcare.community.post.scheduler;
 
 import org.slf4j.Logger;

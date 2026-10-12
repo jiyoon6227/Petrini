@@ -1,16 +1,6 @@
 /**
- * 역할: 정산 마스터 (TB_SETTLEMENT) — 숙소/쇼핑 공용 컬럼 매핑
- * 숙소 정산 VO
- *
- * [5-3 상태 일관화 — 화면 표기]
- * - PAY_STATUS WAIT  → 화면 "지급대기" (지급 전)
- * - PAY_STATUS DONE  → 화면 "지급완료"
- * - SETTLE_STATUS PENDING → 정산마스터 생성됨·아직 지급 전 (내부)
- * - SETTLE_STATUS PAID    → 지급 처리됨 (PAY_STATUS=DONE 과 함께)
- * - REQUEST.STATUS REQUESTED/APPROVED/REJECTED → "요청대기/요청승인/요청거절"
- * - REQUEST_TYPE REGULAR → "월정산(정기)" / ADHOC → "중간정산"
- *
- * 참고 테이블: TB_SETTLEMENT
+ * 화면 표기: PAY_STATUS WAIT 지급대기 / DONE 지급완료, SETTLE_STATUS PENDING 지급 전 / PAID 지급 처리
+ * REQUEST.STATUS REQUESTED/APPROVED/REJECTED → 요청대기/요청승인/요청거절, REQUEST_TYPE REGULAR 월정산 / ADHOC 중간정산
  */
 package com.petcare.petcare.settlement.vo;
 

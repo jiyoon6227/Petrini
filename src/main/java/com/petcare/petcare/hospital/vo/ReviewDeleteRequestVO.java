@@ -1,13 +1,3 @@
-/**
- * 역할: 사업자 리뷰 삭제 요청 데이터 객체
- *
- * 담당 화면
- * - biz/hospital/reviews.jsp   삭제 요청
- *
- * 참고 테이블
- * - TB_REVIEW_DELETE_REQUEST
- */
-
 package com.petcare.petcare.hospital.vo;
 
 import java.util.Date;
@@ -19,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class ReviewDeleteRequestVO {
 
-    // ── TB_REVIEW_DELETE_REQUEST ──────────────────────────────
+    // TB_REVIEW_DELETE_REQUEST
 
     private Long requestId;       // REQUEST_ID — 요청 번호
     private Long reviewId;        // REVIEW_ID — 대상 리뷰 번호
@@ -33,7 +23,7 @@ public class ReviewDeleteRequestVO {
     private Date processDate;     // PROCESS_DATE — 처리일
     private String rejectReason;  // REJECT_REASON — 관리자 반려 사유
 
-    // ── 조회 전용 (LEFT JOIN, 승인 후 리뷰 삭제 시 null 가능) ──
+    // 조회 전용 (LEFT JOIN, 승인 후 리뷰 삭제 시 null 가능)
 
     private String reviewerNickname; // M.NICKNAME — 리뷰 작성자 닉네임
     private Double reviewRating;     // R.RATING — 리뷰 평점

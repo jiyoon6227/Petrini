@@ -1,11 +1,3 @@
-/**
- * 역할: 마이페이지 예약 내역 비즈니스 로직 (interface)
- *
- * 담당 화면
- * - mypage/reserve.jsp         예약 내역 (재능나눔 통합)
- * - mypage/reserve-detail.jsp  예약 상세
- */
-
 package com.petcare.petcare.mypage.reserve.service;
 
 import java.util.List;

@@ -1,14 +1,3 @@
-/**
- * 역할: 사업자 펫호텔 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: BizStayService
- * - 상속: BizBaseController (사업자 로그인 체크)
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.biz.stay.controller;
 
 import java.util.HashMap;
@@ -257,43 +246,28 @@ public class BizStayController extends BizBaseController {
     @GetMapping("/reviews")
     public String stayReviews(HttpSession session, Model model) throws Exception {
 
-    // ═══════════════════════════════════════
-    // ① 로그인 확인
-    // ═══════════════════════════════════════
     MemberVO member = getBizMember(session);
     if (member == null) {
         return "redirect:/login";
     }
 
-    // ═══════════════════════════════════════
-    // ② 이 사업자의 숙소 정보 가져오기
-    // ═══════════════════════════════════════
     StayVO stay = bizStayService.resolveStayByBizId(member.getMemberId());
     if (stay == null || stay.getStayId() == null) {
         return "redirect:/mypage/biz";
     }
 
-    // ═══════════════════════════════════════
-    // ③ DB에서 리뷰 목록 조회
     // TB_REVIEW(STAY) 사업자 숙소 리뷰
-    // ═══════════════════════════════════════
     List<StayReviewVO> reviewList =
             bizStayService.getBizStayReviews(stay.getStayId());
 
-    // ═══════════════════════════════════════
-    // ④ DB에서 삭제 요청 목록 조회
     // TB_REVIEW_DELETE_REQUEST (bizNo 기준)
-    // ═══════════════════════════════════════
     List<ReviewDeleteRequestVO> deleteRequests = List.of();
     if (stay.getBizNo() != null) {
         deleteRequests = bizStayService.getBizReviewDeleteRequests(
                 stay.getStayId(), stay.getBizNo());
     }
 
-    // ═══════════════════════════════════════
-    // ⑤ "삭제 요청 대기 중"인 리뷰 ID 모으기
     // PENDING 건은 답글·삭제요청 버튼 숨김용
-    // ═══════════════════════════════════════
     Set<Long> pendingReviewIds = new HashSet<>();
     for (ReviewDeleteRequestVO dr : deleteRequests) {
         if ("PENDING".equals(dr.getStatusCd()) && dr.getReviewId() != null) {
@@ -301,10 +275,7 @@ public class BizStayController extends BizBaseController {
         }
     }
 
-    // ═══════════════════════════════════════
-    // ⑥ 리뷰 목록 → JSP용 Map 리스트로 변환
     // reviews.jsp var reviews (id/author/date/rating/content/reply/deleteRequestPending)
-    // ═══════════════════════════════════════
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     List<Map<String, Object>> rows = new ArrayList<>();
 
@@ -321,10 +292,7 @@ public class BizStayController extends BizBaseController {
         rows.add(row);
     }
 
-    // ═══════════════════════════════════════
-    // ⑦ 삭제 요청 목록 → JSP용 Map 리스트로 변환
     // reviews.jsp var deleteRequests (statusCd·reqDate·processDate 등)
-    // ═══════════════════════════════════════
     List<Map<String, Object>> deleteRows = new ArrayList<>();
 
     for (ReviewDeleteRequestVO dr : deleteRequests) {
@@ -343,10 +311,7 @@ public class BizStayController extends BizBaseController {
         deleteRows.add(row);
     }
 
-    // ═══════════════════════════════════════
-    // ⑧ JSP에 데이터 넘기고 화면 반환
     // reviewListJson / deleteRequestListJson (ObjectMapper)
-    // ═══════════════════════════════════════
     model.addAttribute("stay", stay);
     model.addAttribute("reviewListJson", objectMapper.writeValueAsString(rows));
     model.addAttribute("deleteRequestListJson", objectMapper.writeValueAsString(deleteRows));
@@ -667,7 +632,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/profile";
     }
 
-    // ── GET: 객실 목록 ──
+    // GET: 객실 목록
     @GetMapping("/rooms")
     public String stayRooms(HttpSession session, Model model) {
         MemberVO member = getBizMember(session);
@@ -682,7 +647,7 @@ public class BizStayController extends BizBaseController {
         return "biz/stay/rooms";
     }
 
-    // ── POST: 객실 등록/수정 ──
+    // POST: 객실 등록/수정
     @PostMapping("/rooms")
     public String saveRoom(StayRoomVO room,
                            HttpSession session,
@@ -710,7 +675,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/rooms";
     }
 
-    // ── POST: 객실 상태 (운영중/운영중지/운영종료) ──
+    // POST: 객실 상태 (운영중/운영중지/운영종료)
     @PostMapping("/rooms/status")
     public String changeRoomStatus(@RequestParam Long roomId,
                                    @RequestParam String statusCd,
@@ -738,7 +703,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/rooms";
     }
     //
-    // ── 쿠폰 신청 목록 ──
+    // 쿠폰 신청 목록
     // BIZ_MEMBER_NO = BIZ_NO
     //
     @GetMapping({"/coupon", "/coupon/"})
@@ -757,7 +722,7 @@ public class BizStayController extends BizBaseController {
         return "biz/stay/coupon";
     }
 
-    // ── 쿠폰 신청 POST ──
+    // 쿠폰 신청 POST
     @PostMapping("/coupon/apply")
     public String applyCoupon(BizCouponVO vo,
                               HttpSession session,
@@ -779,7 +744,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/coupon";
     }
 
-    // ── 쿠폰 수정 POST (PENDING 상태일 때만) ──
+    // 쿠폰 수정 POST (PENDING 상태일 때만)
     @PostMapping("/coupon/update")
     public String updateCoupon(BizCouponVO vo,
                                HttpSession session,
@@ -807,7 +772,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/coupon";
     }
 
-    // ── 쿠폰 삭제 POST (PENDING 상태일 때만) ──
+    // 쿠폰 삭제 POST (PENDING 상태일 때만)
     @PostMapping("/coupon/delete")
     public String deleteCoupon(@RequestParam Long couponId,
                                HttpSession session,
@@ -835,7 +800,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/coupon";
     }
 
-    // ── 쿠폰 조기 마감 POST (store closeCoupon과 동일 패턴) ──
+    // 쿠폰 조기 마감 POST (store closeCoupon과 동일 패턴)
     @PostMapping("/coupon/close")
     public String closeCoupon(@RequestParam Long couponId,
                               HttpSession session,

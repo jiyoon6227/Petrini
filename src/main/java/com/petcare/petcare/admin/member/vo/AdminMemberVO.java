@@ -1,12 +1,3 @@
-/**
- * 역할: 관리자 회원 목록·상세 데이터 객체
- *
- * 참고 테이블
- * - TB_MEMBER, TB_BUSINESS
- * - TB_ORDER, TB_RESERVATION, TB_POST, TB_POST_REPORT
- * - TB_MEMBER_COUPON, TB_FAVORITE, TB_PET, TB_POINT
- */
-
 package com.petcare.petcare.admin.member.vo;
 
 import java.time.LocalDateTime;
@@ -18,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class AdminMemberVO {
 
-    // ── TB_MEMBER 컬럼 ──────────────────────────────────────
+    // TB_MEMBER 컬럼
 
     private Long memberNo;              // MEMBER_NO — 회원 번호 (PK)
     private String memberName;          // MEMBER_NAME — 이름
@@ -35,11 +26,11 @@ public class AdminMemberVO {
     private LocalDateTime lastLoginDate;  // LAST_LOGIN_DATE — 최근 로그인
     private LocalDateTime suspendEndDate; // SUSPEND_END_DATE — 기간 정지 종료일 (NULL=영구)
 
-    // ── 조회 전용 (JOIN·계산) ───────────────────────────────
+    // 조회 전용 (JOIN·계산)
 
     private String roleType;            // (계산) — GENERAL(일반) / BIZ(사업자)
 
-    // ── 관리자 상세 활동 현황 ─────────────
+    // 관리자 상세 활동 현황
 
     private Integer orderCount;          // (집계) — 총 주문 수
     private Long totalPayAmount;         // (집계) — 총 결제 금액
@@ -52,12 +43,12 @@ public class AdminMemberVO {
     private Integer petCount;            // (집계) — 등록 반려동물 수
     private String petNames;             // (집계) — 반려동물 이름 (쉼표 구분)
 
-    // ── 관리자 상세 포인트 요약 ──────────
+    // 관리자 상세 포인트 요약
 
     private Integer totalEarnPoint;    // (집계) — 총 적립 (TB_POINT EARN 합계)
     private Integer totalUsePoint;       // (집계) — 총 사용 (TB_POINT USE 합계)
 
-    // ── 활동 누적 ─────────────────────────────
+    // 활동 누적
 
     private int posts;                   // POST_COUNT — 게시글 수 (TB_MEMBER)
     private int comments;                // COMMENT_COUNT — 댓글 수 (TB_MEMBER)

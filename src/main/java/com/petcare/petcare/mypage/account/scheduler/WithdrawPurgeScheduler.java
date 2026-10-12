@@ -1,14 +1,4 @@
-/**
- * 역할: 탈퇴 7일 경과 회원 개인정보 자동 삭제 (스케줄)
- *
- * - 매일 자정(00:00) 실행
- * - STATUS_CD = 'WITHDRAWN' 이고 JOIN_DATE + 7일 경과 회원 대상
- * - 개인정보 익명화 + 관련 테이블 삭제
- *
- * 연결
- * - MypageAccountService.purgeExpiredWithdrawnMembers()
- * - PetcareApplication @EnableScheduling
- */
+/** 탈퇴일(WITHDRAW_DATE) 7일 경과 회원 개인정보 익명화 + 관련 테이블 삭제 */
 
 package com.petcare.petcare.mypage.account.scheduler;
 

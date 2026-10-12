@@ -1,9 +1,3 @@
-/**
- * 역할: 배너 공통 상수
- *
- * - POSITION_CD별 최대 노출 수 (MAX_PER_POSITION)
- * - 관리자 배너 관리 대분류 카테고리 (main/stay/store/hospital)
- */
 package com.petcare.petcare.main.banner;
 
 public final class BannerConstants {

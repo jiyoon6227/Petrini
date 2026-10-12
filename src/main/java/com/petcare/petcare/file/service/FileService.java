@@ -36,10 +36,9 @@ public class FileService {
     @Transactional
     public FileVO uploadFile(MultipartFile file, String refType, Long refId) throws Exception {
 
-        // 1) 저장 경로: hospital/3/
         String subDir = refType.toLowerCase() + "/" + refId;
 
-        // 2) 파일명 중복 방지: UUID + 원본 확장자
+        // 파일명 중복 방지: UUID + 원본 확장자
         String originName = file.getOriginalFilename();
         String ext = "";
         if (originName != null && originName.contains(".")) {
@@ -75,7 +74,7 @@ public class FileService {
             //#endregion
         }
 
-        // 3) DB INSERT (selectKey로 fileId가 VO에 자동 세팅됨)
+        // selectKey로 fileId가 VO에 세팅됨
         FileVO vo = new FileVO();
         vo.setRefType(refType);
         vo.setRefId(refId);
@@ -90,7 +89,6 @@ public class FileService {
     @Transactional
     public void deleteFile(Long fileId) throws Exception {
 
-        // 1) DB에서 경로 조회
         FileVO file = fileMapper.selectFile(fileId);
         if (file == null) {
             return;
@@ -113,7 +111,6 @@ public class FileService {
             //#endregion
         }
 
-        // 2) DB 삭제
         fileMapper.deleteFile(fileId);
     }
 

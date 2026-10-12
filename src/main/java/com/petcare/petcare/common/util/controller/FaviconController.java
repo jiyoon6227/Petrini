@@ -1,12 +1,3 @@
-/**
- * 역할: favicon.ico 정적 리소스 제공
- *
- * 연결
- * - 리소스: classpath:static/favicon.svg
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
 package com.petcare.petcare.common.util.controller;
 
 import java.io.IOException;

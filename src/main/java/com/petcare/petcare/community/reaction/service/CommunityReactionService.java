@@ -1,19 +1,3 @@
-/**
- * 역할: 커뮤니티 좋아요 비즈니스 로직 (interface)
- *
- * 담당 화면
- * - community/detail.jsp   좋아요 버튼 Ajax 토글
- *
- * 연결
- * - 구현: CommunityReactionServiceImpl
- * - 호출: CommunityReactionController, CommunityPostController (isLiked)
- * - DB: CommunityReactionMapper, CommunityPostMapper (LIKE_CNT)
- *
- * 참고 테이블
- * - TB_POST_LIKE
- * - TB_POST.LIKE_CNT
- */
-
 package com.petcare.petcare.community.reaction.service;
 
 import com.petcare.petcare.community.reaction.vo.CommunityLikeToggleResult;

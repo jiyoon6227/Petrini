@@ -1,6 +1,3 @@
-/**
- * 역할: 관리자 숙소 관리 DB
- */
 package com.petcare.petcare.admin.stay.mapper;
 
 import java.util.List;

@@ -1,20 +1,6 @@
 /**
- * 역할: FAQ(자주 묻는 질문) 데이터 객체
- *
- * - FAQ CMS (관리자 등록 · 회원 고객센터 노출)
- *
- * 참고 테이블
- * - TB_FAQ
- *
- * [CATEGORY_CD]
- * - SERVICE  서비스
- * - ORDER    주문/배송
- * - MEMBER   회원
- * - RESERVE  예약
- *
- * [VISIBLE_YN]
- * - Y  노출
- * - N  숨김
+ * CATEGORY_CD: SERVICE 서비스 / ORDER 주문·배송 / MEMBER 회원 / RESERVE 예약
+ * VISIBLE_YN: Y 노출 / N 숨김
  */
 
 package com.petcare.petcare.admin.cms.vo;
@@ -28,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class FaqVO {
 
-    // ── TB_FAQ 컬럼 ──────────────────────────────────────────────
+    // TB_FAQ 컬럼
 
     private Long faqId;           // FAQ_ID — FAQ 번호 (PK)
     private String categoryCd;    // CATEGORY_CD — 카테고리 (SERVICE/ORDER/MEMBER/RESERVE)

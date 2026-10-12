@@ -13,21 +13,21 @@
 	/* 전체 래퍼 — 섹션 사이 간격 20px */
 	.info-wrap{display:flex;flex-direction:column;gap:20px}
 	
-	/* ── 상단 히어로 배너 ── */
+	/* 상단 히어로 배너 */
 	.info-hero{background:linear-gradient(135deg,#1F8464 0%,#2BAB82 100%);border-radius:12px;padding:28px 32px;color:#fff;display:flex;align-items:center;gap:20px}
 	.info-hero-icon{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 	.info-hero-icon svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 	.info-hero h2{font-size:20px;font-weight:800;margin:0 0 6px}
 	.info-hero p{font-size:13px;opacity:.85;margin:0;line-height:1.6}
 	
-	/* ── 흰색 섹션 카드 ── */
+	/* 흰색 섹션 카드 */
 	.info-section{background:#fff;border:1px solid #E4E6ED;border-radius:12px;padding:24px}
 	
 	/* 섹션 제목 — 하단 구분선 포함 */
 	.info-stitle{font-size:14px;font-weight:800;color:#1A1A2E;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid #E4E6ED;display:flex;align-items:center;gap:8px}
 	.info-stitle svg{width:16px;height:16px;stroke:#2BAB82;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 	
-	/* ── 폼 그리드 (2열) ── */
+	/* 폼 그리드 (2열) */
 	.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 	.info-group{display:flex;flex-direction:column;gap:6px}
 	.info-group.full{grid-column:1/-1}                     /* 한 줄 전체 차지 */
@@ -47,9 +47,7 @@
 	.btn-addr{padding:10px 16px;border:none;border-radius:8px;background:#2BAB82;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
 	.btn-addr:hover{background:#1F8464}
 	
-	/* ═══════════════════════════════════
-	운영시간 테이블
-	═══════════════════════════════════ */
+	/* 운영시간 테이블 */
 	.hours-table{width:100%;border-collapse:collapse}
 	.hours-table th{font-size:12px;font-weight:700;color:#999;text-align:left;padding:8px;border-bottom:1px solid #E4E6ED}
 	.hours-table td{padding:8px;border-bottom:1px solid #E4E6ED;vertical-align:middle}
@@ -82,18 +80,14 @@
 	.row-off .hours-day{opacity:.35}
 	.row-off .hours-time input{opacity:.35;pointer-events:none}
 	
-	/* ═══════════════════════════════════
-	병원 특성 태그
-	═══════════════════════════════════ */
+	/* 병원 특성 태그 */
 	.tag-checks{display:flex;gap:8px;flex-wrap:wrap}
 	.tag-check{display:flex;align-items:center;gap:6px;padding:8px 16px;border:1.5px solid #E4E6ED;border-radius:8px;font-size:13px;font-weight:600;color:#555;cursor:pointer;transition:all .2s}
 	.tag-check:has(input:checked){background:#F0FAF6;border-color:#2BAB82;color:#1F8464}
 	.tag-check input{display:none}
 	.tag-check svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
 	
-	/* ═══════════════════════════════════
-	이미지 업로드
-	═══════════════════════════════════ */
+	/* 이미지 업로드 */
 	.img-upload-area{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 	.img-upload-box{aspect-ratio:1;border:2px dashed #E4E6ED;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;color:#999}
 	.img-upload-box:hover{border-color:#2BAB82;color:#1F8464;background:#F0FAF6}
@@ -111,17 +105,13 @@
 	/* 삭제 마킹된 기존 이미지 — 흐리게 + 클릭 불가 */
 	.img-upload-box.deleted{opacity:.3;pointer-events:none}
 	
-	/* ═══════════════════════════════════
-	하단 버튼
-	═══════════════════════════════════ */
+	/* 하단 버튼 */
 	.info-btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:4px}
 	.btn-info-cancel{padding:11px 24px;border:1px solid #E4E6ED;border-radius:8px;background:#fff;color:#555;font-size:14px;font-weight:600;cursor:pointer}
 	.btn-info-submit{padding:11px 28px;border:none;border-radius:8px;background:#2BAB82;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
 	.btn-info-submit:hover{background:#1F8464}
 	
-	/* ═══════════════════════════════════
-	반응형 — 960px 이하에서 운영시간 카드 전환
-	═══════════════════════════════════ */
+	/* 반응형 — 960px 이하에서 운영시간 카드 전환 */
 	@media (max-width:960px) {
 		.info-hero{padding:22px 20px;gap:16px}
 		.info-hero-icon{width:50px;height:50px;border-radius:12px}
@@ -158,9 +148,7 @@
 	}
 </style>
 
-<!-- ===================================
-     HTML 본문 시작
-     =================================== -->
+<!-- HTML 본문 시작 -->
 <main class="biz-main">
   <div class="biz-page-head">
     <h1 class="biz-page-title">업체 정보 등록/수정</h1>
@@ -183,11 +171,11 @@
       </div>
     </div>
 
-    <!-- ===================================
+    <!--
       폼 시작
       - method="post" : 저장 요청
       - enctype="multipart/form-data" : 파일 업로드 필수
-      =================================== -->
+      -->
     <form name="hospitalInfoForm" method="post" action="${contextPath}/biz/hospital/profile" enctype="multipart/form-data">
 		<input type="hidden" name="_csrf" value="${_csrf}">
 		
@@ -207,11 +195,11 @@
           </div>
         </div>
       </div>
-      <!-- ─────────── 1. 운영 시간 ───────────
+      <!-- 1. 운영 시간
             - 요일별로 토글(ON/OFF) + 시간 입력
             - 토글 OFF = 휴무
             - 저장 시 JS가 JSON으로 변환 → hoursJson 히든필드에 넣음
-          ─────────────────────────────────── -->
+          -->
       <div class="info-section">
           <div class="info-stitle">
             <svg viewBox="0 0 24 24">
@@ -430,11 +418,11 @@
       </div>
 
 
-      <!-- ─────────── 3. 병원 특성 ───────────
+      <!-- 3. 병원 특성
             - name="tags"인 체크박스 → Controller에서 String[]로 받음
             - Controller가 String.join(",", tagsArr) → vo.setTagList()
             - fn:contains로 DB 값과 비교 → checked 복원
-            ─────────────────────────────────── -->
+            -->
       <div class="info-section">
           <div class="info-stitle">
             <svg viewBox="0 0 24 24">
@@ -486,10 +474,10 @@
           </div>
       </div>
 
-      <!-- ─────────── 3-2. 진료 대상 ───────────
+      <!-- 3-2. 진료 대상
             - 병원 특성과 동일하게 name="tagList" → 같은 TAG_LIST 컬럼에 저장
             - hospital/list 검색 필터(진료 대상)에서 사용
-            ─────────────────────────────────── -->
+            -->
       <div class="info-section">
           <div class="info-stitle">
             <svg viewBox="0 0 24 24">
@@ -549,7 +537,7 @@
           <div id="deleteFileArea"></div>
 
           <div class="img-upload-area">
-            <!-- ── A. 기존 이미지 (DB에서 가져온 것) ── -->
+            <!-- A. 기존 이미지 (DB에서 가져온 것) -->
             <c:forEach var="img" items="${imgList}" varStatus="st">
               <div class="img-upload-box ${st.index == 0 ? 'main' : ''}" id="existing-${img.fileId}">
                 <!-- 이미 저장된 이미지 표시 -->
@@ -559,7 +547,7 @@
               </div>
             </c:forEach>
 
-            <!-- ── B. 빈 업로드 슬롯 (최대 4장 - 기존 이미지 수) ── -->
+            <!-- B. 빈 업로드 슬롯 (최대 4장 - 기존 이미지 수) -->
             <c:forEach begin="1" end="${4 - fn:length(imgList)}">
               <div class="img-upload-box" onclick="this.querySelector('input').click()">
                 <svg viewBox="0 0 24 24">
@@ -574,7 +562,7 @@
           </div>
       </div>
 
-      <!-- ─────────── 저장 / 취소 버튼 ─────────── -->
+      <!-- 저장 / 취소 버튼 -->
       <div class="info-btn-row">
             <button type="button" class="btn-info-cancel" onclick="location.href='${contextPath}/biz/hospital'">취소</button>
             <button type="submit" class="btn-info-submit">저장하기</button>
@@ -584,18 +572,15 @@
 </main>
 
 
-<!-- ===================================
+<!--
      JavaScript
      - 주소 검색 API
      - 운영시간 JSON 처리
      - 이미지 미리보기 / 삭제
-     =================================== -->
+     -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
-	/* ===================================
-	   요일 목록 (전역 상수)
-	   - JS 전체에서 이 배열을 순회하며 요일별 처리
-	   =================================== */
+	/* 요일 목록 (전역 상수) - JS 전체에서 이 배열을 순회하며 요일별 처리 */
 	var DAYS = ['월','화','수','목','금','토','일','공휴일'];
 
 	/* 다음 주소 검색 → addr 입력 후 저장 시 서버에서 LAT/LNG 변환 */
@@ -611,13 +596,13 @@
 	}
 
 
-	/* ===================================
-	   [1] 페이지 로딩 시: DB의 hoursJson → 화면에 채우기
+	/*
+	   페이지 로딩 시 DB hoursJson을 화면에 채움
 
 	   DB 예시: {"월":{"open":"09:00","close":"18:00","lunchStart":"12:00","lunchEnd":"13:00"}, ...}
 	   - JSON에 있는 요일 → 토글 ON + 시간 채우기
 	   - JSON에 없는 요일 → 토글 OFF + 시간 비우기 (= 휴무)
-	   =================================== */
+	   */
 	document.addEventListener('DOMContentLoaded', function() {
 
 	    // 히든필드에서 JSON 문자열 가져오기
@@ -669,8 +654,8 @@
 	});
 
 
-	/* ===================================
-	   [2] 저장 버튼 클릭 시: 화면의 시간 → JSON으로 조립 → 히든필드에 넣기
+	/*
+	   저장 시 화면 시간을 JSON으로 조립해 히든필드에 세팅
 
 	   결과 예시:
 	   {
@@ -678,7 +663,7 @@
 	     "토": {"open":"09:00","close":"14:00","lunchStart":"","lunchEnd":""}
 	   }
 	   → 토글 OFF인 요일(일, 공휴일)은 JSON에 안 들어감 = 휴무
-	   =================================== */
+	   */
 	document.querySelector('form[name="hospitalInfoForm"]').addEventListener('submit', function() {
 
 	    var result = {};  // 빈 객체에 요일별로 추가
@@ -708,18 +693,12 @@
 	        };
 	    }
 
-	    // 객체 → JSON 문자열로 변환 → 히든필드에 세팅
 	    document.getElementById('hoursJsonInput').value = JSON.stringify(result);
 	    // 이후 폼이 submit되면서 Controller로 전송됨
 	});
 
 
-	/* ===================================
-	   [3] 요일 토글 ON/OFF
-
-	   - 체크 해제 → 해당 행에 'row-off' 클래스 추가 → CSS가 흐리게 + 입력 비활성화
-	   - 체크 선택 → 'row-off' 제거 → 정상 표시
-	   =================================== */
+	/* 요일 토글 ON/OFF 체크 해제 시 'row-off' 클래스로 흐리게 + 입력 비활성화 */
 	function toggleDay(day, checkbox) {
 	    var row = document.getElementById('row-' + day);
 	    if (checkbox.checked) {
@@ -730,12 +709,12 @@
 	}
 
 
-	/* ===================================
-	   [4] 월요일 시간을 나머지 요일에 복사
+	/*
+	   월요일 시간을 나머지 요일에 복사
 
 	   월요일의 4개 input값(시작, 종료, 점심시작, 점심종료)을
 	   화~공휴일에 그대로 넣고, 토글도 월요일과 같게 맞춤
-	   =================================== */
+	   */
 	function copyMonToAll() {
 	    // 월요일 값 읽기
 	    var monOpen   = document.getElementById('open-월').value;
@@ -756,12 +735,7 @@
 	    }
 	}
 
-	/* ===================================
-	   [6] 새 이미지 미리보기
-
-	   파일 선택 → FileReader로 읽기 → img 태그 생성 → 미리보기 표시
-	   + 삭제(취소) 버튼도 함께 추가
-	   =================================== */
+	/* 새 이미지 미리보기 + 삭제(취소) 버튼도 함께 추가 */
 	function previewImg(input) {
 	    // 파일이 선택 안 됐으면 무시
 	    if (!input.files || !input.files[0]) return;
@@ -805,12 +779,12 @@
 	}
 
 
-	/* ===================================
-	   [7] 기존 이미지 삭제 표시
+	/*
+	   기존 이미지 삭제 표시
 
 	   실제로 지우는 건 아니고, "삭제할 파일 ID"를 hidden input에 기록만 함
 	   → 폼 submit 시 Controller가 deleteFileIds로 받아서 DB+물리파일 삭제
-	   =================================== */
+	   */
 	function markDelete(fileId, btn) {
 	    // 이미지 박스를 흐리게 + 클릭 불가 처리
 	    var box = btn.closest('.img-upload-box');
@@ -825,11 +799,7 @@
 	}
 
 
-	/* ===================================
-	   [8] 새 이미지 업로드 취소 (빈 슬롯으로 복원)
-
-	   미리보기, 삭제버튼 제거 → file input 초기화 → + 아이콘 다시 표시
-	   =================================== */
+	/* 새 이미지 업로드 취소 (빈 슬롯으로 복원) */
 	function resetUploadBox(box) {
 	    // 미리보기 이미지 제거
 	    var preview = box.querySelector('.img-preview');

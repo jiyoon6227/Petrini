@@ -1,7 +1,3 @@
-<%--
-  역할: 관리자 스케줄러 수동 실행 (QA)
-  ADMIN + csrfFetch
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

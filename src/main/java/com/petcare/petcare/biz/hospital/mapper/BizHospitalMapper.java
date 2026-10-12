@@ -1,23 +1,3 @@
-/**
- * 역할: 사업자 동물병원 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/biz/hospital/BizHospitalMapper.xml
- * namespace: com.petcare.petcare.biz.hospital.mapper.BizHospitalMapper
- *
- * 쿼리 예시
- * - selectReservationList
- * - updateReservationStatus
- * - selectMedicalRecords
- *
- * 참고 테이블
- * - TB_RESERVATION
- * - TB_MEDICAL_RECORD
- * - TB_REVIEW
- *
- * SQL은 XML에만 작성 (@Select 등 어노테이션 사용 X)
- * 메서드명은 Service에서 호출하는 이름과 동일하게
- */
-
 package com.petcare.petcare.biz.hospital.mapper;
 
 import java.util.List;
@@ -135,7 +115,7 @@ public interface BizHospitalMapper {
     int deleteResvException(@Param("hospitalId") Long hospitalId,
                             @Param("excId") Long excId) throws Exception;
 
-   // ── 대시보드 집계 ──
+   // 대시보드 집계
    int countResvByDate(@Param("targetId") Long targetId, @Param("dt") String dt);
    int countCancelByDate(@Param("targetId") Long targetId, @Param("dt") String dt);
    int countDoneByDate(@Param("targetId") Long targetId, @Param("dt") String dt);

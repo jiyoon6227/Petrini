@@ -1,6 +1,3 @@
-/**
- * 역할: 관리자 숙소 환불 신청 URL (2-7)
- */
 package com.petcare.petcare.admin.inquiry.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;

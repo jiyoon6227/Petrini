@@ -82,7 +82,7 @@
     </div>
   </div>
 
-  <%-- ═══ 진료유형 ═══ --%>
+  <%-- 진료유형 --%>
   <div class="sch-panel on" id="panelTreat">
     <div class="biz-card">
       <div class="sch-head-row">
@@ -105,7 +105,7 @@
     </div>
   </div>
 
-  <%-- ═══ 의사 ═══ --%>
+  <%-- 의사 --%>
   <div class="sch-panel" id="panelDoctor">
     <div class="biz-card">
       <div class="sch-head-row">
@@ -128,7 +128,7 @@
     </div>
   </div>
 
-  <%-- ═══ 예약간격 (병원 RESV_INTERVAL_MIN) ═══ --%>
+  <%-- 예약간격 (병원 RESV_INTERVAL_MIN) --%>
   <div class="sch-panel" id="panelInterval">
     <div class="biz-card">
       <div class="sch-head-row">
@@ -150,7 +150,7 @@
     </div>
   </div>
 
-  <%-- ═══ 예약예외 ═══ --%>
+  <%-- 예약예외 --%>
   <div class="sch-panel" id="panelException">
     <p class="sch-hint" style="padding:0 0 12px">특정일만 미리 규칙을 덮어씁니다. CLOSE=그날 그 구간 불가, REPLACE=그날 그 구간만 오픈.</p>
     <div class="sch-exc-layout">

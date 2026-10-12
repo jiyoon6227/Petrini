@@ -1,22 +1,3 @@
-/**
- * 역할: 재능나눔 비즈니스 로직 (interface)
- *
- * - 참여 신청·확인·마감·알림·이미지·예약내역 연동
- *
- * 담당 화면
- * - give/talent/list.jsp        사용자 재능나눔 목록 (APPROVED)
- * - give/talent/detail.jsp      사용자 재능나눔 상세
- * - admin/biz/talent.jsp        관리자 승인·반려
- * - biz/hospital/talent.jsp     사업자 재능나눔 신청 (병원만 DB 연동)
- *
- * 연결
- * - 구현: GiveTalentServiceImpl
- * - DB: GiveTalentMapper
- *
- * 참고 테이블
- * - TB_TALENT (STATUS: PENDING / APPROVED / REJECTED / DONE)
- */
-
 package com.petcare.petcare.give.talent.service;
 
 import java.util.List;
@@ -29,7 +10,7 @@ import com.petcare.petcare.give.talent.vo.GiveTalentVO;
 
 public interface GiveTalentService {
 
-    // ── 사용자 목록·상세 ─────────────────────────────
+    // 사용자 목록·상세
 
     List<GiveTalentVO> getApprovedTalentList(String talentType);
 
@@ -37,7 +18,7 @@ public interface GiveTalentService {
 
     GiveTalentVO getTalentDetail(long talentId);
 
-    // ── 관리자 승인 화면 ─────────────────────────────
+    // 관리자 승인 화면
 
     List<GiveTalentVO> getTalentListByStatus(String statusCd);
 
@@ -49,7 +30,7 @@ public interface GiveTalentService {
 
     void completeTalent(long talentId, long adminNo);
 
-    // ── 사업자 신청 ( — 병원) ───────────────────
+    // 사업자 신청 (병원)
 
     /** 사업자 재능나눔 신청 — TB_TALENT INSERT + 대표 이미지(선택) */
     void applyTalent(String bizId, GiveTalentVO vo, MultipartFile thumbImage);
@@ -57,7 +38,7 @@ public interface GiveTalentService {
     /** 사업자 본인 재능나눔 이력 — biz/hospital/talent.jsp 하단 테이블 */
     List<GiveTalentVO> getTalentListByBizId(String bizId);
 
-    // ── 일반 회원 참여 신청  ───────────────────
+    // 일반 회원 참여 신청
 
     /** 모집 중인지 (APPROVED + 인원 여유 + DONE 아님) */
     boolean isRecruitmentOpen(GiveTalentVO talent);
@@ -71,7 +52,7 @@ public interface GiveTalentService {
     /** 상세 화면 — 내 신청 1건 (없으면 null) */
     GiveTalentApplyVO getMyApply(long talentId, long memberNo);
 
-    // ── 병원 사업자 신청자 확인  ─────────────
+    // 병원 사업자 신청자 확인
 
     /** 병원 — 내 글에 달린 신청 전체 */
     List<GiveTalentApplyVO> getAppliesByBizId(String bizId);

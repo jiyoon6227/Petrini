@@ -1,18 +1,3 @@
-/**
- * 역할: BizStayService 구현체 (@Service)
- *
- * 구현 내용
- * - Controller에서 넘어온 요청 처리
- * - Mapper 호출하여 DB 조회·수정
- * - 비즈니스 규칙 검증 및 결과 반환
- *
- * 연결
- * - implements: BizStayService
- * - 사용: BizStayMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- */
-
 package com.petcare.petcare.biz.stay.service;
 
 import java.util.ArrayList;
@@ -119,7 +104,7 @@ public class BizStayServiceImpl implements BizStayService {
         bizStayMapper.updateStayProfile(vo);
     }
 
-    // ── 객실 관리 ──
+    // 객실 관리
     @Override
     public List<StayRoomVO> getRoomList(Long stayId) {
         return bizStayMapper.selectRoomList(stayId);
@@ -184,7 +169,7 @@ public class BizStayServiceImpl implements BizStayService {
         }
     }
 
-    // ── 예약 관리 ──
+    // 예약 관리
 
     @Override
     @Transactional(readOnly = true)
@@ -376,8 +361,8 @@ public class BizStayServiceImpl implements BizStayService {
 
     /**
      * 병원/숙소 쿠폰 조기 마감 (BizStoreServiceImpl.closeCoupon과 동일 패턴)
-     * 관리자 재승인 없이 사업자가 직접 마감한다.
-     * 기존에 발급된 회원 쿠폰은 변경하지 않는다.
+     * 관리자 재승인 없이 사업자가 직접 마감
+     * 기존에 발급된 회원 쿠폰은 변경 없음
      */
     @Override
     public void closeCoupon(Long bizNo, Long couponId) {
@@ -425,7 +410,7 @@ public class BizStayServiceImpl implements BizStayService {
         return result;
     }
 
-    // ── 사업자: 배너 신청 (INSERT + 이미지 업로드) ──
+    // 사업자: 배너 신청 (INSERT + 이미지 업로드)
     @Override
     @Transactional
     public void applyBanner(MainBannerVO banner, MultipartFile image) throws Exception {
@@ -574,7 +559,7 @@ public class BizStayServiceImpl implements BizStayService {
         return bizStayMapper.selectBizReviewDeleteRequests(stayId, bizNo);
     }
 
-    // ── 대시보드 ──
+    // 대시보드
 
     @Override
     public BizDashboardVO getDashboardData(Long stayId, int chartDays) throws Exception {

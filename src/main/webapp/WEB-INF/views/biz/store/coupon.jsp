@@ -1,17 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 사업자 쿠폰 승인신청 화면 (biz/store/coupon)
-
-  [화면 흐름]
-  1. GET /biz/store/coupon → 본인 쿠폰 목록 표시
-  2. 신규 신청 모달 → POST /biz/store/coupon/apply (PENDING)
-  3. PENDING 쿠폰 수정/삭제 가능
-  4. 관리자 승인 후 사용자 이벤트/쿠폰 게시판 노출
-  validateForm 빈 숫자칸 제거 + Controller @InitBinder (Integer 바인딩 오류 방지)
-
-  [model]
-  - couponList, msg, errorMsg
---%>
+<%-- 빈 숫자칸은 전송 안 함 (Controller @InitBinder와 함께 Integer 바인딩 오류 방지) --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -22,7 +10,7 @@
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
 <style>
-    /* ── 쿠폰 카드 그리드 ── */
+    /* 쿠폰 카드 그리드 */
     .cpn-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px; }
 
     .cpn-card {
@@ -73,7 +61,7 @@
         font-size:12px; color:#DC2626; flex:1;
     }
 
-    /* ── 버튼 ── */
+    /* 버튼 */
     .cpn-btn {
         border:none; border-radius:6px; padding:7px 16px; font-size:13px;
         font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s;
@@ -85,7 +73,7 @@
     .cpn-btn.red     { background:#FEE2E2; color:#DC2626; }
     .cpn-btn.red:hover { background:#FECACA; }
 
-    /* ── 모달 ── */
+    /* 모달 */
     .cpn-modal-overlay {
         display:none; position:fixed; inset:0; background:rgba(0,0,0,.45);
         z-index:1000; justify-content:center; align-items:center;
@@ -122,7 +110,7 @@
         padding:16px 24px; border-top:1px solid #E4E6ED;
     }
 
-    /* ── 예산 프로그레스 ── */
+    /* 예산 프로그레스 */
     .cpn-progress-bar {
         background:#F1F3F7; border-radius:4px; height:6px; margin-top:6px; overflow:hidden;
     }
@@ -130,7 +118,7 @@
         height:100%; border-radius:4px; background:#3B5BDB; transition:width .3s;
     }
 
-    /* ── 빈 상태 ── */
+    /* 빈 상태 */
     .cpn-empty {
         text-align:center; color:#999; padding:60px 0;
     }

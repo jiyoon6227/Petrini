@@ -1,18 +1,4 @@
-/**
- * 토스 빌링 카드등록 Controller
- *
- * URL
- * - GET  /billing/card/prepare  : Ajax — clientKey·customerKey·콜백 URL 발급
- * - GET  /billing/card/success  : 토스 성공 리다이렉트 → 빌링키 발급·DB(또는 세션) 저장
- * - GET  /billing/card/fail     : 토스 실패 리다이렉트 → 원래 화면 + 알림
- * - GET  /billing/card/list     : Ajax — 활성 카드 목록 (billingKey 제외)
- * - POST /billing/card/delete   : Ajax — 논리삭제
- *
- * 흐름 요약 (공부용)
- * 1) 화면 JS → prepare → TossPayments.requestBillingAuth (토스 카드등록 창)
- * 2) 토스 → success?authKey&customerKey
- * 3) 서버 issueBillingKey → TB_BILLING_CARD (가입 중이면 세션 pending)
- */
+/** 토스 카드등록: prepare → TossPayments.requestBillingAuth → success 콜백에서 서버가 빌링키 발급 (가입 중이면 세션 pending) */
 package com.petcare.petcare.common.billing.controller;
 
 import java.net.URLEncoder;
@@ -110,7 +96,6 @@ public class BillingCardController {
 
     /**
      * 토스 성공 콜백
-     * 쿼리: authKey, customerKey → 빌링키 발급 API → DB/세션 저장 → returnPath 복귀
      */
     @GetMapping("/success")
     public String success(
@@ -267,7 +252,7 @@ public class BillingCardController {
         return res;
     }
 
-    // ── helpers ──
+    // helpers
 
     private OwnerContext resolveOwner(HttpSession session, String returnPath) {
         OwnerContext loggedIn = resolveLoggedInOwner(session);

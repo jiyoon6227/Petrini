@@ -13,13 +13,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @RequestMapping("/studio")
 public class StudioController {
 
-    // ── 사진관 목록 ─────────────────────────────────────────
+    // 사진관 목록
     @GetMapping({"", "/"})
     public String list(Model model) throws JsonMappingException, JsonProcessingException {
         return "studio/list";
     }
 
-    // ── 사진관 상세 ─────────────────────────────────────────
+    // 사진관 상세
     @GetMapping("/detail")
     public String detail(@RequestParam(defaultValue = "1") String id, Model model) {
         model.addAttribute("id", id);
@@ -27,14 +27,14 @@ public class StudioController {
         return "studio/detail";
     }
 
-    // ── 촬영 예약 ───────────────────────────────────────────
+    // 촬영 예약
     @GetMapping("/reserve")
     public String reserve(@RequestParam(defaultValue = "1") String id, Model model) {
         model.addAttribute("id", id);
         return "studio/reserve";
     }
 
-    // ── 예약 완료 ───────────────────────────────────────────
+    // 예약 완료
     @GetMapping("/complete")
     public String complete() {
         return "studio/complete";

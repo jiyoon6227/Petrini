@@ -3,34 +3,12 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.admin.cms.mapper.AdminCMSMapper">
 
-<!--
-  역할: AdminCMSMapper SQL 정의
-
-  쿼리 id 예시
-  - selectBannerList
-  - insertBanner
-  - updateBanner
-  - deleteBanner
-  - selectNoticeList
-  - insertNotice
-  - updateNotice
-  - deleteNotice
-  - selectFaqList
-  - insertFaq
-  - updateFaq
-  - deleteFaq
-
-  테이블
-  - TB_BANNER
-  - TB_NOTICE
-  - TB_FAQ
--->
     <!-- 이미지 JOIN을 FILE_ID로 -->
     <sql id="bannerImageJoin">
         LEFT JOIN TB_FILE f ON f.FILE_ID = b.FILE_ID
     </sql>
     
-    <!-- ─── 관리자: 전체 배너 목록 (PENDING 우선) ─── -->
+    <!-- 관리자: 전체 배너 목록 (PENDING 우선) -->
     <!-- DATE → TO_CHAR, 이미지 JOIN REF_ID=BIZ_NO -->
     <select id="selectAllBannerList" resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">
         SELECT
@@ -53,12 +31,12 @@
                     b.REG_DATE DESC
     </select>
 
-    <!-- ─── 관리자: PENDING 건수 (사이드바 배지용) ─── -->
+    <!-- 관리자: PENDING 건수 (사이드바 배지용) -->
     <select id="selectPendingBannerCount" resultType="int">
         SELECT COUNT(*) FROM TB_BANNER WHERE STATUS_CD = 'PENDING'
     </select>
 
-    <!-- ─── 관리자: 상태 변경 (승인/반려) ─── -->
+    <!-- 관리자: 상태 변경 (승인/반려) -->
     <update id="updateBannerStatus" parameterType="com.petcare.petcare.main.banner.vo.MainBannerVO">
         UPDATE  TB_BANNER
         SET     STATUS_CD = #{statusCd},
@@ -67,7 +45,7 @@
         WHERE   BANNER_ID = #{bannerId}
     </update>
 
-    <!-- ─── 관리자: 배너 1건 (승인 알림용) ─── -->
+    <!-- 관리자: 배너 1건 (승인 알림용) -->
     <select id="selectBannerById" parameterType="long"
             resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">
         SELECT
@@ -83,7 +61,7 @@
         WHERE   b.BANNER_ID = #{bannerId}
     </select>
 
-    <!-- ─── 관리자: 배너 상세 ─── -->
+    <!-- 관리자: 배너 상세 -->
     <!-- b.FILE_ID AS fileId SELECT -->
     <select id="selectBannerDetail" parameterType="long"
             resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">

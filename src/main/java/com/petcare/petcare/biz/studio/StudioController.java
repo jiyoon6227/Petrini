@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller("bizStudioController")
 @RequestMapping("/biz/studio")
 public class StudioController extends BizBaseController {
-    // ── 쇼핑몰 (store) ─────────────────────────────────────────
+    // 쇼핑몰 (store)
     @GetMapping({"", "/"})
     public String studioDashboard(HttpSession session) {
         if (getBizMember(session) == null) 

@@ -1,12 +1,4 @@
-/**
- * 역할: 제보 첨부 사진 데이터 객체
- *
- * - 로컬 사진 업로드 (구글드라이브는 추후)
- *
- * 참고 테이블: TB_FILE
- * DRIVE_FILE_ID = 'LOCAL' (로컬 저장)
- * FILE_URL 예: /upload/give/report/{postId}/{uuid}.jpg
- */
+/** DRIVE_FILE_ID = 'LOCAL' (로컬 저장), FILE_URL 예: /upload/give/report/{postId}/{uuid}.jpg */
 
 package com.petcare.petcare.give.report.vo;
 

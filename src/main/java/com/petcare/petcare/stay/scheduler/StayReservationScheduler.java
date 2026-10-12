@@ -1,8 +1,4 @@
-/**
- * 역할: 숙소 예약 자동 DONE 스케줄러
- * CHECKOUT + 체크아웃일 경과 → DONE (하루 1회 의미, 감지 주기 1분)
- * DONE 전환 시 회원 알림
- */
+/** CHECKOUT 후 체크아웃일이 지나면 DONE (감지 주기 1분), 전환 시 회원 알림 */
 package com.petcare.petcare.stay.scheduler;
 
 import java.util.List;

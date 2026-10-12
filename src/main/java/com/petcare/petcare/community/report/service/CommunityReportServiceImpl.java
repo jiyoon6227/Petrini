@@ -1,12 +1,3 @@
-/**
- * 역할: CommunityReportService 구현체 (@Service)
- *
- * [insertPostReport]
- * 1. 로그인·사유 검증
- * 2. 본인 글 신고 불가 / 중복 대기 신고 불가
- * 3. TB_POST_REPORT INSERT (STATUS_CD = PENDING)
- */
-
 package com.petcare.petcare.community.report.service;
 
 import org.springframework.stereotype.Service;

@@ -2,19 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-  <!--
-  역할: StayStayMapper SQL 정의
-
-  쿼리 id 예시
-  - selectStayList
-  - selectStayDetail
-  - insertReservation
-
-  테이블
-  - TB_STAY
-  - TB_RESERVATION
--->
-
 <mapper namespace="com.petcare.petcare.stay.mapper.StayMapper">
     <!-- 숙소 목록 (최저가 + 객실수 포함) -->
     <select id="selectStayList" resultType="com.petcare.petcare.stay.vo.StayVO">

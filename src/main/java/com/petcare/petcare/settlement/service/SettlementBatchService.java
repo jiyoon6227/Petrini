@@ -1,10 +1,6 @@
 /**
- * 역할: 정산 배치 (월정산 생성 · 15일 더미 자동지급) — 숙소/쇼핑 공용
- *
- * 규칙
- * - 월정산: REQUEST_TYPE=REGULAR, 전월 1일~말일, 사업자당 월 1건
- * - 중간정산으로 이미 ITEM 잡힌 건은 엔진 NOT EXISTS 로 제외
- * - 15일 지급: PAY_STATUS=WAIT 만 더미 DONE (FAIL은 관리자 수동입금)
+ * 월정산: REQUEST_TYPE=REGULAR, 전월 1일~말일, 사업자당 월 1건 (중간정산 ITEM은 NOT EXISTS로 제외)
+ * 15일 지급: PAY_STATUS=WAIT만 더미 DONE (FAIL은 관리자 수동입금)
  */
 package com.petcare.petcare.settlement.service;
 

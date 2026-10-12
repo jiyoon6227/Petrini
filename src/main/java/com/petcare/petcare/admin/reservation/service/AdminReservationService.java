@@ -1,6 +1,3 @@
-/**
- * 역할: 관리자 숙소 예약 관리 Service
- */
 package com.petcare.petcare.admin.reservation.service;
 
 import java.util.List;

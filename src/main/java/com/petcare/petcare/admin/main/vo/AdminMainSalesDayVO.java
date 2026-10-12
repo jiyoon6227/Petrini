@@ -1,13 +1,4 @@
-/**
- * 역할: 대시보드·통계 차트 1일치(1구간) 데이터
- *
- * - salesChart (대시보드)
- * - stats 차트 재사용
- *
- * dayLabel / salesAmount 는 화면별로 의미가 달라짐
- * - 대시보드: 요일·일별 매출(원)
- * - 통계: 월·구분·건수 등 (Service/JSP에서 단위 변환)
- */
+/** dayLabel·salesAmount는 화면별 의미가 다름 (대시보드: 요일·일별 매출(원), 통계: 월·구분·건수) */
 
 package com.petcare.petcare.admin.main.vo;
 

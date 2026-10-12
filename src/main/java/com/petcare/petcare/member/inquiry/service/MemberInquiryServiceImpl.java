@@ -1,7 +1,3 @@
-/**
- * 역할: 1:1 문의 Service
- * TB_INQUIRY 연동 + 숙소 환불신청
- */
 package com.petcare.petcare.member.inquiry.service;
 
 import java.time.LocalDateTime;

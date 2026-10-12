@@ -1,16 +1,3 @@
-/**
- * 역할: 관리자 리뷰 삭제 요청 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/admin/review/AdminReviewMapper.xml
- * namespace: com.petcare.petcare.admin.review.mapper.AdminReviewMapper
- *
- * 참고 테이블
- * - TB_REVIEW_DELETE_REQUEST
- * - TB_REVIEW, TB_HOSPITAL, TB_BUSINESS, TB_MEMBER (JOIN)
- *
- * SQL은 XML에만 작성 (@Select 등 어노테이션 사용 X)
- */
-
 package com.petcare.petcare.admin.review.mapper;
 
 import java.util.List;

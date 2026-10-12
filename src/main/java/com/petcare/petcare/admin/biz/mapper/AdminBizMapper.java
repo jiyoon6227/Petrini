@@ -1,9 +1,3 @@
-/**
- * 역할: 관리자 사업자 관리 DB 접근 (MyBatis interface)
- *
- * XML: resources/mybatis/mapper/admin/biz/AdminBizMapper.xml
- */
-
 package com.petcare.petcare.admin.biz.mapper;
 
 import java.util.List;

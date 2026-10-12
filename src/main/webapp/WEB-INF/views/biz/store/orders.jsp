@@ -8,19 +8,15 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%--
-     Controller: BizStoreController.storeOrders() / getOrderDetailJson() / updateOrderStatus()
-     Service: BizStoreService.getOrderList / getOrderDetail / updateOrderStatus
-     화면 레이아웃(CSS, HTML 뼈대)은 원본 그대로 유지, 데이터 표시/저장 로직만 실데이터로 교체 --%>
 <style>
-  /* =========================================================
+  /*
      주문관리 상세 화면 UI 개선
      - 기존 데이터/JS 로직은 그대로 유지
      - 목록/상세 카드 폭 확장
      - 주문정보/배송정보 2열
      - 주문상품/결제금액 2열
      - 반응형 대응
-     ========================================================= */
+     */
 
   /* 이 페이지 전용 전체 폭 */
   .order-page-wrap{

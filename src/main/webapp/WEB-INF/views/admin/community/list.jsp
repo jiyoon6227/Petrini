@@ -1,8 +1,3 @@
-<%--
-  - GET /admin/community/list → ${list}, ${totalCount}
-  - POST 숨김·삭제·복구 (상태별 버튼 분기)
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

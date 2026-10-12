@@ -1,15 +1,3 @@
-/**
- * 역할: 마이페이지 예약·재능나눔 신청 통합 표시용 VO
- *
- * - 재능나눔 참여 신청 필드 (예약내역 통합)
- * - TB_RESERVATION 병원·숙소 예약 필드
- *
- * 참고 테이블
- * - TB_RESERVATION
- * - TB_HOSPITAL, TB_STAY, TB_PET
- * - TB_TALENT_APPLY, TB_TALENT, TB_BUSINESS (재능나눔)
- */
-
 package com.petcare.petcare.mypage.reserve.vo;
 
 import java.util.Date;
@@ -21,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class MypageReserveVO {
 
-    // ── TB_RESERVATION 컬럼 ────────────────────────────────────
+    // TB_RESERVATION 컬럼
 
     private Long resvId;            // RESV_ID — 예약 번호 (PK)
     private String resvNo;          // RESV_NO — 예약번호 (화면 표시용)
@@ -39,18 +27,18 @@ public class MypageReserveVO {
     private String rejectReason;    // REJECT_REASON — 취소·거절 사유
     private Date regDate;           // REG_DATE — 등록일
 
-    // ── 조회 전용 (TB_PET JOIN) ─────────────────────────────────
+    // 조회 전용 (TB_PET JOIN)
 
     private String petName;         // PET_NAME — 반려동물 이름
     private String petSpecies;      // SPECIES — 종 (DOG/CAT 등)
     private String petBreed;        // BREED — 품종
 
-    // ── 조회 전용 (TB_HOSPITAL JOIN) ────────────────────────────
+    // 조회 전용 (TB_HOSPITAL JOIN)
 
     private String hospitalName;    // NAME — 병원명
     private String hospitalAddr;    // ADDR — 병원 주소
 
-    // ── 조회 전용 (병원 예약 고도화) ───────
+    // 조회 전용 (병원 예약 고도화)
 
     private Long doctorId;          // DOCTOR_ID — 담당 수의사 FK
     private Long treatTypeId;       // TREAT_TYPE_ID — 진료 유형 FK
@@ -60,7 +48,7 @@ public class MypageReserveVO {
     private String treatTypeName;   // TYPE_NAME — 진료 유형명 (JOIN)
     private String reviewedYn;      // (계산) — 리뷰 작성 여부 (Y/N)
 
-    // ── 조회 전용 (TB_STAY JOIN) ────────────────────────────────
+    // 조회 전용 (TB_STAY JOIN)
 
     private Date checkinDate;       // CHECKIN_DATE — 체크인일
     private Date checkoutDate;      // CHECKOUT_DATE — 체크아웃일
@@ -71,7 +59,7 @@ public class MypageReserveVO {
     private Long roomId;            // ROOM_ID — 객실 FK
     private String roomName;        // ROOM_NAME — 객실명
 
-    // ── 유저 취소 위약금/환불 ───────────────
+    // 유저 취소 위약금/환불
 
     private Long cancelFeeAmt;      // CANCEL_FEE_AMT — 취소 위약금
     private Long refundAmt;         // REFUND_AMT — 환불 금액
@@ -89,14 +77,14 @@ public class MypageReserveVO {
     // 환불 승인/거절 시 관리자 답변
     private String stayRefundAnswer;
 
-    // ── 상세 화면 미리보기용 (DB 미저장) ───
+    // 상세 화면 미리보기용 (DB 미저장)
 
     private Long daysUntilCheckin;       // (계산) — 체크인까지 남은 일수
     private Integer cancelFeeRatePercent; // (계산) — 취소 수수료율 (%)
     private String cancelFeeTierLabel;   // (계산) — 취소 정책 구간 라벨
     private Boolean cancelable;          // (계산) — 취소 가능 여부
 
-    // ── 재능나눔 참여 신청 ─────────────────
+    // 재능나눔 참여 신청
 
     private String talentTitle;     // TB_TALENT.TITLE — 재능나눔 제목
     private String bizName;         // TB_BUSINESS.BIZ_NAME — 제공 업체명

@@ -3,18 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.hospital.mapper.HospitalMapper">
 
-<!--
-  역할: HospitalMapper SQL 정의
-
-  쿼리 id 예시
-  - selectHospitalList
-  - selectHospitalDetail
-  - insertReservation
-
-  테이블
-  - TB_HOSPITAL
-  - TB_RESERVATION
--->
     <!-- 병원 목록 전체 조회 -->
     <select id="selectHospitalList" resultType="com.petcare.petcare.hospital.vo.HospitalVO">
         SELECT      H.HOSPITAL_ID,

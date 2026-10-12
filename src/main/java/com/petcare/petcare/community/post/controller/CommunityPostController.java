@@ -1,41 +1,3 @@
-/**
- * 역할: 커뮤니티 게시글 URL 처리 → Service 호출 → JSP 반환
- *
- * [목록 화면 흐름]
- * 1. GET /community?boardType=...&keyword=...&page=...
- * 2. communityPostService.getPostList() → TB_POST + 썸네일
- * 3. list.jsp 에 ${list} 전달
- *
- * [상세 화면 흐름]
- * 1. GET /community/detail?id=번호
- * 2. getPostDetail() → 조회수 +1, 사진 URL 조회
- * 3. comments 목록 + liked(좋아요 여부) model 추가
- * 4. detail.jsp 반환
- *
- * [작성 화면 흐름]
- * 1. GET /community/write → 로그인 확인 후 write.jsp
- * 2. POST /community/write → insertPost() → 상세 redirect + flash 메시지
- *
- * [댓글]
- * 1. GET detail → communityCommentService.getCommentList()
- * 2. POST /community/comment → TB_POST_COMMENT INSERT
- * 3. LIFE + 일반댓글 성공 시 markLifeAnswered() → TAGS=ANSWERED
- * 4. POST /community/comment/delete → IS_DELETED='Y' (작성자 본인)
- * 5. POST /community/comment/update → BODY 수정 (작성자 본인)
- * 6. POST /community/report → TB_POST_REPORT INSERT
- *
- * [탭 ↔ boardType]
- * - 전체     → "" (빈값, 기본 진입)
- * - 집사생활 → TOWN
- * - 무료나눔 → SHARE
- * - 수의사 상담 → LIFE
- *
- * 연결
- * - Service: CommunityPostService, CommunityReactionService, CommunityCommentService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- */
-
 package com.petcare.petcare.community.post.controller;
 
 import org.slf4j.Logger;
@@ -186,9 +148,6 @@ public class CommunityPostController {
 
     /**
      * [댓글·대댓글 등록 화면 흐름]
-     * 1. POST /community/comment (postId, body, parentId 선택)
-     * 2. parentId 없음 → 일반댓글 / 있음 → 대댓글 (PARENT_ID)
-     * 3. 성공 시 상세 redirect / 실패 시 ?error=...
      */
     @PostMapping("/comment")
     public String insertComment(
@@ -236,9 +195,6 @@ public class CommunityPostController {
      
     /**
     * [댓글 삭제 화면 흐름]
-    * 1. POST /community/comment/delete (commentId, postId)
-    * 2. 작성자 본인 확인 → IS_DELETED='Y'
-    * 3. 상세 redirect
     */
     @PostMapping("/comment/delete")
     public String deleteComment(
@@ -399,7 +355,6 @@ public class CommunityPostController {
 
     /**
      * [게시글 수정 처리]
-     * POST /community/edit → updatePost() → 상세 redirect
      * photos(추가), removePhotoUrls(선택 삭제) multipart 전달
      */
     @PostMapping("/edit")
@@ -441,7 +396,6 @@ public class CommunityPostController {
 
     /**
      * [게시글 삭제]
-     * POST /community/delete → deletePost() → 목록 redirect
      */
     @PostMapping("/delete")
     public String deletePost(@RequestParam long postId,

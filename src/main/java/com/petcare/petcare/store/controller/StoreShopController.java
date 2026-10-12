@@ -1,13 +1,3 @@
-/**
- * 역할: 쇼핑몰 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: StoreShopService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.store.controller;
 
 import java.util.List;
@@ -398,9 +388,7 @@ public String payment(@RequestParam(required = false) Long productId,
     /**
      * 등록카드(빌링키) Ajax 결제
      * POST /store/payment/billing-card
-     * 1) 세션 orderTemp 금액으로 토스 자동결제 승인
-     * 2) 성공 시 completeOrder → TB_ORDER / TB_PAYMENT
-     * 3) JSON { ok, redirectUrl } 또는 { ok:false, message }
+     * 세션 orderTemp 금액으로 토스 자동결제 승인
      */
     @PostMapping("/payment/billing-card")
     @ResponseBody

@@ -1,6 +1,3 @@
-/**
- * 역할: 숙소 전액 환불 취소 DB (사업자·관리자 공통)
- */
 package com.petcare.petcare.stay.mapper;
 
 import java.util.Map;

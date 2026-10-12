@@ -1,18 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  - 게시글 작성 화면
-
-  [작성 화면 흐름]
-  1. GET /community/write → 로그인 확인 후 이 JSP 표시
-  2. form POST /community/write (multipart/form-data)
-  3. 성공 → /community/detail?id=... redirect + successMessage
-  4. 실패 → ?error=member / ?error=save
-
-  [form 필드]
-  - boardType : TOWN / SHARE / LIFE
-  - title, body, photos(최대 5장)
-  선택 이미지 미리보기 + X 삭제 (5장 제한)
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId" value="community" />

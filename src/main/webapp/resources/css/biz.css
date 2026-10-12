@@ -1,14 +1,14 @@
-/* ================================================================
-   사업자센터 전용 CSS  /biz/**  전용 레이아웃
-================================================================ */
+/* 사업자센터 전용 CSS (/biz/**) */
 
-/* ── 기본 변수 (petcare.css 변수 그대로 활용) ── */
+body { margin: 0; }
+
+/* 기본 변수 (petcare.css 변수 그대로 활용) */
 /*사업자(숙박) 예약관리 버튼색상넣기*/
 :root {
     --biz-primary: #2BAB82;
     --biz-border: #E2E8E4;
 }
-/* ── 전체 페이지 구조 ── */
+/* 전체 페이지 구조 */
 .biz-page {
     display: flex;
     flex-direction: column;
@@ -16,9 +16,7 @@
     background: #F0F4F8;
 }
 
-/* ================================================================
-   사업자 전용 헤더
-================================================================ */
+/* 사업자 전용 헤더 */
 .biz-header {
     height: 56px;
     background: #1A2E22;
@@ -100,17 +98,13 @@
     stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
 }
 
-/* ================================================================
-   본문 래퍼
-================================================================ */
+/* 본문 래퍼 */
 .biz-body {
     display: flex;
     flex: 1;
 }
 
-/* ================================================================
-   사이드바
-================================================================ */
+/* 사이드바 */
 .biz-sidebar {
     width: 220px;
     flex-shrink: 0;
@@ -186,9 +180,7 @@
     min-width: 18px; text-align: center;
 }
 
-/* ================================================================
-   메인 콘텐츠
-================================================================ */
+/* 메인 콘텐츠 */
 .biz-main {
     flex: 1;
     min-width: 0;
@@ -372,9 +364,7 @@
 .biz-placeholder small { font-size: 13px; color: #aaa; }
 
 
-/* ================================================================
-   병원 대시보드 (dashboard.jsp "after" 버전) 전용 CSS
-================================================================ */
+/* 병원 대시보드 (dashboard.jsp "after" 버전) 전용 CSS */
 .dashboard-top {
     display: flex; justify-content: space-between; align-items: flex-start;
     margin-bottom: 22px;
@@ -515,9 +505,7 @@
 .review-item .stars { color: #F59E0B; font-size: 12px; margin-left: 4px; }
 .review-item em { font-style: normal; font-size: 11px; color: #bbb; margin-left: auto; white-space: nowrap; }
 
-/* ================================================================
-   리뷰 답글 인라인 박스 (모달 대신 카드 안에서 펼쳐지는 방식)
-================================================================ */
+/* 리뷰 답글 인라인 박스 (모달 대신 카드 안에서 펼쳐지는 방식) */
 .biz-reply-box {
     background: #fff; border: 1px solid #E2E8E4; border-radius: 12px;
     padding: 16px; margin-top: 12px;
@@ -549,10 +537,7 @@
 .biz-reply-box-actions .btn-cancel { border: 1px solid #E2E8E4; background: #fff; color: #666; }
 .biz-reply-box-actions .btn-cancel:hover { background: #F5F5F5; }
 
-/* ================================================================
-   info.jsp (업체정보 수정) 화면 전용
-   좌측 이미지 + 우측 폼 필드 레이아웃, 저장/취소 버튼
-================================================================ */
+/* info.jsp (업체정보 수정) 화면 전용 좌측 이미지 + 우측 폼 필드 레이아웃, 저장/취소 버튼 */
 .biz-form-grid {
     display: grid;
     grid-template-columns: 260px 1fr;
@@ -638,10 +623,7 @@
 }
 .biz-btn-ghost:hover { background: #F5F5F5; }
 
-/* ================================================================
-   info.jsp 저장 완료 / reviews.jsp 답글 등록 완료
-   화면 하단에 잠깐 떴다 사라지는 토스트 알림 (두 화면 공용)
-================================================================ */
+/* info.jsp 저장 완료 / reviews.jsp 답글 등록 완료 화면 하단에 잠깐 떴다 사라지는 토스트 알림 (두 화면 공용) */
 .biz-toast {
     position: fixed; bottom: 32px; left: 50%;
     transform: translateX(-50%) translateY(20px);
@@ -657,9 +639,7 @@
 .biz-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 .biz-toast svg { width: 16px; height: 16px; stroke: #4ADE80; }
 
-/* ================================================================
-   reviews.jsp 상단 "전체 / 신고관리" 탭 + 정렬 드롭다운
-================================================================ */
+/* reviews.jsp 상단 "전체 / 신고관리" 탭 + 정렬 드롭다운 */
 .biz-tabs {
     display: flex; gap: 26px;
     border-bottom: 1px solid #E2E8E4;
@@ -681,10 +661,7 @@
     font-size: 13px; color: #555; background: #fff;
 }
 
-/* ================================================================
-   reviews.jsp 리뷰 카드 리스트 (별점/작성자/내용/답글 표시)
-   "답글쓰기" 눌렀을 때 펼쳐지는 입력창(.biz-reply-box)은 이미 파일에 있음
-================================================================ */
+/* reviews.jsp 리뷰 카드 리스트 (별점/작성자/내용/답글 표시) "답글쓰기" 눌렀을 때 펼쳐지는 입력창(.biz-reply-box)은 이미 파일에 있음 */
 .biz-review-list { display: flex; flex-direction: column; padding: 0 20px 20px; }
 .biz-review-item {
     display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px;

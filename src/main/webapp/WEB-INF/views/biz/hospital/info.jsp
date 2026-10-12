@@ -9,29 +9,26 @@
 <%@ include file="/WEB-INF/views/biz/common/sidebar_hospital.jsp" %>
 
 <style>
-	/* ===================================
-	info 페이지 스타일
-	talent.jsp와 동일한 색상 체계 사용
-	=================================== */
+	/* info 페이지 스타일 talent.jsp와 동일한 색상 체계 사용 */
 	
 	/* 전체 래퍼 — 섹션 사이 간격 20px */
 	.info-wrap{display:flex;flex-direction:column;gap:20px}
 	
-	/* ── 상단 히어로 배너 ── */
+	/* 상단 히어로 배너 */
 	.info-hero{background:linear-gradient(135deg,#1F8464 0%,#2BAB82 100%);border-radius:12px;padding:28px 32px;color:#fff;display:flex;align-items:center;gap:20px}
 	.info-hero-icon{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 	.info-hero-icon svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 	.info-hero h2{font-size:20px;font-weight:800;margin:0 0 6px}
 	.info-hero p{font-size:13px;opacity:.85;margin:0;line-height:1.6}
 	
-	/* ── 흰색 섹션 카드 ── */
+	/* 흰색 섹션 카드 */
 	.info-section{background:#fff;border:1px solid #E4E6ED;border-radius:12px;padding:24px}
 	
 	/* 섹션 제목 — 하단 구분선 포함 */
 	.info-stitle{font-size:14px;font-weight:800;color:#1A1A2E;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid #E4E6ED;display:flex;align-items:center;gap:8px}
 	.info-stitle svg{width:16px;height:16px;stroke:#2BAB82;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 	
-	/* ── 폼 그리드 (2열) ── */
+	/* 폼 그리드 (2열) */
 	.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 	.info-group{display:flex;flex-direction:column;gap:6px}
 	.info-group.full{grid-column:1/-1}                     /* 한 줄 전체 차지 */
@@ -54,9 +51,7 @@
 	input[readonly] {background-color: #f5f5f5;cursor: default;}
 </style>
 
-<!-- ===================================
-     HTML 본문 시작
-     =================================== -->
+<!-- HTML 본문 시작 -->
 <main class="biz-main">
     <div class="biz-page-head">
         <h1 class="biz-page-title">업체 정보 등록/수정</h1>
@@ -80,7 +75,7 @@
             </div>
         </div>
 
-		<!-- ─────────── 1. 기본 정보 ─────────── -->
+		<!-- 1. 기본 정보 -->
 		<div class="info-section">
 			<div class="info-stitle">
 				<svg viewBox="0 0 24 24">

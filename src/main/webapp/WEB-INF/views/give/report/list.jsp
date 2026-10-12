@@ -1,11 +1,3 @@
-<%-- give/report/list.jsp — 분실/보호 게시판 탭 --%>
-<%--
-
-  [목록 화면 흐름]
-  1. GET /give/report/list?status= → giveReportService.getReportList()
-  2. status: 전체 / FINDING(찾는중) / OWNER_FOUND(주인찾음) / RESCUED(구조완료)
-  3. TB_POST 목록 + thumbUrl(첫 사진) 표시
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>

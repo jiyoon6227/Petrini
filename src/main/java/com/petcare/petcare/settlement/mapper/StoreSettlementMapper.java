@@ -1,12 +1,3 @@
-/**
- * 역할: 쇼핑 정산 조회·저장 (MyBatis)
- * 쇼핑 정산
- * 사업자 화면 · 중간요청
- *
- * 참고 테이블
- * - TB_ORDER, TB_ORDER_ITEM, TB_PRODUCT, TB_BUSINESS
- * - TB_SETTLEMENT, TB_SETTLEMENT_ITEM, TB_SETTLEMENT_REQUEST
- */
 package com.petcare.petcare.settlement.mapper;
 
 import java.util.Date;

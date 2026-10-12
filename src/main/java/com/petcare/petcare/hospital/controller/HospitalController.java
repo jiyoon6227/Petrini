@@ -1,13 +1,3 @@
-/**
- * 역할: 동물병원 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: HospitalService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.hospital.controller;
 
 import java.util.ArrayList;
@@ -64,7 +54,7 @@ public class HospitalController extends CommonConfigController {
         return "hospital/list";
     }
 
-    // ── 병원 상세 ─────────────────────────────────────
+    // 병원 상세
     @GetMapping("/detail")
     public String detail(@RequestParam String id, Model model) throws Exception {
         Long hospitalId = Long.parseLong(id);
@@ -75,7 +65,7 @@ public class HospitalController extends CommonConfigController {
             List<HospitalVO> singleList = new ArrayList<>();
             singleList.add(hospital); 
             kakaoMapService.addMapAttributes(model, singleList);
-            // → markersJson에 1개만 들어감 → kakaomap.jsp가 상세모드로 자동 동작
+            // 마커 1개면 kakaomap.jsp가 상세모드로 동작
         }
 
         model.addAttribute("hospital", hospital);

@@ -1,13 +1,4 @@
-/**
- * 역할: 기간 정지 만료 회원 자동 복구 (스케줄)
- *
- * 매일 0시 TB_MEMBER.SUSPEND_END_DATE 만료 건 → STATUS_CD = NORMAL
- * (로그인 시 releaseExpiredSuspensions 와 동일 로직, 미접속 회원 처리용)
- *
- * 연결
- * - AdminMemberService.releaseExpiredSuspensions()
- * - PetcareApplication @EnableScheduling
- */
+/** 로그인 시 releaseExpiredSuspensions와 같은 처리 (미접속 회원용) */
 
 package com.petcare.petcare.admin.member.scheduler;
 

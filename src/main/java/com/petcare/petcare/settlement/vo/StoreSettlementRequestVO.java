@@ -1,9 +1,3 @@
-/**
- * 역할: 중간정산 요청 (TB_SETTLEMENT_REQUEST) — 쇼핑용
- * 쇼핑 정산 VO (중간정산 요청)
- *
- * 참고 테이블: TB_SETTLEMENT_REQUEST
- */
 package com.petcare.petcare.settlement.vo;
 
 import java.util.Date;

@@ -1,16 +1,3 @@
-/**
- * 역할: 펫호텔·예약 데이터 객체
- *
- * 필드 예시
- * - stayId, stayName, address, pricePerNight, rating
- *
- * 참고 테이블
- * - TB_STAY
- * - TB_RESERVATION
- *
- * DB 컬럼명은 팀 VO 규칙(camelCase)에 맞게 작성
- */
-
 package com.petcare.petcare.stay.vo;
 
 import java.util.List;
@@ -23,7 +10,7 @@ import lombok.Setter;
 
 @Getter @Setter
 public class StayVO implements Mapperable {
-    // ── TB_STAY ──
+    // TB_STAY
     private Long   stayId;
     private Long   memberNo;
     private Long   bizNo;
@@ -51,20 +38,20 @@ public class StayVO implements Mapperable {
     private Double avgRating;     // AVG_RATING
     private Long   reviewCnt;     // REVIEW_CNT
  
-    // ── 목록용 (SQL에서 계산) ──
+    // 목록용 (SQL에서 계산)
     private int    minPrice;      // MIN(PRICE_PER_NIGHT)
     private int    roomCount;     // 객실 수
 
-    // ── 검색 조건 (list 화면용) ──
+    // 검색 조건 (list 화면용)
     private String region;              // 지역 필터 (서울, 경기, 강원, 제주, 부산, 경상, 전라)
     private int    maxPrice;            // 1박 최대 요금 (0이면 제한 없음)
     private String sort;                // 정렬 (review/recommend, priceLow)
     private String[] facilityFilter;    // 특화 조건 코드 배열 (LARGEPET, PETYARD 등)
 
-    // ── 상세용 (객실 목록) ──
+    // 상세용 (객실 목록)
     private List<StayRoomVO> rooms;
 
-    // ── Mapperble 구현 (카카오맵 마커용) ──
+    // Mapperble 구현 (카카오맵 마커용)
     public String getMarkerId()   { return stayId != null ? String.valueOf(stayId) : "0"; }
     public String getMarkerName() { return name; }
     public Double getMarkerLat()  { return lat; }

@@ -1,11 +1,3 @@
-/**
- * 역할: 정산 스케줄러 — 매월 1일 월정산 생성 / 매월 15일 더미 자동지급
- * 숙소·쇼핑 정산 배치
- *
- * cron: 초 분 시 일 월 요일
- * - 1일 02:00 → 전월 REGULAR 월정산
- * - 15일 03:00 → WAIT 더미 지급
- */
 package com.petcare.petcare.settlement.scheduler;
 
 import org.springframework.beans.factory.annotation.Autowired;

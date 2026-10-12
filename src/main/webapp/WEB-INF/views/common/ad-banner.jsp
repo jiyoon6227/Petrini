@@ -1,13 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%-- ===================================================================
-     광고 배너 (DB 연동 버전)
-     - 다른 JSP에서 <%@ include file="/WEB-INF/views/common/ad-banner.jsp" %> 로 삽입
-     - pageId 변수(store, hospital, stay, grooming)를 POSITION_CD로 매핑
-     - /api/banners?position=STORE 등으로 해당 위치 배너만 조회
-     - store/list.jsp 연동, 이미지 URL 처리
-     - API imageUrl 직접 사용, 로드 실패 시 placeholder
-==================================================================== --%>
+<%-- pageId(store·hospital·stay·grooming)를 POSITION_CD로 매핑해 /api/banners?position= 조회 (로드 실패 시 placeholder) --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
 <style>

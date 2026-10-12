@@ -11,7 +11,7 @@
 <%@ include file="/WEB-INF/views/mypage/sidebar.jsp" %>
 <div class="mypage-content">
 
-<%-- ── 회원정보 수정 ── --%>
+<%-- 회원정보 수정 --%>
 <div class="mp-section active">
     <h2 class="mp-title">회원정보 수정</h2>
     <c:if test="${not empty msg}">
@@ -295,7 +295,7 @@ $("#btnSearchAddr").click(function(){
     }).open();
 });
 
-/* ── 회원정보 저장 (닉네임·전화번호·주소) ── */
+/* 회원정보 저장 (닉네임·전화번호·주소) */
 $("#btnSaveProfile").click(function(){
     var nickname = $.trim($("#nickname").val());
     var phone    = $.trim($("#phone").val());
@@ -337,7 +337,7 @@ $("#btnSaveProfile").click(function(){
         });
 });
 
-/* ── 비밀번호 변경 ── */
+/* 비밀번호 변경 */
 $("#btnChangePw").click(function(){
     var cur     = $.trim($("#currentPassword").val());
     var newPw   = $.trim($("#newPassword").val());
@@ -385,7 +385,7 @@ $("#btnChangePw").click(function(){
         });
 });
 
-/* ── 비밀번호 보기/숨기기 토글 ── */
+/* 비밀번호 보기/숨기기 토글 */
 $(".edit-pw-eye").click(function(){
     var input = $(this).siblings("input");
     if (input.attr("type") === "password") {

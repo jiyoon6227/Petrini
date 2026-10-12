@@ -1,10 +1,3 @@
-/**
- * 역할: 유기동물 API 비즈니스 로직 (interface)
- *
- * - Controller 에 있던 API 호출을 Service 로 분리
- * - 목록·상세 조회 메서드 정의
- */
-
 package com.petcare.petcare.give.animal.service;
 
 import com.petcare.petcare.give.animal.vo.GiveAnimalListResult;

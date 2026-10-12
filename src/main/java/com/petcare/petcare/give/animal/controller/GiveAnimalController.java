@@ -1,20 +1,3 @@
-/**
- * 역할: 유기동물(정부 API) URL 처리 → Service 호출 → JSP 반환
- *
- * - 파일 안에서 API 를 직접 호출했는데, Service 로 옮김
- *
- * [목록 화면 흐름] (조건 선택 후 조회)
- * 1. 사용자가 /give/animal/list 주소로 들어옴 → API 안 부름, 안내만 표시
- * 2. 조건 고르고 [조회] 클릭 → search=true 와 함께 Service 호출
- * 3. giveAnimalService.getAnimalList() (캐시 적용)
- * 4. 받은 결과를 model 에 넣고 list.jsp 보여줌
- *
- * [상세 화면 흐름]
- * 1. 사용자가 /give/animal/detail?desertionNo=번호 로 들어옴
- * 2. giveAnimalService.getAnimalDetail() 에 맡김
- * 3. 받은 유기견 1마리 정보를 detail.jsp 에 보여줌
- */
-
 package com.petcare.petcare.give.animal.controller;
 
 import java.util.Collections;

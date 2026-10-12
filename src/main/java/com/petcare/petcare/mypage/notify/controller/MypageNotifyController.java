@@ -1,7 +1,3 @@
-/**
- * 역할: 마이페이지 알림 URL 처리 → Service 호출 → JSP 반환
- */
-
 package com.petcare.petcare.mypage.notify.controller;
 
 import com.petcare.petcare.member.vo.MemberVO;

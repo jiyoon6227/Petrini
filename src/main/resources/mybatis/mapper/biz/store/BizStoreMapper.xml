@@ -3,25 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.biz.store.mapper.BizStoreMapper">
 
-<!--
-  역할: BizStoreMapper SQL 정의
-
-  쿼리 id 예시
-  - selectBizDashboard
-  - selectProductList
-  - updateProduct
-  - selectOrderList
-  - updateOrderStatus
-  - selectReviewList
-
-  테이블
-  - TB_PRODUCT
-  - TB_ORDER
-  - TB_ORDER_ITEM
-  - TB_REVIEW
--->
-
-
 <!-- 로그인 ID로 BIZ_NO 조회 -->
 <select id="selectBizNoByBizId" resultType="Long">
     SELECT BIZ_NO FROM TB_BUSINESS WHERE BIZ_ID = #{bizId}
@@ -602,7 +583,7 @@
      WHERE BIZ_NO = #{bizNo}
 </update>
 
-<!-- ========== 상품단위 환불(RETURN_*) ========== -->
+<!-- 상품단위 환불(RETURN_*) -->
 
 <!-- 환불신청/진행/완료 목록 (statusCd: REQUESTED | RETURNING | DONE) -->
 <select id="selectReturnList" resultType="com.petcare.petcare.biz.store.vo.BizReturnVO">
@@ -758,8 +739,8 @@
 <!--
   쇼핑몰 사업자 쿠폰 조기 마감
 
-  관리자 승인 없이 ACTIVE 쿠폰을 INACTIVE로 변경한다.
-  이미 회원이 발급받은 쿠폰은 변경하지 않는다.
+  관리자 승인 없이 ACTIVE → INACTIVE
+  이미 회원이 발급받은 쿠폰은 변경 없음
 -->
 <update id="closeCoupon">
   UPDATE TB_COUPON

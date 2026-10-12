@@ -1,18 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--
-  역할: 분실/보호 신고 상세 (give/report/detail)
-
-
-  [상세 화면 흐름]
-  1. GET /give/report/detail?id=번호
-  2. report(TB_POST) + report.photoUrls(TB_FILE) 표시
-  4. POST /give/report/status → 상태 변경
-  5. comments(TB_POST_COMMENT) 표시 + POST /give/report/comment (parentId → 대댓글)
-  6. POST /give/report/comment/delete — 본인 댓글 삭제
-  7. POST /give/report/comment/update — 본인 댓글 수정
-
-  - 발견 위치 카카오맵 (TB_POST LOST_LAT/LNG, kakaomap.jsp)
---%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />

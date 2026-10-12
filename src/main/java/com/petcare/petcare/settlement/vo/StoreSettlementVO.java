@@ -1,9 +1,3 @@
-/**
- * 역할: 정산 마스터 (TB_SETTLEMENT) — 쇼핑(STORE) 매핑
- * 쇼핑 정산 VO
- *
- * 참고 테이블: TB_SETTLEMENT (BIZ_TYPE=STORE)
- */
 package com.petcare.petcare.settlement.vo;
 
 import java.util.Date;

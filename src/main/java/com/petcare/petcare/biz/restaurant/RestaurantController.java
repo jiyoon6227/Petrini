@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/biz/restaurant")
 public class RestaurantController extends BizBaseController {
 
-    // ── 요식업 (RESTAURANT) ───────────────────────────────────
+    // 요식업 (RESTAURANT)
     @GetMapping({"", "/"})
     public String restaurantDashboard(HttpSession session) {
         if (getBizMember(session) == null) 

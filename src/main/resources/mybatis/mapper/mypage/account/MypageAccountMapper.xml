@@ -68,9 +68,7 @@
      WHERE MEMBER_NO = #{memberNo}
   </update>
 
-    <!-- ══════════════════════════════════════════════
-         7일 경과 탈퇴 회원 개인정보 삭제 (스케줄러용)
-    ══════════════════════════════════════════════ -->
+    <!-- 7일 경과 탈퇴 회원 개인정보 삭제 (스케줄러용) -->
 
     <!-- 7일 경과 탈퇴 회원 MEMBER_NO 목록 조회 -->
     <select id="selectExpiredWithdrawnMemberNos" resultType="long">

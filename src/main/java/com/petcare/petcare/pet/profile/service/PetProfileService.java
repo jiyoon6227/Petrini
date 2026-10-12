@@ -1,9 +1,3 @@
-/**
- * 반려동물 프로필 비즈니스 로직
- *
- * 담당 화면: mypage/pets.jsp
- */
-
 package com.petcare.petcare.pet.profile.service;
 
 import java.util.List;

@@ -1,8 +1,4 @@
-/**
- * 역할: 숙소 예약 전액 환불 취소 (사업자·관리자 공통)
- * 수수료 0 · 결제액 전액 토스 취소 · 정산 대상 아님(CANCEL)
- * 실결제(PAY_AMOUNT) 환불 + 포인트·쿠폰 복구
- */
+/** 수수료 0, 결제액 전액 토스 취소 (정산 대상 아님), 포인트·쿠폰 복구 */
 package com.petcare.petcare.stay.service;
 
 import java.util.Map;

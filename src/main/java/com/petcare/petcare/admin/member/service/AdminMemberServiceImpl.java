@@ -1,22 +1,3 @@
-/**
- * 역할: AdminMemberService 구현체 (@Service)
- *
- * [getAdminMemberDetail — 상세]
- * 1. selectAdminMemberDetail → TB_MEMBER 기본정보
- * 2. selectAdminMemberActivityStats → 주문·예약·게시글 등 COUNT (STEP 8)
- * 3. stats 필드를 member VO에 합쳐서 반환
- *
- * [suspendMember / restoreMember / withdrawMember — STEP 7]
- * 1. updateMemberStatus → TB_MEMBER.STATUS_CD 변경
- * 2. updated == 0 이면 MEMBER_NOT_FOUND 예외
- *
- * 연결
- * - implements: AdminMemberService
- * - 사용: AdminMemberMapper
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- */
-
 package com.petcare.petcare.admin.member.service;
 
 import java.util.List;

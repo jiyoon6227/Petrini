@@ -222,7 +222,7 @@
 </div>
 
 <script>
-  /* ── 1) JSTL → JS 배열 변환 ── */
+  /* JSTL → JS 배열 변환 */
   var HOSPITALS = [
     <c:forEach items="${hospitalList}" var="h" varStatus="st">
       {
@@ -235,12 +235,12 @@
     </c:forEach>
   ];
 
-  /* ── 2) 전역 변수 ── */
+  /* 전역 변수 */
   var map;
   var markers = [];
   var infowindows = [];
 
-  /* ── 3) 페이지 로딩 → 마커 생성 ── */
+  /* 페이지 로딩 → 마커 생성 */
   document.addEventListener('DOMContentLoaded', function() {
       map = window.kakaoMap;
       if (!map) return;
@@ -278,7 +278,7 @@
   });
 
 
-  /* ── 4) 마커 이벤트 등록 (클로저 해결용 별도 함수) ── */
+  /* 마커 이벤트 등록 (클로저 해결용 별도 함수) */
   function addMarkerEvents(marker, infowindow, hospitalId) {
       kakao.maps.event.addListener(marker, 'mouseover', function() {
           infowindow.open(map, marker);
@@ -291,7 +291,7 @@
       });
   }
 
-  /* ── 5) 카드 클릭 → 지도 이동 + 말풍선 + 강조 ── */
+  /* 카드 클릭 → 지도 이동 + 말풍선 + 강조 */
   function selectHospital(hospitalId) {
       var hospital = null;
       var hospitalIdx = -1;
@@ -323,7 +323,7 @@
       highlightCard(hospitalId);
   }
   
-  /* ── 6) 카드 강조 ── */
+  /* 카드 강조 */
   function highlightCard(hospitalId) {
       var allCards = document.querySelectorAll('.hosp-card');
       for (var i = 0; i < allCards.length; i++) {
@@ -336,7 +336,7 @@
       }
   }
   
-  /* ── 7) 검색 ── */
+  /* 검색 */
   function searchPlace() {
       var keyword = document.getElementById('mapSearchInput').value.trim();
       if (!keyword) return;
@@ -353,12 +353,12 @@
       });
   }
   
-  /* ── 8) 검색 폼 제출 ── */
+  /* 검색 폼 제출 */
   function submitSearch() {
       document.getElementById('searchForm').submit();
   }
 
-  /* ── 9) 칩 클릭 (진료과목 / 진료 대상) ── */
+  /* 칩 클릭 (진료과목 / 진료 대상) */
   function selChipSearch(el, value) {
       var parent   = el.closest('.hosp-filter-chips');
       var targetId = parent.getAttribute('data-target');
@@ -371,13 +371,13 @@
       submitSearch();
   }
 
-  /* ── 10) 정렬 클릭 ── */
+  /* 정렬 클릭 */
   function selSortSearch(sortValue) {
       document.getElementById('hSort').value = sortValue;
       submitSearch();
   }
 
-  /* ── 11) 키워드 검색 (Enter 또는 버튼) ── */
+  /* 키워드 검색 (Enter 또는 버튼) */
   function searchByKeyword() {
       document.getElementById('hKeyword').value = document.getElementById('keywordInput').value.trim();
       submitSearch();

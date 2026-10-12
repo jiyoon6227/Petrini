@@ -1,11 +1,6 @@
 /**
- * 가입 임시저장(세션) 범위 제한
- *
- * 정책
- * - joinDraft / 가입 pending 카드는 「가입·토스 카드등록 왕복」에서만 유지
- * - 다른 HTML 페이지로 이동하면 폐기
- * - 주의: footer 장바구니/알림 count 같은 Ajax 는 지우면 안 됨
- *   → Sec-Fetch-Dest=document (또는 HTML 문서 요청) 일 때만 폐기
+ * joinDraft·가입 pending 카드는 가입·토스 카드등록 왕복에서만 유지, 다른 HTML 페이지 이동 시 폐기
+ * Ajax(장바구니·알림 count 등)는 유지: Sec-Fetch-Dest=document 요청일 때만 폐기
  */
 package com.petcare.petcare.common.interceptor;
 

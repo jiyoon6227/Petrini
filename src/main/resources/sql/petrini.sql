@@ -1,23 +1,18 @@
-/* =========================================================
-   DATABASE_TABLE.sql
-   프로젝트: petcare
-   ========================================================= */
+/* DATABASE_TABLE.sql (프로젝트: petcare) */
 
 
 -- 순서: 1.DROP  2.CREATE  3.FK  4.COMMENT
 
 SET DEFINE OFF;
 
--- =========================================================
 -- 미사용 테이블 정리 (팀 확인용)
 -- 제외 대상 CREATE / FK / COMMENT 는 제거
 -- DROP 은 유지 (기존 DB 정리용). 팀 확인 후 DROP 도 주석 예정
 -- 제외: PET_HEALTH, STATUS_HIST, SYSTEM_POLICY, AUTH_VERIFY,
 --       PRODUCT_APPROVAL, EXPERIENCE_*, PROMOTION, POI*, SHELTER,
 --       PUBLIC_DATA_SYNC, DONATION, VOLUNTEER*, WALK_*
--- =========================================================
 
--- ==================== 1. DROP TABLE ====================
+-- 1. DROP TABLE
 
 -- 유저↔사업자 신고 (TB_POST_REPORT 와 별개, 자식 테이블 먼저 DROP)
 -- TB_REVIEW_REPORT
@@ -756,7 +751,7 @@ EXCEPTION
 END;
 /
 
--- ==================== 2. CREATE TABLE ====================
+-- 2. CREATE TABLE
 
 -- TB_MEMBER_GRADE (회원등급)
 CREATE TABLE TB_MEMBER_GRADE (
@@ -1049,9 +1044,7 @@ CREATE TABLE TB_PET (
     CONSTRAINT PK_TB_PET PRIMARY KEY (PET_ID)
 );
 
--- =========================================================
 -- 병원 진료유형 (소요시간)
--- =========================================================
 -- TB_HOSPITAL_TREAT_TYPE (병원 진료유형)
 CREATE TABLE TB_HOSPITAL_TREAT_TYPE (
     TREAT_TYPE_ID                    NUMBER                   NOT NULL,  -- 진료유형 ID
@@ -1067,9 +1060,7 @@ CREATE TABLE TB_HOSPITAL_TREAT_TYPE (
         REFERENCES TB_HOSPITAL (HOSPITAL_ID)
 );
 
--- =========================================================
 -- 병원 의사 (상세에서만 표시, 의사별 캘린더 없음)
--- =========================================================
 -- TB_HOSPITAL_DOCTOR (병원 의사)
 CREATE TABLE TB_HOSPITAL_DOCTOR (
     DOCTOR_ID                        NUMBER                   NOT NULL,  -- 의사 ID
@@ -1084,10 +1075,8 @@ CREATE TABLE TB_HOSPITAL_DOCTOR (
     CONSTRAINT FK_PTN65_0103 FOREIGN KEY (HOSPITAL_ID)
         REFERENCES TB_HOSPITAL (HOSPITAL_ID)
 );
--- =========================================================
 -- 병원 예약 예외 (미리 설정, 특정일 덮어쓰기)
 -- 예: 특정일 CLOSE / 의사 휴가(의사 지정) / REPLACE 단축
--- =========================================================
 -- TB_HOSPITAL_RESV_EXCEPTION (병원 예약예외)
 CREATE TABLE TB_HOSPITAL_RESV_EXCEPTION (
     EXC_ID                           NUMBER                   NOT NULL,  -- 예외 ID
@@ -1112,10 +1101,8 @@ CREATE TABLE TB_HOSPITAL_RESV_EXCEPTION (
         REFERENCES TB_HOSPITAL_DOCTOR (DOCTOR_ID)
 );
 
--- =========================================================
 -- 병원 예약 임시 선점
 -- 유저가 시간 선택 후 펫·증상 단계로 넘어갈 때 구간 점유 (만료 EXPIRE_DATE)
--- =========================================================
 -- TB_HOSPITAL_RESV_HOLD (병원 예약 임시 선점)
 CREATE TABLE TB_HOSPITAL_RESV_HOLD (
     HOLD_ID                          NUMBER                   NOT NULL,  -- 선점 ID
@@ -1768,7 +1755,7 @@ CREATE TABLE TB_BILLING_CARD (
     CONSTRAINT PK_TB_BILLING_CARD PRIMARY KEY (BILLING_CARD_ID)
 );
 
--- ==================== 3. FOREIGN KEY ====================
+-- 3. FOREIGN KEY
 
 -- TB_MEMBER.GRADE_CD → TB_MEMBER_GRADE.GRADE_CD
 ALTER TABLE TB_MEMBER
@@ -2150,12 +2137,10 @@ ALTER TABLE TB_SETTLEMENT_ITEM
     ADD CONSTRAINT FK_SETTLE_ITEM_ORDER_ITEM
     FOREIGN KEY (ORDER_ITEM_ID) REFERENCES TB_ORDER_ITEM (ORDER_ITEM_ID);
 
--- =========================================================
 -- 병원 예약 FK
 -- CREATE 절: FK_PTN65_0100 (유형→병원), FK_PTN65_0103 (의사→병원)
 -- 슬롯 FK(0102/0105) 제거, 규칙·예외 FK는 CREATE에 포함(0106~0109)
 -- 선점 FK는 아래 ALTER(0110~0113)
--- =========================================================
 
 -- TB_RESERVATION.TREAT_TYPE_ID → TB_HOSPITAL_TREAT_TYPE.TREAT_TYPE_ID
 ALTER TABLE TB_RESERVATION
@@ -2188,7 +2173,7 @@ ALTER TABLE TB_HOSPITAL_RESV_HOLD
     ADD CONSTRAINT FK_PTN65_0113
     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- ==================== 4. TABLE / COLUMN COMMENT ====================
+-- 4. TABLE / COLUMN COMMENT
 
 COMMENT ON TABLE TB_MEMBER_GRADE IS '회원등급 | 등급·혜택 정의';
 COMMENT ON TABLE TB_BUSINESS IS '사업자 | 병원/펫샵/숙소 사업자 계정';
@@ -2842,13 +2827,13 @@ COMMENT ON COLUMN TB_BILLING_CARD.REG_DATE IS '등록일';
 
 
 
-/* =========================================================
+/*
    PETRINI_MIN_DEMO_DATA.sql
    프로젝트 : Petrini / petcare
    용도     : 발표/포트폴리오용 최소 더미 데이터
    전제     : DATABASE_TABLE.sql 실행 완료
    비밀번호 : 모든 테스트 로그인 계정 1234
-   ========================================================= */
+   */
 SET DEFINE OFF;
 /* 이미지 파일명 (C:\upload 바로 아래)
    main_banner.jpg / pet_dog.jpg / pet_cat.jpg
@@ -2857,11 +2842,11 @@ SET DEFINE OFF;
    cat_food.jpg / cat_snack.jpg / cat_goods.jpg
    hospital_main.jpg / stay_main.jpg / stay_deluxe.jpg / stay_suite.jpg
 */
-/* =========================================================
+/*
    0. 기존 테스트 데이터 정리
    - 개발/발표 DB에서 재실행하기 위한 초기화용
    - FK 자식 → 부모 순서
-   ========================================================= */
+   */
 
 DELETE FROM TB_SETTLEMENT_ITEM;
 DELETE FROM TB_SETTLEMENT_REQUEST;
@@ -2939,9 +2924,7 @@ DELETE FROM TB_ADMIN_ROLE;
 COMMIT;
 
 
-/* =========================================================
-   1. 시퀀스 재생성
-   ========================================================= */
+/* 1. 시퀀스 재생성 */
 
 BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_MEMBER'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -2289 THEN RAISE; END IF; END;
 /
@@ -3027,10 +3010,7 @@ CREATE SEQUENCE SEQ_ORDER_ITEM START WITH 5 INCREMENT BY 1 NOCACHE NOCYCLE;     
 CREATE SEQUENCE SEQ_ORDER_DELIVERY START WITH 4 INCREMENT BY 1 NOCACHE NOCYCLE;  -- 데모 배송 1~3 다음
 
 
-/* =========================================================
-   2. 기준정보
-   - 아래는 "더미"라기보다 서비스 구동용 기준값
-   ========================================================= */
+/* 2. 기준정보 - 아래는 "더미"라기보다 서비스 구동용 기준값 */
 
 -- 회원 등급
 INSERT INTO TB_MEMBER_GRADE (GRADE_CD, GRADE_NAME, MIN_POINT, BENEFIT_DESC) VALUES ('BRONZE', '브론즈', 0, '기본 등급');
@@ -3081,16 +3061,12 @@ INSERT INTO TB_POLICY (POLICY_ID, POLICY_TYPE, POLICY_KEY, POLICY_VALUE) VALUES 
 INSERT INTO TB_POLICY (POLICY_ID, POLICY_TYPE, POLICY_KEY, POLICY_VALUE) VALUES (4, 'POINT', 'REVIEW_MIN_LENGTH', '50');
 
 
-/* =========================================================
-   3. 여기부터 실제 발표용 더미 데이터
-   ========================================================= */
+/* 3. 여기부터 실제 발표용 더미 데이터 */
 
--- ---------------------------------------------------------
 -- 3-1. 일반 회원 2명 + 사업자 로그인용 회원 3명
 --      ※ 사업자도 로그인 자체는 TB_MEMBER를 거친 뒤
 --         TB_BUSINESS.BIZ_ID로 사업자 권한을 확인하므로
 --         물리적으로 TB_MEMBER에는 총 5행이 필요함.
--- ---------------------------------------------------------
 
 -- 일반회원 1: 남
 INSERT INTO TB_MEMBER (MEMBER_NO, MEMBER_ID, MEMBER_PWD, MEMBER_NAME, NICKNAME, EMAIL, PHONE, ZIP_CODE, ADDR1, ADDR2, GRADE_CD, POINT_BALANCE, PROFILE_IMG_URL, STATUS_CD, MARKETING_YN, JOIN_DATE, BIRTH_DATE, GENDER) VALUES (1, 'user01', '$2a$10$qIkpgyhoGUjLySmgmn8O6OldY5gulqDQBB0I1CFE7Rfn3raFElZNa', '김민준', '몽이아빠', 'user01@petrini.demo', '010-1111-1111', '34141', '대전광역시 유성구 대학로 10', '101호', 'BRONZE', 374, '/upload/profile_male.jpg', 'NORMAL', 'Y', SYSDATE - 120, TO_DATE('1992-05-14', 'YYYY-MM-DD'), 'M');
@@ -3104,17 +3080,13 @@ INSERT INTO TB_MEMBER (MEMBER_NO, MEMBER_ID, MEMBER_PWD, MEMBER_NAME, NICKNAME, 
 INSERT INTO TB_MEMBER (MEMBER_NO, MEMBER_ID, MEMBER_PWD, MEMBER_NAME, NICKNAME, EMAIL, PHONE, GRADE_CD, POINT_BALANCE, STATUS_CD, MARKETING_YN, JOIN_DATE) VALUES (5, 'stay01', '$2a$10$qIkpgyhoGUjLySmgmn8O6OldY5gulqDQBB0I1CFE7Rfn3raFElZNa', '한소영', '포레스트스테이', 'stay01@petrini.demo', '010-5555-5555', 'BRONZE', 0, 'NORMAL', 'N', SYSDATE - 180);
 
 
--- ---------------------------------------------------------
 -- 3-2. 반려동물 2마리 (일반회원당 1마리)
--- ---------------------------------------------------------
 INSERT INTO TB_PET (PET_ID, MEMBER_NO, PET_NAME, SPECIES, BREED, GENDER, BIRTH_DATE, AGE, WEIGHT, IS_REPRESENT, PHOTO_URL, DEL_YN, REG_DATE, FUR_COLOR, NEUTER_YN, TRAITS, MEMO) VALUES (1, 1, '몽이', 'DOG', '말티푸', 'M', ADD_MONTHS(TRUNC(SYSDATE), -36), 3, 5.2, 'Y', '/upload/pet_dog.jpg', 'N', SYSDATE - 100, '크림', 'Y', '활발함,사람좋아함', '산책을 좋아해요.');
 
 INSERT INTO TB_PET (PET_ID, MEMBER_NO, PET_NAME, SPECIES, BREED, GENDER, BIRTH_DATE, AGE, WEIGHT, IS_REPRESENT, PHOTO_URL, DEL_YN, REG_DATE, FUR_COLOR, NEUTER_YN, TRAITS, MEMO) VALUES (2, 2, '루나', 'CAT', '코리안숏헤어', 'F', ADD_MONTHS(TRUNC(SYSDATE), -48), 4, 4.3, 'Y', '/upload/pet_cat.jpg', 'N', SYSDATE - 80, '고등어', 'Y', '차분함,낯가림', '츄르를 좋아해요.');
 
 
--- ---------------------------------------------------------
 -- 3-3. 사업자 3명: 쇼핑몰 / 병원 / 숙소
--- ---------------------------------------------------------
 INSERT INTO TB_BUSINESS (BIZ_NO, BIZ_ID, BIZ_TYPE, BIZ_REG_NO, BIZ_NAME, CEO_NAME, PHONE, EMAIL, ZIP_CODE, ADDR, ADDR_DETAIL, STATUS_CD, JOIN_DATE, APPROVE_DATE, FEE_RATE, SETTLE_ACCOUNT, SETTLE_BANK, SETTLE_BANK_CODE, SETTLE_HOLDER, SETTLE_VERIFY_YN, SETTLE_VERIFY_DATE, START_DATE, END_DATE, SHOP_NAME) VALUES (1, 'store01', 'STORE', '101-11-11111', 'Petrini 펫마켓', '박민수', '042-111-1111', 'store01@petrini.demo', '04001', '서울특별시 마포구 월드컵로 10', '1층', 'APPROVED', SYSDATE - 180, SYSDATE - 170, 5.0, '000000000001', '신한은행', '088', '박민수', 'Y', SYSDATE - 175, SYSDATE - 170, ADD_MONTHS(SYSDATE, 12), 'Petrini 펫마켓');
 
 INSERT INTO TB_BUSINESS (BIZ_NO, BIZ_ID, BIZ_TYPE, BIZ_REG_NO, BIZ_NAME, CEO_NAME, PHONE, EMAIL, ZIP_CODE, ADDR, ADDR_DETAIL, STATUS_CD, JOIN_DATE, APPROVE_DATE, FEE_RATE, SETTLE_ACCOUNT, SETTLE_BANK, SETTLE_BANK_CODE, SETTLE_HOLDER, SETTLE_VERIFY_YN, SETTLE_VERIFY_DATE, ANNUAL_FEE, START_DATE, END_DATE) VALUES (2, 'hospital01', 'HOSPITAL', '202-22-22222', '온누리 동물병원', '정유진', '042-222-2222', 'hospital01@petrini.demo', '34141', '대전광역시 유성구 대학로 20', '2층', 'APPROVED', SYSDATE - 180, SYSDATE - 170, 3.0, '000000000002', '신한은행', '088', '정유진', 'Y', SYSDATE - 175, 120000, SYSDATE - 170, ADD_MONTHS(SYSDATE, 12));
@@ -3129,9 +3101,7 @@ INSERT INTO TB_BUSINESS_AUTH (AUTH_ID, BIZ_NO, BIZ_REG_NO, BIZ_TYPE, AD_APPLY_YN
 INSERT INTO TB_BUSINESS_AUTH (AUTH_ID, BIZ_NO, BIZ_REG_NO, BIZ_TYPE, AD_APPLY_YN, STATUS_CD, APPLY_DATE, APPROVE_DATE, ADMIN_NO) VALUES (3, 3, '303-33-33333', 'STAY', 'N', 'APPROVED', SYSDATE - 180, SYSDATE - 170, 1);
 
 
--- ---------------------------------------------------------
 -- 3-4. 병원 + 의사 2명 + 진료유형 3개
--- ---------------------------------------------------------
 INSERT INTO TB_HOSPITAL (HOSPITAL_ID, BIZ_NO, MEMBER_NO, NAME, PHONE, ADDR, ADDR_DETAIL, LAT, LNG, AVG_RATING, REVIEW_CNT, DATA_SOURCE, STATUS_CD, APPROVE_DATE, HOURS_JSON, DESCRIPTION, TAG_LIST, RESV_CAPACITY, RESV_INTERVAL_MIN) VALUES (1, 2, 4, '온누리 동물병원', '042-222-2222', '대전광역시 유성구 대학로 20', '2층', 36.3622000, 127.3560000, 4.5, 1, 'PLATFORM', 'ACTIVE', SYSDATE - 170, '{"월":{"open":"09:00","close":"18:00","lunchStart":"12:00","lunchEnd":"13:00"},"화":{"open":"09:00","close":"18:00","lunchStart":"12:00","lunchEnd":"13:00"},"수":{"open":"09:00","close":"18:00","lunchStart":"12:00","lunchEnd":"13:00"},"목":{"open":"09:00","close":"18:00","lunchStart":"12:00","lunchEnd":"13:00"},"금":{"open":"09:00","close":"18:00","lunchStart":"12:00","lunchEnd":"13:00"},"토":{"open":"09:00","close":"13:00","lunchStart":"","lunchEnd":""}}', '강아지와 고양이 일반진료, 예방접종, 건강검진을 운영하는 동물병원입니다.', '강아지,고양이,일반진료,예방접종,건강검진', 2, 30);
 
 INSERT INTO TB_HOSPITAL_DOCTOR (DOCTOR_ID, HOSPITAL_ID, DOCTOR_NAME, SPECIALTY, STATUS_CD, SORT_ORDR, REG_DATE) VALUES (1, 1, '김하늘', '내과·예방진료', 'Y', 1, SYSDATE - 150);
@@ -3145,9 +3115,7 @@ INSERT INTO TB_HOSPITAL_TREAT_TYPE (TREAT_TYPE_ID, HOSPITAL_ID, TYPE_NAME, DURAT
 INSERT INTO TB_HOSPITAL_TREAT_TYPE (TREAT_TYPE_ID, HOSPITAL_ID, TYPE_NAME, DURATION_MIN, STATUS_CD, SORT_ORDR, REG_DATE) VALUES (3, 1, '건강검진', 60, 'Y', 3, SYSDATE - 150);
 
 
--- ---------------------------------------------------------
 -- 3-5. 숙소 1곳 + 객실 2개
--- ---------------------------------------------------------
 INSERT INTO TB_STAY (STAY_ID, BIZ_NO, MEMBER_NO, NAME, PHONE, ZIP_CODE, ADDR, ADDR_DETAIL, LAT, LNG, PET_POLICY, REFUND_POLICY, STATUS_CD, APPROVE_DATE, FACILITIES, CHECK_IN, CHECK_OUT, DESCRIPTION, PET_FEE, REGION, AVG_RATING, REVIEW_CNT) VALUES (1, 3, 5, '포레스트 펫스테이', '033-333-3333', '25460', '강원특별자치도 강릉시 해안로 30', '별관', '37.7519000', '128.8761000', '기본 1마리 포함, 예방접종 완료 반려동물만 이용 가능합니다.', '체크인 3일 전까지 전액 환불, 이후 일정에 따라 수수료가 부과됩니다.', 'ACTIVE', TO_CHAR(SYSDATE - 170, 'YYYY-MM-DD'), '주차,운동장,펫샤워실,와이파이', '15:00', '11:00', '조용한 휴식을 즐길 수 있는 반려동물 동반 숙소입니다.', 10000, '강원', 5.0, 1);
 
 INSERT INTO TB_STAY_ROOM (ROOM_ID, STAY_ID, NAME, PRICE_PER_NIGHT, CAPACITY, PET_LIMIT, STATUS_CD) VALUES (1, 1, '포레스트 디럭스', 120000, 3, 2, 'APPROVE');
@@ -3155,9 +3123,7 @@ INSERT INTO TB_STAY_ROOM (ROOM_ID, STAY_ID, NAME, PRICE_PER_NIGHT, CAPACITY, PET
 INSERT INTO TB_STAY_ROOM (ROOM_ID, STAY_ID, NAME, PRICE_PER_NIGHT, CAPACITY, PET_LIMIT, STATUS_CD) VALUES (2, 1, '포레스트 스위트', 170000, 4, 2, 'APPROVE');
 
 
--- ---------------------------------------------------------
 -- 3-6. 상품 6개: 강아지 3 + 고양이 3
--- ---------------------------------------------------------
 INSERT INTO TB_PRODUCT (PRODUCT_ID, PRODUCT_CD, PRODUCT_NAME, BIZ_NO, CATEGORY_ID, PRICE, SALE_PRICE, STOCK_QTY, LOW_STOCK_THRESHOLD, DESCRIPTION, STATUS_CD, APPROVE_DATE, REG_DATE, BRAND_NAME, TAGS) VALUES (1, 'DOG-FOOD-001', '네이처밸런스 어덜트 독 사료 2kg', 1, 8, '32000', '28900', '25', '5', '성견을 위한 균형 잡힌 데일리 사료입니다.', 'NORMAL', TO_CHAR(SYSDATE - 90, 'YYYY-MM-DD'), TO_CHAR(SYSDATE - 95, 'YYYY-MM-DD'), '네이처밸런스', '강아지,사료,어덜트');
 
 INSERT INTO TB_PRODUCT (PRODUCT_ID, PRODUCT_CD, PRODUCT_NAME, BIZ_NO, CATEGORY_ID, PRICE, SALE_PRICE, STOCK_QTY, LOW_STOCK_THRESHOLD, DESCRIPTION, STATUS_CD, APPROVE_DATE, REG_DATE, BRAND_NAME, TAGS) VALUES (2, 'DOG-SNACK-001', '오리안심 큐브 트릿 100g', 1, 14, '9800', '8500', '30', '5', '한입 크기로 급여하기 편한 오리안심 간식입니다.', 'NORMAL', TO_CHAR(SYSDATE - 85, 'YYYY-MM-DD'), TO_CHAR(SYSDATE - 90, 'YYYY-MM-DD'), '펫프레시', '강아지,간식,트릿');
@@ -3184,10 +3150,8 @@ INSERT INTO TB_PRODUCT_OPTION (OPTION_ID, PRODUCT_ID, OPTION_COLOR, OPTION_SIZE,
 INSERT INTO TB_PRODUCT_OPTION (OPTION_ID, PRODUCT_ID, OPTION_COLOR, OPTION_SIZE, ADD_PRICE, STOCK_QTY) VALUES (6, 6, '기본', 'FREE', 0, 15);
 
 
--- ---------------------------------------------------------
 -- 3-7. 이미지 파일 (실제 파일 위치: C:\upload\)
 -- FILE_URL은 TB_FILE 화면 코드가 /upload/를 붙여서 쓰므로 파일명만 저장
--- ---------------------------------------------------------
 -- 메인 배너 1200x360 권장
 INSERT INTO TB_FILE (FILE_ID, REF_TYPE, REF_ID, DRIVE_FILE_ID, FILE_URL, ORIGIN_NAME, REG_DATE) VALUES (1, 'BANNER', 1, NULL, 'main_banner.jpg', 'main_banner.jpg', SYSDATE - 30);
 INSERT INTO TB_FILE (FILE_ID, REF_TYPE, REF_ID, DRIVE_FILE_ID, FILE_URL, ORIGIN_NAME, REG_DATE) VALUES (12, 'BANNER', 2, NULL, 'main_banner_shop.jpg', 'main_banner_shop.jpg', SYSDATE - 20);
@@ -3214,9 +3178,7 @@ INSERT INTO TB_BANNER (BANNER_ID, BIZ_NO, TITLE, POSITION_CD, FILE_ID, LINK_URL,
 
 --분실 보호
 INSERT INTO TB_FILE (FILE_ID, REF_TYPE, REF_ID, DRIVE_FILE_ID, FILE_URL, ORIGIN_NAME, REG_DATE) VALUES (SEQ_TB_FILE.NEXTVAL, 'POST', 5, 'LOCAL', '/upload/give/report/5/lost_dog.jpg', 'lost_dog.jpg', SYSDATE - 1);
--- ---------------------------------------------------------
 -- 3-8. 쿠폰 3개 + 회원 보유쿠폰 4개
--- ---------------------------------------------------------
 INSERT INTO TB_COUPON (COUPON_ID, COUPON_CODE, COUPON_NAME, COUPON_TYPE, DISCOUNT_VALUE, MAX_DISCOUNT_AMT, MIN_ORDER_AMT, STATUS_CD, TOTAL_BUDGET, ISSUED_BUDGET, TOTAL_QTY, ISSUED_QTY, USE_START_DATE, USE_END_DATE, BIZ_MEMBER_NO, APPROVAL_STATUS, APPROVAL_DATE, REG_DATE, BIZ_NO) VALUES (1, 'STORE10', '펫마켓 10% 할인', 'RATE', 10, 5000, 20000, 'ACTIVE', 500000, 20, 100, 2, TO_CHAR(SYSDATE - 30, 'YYYYMMDD'), TO_CHAR(SYSDATE + 180, 'YYYYMMDD'), 1, 'APPROVED', TO_CHAR(SYSDATE - 29, 'YYYYMMDD'), TO_CHAR(SYSDATE - 30, 'YYYYMMDDHH24MISS'), 1);
 
 INSERT INTO TB_COUPON (COUPON_ID, COUPON_CODE, COUPON_NAME, COUPON_TYPE, DISCOUNT_VALUE, MAX_DISCOUNT_AMT, MIN_ORDER_AMT, STATUS_CD, TOTAL_BUDGET, ISSUED_BUDGET, TOTAL_QTY, ISSUED_QTY, USE_START_DATE, USE_END_DATE, BIZ_MEMBER_NO, APPROVAL_STATUS, APPROVAL_DATE, REG_DATE, BIZ_NO) VALUES (2, 'HOSP5000', '병원 5,000원 할인', 'FIXED', 5000, NULL, 30000, 'ACTIVE', 250000, 5000, 50, 1, TO_CHAR(SYSDATE - 30, 'YYYYMMDD'), TO_CHAR(SYSDATE + 180, 'YYYYMMDD'), 2, 'APPROVED', TO_CHAR(SYSDATE - 29, 'YYYYMMDD'), TO_CHAR(SYSDATE - 30, 'YYYYMMDDHH24MISS'), 2);
@@ -3234,9 +3196,7 @@ INSERT INTO TB_MEMBER_COUPON (MEMBER_COUPON_ID, COUPON_ID, MEMBER_NO, EXPIRE_DAT
 INSERT INTO TB_MEMBER_COUPON (MEMBER_COUPON_ID, COUPON_ID, MEMBER_NO, EXPIRE_DATE, USE_END_DATE, REG_DATE, STATUS_CD) VALUES (4, 3, 2, TO_CHAR(SYSDATE + 180, 'YYYYMMDD'), TO_CHAR(SYSDATE + 180, 'YYYYMMDD'), TO_CHAR(SYSDATE - 10, 'YYYYMMDDHH24MISS'), 'USED');
 
 
--- ---------------------------------------------------------
 -- 3-9. 쇼핑 주문 3건 + 주문상품 4건 + 결제/배송
--- ---------------------------------------------------------
 
 -- 주문 1: 배송준비중 / user01 / 강아지 용품 / 쿠폰 사용
 INSERT INTO TB_ORDER (ORDER_ID, ORDER_NO, MEMBER_NO, ORDER_STATUS, TOTAL_AMOUNT, DISCOUNT_AMOUNT, POINT_USED, PAY_AMOUNT, ORDER_DATE, RECV_NAME, RECV_PHONE, ZIP_CODE, ADDR1, ADDR2, DELIVERY_MEMO, DELIVERY_FEE, BIZ_NO, MEMBER_COUPON_ID, CONFIRM_YN) VALUES (1, 'ORD-DEMO-0001', 1, 'READY', 21900, 2190, 0, 22710, SYSDATE - 2, '김민준', '010-1111-1111', '34141', '대전광역시 유성구 대학로 10', '101호', '문 앞에 놓아주세요.', 3000, 1, 1, 'N');
@@ -3274,9 +3234,7 @@ INSERT INTO TB_ORDER_DELIVERY (DELIVERY_ID, ORDER_ID, BIZ_NO, COURIER_NAME, TRAC
 INSERT INTO TB_POINT (POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT, BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE) VALUES (1, 1, 'EARN', '374', '374', 'PURCHASE_CONFIRM', 'ORDER', '3', TO_CHAR(SYSDATE - 14, 'YYYY-MM-DD'));
 
 
--- ---------------------------------------------------------
 -- 3-10. 병원 예약 3건
--- ---------------------------------------------------------
 
 -- 진료완료
 INSERT INTO TB_RESERVATION (RESV_ID, RESV_NO, RESV_TYPE, MEMBER_NO, PET_ID, TARGET_ID, SERVICE_NAME, RESV_DATE, RESV_TIME, TOTAL_AMOUNT, STATUS_CD, REG_DATE, TREAT_TYPE_ID, DURATION_MIN, END_TIME, DOCTOR_ID, SYMPTOMS, REQUEST_MEMO) VALUES (1, 'HOSP-DEMO-0001', 'HOSPITAL', 1, 1, '1', '일반진료', TRUNC(SYSDATE) - 10, '10:00', 30000, 'DONE', SYSDATE - 15, 1, 30, '10:30', 1, '귀를 자주 긁어요.', '처음 방문합니다.');
@@ -3288,9 +3246,7 @@ INSERT INTO TB_RESERVATION (RESV_ID, RESV_NO, RESV_TYPE, MEMBER_NO, PET_ID, TARG
 INSERT INTO TB_RESERVATION (RESV_ID, RESV_NO, RESV_TYPE, MEMBER_NO, PET_ID, TARGET_ID, SERVICE_NAME, RESV_DATE, RESV_TIME, TOTAL_AMOUNT, STATUS_CD, REJECT_REASON, CANCEL_FEE_AMT, REFUND_AMT, CANCEL_AT, REG_DATE, TREAT_TYPE_ID, DURATION_MIN, END_TIME, DOCTOR_ID, SYMPTOMS) VALUES (3, 'HOSP-DEMO-0003', 'HOSPITAL', 1, 1, '1', '건강검진', TRUNC(SYSDATE) + 5, '11:00', 60000, 'CANCEL', '개인 일정으로 예약 취소', 0, 60000, SYSDATE - 1, SYSDATE - 5, 3, 60, '12:00', 1, '정기 건강검진');
 
 
--- ---------------------------------------------------------
 -- 3-11. 숙소 예약 3건
--- ---------------------------------------------------------
 
 -- 이용완료 + 쿠폰 사용
 INSERT INTO TB_RESERVATION (RESV_ID, RESV_NO, RESV_TYPE, MEMBER_NO, PET_ID, TARGET_ID, ROOM_ID, SERVICE_NAME, CHECKIN_DATE, CHECKOUT_DATE, NIGHT_CNT, RESV_DATE, TOTAL_AMOUNT, STATUS_CD, REG_DATE, MEMBER_COUPON_ID, COUPON_DISCOUNT, POINT_USED, PET_CNT) VALUES (4, 'STAY-DEMO-0001', 'STAY', 2, 2, '1', 1, '포레스트 디럭스', TRUNC(SYSDATE) - 12, TRUNC(SYSDATE) - 11, 1, TRUNC(SYSDATE) - 12, 120000, 'DONE', SYSDATE - 20, 4, 10000, 0, 1);
@@ -3302,9 +3258,7 @@ INSERT INTO TB_RESERVATION (RESV_ID, RESV_NO, RESV_TYPE, MEMBER_NO, PET_ID, TARG
 INSERT INTO TB_RESERVATION (RESV_ID, RESV_NO, RESV_TYPE, MEMBER_NO, PET_ID, TARGET_ID, ROOM_ID, SERVICE_NAME, CHECKIN_DATE, CHECKOUT_DATE, NIGHT_CNT, RESV_DATE, TOTAL_AMOUNT, STATUS_CD, REJECT_REASON, CANCEL_FEE_AMT, REFUND_AMT, CANCEL_AT, REG_DATE, COUPON_DISCOUNT, POINT_USED, PET_CNT) VALUES (6, 'STAY-DEMO-0003', 'STAY', 2, 2, '1', 2, '포레스트 스위트', TRUNC(SYSDATE) + 20, TRUNC(SYSDATE) + 21, 1, TRUNC(SYSDATE) + 20, 170000, 'CANCEL', '여행 일정 변경', 0, 170000, SYSDATE - 1, SYSDATE - 6, 0, 0, 1);
 
 
--- ---------------------------------------------------------
 -- 3-12. 예약 결제
--- ---------------------------------------------------------
 
 -- 병원 3건
 INSERT INTO TB_PAYMENT (PAYMENT_ID, ORDER_ID, RESV_ID, PAY_TYPE, PAY_METHOD, PAY_AMOUNT, TOSS_PAYMENT_KEY, TOSS_ORDER_ID, PAY_STATUS, PAY_DATE, REFUND_AMT) VALUES (4, NULL, 1, 'RESERVATION', 'CARD', 30000, 'dummy_pay_hosp_1', 'HOSP-DEMO-0001', 'DONE', SYSDATE - 15, 0);
@@ -3321,9 +3275,7 @@ INSERT INTO TB_PAYMENT (PAYMENT_ID, ORDER_ID, RESV_ID, PAY_TYPE, PAY_METHOD, PAY
 INSERT INTO TB_PAYMENT (PAYMENT_ID, ORDER_ID, RESV_ID, PAY_TYPE, PAY_METHOD, PAY_AMOUNT, TOSS_PAYMENT_KEY, TOSS_ORDER_ID, PAY_STATUS, PAY_DATE, REFUND_AMT) VALUES (9, NULL, 6, 'RESERVATION', 'CARD', 170000, 'dummy_pay_stay_3', 'STAY-DEMO-0003', 'REFUND', SYSDATE - 6, 170000);
 
 
--- ---------------------------------------------------------
 -- 3-13. 리뷰 4건
--- ---------------------------------------------------------
 
 -- 상품 리뷰 2개: 배송완료/구매확정 주문상품과 연결
 INSERT INTO TB_REVIEW (REVIEW_ID, REVIEW_TYPE, TARGET_ID, MEMBER_NO, ORDER_ITEM_ID, RESV_ID, RATING, CONTENT, BIZ_REPLY, REG_DATE) VALUES (1, 'PRODUCT', 1, 1, 3, NULL, 5.0, '알갱이 크기가 적당하고 몽이가 잘 먹어요. 포장도 깔끔했습니다.', '소중한 후기 감사합니다. 앞으로도 좋은 상품으로 준비하겠습니다.', SYSDATE - 12);
@@ -3337,10 +3289,8 @@ INSERT INTO TB_REVIEW (REVIEW_ID, REVIEW_TYPE, TARGET_ID, MEMBER_NO, ORDER_ITEM_
 INSERT INTO TB_REVIEW (REVIEW_ID, REVIEW_TYPE, TARGET_ID, MEMBER_NO, ORDER_ITEM_ID, RESV_ID, RATING, CONTENT, BIZ_REPLY, REG_DATE) VALUES (4, 'STAY', 1, 2, NULL, 4, 5.0, '객실이 깔끔하고 반려동물 동선이 편해서 루나와 편하게 쉬었습니다.', '좋은 후기 감사합니다. 다음 방문도 편안하게 준비해두겠습니다.', SYSDATE - 10);
 
 
--- ---------------------------------------------------------
 -- 3-14. 커뮤니티 게시글 6개
 --      TOWN / LIFE / LOST / SHARE 골고루
--- ---------------------------------------------------------
 
 INSERT INTO TB_POST (POST_ID, MEMBER_NO, BOARD_TYPE, TITLE, BODY, VIEW_COUNT, LIKE_CNT, REGION, STATUS_CD, REG_DATE, TAGS) VALUES (1, 1, 'TOWN', '요즘 저녁 산책은 몇 시쯤 나가세요?', '낮에는 아직 조금 더운 것 같아서 저녁 산책 시간을 늦춰볼까 고민 중이에요. 다른 분들은 보통 몇 시쯤 나가시는지 궁금합니다.', 32, 1, '대전', 'ACTIVE', SYSDATE - 3, '#강아지 #산책 #동네');
 
@@ -3355,9 +3305,7 @@ INSERT INTO TB_POST (POST_ID, MEMBER_NO, BOARD_TYPE, TITLE, BODY, VIEW_COUNT, LI
 INSERT INTO TB_POST (POST_ID, MEMBER_NO, BOARD_TYPE, TITLE, BODY, VIEW_COUNT, LIKE_CNT, REGION, STATUS_CD, REG_DATE, TAGS) VALUES (6, 2, 'SHARE', '사용하지 않는 고양이 장난감 나눔합니다', '루나가 관심을 보이지 않아 거의 사용하지 않은 낚싯대 장난감 두 개 나눔하려고 합니다. 가까운 분이면 직접 전달할게요.', 39, 1, '천안', 'ACTIVE', SYSDATE - 2, '#무료나눔 #고양이 #장난감');
 
 
--- ---------------------------------------------------------
 -- 3-15. 댓글 8개
--- ---------------------------------------------------------
 INSERT INTO TB_POST_COMMENT (COMMENT_ID, POST_ID, PARENT_ID, MEMBER_NO, BODY, IS_DELETED, REG_DATE) VALUES (1, 1, NULL, 2, '저는 해 지고 한 시간 정도 지난 뒤에 나가요. 바닥 열기도 많이 빠져서 괜찮더라고요.', 'N', SYSDATE - 3);
 
 INSERT INTO TB_POST_COMMENT (COMMENT_ID, POST_ID, PARENT_ID, MEMBER_NO, BODY, IS_DELETED, REG_DATE) VALUES (2, 1, 1, 1, '좋은 팁 감사합니다. 오늘부터 조금 늦게 나가봐야겠어요.', 'N', SYSDATE - 3);
@@ -3375,9 +3323,7 @@ INSERT INTO TB_POST_COMMENT (COMMENT_ID, POST_ID, PARENT_ID, MEMBER_NO, BODY, IS
 INSERT INTO TB_POST_COMMENT (COMMENT_ID, POST_ID, PARENT_ID, MEMBER_NO, BODY, IS_DELETED, REG_DATE) VALUES (8, 6, NULL, 1, '아직 나눔 전이면 제가 받을 수 있을까요?', 'N', SYSDATE - 1);
 
 
--- ---------------------------------------------------------
 -- 3-16. 좋아요 6건
--- ---------------------------------------------------------
 INSERT INTO TB_POST_LIKE (LIKE_ID, POST_ID, MEMBER_NO, REG_DATE) VALUES (1, 1, 2, TO_CHAR(SYSDATE - 3, 'YYYY-MM-DD'));
 
 INSERT INTO TB_POST_LIKE (LIKE_ID, POST_ID, MEMBER_NO, REG_DATE) VALUES (2, 2, 1, TO_CHAR(SYSDATE - 4, 'YYYY-MM-DD'));
@@ -3391,10 +3337,8 @@ INSERT INTO TB_POST_LIKE (LIKE_ID, POST_ID, MEMBER_NO, REG_DATE) VALUES (5, 5, 2
 INSERT INTO TB_POST_LIKE (LIKE_ID, POST_ID, MEMBER_NO, REG_DATE) VALUES (6, 6, 1, TO_CHAR(SYSDATE - 1, 'YYYY-MM-DD'));
 
 
--- ---------------------------------------------------------
 -- 3-17. 신고
 --      게시글 신고 1 + 댓글 신고 1 + 리뷰 신고 1
--- ---------------------------------------------------------
 INSERT INTO TB_POST_REPORT (REPORT_ID, POST_ID, COMMENT_ID, TARGET_TYPE, REPORTER_NO, REASON, STATUS_CD, ADMIN_NO) VALUES (1, 3, NULL, 'POST', 2, '상업성 홍보 게시글인지 확인이 필요합니다.', 'PENDING', NULL);
 
 INSERT INTO TB_POST_REPORT (REPORT_ID, POST_ID, COMMENT_ID, TARGET_TYPE, REPORTER_NO, REASON, STATUS_CD, ADMIN_NO) VALUES (2, 4, 6, 'COMMENT', 1, '신고 기능 테스트용 댓글 신고입니다.', 'PENDING', NULL);
@@ -3402,37 +3346,27 @@ INSERT INTO TB_POST_REPORT (REPORT_ID, POST_ID, COMMENT_ID, TARGET_TYPE, REPORTE
 INSERT INTO TB_REVIEW_REPORT (REPORT_ID, REPORTER_TYPE, REPORTER_NO, TARGET_MEMBER_NO, HOSPITAL_ID, REVIEW_ID, BIZ_NO, REASON, STATUS_CD, ADMIN_NO, REG_DATE) VALUES (1, 'BIZ', 2, 1, 1, 3, 2, '리뷰 내용 확인이 필요하여 신고합니다.', 'PENDING', NULL, SYSDATE - 8);
 
 
--- ---------------------------------------------------------
 -- 3-18. 재능나눔 2건
--- ---------------------------------------------------------
 INSERT INTO TB_TALENT (TALENT_ID, BIZ_NO, TITLE, TALENT_TYPE, CAPACITY, CURRENT_CNT, SCHEDULE, DURATION, LOCATION, CONTACT, BODY, STATUS_CD, ADMIN_NO, REG_DATE, APPROVE_DATE) VALUES (SEQ_TB_TALENT.NEXTVAL, 2, '반려동물 무료 건강상담', 'HOSPITAL', 5, 0, '매주 토요일 10:00~12:00', '30분', '대전 유성구', '042-222-2222', '반려동물의 기본 건강상태를 확인하고 간단한 건강상담을 진행합니다.', 'APPROVED', 1, SYSDATE - 10, SYSDATE - 9);
 
 INSERT INTO TB_TALENT (TALENT_ID, BIZ_NO, TITLE, TALENT_TYPE, CAPACITY, CURRENT_CNT, SCHEDULE, DURATION, LOCATION, CONTACT, BODY, STATUS_CD, ADMIN_NO, REG_DATE, APPROVE_DATE) VALUES (SEQ_TB_TALENT.NEXTVAL, 3, '반려동물 돌봄 상담', 'ETC', 4, 0, '매월 둘째 주 일요일', '1시간', '강원 강릉시', '033-333-3333', '반려동물과 여행할 때 필요한 준비사항과 돌봄 방법을 안내합니다.', 'APPROVED', 1, SYSDATE - 8, SYSDATE - 7);
 
--- ---------------------------------------------------------
 -- 3-19. 화면용 누적값 정리
--- ---------------------------------------------------------
 UPDATE TB_MEMBER SET POST_COUNT = 3, COMMENT_COUNT = 4 WHERE MEMBER_NO IN (1, 2);
 
--- ---------------------------------------------------------
 -- 고객센터 FAQ 3건 (TB_FAQ — MemberCsMapper 조회 테이블)
--- ---------------------------------------------------------
 INSERT INTO TB_FAQ (FAQ_ID, CATEGORY_CD, QUESTION, ANSWER, VISIBLE_YN, SORT_ORDER, REG_DATE) VALUES (1, 'MEMBER', '비밀번호는 어디서 변경하나요?', '마이페이지 > 회원정보 수정에서 비밀번호를 변경할 수 있습니다.', 'Y', 1, SYSDATE - 20);
 
 INSERT INTO TB_FAQ (FAQ_ID, CATEGORY_CD, QUESTION, ANSWER, VISIBLE_YN, SORT_ORDER, REG_DATE) VALUES (2, 'ORDER', '배송 상태는 어디서 확인하나요?', '주문 완료 후 마이페이지 > 주문내역에서 배송 상태를 확인할 수 있습니다.', 'Y', 2, SYSDATE - 18);
 
 INSERT INTO TB_FAQ (FAQ_ID, CATEGORY_CD, QUESTION, ANSWER, VISIBLE_YN, SORT_ORDER, REG_DATE) VALUES (3, 'RESERVE', '병원이나 숙소 예약은 어떻게 하나요?', '병원 또는 숙소 상세 화면에서 원하는 날짜와 시간을 선택해 예약할 수 있습니다.', 'Y', 3, SYSDATE - 15);
 
--- ---------------------------------------------------------
 -- 고객센터 공지사항 2건 (TB_NOTICE — MemberCsMapper 조회 테이블)
--- ---------------------------------------------------------
 INSERT INTO TB_NOTICE (NOTICE_ID, NOTICE_TYPE_CD, TITLE, BODY, WRITER_NAME, PIN_YN, VISIBLE_YN, VIEW_COUNT, REG_DATE) VALUES (1, 'NOTICE', '펫린이 서비스 이용 안내', '펫린이를 이용해 주셔서 감사합니다. 쇼핑, 병원 예약, 숙소 예약 등 다양한 반려동물 서비스를 이용하실 수 있습니다.', '관리자', 'Y', 'Y', 0, SYSDATE - 10);
 
 INSERT INTO TB_NOTICE (NOTICE_ID, NOTICE_TYPE_CD, TITLE, BODY, WRITER_NAME, PIN_YN, VISIBLE_YN, VIEW_COUNT, REG_DATE) VALUES (2, 'NOTICE', '고객센터 운영 안내', '고객센터는 평일 오전 9시부터 오후 6시까지 운영됩니다. 문의사항은 1:1 문의를 이용해 주세요.', '관리자', 'N', 'Y', 0, SYSDATE - 5);
 
-/* =========================================================
-   4. IDENTITY / 호환 설정
-   ========================================================= */
+/* 4. IDENTITY / 호환 설정 */
 
 ALTER TABLE TB_BUSINESS MODIFY (
     BIZ_NO GENERATED BY DEFAULT ON NULL AS IDENTITY (START WITH LIMIT VALUE)
@@ -3452,9 +3386,8 @@ ALTER TABLE TB_CART_ITEM MODIFY (OPTION_ID NULL);
 COMMIT;
 
 
-/* =========================================================
+/*
    테스트 로그인 계정
-   ---------------------------------------------------------
    관리자
    - admin / 1234
 
@@ -3466,4 +3399,4 @@ COMMIT;
    - store01    / 1234   (쇼핑몰)
    - hospital01 / 1234   (병원)
    - stay01     / 1234   (숙소)
-   ========================================================= */
+   */

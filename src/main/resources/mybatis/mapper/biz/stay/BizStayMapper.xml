@@ -2,21 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.biz.stay.mapper.BizStayMapper">
-<!--
-  역할: BizStayMapper SQL 정의
-
-  쿼리 id 예시
-  - selectReservationList
-  - updateReservationStatus
-  - selectRoomList
-  - insertRoom
-  - updateRoom
-
-  테이블
-  - TB_STAY_ROOM
-  - TB_RESERVATION
-  - TB_REVIEW
--->
     <!-- 회원ID로 조회 -->
     <select id="selectStayByBizId" parameterType="string" resultType="com.petcare.petcare.stay.vo.StayVO">
         SELECT  S.STAY_ID, 
@@ -118,7 +103,7 @@
         WHERE  STAY_ID       = #{stayId}
     </update>
 
-    <!-- ═══ 객실 CRUD ═══ -->
+    <!-- 객실 CRUD -->
 
     <!-- 해당 숙소의 객실 목록 -->
     <select id="selectRoomList" parameterType="long"
@@ -456,7 +441,7 @@
 
   <!--
     병원/숙소 쿠폰 조기 마감 (store BizStoreMapper.closeCoupon과 동일 패턴)
-    관리자 재승인 없이 사업자가 직접 마감. 기존 발급된 회원 쿠폰은 변경하지 않는다.
+    관리자 재승인 없이 사업자가 직접 마감, 기존 발급된 회원 쿠폰은 변경 없음
   -->
   <update id="closeCoupon">
     UPDATE TB_COUPON
@@ -479,7 +464,7 @@
         LEFT JOIN TB_FILE f ON f.FILE_ID = b.FILE_ID
     </sql>
 
-    <!-- ─── 사업자: 내 배너 목록 ─── -->
+    <!-- 사업자: 내 배너 목록 -->
     <!-- DATE → TO_CHAR (VO String 매핑) -->
     <select id="selectBannerList" parameterType="Long" resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">
         SELECT
@@ -500,7 +485,7 @@
         ORDER   BY b.REG_DATE DESC
     </select>
 
-    <!-- ─── 사업자: 배너 신청 INSERT ─── -->
+    <!-- 사업자: 배너 신청 INSERT -->
     <!-- START/END_DATE가 DATE 타입 → TO_DATE로 바인딩 (문자열 INSERT ORA-01861 방지) -->
     <!-- BANNER_ID 시퀀스 누락 시 ORA-01400 방지 -->
     <insert id="insertBanner" parameterType="com.petcare.petcare.main.banner.vo.MainBannerVO">
@@ -641,9 +626,7 @@
          ORDER BY DR.REQ_DATE DESC, DR.REQUEST_ID DESC
     </select>
 
-   <!-- ══════════════════════════════════════════════
-        대시보드 집계 쿼리
-    ══════════════════════════════════════════════ -->
+   <!-- 대시보드 집계 쿼리 -->
 
     <!-- 특정 날짜 예약(체크인) 건수 -->
     <select id="countResvByDate" resultType="int">

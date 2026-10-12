@@ -1,8 +1,6 @@
 /* PetCare - main.js */
 
-    /* =============================================
-       HERO SLIDER
-       ============================================= */
+    /* HERO SLIDER */
 function initHeroSlider() {
     const slides = document.querySelectorAll('.hero-slide');
 
@@ -57,9 +55,7 @@ function initHeroSlider() {
     startAuto();
 }
 
-/* =============================================
-   페이지 로드 시 실행
-   ============================================= */
+/* 페이지 로드 시 실행 */
    document.addEventListener('DOMContentLoaded', function () {
     /* LAZY IMAGE FALLBACK */
     document.querySelectorAll('img').forEach(function (img) {

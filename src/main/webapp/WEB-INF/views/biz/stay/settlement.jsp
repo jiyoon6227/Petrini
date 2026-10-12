@@ -8,11 +8,6 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_stay.jsp" %>
 
-<%--
-  숙소 정산 내역
-  - 2-1 상단 요약 / 2-2 목록 / 2-4 상세(아코디언 + AJAX ITEM)
-  - 4-1/4-2 중간정산 요청 버튼·폼 + REQUEST 저장
---%>
 <style>
   .settle-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
   .settle-summary-card{background:#fff;border:1px solid var(--biz-border);border-radius:12px;padding:16px 18px}
@@ -261,7 +256,7 @@
   </div>
 </div>
 
-<%-- ===== 4-1 중간정산 요청 모달 ===== --%>
+<%-- 중간정산 요청 모달 --%>
 <div class="adhoc-modal-bg" id="adhocModalBg" onclick="if(event.target===this) closeAdhocModal()">
   <div class="adhoc-modal" role="dialog" aria-labelledby="adhocModalTitle">
     <div class="adhoc-modal-head">
@@ -465,7 +460,7 @@
   document.getElementById('saAccountHolder').addEventListener('input', clearSettleAccountVerify);
   document.getElementById('saBankAccount').addEventListener('input', clearSettleAccountVerify);
 
-  /* ----- 4-2 중간정산 요청 ----- */
+  /* 중간정산 요청 */
   function firstDayOfMonthStr(yyyyMmDd) {
     if (!yyyyMmDd || yyyyMmDd.length < 7) return '';
     return yyyyMmDd.substring(0, 7) + '-01';

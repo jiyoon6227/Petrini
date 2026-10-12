@@ -1,7 +1,3 @@
-/**
- * 역할: 쇼핑 사업자 정산 상단 요약 (예정/완료/수수료)
- * 쇼핑 정산 VO (사업자 화면 조회)
- */
 package com.petcare.petcare.settlement.vo;
 
 import lombok.Getter;

@@ -1,6 +1,3 @@
-/**
- * 역할: 관리자 숙소 예약 목록·상세 VO
- */
 package com.petcare.petcare.admin.reservation.vo;
 
 import java.util.Date;

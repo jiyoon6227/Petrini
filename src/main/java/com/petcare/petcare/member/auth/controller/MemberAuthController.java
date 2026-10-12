@@ -1,15 +1,3 @@
-/**
- * 역할: 회원 로그인·가입 URL 처리 → Service 호출 → JSP/리다이렉트 반환
- *
- * - 정지 회원 로그인 후 /member/cs 리다이렉트, 탈퇴 로그인 메시지
- *
- * 연결
- * - Service: MemberAuthService
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.member.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +70,6 @@ public class MemberAuthController {
             @RequestParam(required = false) String redirect,
             HttpSession session) {
 
-        // [1] 필수값 검증 — 아이디·비밀번호 빈 값이면 로그인 페이지로 (error=empty)
         if (loginId == null || loginId.isBlank() || loginPw == null || loginPw.isBlank()) {
             return "redirect:/login?error=empty";
         }
@@ -93,7 +80,6 @@ public class MemberAuthController {
             return "redirect:/login?error=locked&minutes=" + remaining;
         }
         
-        // [2] Service 호출 — TB_MEMBER 조회 + BCrypt 검증, 성공 시 세션용 MemberVO 반환
         try {
             MemberVO member = memberAuthService.login(loginId, loginPw);
             if (member == null) {
@@ -109,7 +95,7 @@ public class MemberAuthController {
             // 성공 시 실패 기록 초기화
             LoginAttemptUtil.resetAttempts(loginId);
 
-            // [3] 로그인 성공 — 세션에 회원 정보 저장 (header.jsp에서 memberInfo로 로그아웃 표시)
+            // 세션 memberInfo 저장 (header.jsp 로그인 상태 표시용)
             session.setAttribute("memberInfo", member);
 
             // 정지 회원은 고객센터로
@@ -117,7 +103,6 @@ public class MemberAuthController {
                 return "redirect:/member/cs";
             }
 
-            // [4] 로그인 전 가려던 페이지가 있으면 해당 URL로 이동
             // "//" 로 시작하는 외부 URL 차단 (오픈 리다이렉트 방지)
             if (redirect != null && !redirect.isBlank() && redirect.startsWith("/") && !redirect.startsWith("//")) {
                 return "redirect:" + redirect;
@@ -158,7 +143,7 @@ public class MemberAuthController {
     }
 
     /**
-     * 카카오 콜백 — 인가 코드 수신 → 토큰 교환 → 사용자 정보 → intent 에 따라 분기
+     * 카카오 콜백 (intent에 따라 로그인/회원가입 분기)
      * 카카오가 돌려주는 state 를 우선 사용 (세션 intent 유실 시 로그인으로 오인 방지)
      */
     @GetMapping("/oauth/kakao/callback")
@@ -174,14 +159,12 @@ public class MemberAuthController {
                 ? state : sessionIntent;
         boolean signupFlow = KAKAO_INTENT_SIGNUP.equals(intent);
 
-        // [1] 사용자가 카카오 로그인을 취소한 경우
         if (error != null || code == null || code.isBlank()) {
             return signupFlow
                     ? "redirect:/join?error=kakao_cancel"
                     : "redirect:/login?error=kakao_cancel";
         }
 
-        // [2] 인가 코드 → 액세스 토큰 교환
         String accessToken = kakaoOAuthService.getAccessToken(code);
         if (accessToken == null) {
             return signupFlow
@@ -189,7 +172,6 @@ public class MemberAuthController {
                     : "redirect:/login?error=kakao_token";
         }
 
-        // [3] 액세스 토큰 → 카카오 사용자 정보 조회
         KakaoUserVO kakaoUser = kakaoOAuthService.getUserInfo(accessToken);
         if (kakaoUser == null) {
             return signupFlow
@@ -197,11 +179,9 @@ public class MemberAuthController {
                     : "redirect:/login?error=kakao_user";
         }
 
-        // [4] 기존 회원 조회
         try {
             MemberVO member = memberAuthService.kakaoLogin(kakaoUser);
 
-            // [5] 미가입 — intent 에 따라 분기
             if (member == null) {
                 if (signupFlow) {
                     session.setAttribute("kakaoUserInfo", kakaoUser);
@@ -210,12 +190,11 @@ public class MemberAuthController {
                 return "redirect:/login?error=kakao_not_member";
             }
 
-            // [6] 회원가입 경로인데 이미 가입됨 → 로그인 처리하지 않고 로그인 페이지로 안내
+            // 회원가입 경로인데 이미 가입된 회원은 로그인 처리 없이 로그인 페이지로 안내
             if (signupFlow) {
                 return "redirect:/login?error=kakao_already_member";
             }
 
-            // [7] 로그인 경로 — 로그인 성공
             session.setAttribute("memberInfo", member);
             session.setAttribute("kakaoAccessToken", accessToken);
 
@@ -255,9 +234,7 @@ public class MemberAuthController {
         return "member/join";
     }
 
-    // =========================================================================
     // join 세션 임시저장 (토스 카드등록 왕복용)
-    // =========================================================================
 
     /** 세션 키 — JoinDraftVO */
     public static final String SESSION_JOIN_DRAFT = "joinDraft";
@@ -455,7 +432,7 @@ public class MemberAuthController {
 
     // login(로그아웃)
 
-    // ── 로그아웃 ──
+    // 로그아웃
     // 서버 세션만 제거 (브라우저 자동로그인용 sessionStorage는 login.jsp에서 별도 처리 예정)
     @GetMapping("/member/logout")
     public String logout(HttpSession session) {

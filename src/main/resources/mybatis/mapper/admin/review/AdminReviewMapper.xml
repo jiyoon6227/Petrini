@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!--
-  관리자 리뷰 삭제 요청 (병원·숙소)
-  쇼핑(TB_REVIEW_REPORT BIZ) 삭제요청 UNION 통합
--->
+<!-- 병원·숙소 삭제 요청 + 쇼핑(TB_REVIEW_REPORT BIZ) 삭제요청 UNION -->
 <mapper namespace="com.petcare.petcare.admin.review.mapper.AdminReviewMapper">
 
   <!-- 병원·숙소: TB_REVIEW_DELETE_REQUEST -->

@@ -1,14 +1,3 @@
-/**
- * 역할: 사용자 이벤트/쿠폰 페이지 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: EventCouponService
- * - JSP: event/list.jsp
- *
- * URL
- * - GET  /coupon           → 쿠폰 목록 (list.jsp)
- * - POST /coupon/claim     → 쿠폰 받기 (AJAX)
- */
 package com.petcare.petcare.coupon.controller;
 
 import java.time.LocalDate;
@@ -99,8 +88,7 @@ public class CouponController {
 /**
  * 쇼핑몰 쿠폰 적용 상품 목록 화면
  *
- * 쿠폰을 발급한 STORE 사업자의 상품만 조회한다.
- * 병원과 숙소 쿠폰은 쿠폰함에서 기존 상세 페이지로 이동한다.
+ * STORE 쿠폰은 발급 사업자 상품만 조회 (병원·숙소 쿠폰은 쿠폰함에서 기존 상세로 이동)
  */
 /**
  * 쿠폰 적용 상품 목록·검색·정렬

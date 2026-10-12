@@ -1,6 +1,4 @@
-/* ================================================================
-   마이페이지 공통
-================================================================ */
+/* 마이페이지 공통 */
 .mypage-wrap {
     max-width: var(--inner-width);
     margin: 40px auto 80px;
@@ -10,7 +8,7 @@
     align-items: flex-start;
 }
 
-/* ── 사이드바 ── */
+/* 사이드바 */
 .mypage-sidebar {
     width: 230px;
     flex-shrink: 0;
@@ -71,7 +69,7 @@
     border-radius:20px; min-width:18px; text-align:center;
 }
 
-/* ── 콘텐츠 ── */
+/* 콘텐츠 */
 .mypage-content { flex:1; min-width:0; }
 .mp-section {
     display:none;
@@ -160,9 +158,7 @@
 .mp-empty p     { font-size:15px; color:var(--text-sub); margin:0; }
 .mp-empty small { font-size:13px; color:var(--text-muted); }
 
-/* ================================================================
-   대시보드
-================================================================ */
+/* 대시보드 */
 .dash-cards {
     display:grid; grid-template-columns:repeat(3,1fr);
     gap:16px; margin-bottom:28px;
@@ -189,9 +185,7 @@
     stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;
 }
 
-/* ================================================================
-   주문내역
-================================================================ */
+/* 주문내역 */
 
 .order-filter { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
 .filter-btn {
@@ -253,9 +247,7 @@
     padding:12px 18px; border-top:1px solid var(--border);
 }
 
-/* ================================================================
-   예약내역
-================================================================ */
+/* 예약내역 */
 .resv-card {
     display:flex; gap:16px; align-items:flex-start;
     border:1px solid var(--border); border-radius:var(--radius-md);
@@ -280,9 +272,7 @@
 .resv-info .rmeta svg { width:13px; height:13px; stroke:var(--text-muted); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .resv-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
 
-/* ================================================================
-   포인트 / 쿠폰
-================================================================ */
+/* 포인트 / 쿠폰 */
 .point-summary {
     display:grid; grid-template-columns:repeat(3,1fr);
     gap:1px; background:var(--border);
@@ -320,9 +310,7 @@
     stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;
 }
 
-/* ================================================================
-   관심상품
-================================================================ */
+/* 관심상품 */
 .wishlist-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
 .wish-card {
     border:1px solid var(--border); border-radius:var(--radius-md);
@@ -355,9 +343,7 @@
 }
 .wish-footer .btn-cart:hover { background:var(--primary-dark); }
 
-/* ================================================================
-   반려동물 관리
-================================================================ */
+/* 반려동물 관리 */
 .pets-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
 .pets-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
 .pet-card {
@@ -391,9 +377,7 @@
 .pet-add-card svg { width:32px; height:32px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
 .pet-add-card span { font-size:13px; font-weight:600; }
 
-/* ================================================================
-   회원정보 수정
-================================================================ */
+/* 회원정보 수정 */
 .edit-section {
     border:1px solid var(--border); border-radius:var(--radius-md);
     padding:24px; margin-bottom:20px; background:var(--bg-page);
@@ -439,9 +423,7 @@
 .edit-avatar-btns { display:flex; flex-direction:column; gap:8px; }
 .edit-submit-area { display:flex; justify-content:center; margin-top:28px; }
 
-/* ================================================================
-   알림함
-================================================================ */
+/* 알림함 */
 .noti-filter { display:flex; gap:8px; margin-bottom:20px; }
 .noti-list { display:flex; flex-direction:column; gap:0; }
 .noti-item {
@@ -472,9 +454,7 @@
 .noti-time { font-size:12px; color:var(--text-muted); }
 .noti-actions { display:flex; justify-content:flex-end; gap:8px; margin-bottom:20px; }
 
-/* ================================================================
-   사업자 등록 신청 (biz/apply)
-================================================================ */
+/* 사업자 등록 신청 (biz/apply) */
 .biz-hero {
     position:relative; border-radius:var(--radius-md);
     overflow:hidden; margin-bottom:32px; height:180px;
@@ -547,9 +527,7 @@
 .biz-submit-btn:hover  { background:var(--primary-dark); }
 .biz-submit-btn:active { transform:scale(.98); }
 
-/* ================================================================
-   사업자센터 (BIZ 전용)
-================================================================ */
+/* 사업자센터 (BIZ 전용) */
 .biz-center-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
 .bc-stat {
     background:var(--bg-page); border:1px solid var(--border);

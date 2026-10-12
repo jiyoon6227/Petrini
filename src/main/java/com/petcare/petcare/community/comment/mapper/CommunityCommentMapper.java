@@ -1,20 +1,3 @@
-/**
- * 역할: 게시글 댓글 DB 접근 (MyBatis interface)
- *
- * 쿼리
- * - selectAllCommentsByPostId   일반 + 대댓글 전체
- * - selectCommentById         부모 댓글 검증
- * - selectCommentCountByPostId 댓글 총 개수
- * - insertComment             PARENT_ID 포함 INSERT
- * - softDeleteComment         IS_DELETED='Y'
- * - updateCommentBody         BODY 수정 (작성자 본인)
- *
- * XML: resources/mybatis/mapper/community/comment/CommunityCommentMapper.xml
- *
- * 참고 테이블
- * - TB_POST_COMMENT
- */
-
 package com.petcare.petcare.community.comment.mapper;
 
 import java.util.List;

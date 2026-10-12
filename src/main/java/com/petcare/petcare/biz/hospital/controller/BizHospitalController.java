@@ -1,14 +1,3 @@
-/**
- * 역할: 사업자 동물병원 URL 처리 → Service 호출 → JSP 반환
- *
- * 연결
- * - Service: BizHospitalService, GiveTalentService
- * - 상속: BizBaseController (사업자 로그인 체크)
- *
- * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
- * return 경로는 담당 JSP와 동일하게 맞출 것
- */
-
 package com.petcare.petcare.biz.hospital.controller;
 
 import java.text.SimpleDateFormat;
@@ -123,7 +112,7 @@ public class BizHospitalController extends BizBaseController {
         }
     }
 
-    // ════ 병원 (HOSPITAL) ════
+    // 병원 (HOSPITAL)
     @GetMapping({"", "/"})
     public String hospitalDashboard(HttpSession session, Model model) throws Exception {
 
@@ -827,10 +816,8 @@ public class BizHospitalController extends BizBaseController {
         return "redirect:/biz/hospital/profile";
     }
 
-    // ─────────────────────────────────────────────
     // 쿠폰
     // 사이드바 /biz/hospital/coupon 진입용 (로직은 BizStayService 공용)
-    // ─────────────────────────────────────────────
     @GetMapping({"/coupon", "/coupon/"})
     public String couponList(HttpSession session, Model model) {
         MemberVO member = getBizMember(session);
@@ -953,11 +940,7 @@ public class BizHospitalController extends BizBaseController {
         return "redirect:/biz/hospital/coupon";
     }
 
-    // ─────────────────────────────────────────────
-
-    // ─────────────────────────────────────────────
     // 병원 배너 (JSP·사이드바, stay 공용 BizStayService)
-    // ─────────────────────────────────────────────
     @GetMapping({"/banner", "/banner/"})
     public String bannerList(HttpSession session, Model model) {
         MemberVO member = getBizMember(session);

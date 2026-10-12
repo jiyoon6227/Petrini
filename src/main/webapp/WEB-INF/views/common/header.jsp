@@ -1,7 +1,3 @@
-<%--
-  역할: 공통 헤더 (일반 회원·고객센터 등)
-  - 정지 회원 안내 배너 (SUSPENDED + role=USER)
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -138,7 +134,7 @@
     </nav>
 </header>
 
-<%-- ── 헤더 검색 + 자동완성 JS ── --%>
+<%-- 헤더 검색 + 자동완성 JS --%>
 <script>
 $(function () {
     var CTX   = '${contextPath}';
@@ -148,7 +144,7 @@ $(function () {
     var timer     = null;
     var acIdx     = -1;          // 키보드 선택 인덱스
 
-    /* ── 검색 실행 (결과 페이지 이동) ── */
+    /* 검색 실행 (결과 페이지 이동) */
     function doSearch() {
         var q = $.trim($input.val());
         if (q.length === 0) return;
@@ -187,7 +183,7 @@ $(function () {
         }
     });
 
-    /* ── 자동완성 요청 (디바운스 300ms) ── */
+    /* 자동완성 요청 (디바운스 300ms) */
     $input.on('input', function () {
         var q = $.trim($input.val());
         acIdx = -1;
@@ -219,7 +215,7 @@ $(function () {
         });
     }
 
-    /* ── 드롭다운 렌더링 ── */
+    /* 드롭다운 렌더링 */
     function renderDropdown(items, q) {
         var html = '';
         for (var i = 0; i < items.length; i++) {
@@ -248,7 +244,7 @@ $(function () {
         }
     });
 
-    /* ── 유틸 함수 ── */
+    /* 유틸 함수 */
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;')

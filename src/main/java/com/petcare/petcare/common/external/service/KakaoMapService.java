@@ -1,15 +1,4 @@
-/**
- * 역할: 카카오맵 API 연동 서비스 (@Service)
- *
- * 구현 내용
- * - 주소 → 좌표 변환 (Kakao Local API)
- * - Model에 mapLat, mapLng, kakaoJsApiKey 속성 추가
- *
- * 연결
- * - 호출: HospitalHospitalController, StayStayController 등
- *
- * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
- */
+/** 주소 → 좌표 변환 (Kakao Local API) */
 
 package com.petcare.petcare.common.external.service;
 

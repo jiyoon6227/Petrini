@@ -1,13 +1,3 @@
-<%--
-  역할: 사용자 재능나눔 목록 (give/talent/list)
-  - give/index.jsp 에서 include (가족찾기 > 재능나눔 탭)
-
-
-  [화면 흐름]
-  1. GET /give/talent/list?talentType=...
-  2. ${list} — TB_TALENT STATUS_CD=APPROVED (관리자 승인 후 노출)
-  3. 카드 클릭 → /give/talent/detail?id=
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>

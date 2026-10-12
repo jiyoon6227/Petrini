@@ -1,6 +1,3 @@
-/**
- * 역할: 관리자 숙소 예약 DB
- */
 package com.petcare.petcare.admin.reservation.mapper;
 
 import java.util.List;
