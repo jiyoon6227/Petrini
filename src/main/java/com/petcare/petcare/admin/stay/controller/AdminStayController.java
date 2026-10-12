@@ -1,6 +1,5 @@
 /**
  * 역할: 관리자 숙소 관리 URL
- * 2026/08/13 장우철
  * - GET /admin/stay/list
  * - GET /admin/stay/detail
  */

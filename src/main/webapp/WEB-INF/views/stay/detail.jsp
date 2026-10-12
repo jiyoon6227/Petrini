@@ -57,7 +57,7 @@
   .rv-name { font-size:14px; font-weight:700; color:var(--text-main); }
   .rv-date { font-size:12px; color:var(--text-muted); }
   .rv-text { font-size:14px; color:var(--text-sub); line-height:1.6; word-break:break-word; overflow-wrap:anywhere; }
-  /* 2026/08/12 장우철 — 사업자 답글 긴 문자열 줄바꿈 */
+  /* 사업자 답글 긴 문자열 줄바꿈 */
   .rv-biz-reply { margin-top:10px; padding:10px 14px; background:var(--bg-page); border-radius:8px; font-size:13px; color:var(--text-sub); max-width:100%; box-sizing:border-box; overflow-wrap:anywhere; word-break:break-word; }
   .rv-biz-reply-label { font-weight:700; color:var(--primary-dark); display:block; margin-bottom:4px; }
   .rv-biz-reply-text { white-space:pre-wrap; line-height:1.6; overflow-wrap:anywhere; word-break:break-word; }
@@ -194,7 +194,7 @@
     </div>
     <div class="sd-rating">
       <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <%-- 2026-07-28 박유정 — TB_STAY.AVG_RATING / REVIEW_CNT (병원 detail.jsp와 동일) --%>
+      <%-- TB_STAY.AVG_RATING / REVIEW_CNT (병원 detail.jsp와 동일) --%>
       <c:choose>
         <c:when test="${not empty stay.avgRating}">
           <fmt:formatNumber value="${stay.avgRating}" pattern="0.0"/>
@@ -266,7 +266,7 @@
       </div>
     </c:if>
 
-    <%-- 환불 정책 — 2026/08/11 장우철: 플랫폼 고정 문구 --%>
+    <%-- 환불 정책 — 플랫폼 고정 문구 --%>
     <c:if test="${not empty stay.refundPolicy}">
       <div class="sd-section">
         <h3><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>환불 / 이용 규칙</h3>
@@ -283,7 +283,7 @@
       </div>
     </c:if>
 
-    <%-- HYJ 26.07.20 리뷰 (DB 연동) --%>
+    <%-- 리뷰 (DB 연동) --%>
     <div class="sd-section">
       <h3><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>리뷰 (<c:out value="${empty stay.reviewCnt ? 0 : stay.reviewCnt}"/>)</h3>
       <c:if test="${not empty stay.avgRating and stay.reviewCnt != null and stay.reviewCnt > 0}">

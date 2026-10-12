@@ -1,7 +1,7 @@
 /**
  * 역할: 숙소 예약 전액 환불 취소 (사업자·관리자 공통)
- * 2026/07/31 장우철 — 수수료 0 · 결제액 전액 토스 취소 · 정산 대상 아님(CANCEL)
- * 2026/08/07 장우철 — 실결제(PAY_AMOUNT) 환불 + 포인트·쿠폰 복구
+ * 수수료 0 · 결제액 전액 토스 취소 · 정산 대상 아님(CANCEL)
+ * 실결제(PAY_AMOUNT) 환불 + 포인트·쿠폰 복구
  */
 package com.petcare.petcare.stay.service;
 
@@ -39,7 +39,7 @@ public class StayFullCancelService {
     }
 
     /**
-     * 2026/07/31 장우철 — R3 관리자 환불승인: DONE 포함 전액 환불 취소
+     * 관리자 환불승인: DONE 포함 전액 환불 취소
      */
     @Transactional
     public void cancelWithFullRefund(Long resvId, Long stayId, String cancelReason, String actorLabel,
@@ -49,7 +49,7 @@ public class StayFullCancelService {
     }
 
     /**
-     * 2026-08-11 박유정 — skipCancelNotification: 관리자 환불승인 시 취소 알림 생략(별도 환불 알림)
+     * skipCancelNotification: 관리자 환불승인 시 취소 알림 생략(별도 환불 알림)
      */
     @Transactional
     public void cancelWithFullRefund(Long resvId, Long stayId, String cancelReason, String actorLabel,
@@ -117,7 +117,7 @@ public class StayFullCancelService {
             throw new IllegalStateException("예약을 취소할 수 없습니다. 상태를 확인해 주세요.");
         }
 
-        // 2026/08/11 장우철 — 숙소 전용 취소 알림 + yujeong skipCancelNotification
+        // 숙소 전용 취소 알림 + skipCancelNotification
         if (!skipCancelNotification) {
             String stayName = resv.getStayName() != null && !resv.getStayName().isBlank()
                     ? resv.getStayName() : "숙소";
@@ -128,7 +128,7 @@ public class StayFullCancelService {
     }
 
     /**
-     * 2026/08/06 장우철 — 관리자 환불승인(보상 숙박): 실결제 환불 + 포인트·쿠폰 복구, 예약 STATUS 유지
+     * 관리자 환불승인(보상 숙박): 실결제 환불 + 포인트·쿠폰 복구, 예약 STATUS 유지
      */
     @Transactional
     public void refundPaymentKeepReservation(Long resvId, String actorLabel) throws Exception {
@@ -179,7 +179,7 @@ public class StayFullCancelService {
             throw new IllegalStateException("환불 금액을 기록할 수 없습니다. 예약 상태를 확인해 주세요.");
         }
 
-        // 2026/08/07 장우철 — 보상환불(이용 유지) → 회원 알림
+        // 보상환불(이용 유지) → 회원 알림
         try {
             String stayName = resv.getStayName() != null && !resv.getStayName().isBlank()
                     ? resv.getStayName() : "숙소";

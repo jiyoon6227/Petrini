@@ -1,7 +1,7 @@
 /**
  * 역할: TB_MEDICAL_RECORD.MEMO 보조 태그 파싱
  *
- * 2026-07-28 박유정 — 사업자 저장 형식 [유형:...] [체중:...] 등을 VO 필드로 분리
+ * 사업자 저장 형식 [유형:...] [체중:...] 등을 VO 필드로 분리
  */
 
 package com.petcare.petcare.hospital.util;

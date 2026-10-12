@@ -1,6 +1,6 @@
 /**
  * 역할: 숙소 정산 계산·저장 구현체
- * 2026/07/30 장우철 — 숙소 정산 구현순서 1-4 / 1-5 / 1-6
+ * 숙소 정산
  *
  * 규칙
  * - 수수료는 상품(예약) 원금에만 적용
@@ -74,7 +74,7 @@ public class StaySettlementServiceImpl implements StaySettlementService {
         if (item.getStatusCd() == null || item.getStatusCd().isBlank()) {
             item.setStatusCd("INCLUDED");
         }
-        // 2026/07/31 장우철 — R3-5: STAY / CANCEL_FEE
+        // STAY / CANCEL_FEE
         if (item.getItemType() == null || item.getItemType().isBlank()) {
             item.setItemType("STAY");
         }

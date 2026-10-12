@@ -1,6 +1,6 @@
 /**
  * 역할: 숙소 정산 조회·저장 (MyBatis)
- * 2026/07/30 장우철 — 숙소 정산 구현순서 1-3 / 1-5 / 1-6 / 4-2
+ * 숙소 정산
  *
  * 쿼리
  * - selectUnsettleStayTargets : 월정산 / 중간정산(ALL) / 객실별(ROOM) 공용
@@ -129,7 +129,7 @@ public interface StaySettlementMapper {
     String selectBizNameByBizNo(@Param("bizNo") Long bizNo);
 
     /**
-     * 2026/07/31 장우철 — R3-2: 환불승인 시 기존 정산 ITEM → REFUNDED
+     * 환불승인 시 기존 정산 ITEM → REFUNDED
      * (미지급 마스터 합계도 차감)
      */
     int updateSettlementItemRefundedByResvId(
@@ -139,9 +139,9 @@ public interface StaySettlementMapper {
     /** 환불 반영 후 미지급 정산 마스터 금액 재합산 */
     int recalcUnpaidSettlementTotalsByResvId(@Param("resvId") Long resvId);
 
-    /** 2026/08/05 장우철 — S12: 승인된 숙소 사업자 목록 (월정산 배치) */
+    /** 승인된 숙소 사업자 목록 (월정산 배치) */
     List<Long> selectApprovedStayBizNos();
 
-    /** 2026/08/05 장우철 — S12: 동일 월 REGULAR 존재 여부 (중복 월정산 방지) */
+    /** 동일 월 REGULAR 존재 여부 (중복 월정산 방지) */
     int countRegularByBizAndMonth(@Param("bizNo") Long bizNo, @Param("settleMonth") String settleMonth);
 }

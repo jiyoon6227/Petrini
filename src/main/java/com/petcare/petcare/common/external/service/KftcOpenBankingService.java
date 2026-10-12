@@ -1,5 +1,5 @@
 /**
- * 2026/07/28 장우철 — 금결원 오픈뱅킹 (계좌실명조회)
+ * 금결원 오픈뱅킹 (계좌실명조회)
  *
  * - mock=true  : 입력값으로 인증 성공 연출 (시뮬레이터 권한 없을 때)
  * - mock=false : testapi 토큰(oob) + /v2.0/inquiry/real_name 실호출
@@ -49,7 +49,7 @@ public class KftcOpenBankingService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // 2026/07/28 장우철 — 토큰 캐시 (oob 는 refresh 없음)
+    // 토큰 캐시 (oob 는 refresh 없음)
     private String cachedAccessToken;
     private String cachedClientUseCode;
     private long tokenExpireAtMs;
@@ -59,7 +59,7 @@ public class KftcOpenBankingService {
     }
 
     /**
-     * 2026/07/28 장우철 — 계좌실명조회
+     * 계좌실명조회
      * @param holderInfoType "1"=사업자번호, " "=생년월일6자리
      * @param holderInfo     사업자번호10자리 또는 생년월일6자리
      * @param expectedHolder 화면 입력 예금주 (mock 시 응답명으로 사용, real 시 참고)

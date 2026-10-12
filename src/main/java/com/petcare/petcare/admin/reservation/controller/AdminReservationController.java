@@ -1,6 +1,5 @@
 /**
  * 역할: 관리자 숙소 예약 URL
- * 2026/07/31 장우철
  * - GET  /admin/reservation/list
  * - GET  /admin/reservation/detail
  * - POST /admin/reservation/cancel  (전액 환불)

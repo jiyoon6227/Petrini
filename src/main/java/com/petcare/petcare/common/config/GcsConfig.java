@@ -14,7 +14,6 @@ import com.google.cloud.storage.StorageOptions;
 
 /**
  * GCS Storage 빈 — gcs.enabled=true 일 때만 로드
- * 2026/07/21 장우철
  */
 @Configuration
 @ConditionalOnProperty(name = "gcs.enabled", havingValue = "true")

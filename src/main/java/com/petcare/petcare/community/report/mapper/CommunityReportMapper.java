@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 게시글 신고 DB 접근 (MyBatis interface)
  *
- * - 박유정 / 2026-07-10
- *
  * XML: resources/mybatis/mapper/community/report/CommunityReportMapper.xml
  *
  * 참고 테이블

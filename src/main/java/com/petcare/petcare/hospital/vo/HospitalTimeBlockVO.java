@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class HospitalTimeBlockVO {
 
-    // 2026/07/16 장우철 — [startTime, endTime) 점유
+    // [startTime, endTime) 점유
     private String startTime;
     private String endTime;
     private Long holdId;

@@ -1,8 +1,6 @@
 /**
  * 역할: 관리자 회원 URL 처리 → Service 호출 → JSP 반환
  *
- * - 박유정 / 2026-07-16 (목록·상세), 2026-07-20 (STEP 7·8)
- *
  * [화면 흐름]
  * 1. GET  /admin/member/list   → list.jsp (검색·필터·페이징)
  * 2. GET  /admin/member/detail → detail.jsp (기본정보 + 활동현황)
@@ -54,7 +52,7 @@ public class AdminMemberController extends AdminBaseController {
     @Autowired
     private AdminMemberService adminMemberService;
 
-    // 2026-07-16 박유정 — 관리자 회원 목록 (DB 연동)
+    // 관리자 회원 목록 (DB 연동)
     @GetMapping("/list")
     public String memberList(HttpSession session,
                              @RequestParam(defaultValue = "") String keyword,
@@ -77,7 +75,7 @@ public class AdminMemberController extends AdminBaseController {
         return "admin/member/list";
     }
 
-    // 2026-07-16 박유정 — 관리자 회원 상세 (기본정보 + STEP 8 활동현황)
+    // 관리자 회원 상세 (기본정보 + 활동현황)
     @GetMapping("/detail")
     public String memberDetail(HttpSession session,
                                @RequestParam long id,
@@ -96,8 +94,8 @@ public class AdminMemberController extends AdminBaseController {
         model.addAttribute("orderList", adminMemberService.getAdminMemberRecentOrders(id));
         return "admin/member/detail";
     }
-    // 2026-07-20 박유정 STEP 7 — 계정 정지
-    // 2026-07-21 박유정 STEP ② — 기간 정지 (suspendType: DAY3/DAY7/PERMANENT)
+    // 계정 정지
+    // 기간 정지 (suspendType: DAY3/DAY7/PERMANENT)
     @PostMapping("/suspend")
     public String suspendMember(HttpSession session,
                                 @RequestParam long memberNo,
@@ -125,7 +123,7 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-20 박유정 STEP 7 — 계정 복구
+    // 계정 복구
     @PostMapping("/restore")
     public String restoreMember(HttpSession session,
                                   @RequestParam long memberNo,
@@ -146,7 +144,7 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-20 박유정 STEP 7 — 강제 탈퇴
+    // 강제 탈퇴
     @PostMapping("/withdraw")
     public String withdrawMember(HttpSession session,
                                  @RequestParam long memberNo,
@@ -167,7 +165,7 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-21 박유정 STEP 9 — 등급 변경
+    // 등급 변경
     @PostMapping("/grade")
     public String updateMemberGrade(HttpSession session,
                                       @RequestParam long memberNo,
@@ -193,7 +191,7 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-21 박유정 STEP 10 — 포인트 지급·차감
+    // 포인트 지급·차감
     @PostMapping("/point")
     public String adjustMemberPoint(HttpSession session,
                                     @RequestParam long memberNo,
@@ -226,8 +224,8 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-21 박유정 STEP 12 — 선택 회원 일괄 정지
-    // 2026-07-21 박유정 STEP ② — 일괄 기간 정지 (suspendType)
+    // 선택 회원 일괄 정지
+    // 일괄 기간 정지 (suspendType)
     @PostMapping("/bulk-suspend")
     public String bulkSuspendMembers(HttpSession session,
                                     @RequestParam List<Long> memberNos,
@@ -256,7 +254,7 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-22 박유정 — 선택 회원 일괄 복구
+    // 선택 회원 일괄 복구
     @PostMapping("/bulk-restore")
     public String bulkRestoreMembers(HttpSession session,
                                      @RequestParam List<Long> memberNos,
@@ -284,7 +282,7 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-21 박유정 STEP 12 — 선택 회원 일괄 탈퇴
+    // 선택 회원 일괄 탈퇴
     @PostMapping("/bulk-withdraw")
     public String bulkWithdrawMembers(HttpSession session,
                                      @RequestParam List<Long> memberNos,
@@ -312,7 +310,7 @@ public class AdminMemberController extends AdminBaseController {
         }
     }
 
-    // 2026-07-21 박유정 — 회원 목록 CSV(Excel)보내기
+    // 회원 목록 CSV(Excel)보내기
     @GetMapping("/export")
     public void exportMemberList(HttpSession session,
                                  @RequestParam(defaultValue = "") String keyword,

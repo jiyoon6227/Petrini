@@ -60,7 +60,7 @@ public class LoggingAspect {
     @Pointcut("execution(* com.petcare.petcare..service..*(..))")
     public void serviceMethod(){}
 
-    // 2026/08/10 장우철 — @Around pointcut 이름 불일치(controllerMethods → controllerMethod) 수정
+    // Around pointcut 이름은 controllerMethod
     @Around("controllerMethod()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         // ── 메서드 정보 추출 ──

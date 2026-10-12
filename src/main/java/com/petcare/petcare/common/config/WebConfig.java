@@ -1,9 +1,9 @@
 /**
  * 역할: 정적 리소스 + 로컬 업로드 파일 URL 매핑, Interceptor 등록
  *
- * - 박유정 / 2026-07-07 — /upload/** → file.upload-dir (give/report 사진 서빙)
- * - 박유정 / 2026-07-22 — SuspendedMemberInterceptor 등록 (정지 회원 고객센터 외 차단)
- * - gcs.enabled=true 이면 /upload/** 는 UploadFileController(GCS)가 처리 — 2026/07/21 장우철
+ * - /upload/** → file.upload-dir (give/report 사진 서빙)
+ * - SuspendedMemberInterceptor 등록 (정지 회원 고객센터 외 차단)
+ * - gcs.enabled=true 이면 /upload/** 는 UploadFileController(GCS)가 처리
  */
 
 package com.petcare.petcare.common.config;
@@ -31,13 +31,13 @@ public class WebConfig implements WebMvcConfigurer {
     private boolean gcsEnabled;
 
     @Autowired
-    private SuspendedMemberInterceptor suspendedMemberInterceptor; // 2026-07-22 박유정 — 정지 회원 Interceptor
+    private SuspendedMemberInterceptor suspendedMemberInterceptor; // 정지 회원 Interceptor
 
-    // 2026/07/27 장우철 — 가입 임시저장은 join/빌링 왕복에서만 유지
+    // 가입 임시저장은 join/빌링 왕복에서만 유지
     @Autowired
     private JoinDraftScopeInterceptor joinDraftScopeInterceptor;
 
-    //HYJ 26.08.06 보안적용
+    // 보안적용
     @Autowired
     private CsrfTokenInterceptor csrfTokenInterceptor;
     @Autowired
@@ -49,7 +49,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("/resources/")
                 .setCachePeriod(0);
 
-        // [로컬 /upload 매핑 — gcs.enabled=false 일 때만] 2026/07/21 장우철
+        // [로컬 /upload 매핑 — gcs.enabled=false 일 때만]
         if (!gcsEnabled) {
             String location = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
             registry.addResourceHandler("/upload/**")
@@ -58,12 +58,12 @@ public class WebConfig implements WebMvcConfigurer {
         }
     }
 
-    // 2026-07-22 박유정 — 정지 회원 고객센터 외 접근 차단
-    // 2026/07/27 장우철 — 가입 draft 는 join·billing 외 이동 시 폐기
+    // 정지 회원 고객센터 외 접근 차단
+    // 가입 draft 는 join·billing 외 이동 시 폐기
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        //HYJ 26.08.06 add순서 중요! 보안쪽 제일 먼저
+        // add순서 중요! 보안쪽 제일 먼저
         registry.addInterceptor(securityHeaderInterceptor)
         .addPathPatterns("/**")
         .excludePathPatterns(

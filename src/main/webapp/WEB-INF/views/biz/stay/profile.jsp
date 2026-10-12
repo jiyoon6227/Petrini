@@ -66,7 +66,6 @@
 
   <form name="stayProfileForm" method="post"
         action="${contextPath}/biz/stay/profile" enctype="multipart/form-data">
-    <!--HYJ 26.08.05-->
     <input type="hidden" name="_csrf" value="${_csrf}">
     
   <div class="pf-wrap">
@@ -139,7 +138,7 @@
       </div>
       <div class="pf-group full">
         <label>환불 규정 <span style="font-weight:500;color:#64748B">(플랫폼 고정 · 수정 불가)</span></label>
-        <%-- 2026/08/11 장우철 — StayCancelFeeCalculator 고정 문구, name 없음 → POST 무시 --%>
+        <%-- StayCancelFeeCalculator 고정 문구, name 없음 → POST 무시 --%>
         <div style="border:1px solid var(--border,#E2E8E4);border-radius:8px;padding:14px 16px;background:#F8FAFC;font-size:13px;line-height:1.7;color:#334155;white-space:pre-line"><c:out value="${stay.refundPolicy}"/></div>
       </div>
     </div>

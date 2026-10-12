@@ -1,8 +1,8 @@
 /**
  * 역할: 반려동물 프로필 데이터 객체
  *
- * - 장우철 / 2026/07/11 — TB_PET 기본 필드
- * - 박유정 / 2026-07-28 — FUR_COLOR, NEUTER_YN, TRAITS, MEMO
+ * - TB_PET 기본 필드
+ * - FUR_COLOR, NEUTER_YN, TRAITS, MEMO
  *
  * 참고 테이블: TB_PET
  *

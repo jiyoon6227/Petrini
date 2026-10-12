@@ -2,8 +2,7 @@
 <%--
   역할: 사용자 재능나눔 상세 (give/talent/detail)
 
-  - 박유정 / 2026-07-13~14
-  - 2026-08-10 박유정 — STEP 4: 모집중/마감, 참여 신청 폼
+  - 모집중/마감, 참여 신청 폼
   2. ${talent} — APPROVED(모집중) 또는 DONE(모집마감) 노출
   [화면 흐름]
   1. GET /give/talent/detail?id=번호
@@ -272,7 +271,7 @@
 
     <h3>제공자 정보</h3>
 
-        <%-- 2026-08-10 박유정 — 모집중/모집마감 뱃지 --%>
+        <%-- 모집중/모집마감 뱃지 --%>
     <c:choose>
       <c:when test="${recruitmentOpen}">
         <span class="tac-status-badge tac-status-open">${recruitmentLabel}</span>
@@ -329,7 +328,7 @@
 
     <div class="tac-divider"></div>
 
-    <%-- 2026-08-10 박유정 — 참여 신청 UI (STEP 4) --%>
+    <%-- 참여 신청 UI --%>
     <c:choose>
 
       <%-- 1) 이미 신청함 --%>

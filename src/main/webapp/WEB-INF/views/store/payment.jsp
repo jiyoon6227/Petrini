@@ -44,7 +44,7 @@
 .order-nav{display:flex;justify-content:flex-start;margin-bottom:20px}
 .btn-back{padding:9px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;color:var(--text-sub);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px}
 .btn-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* 2026/07/27 장우철 — 결제수단 선택 (등록카드 / 계좌이체) */
+/* 결제수단 선택 (등록카드 / 계좌이체) */
 .pay-type-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
 .pay-type-item{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition);background:#fff}
 .pay-type-item:has(input:checked){border-color:var(--primary);background:var(--primary-light)}
@@ -58,7 +58,7 @@
 .pay-card-preview .label{font-size:12px;font-weight:700;color:#166534;margin-bottom:6px}
 .pay-card-preview .num{font-size:16px;font-weight:800;color:var(--text-main)}
 .pay-card-preview .hint{font-size:12px;color:var(--text-muted);margin-top:8px}
-/* 2026/08/11 장우철 — 등록카드 2장 이상 선택 */
+/* 등록카드 2장 이상 선택 */
 .pay-card-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}
 .pay-card-option{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid #BBF7D0;border-radius:var(--radius-sm);cursor:pointer;background:#fff;margin:0}
 .pay-card-option:has(input:checked){border-color:var(--primary);background:var(--primary-light)}
@@ -90,7 +90,7 @@
 
   <div class="order-section">
     <h3>결제 수단</h3>
-    <%-- 2026/07/27 장우철 — 등록카드 / 계좌이체 택1 (UI). API 연동 전 더미 카드정보 --%>
+    <%-- 등록카드 / 계좌이체 택1 (UI). API 연동 전 더미 카드정보 --%>
     <div class="pay-type-list">
       <label class="pay-type-item">
         <input type="checkbox" name="payType" id="payTypeCard" value="CARD">
@@ -109,7 +109,7 @@
     </div>
 
     <div id="panelCard" class="pay-panel">
-      <%-- 2026/08/11 장우철 — 등록카드 목록에서 결제 카드 선택 --%>
+      <%-- 등록카드 목록에서 결제 카드 선택 --%>
       <div class="pay-card-preview" id="payCardPreviewRegistered" style="display:none">
         <div class="label">결제할 카드를 선택하세요</div>
         <div class="pay-card-list" id="payCardList"></div>
@@ -132,13 +132,7 @@
     <div class="order-total-box">
       <div class="order-total-row"><span>상품 금액</span><span><fmt:formatNumber value="${productTotal}" pattern="#,###"/>원</span></div>
             
-<%-- 지윤 26.07.13 수정: deliveryFee(숫자)에 문자열 전용 메서드 concat() 호출하던 버그로 500 에러 발생 -> fmt:formatNumber로 수정 --%>
-<%--<div class="order-total-row"><span>배송비</span><span style="color:var(--primary)">
-        <c:choose>
-          <c:when test="${deliveryFee == 0}">무료</c:when>
-          <c:otherwise><fmt:formatNumber value="${deliveryFee}" pattern="#,###"/>원</c:otherwise>
-        </c:choose>
-      </span></div>--%>
+<%-- 숫자인 deliveryFee는 fmt:formatNumber로 표시 (concat() 호출 시 500 에러) --%>
 <div class="order-total-row"><span>배송비</span><span style="color:var(--primary)">
   <c:choose>
     <c:when test="${deliveryFee == 0}">무료</c:when>
@@ -154,7 +148,7 @@
       <input type="checkbox" id="agreePay" checked onchange="document.getElementById('btnPayFinal').disabled=!this.checked">
       <label for="agreePay">주문 내용을 확인했으며 결제에 동의합니다.<a href="#" onclick="event.preventDefault()">전자결제 이용약관 보기</a></label>
     </div>
-   <%-- 지윤 26.08.07: 쿠폰/포인트로 0원이 되면 버튼 문구도 결제수단 대신 명확히 표시 --%>
+   <%-- 쿠폰/포인트로 0원이 되면 버튼 문구도 결제수단 대신 명확히 표시 --%>
    <c:choose>
      <c:when test="${finalTotal == 0}">
        <button id="btnPayFinal" class="btn-pay" onclick="requestPayment()">쿠폰/포인트로 결제하기</button>
@@ -176,9 +170,9 @@
   const widgets = tossPayments.widgets({ customerKey });
   const ctx = "${contextPath}";
 
-  //지윤 26.07.13 추가: 필수약관 동의 상태 저장용 변수 (기본 false, 위젯 이벤트로 갱신됨)
+  // 필수약관 동의 상태 저장용 변수 (기본 false, 위젯 이벤트로 갱신)
   let agreedRequiredTerms = true;
-  // 2026/07/27 장우철 — 등록카드 목록 (Ajax)
+  // 등록카드 목록 (Ajax)
   let hasRegisteredCard = false;
   let selectedBillingCardId = null;
 
@@ -187,13 +181,13 @@
     await widgets.renderPaymentMethods({ selector: "#payment-method", variantKey: "DEFAULT" });
     const agreementWidget = await widgets.renderAgreement({ selector: "#agreement" });
 
-    //지윤 26.07.13 추가: 약관 체크 상태가 바뀔 때마다 agreedRequiredTerms 값 갱신
+    // 약관 체크 상태가 바뀔 때마다 agreedRequiredTerms 값 갱신
     agreementWidget.on('agreementStatusChange', function (agreementStatus) {
       agreedRequiredTerms = agreementStatus.agreedRequiredTerms;
     });
   })();
 
-  /* 2026/07/27 장우철 — 결제수단 택1 + 등록카드 목록 Ajax */
+  /* 결제수단 택1 + 등록카드 목록 Ajax */
   (function () {
     var card = document.getElementById('payTypeCard');
     var transfer = document.getElementById('payTypeTransfer');
@@ -213,7 +207,7 @@
       }
     }
 
-    // 2026/08/11 장우철 — 등록카드 라디오 목록 렌더
+    // 등록카드 라디오 목록 렌더
     function renderCardList(cards) {
       listEl.innerHTML = '';
       cards.forEach(function (c, i) {
@@ -270,7 +264,7 @@
   })();
 
  async function requestPayment() {
-    // 지윤 26.08.07: 쿠폰/포인트로 최종금액이 0원이면 토스 위젯을 아예 거치지 않고 서버로 바로 확정 요청
+    // 최종금액 0원이면 토스 위젯 없이 서버로 바로 확정 요청
     // (토스는 0원 결제를 처리하지 못해서 위젯 호출 시 결제하기가 그냥 안 먹힘)
     var finalTotal = ${finalTotal};
     if (finalTotal === 0) {
@@ -282,7 +276,7 @@
       return;
     }
 
-    // 2026/07/27 장우철 — 등록카드: 토스 창 없이 Ajax 빌링 승인
+    // 등록카드: 토스 창 없이 Ajax 빌링 승인
     if (document.getElementById('payTypeCard').checked) {
       if (!hasRegisteredCard || !selectedBillingCardId) {
         alert('등록된 카드가 없습니다. 회원정보에서 카드를 등록해 주세요.');
@@ -294,7 +288,6 @@
       }
       try {
         var body = 'billingCardId=' + encodeURIComponent(selectedBillingCardId);
-        //HYJ 26.08.05
         var res = await csrfFetch(ctx + '/store/payment/billing-card', {
           method: 'POST',
           credentials: 'same-origin',
@@ -313,7 +306,7 @@
       }
       return;
     }
-    //지윤 26.07.13 추가: 필수약관 미동의 상태면 안내 팝업 띄우고 결제 요청 자체를 안 보냄
+    // 필수약관 미동의 시 안내 팝업 후 결제 요청 중단
     if (!agreedRequiredTerms) {
       alert('결제 서비스 이용약관, 개인정보 처리 동의는 필수입니다.');
       return;

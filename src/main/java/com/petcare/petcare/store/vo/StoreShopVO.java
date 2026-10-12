@@ -44,15 +44,15 @@ public class StoreShopVO {
     private String description;
     private Double avgRating;
     private Integer reviewCount;
-    private String tags; //지윤 26.07.21 추가: 상품 특징 태그, 쉼표 구분 문자열 (사업자가 등록/수정 시 입력)
+    private String tags; // 상품 특징 태그, 쉼표 구분 문자열 (사업자가 등록/수정 시 입력)
 
-    //지윤 26.07.07 상품 상세 이미지 목록
+    // 상품 상세 이미지 목록
     private List<String> imageList;
 
-    //지윤 26.07.07 상품 옵션 목록
+    // 상품 옵션 목록
     private List<OptionVO> optionList;
 
-    //지윤 26.07.07 상품 리뷰 목록 + 별점 분포(막대그래프용 %)
+    // 상품 리뷰 목록 + 별점 분포(막대그래프용 %)
    private List<ReviewVO> reviewList;
    private Integer rating5Percent;
    private Integer rating4Percent;
@@ -60,6 +60,6 @@ public class StoreShopVO {
    private Integer rating2Percent;
    private Integer rating1Percent;
 
-   //지윤 26.07.07 상품 Q&A 목록
+   // 상품 Q&A 목록
    private List<QnaVO> qnaList;
 }

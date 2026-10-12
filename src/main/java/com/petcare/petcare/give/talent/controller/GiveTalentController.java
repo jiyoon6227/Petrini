@@ -1,8 +1,6 @@
 /**
  * 역할: 재능나눔 URL 처리 → JSP 반환 (가족찾기 Give 모듈)
  *
- * - 박유정 / 2026-07-13~14
- *
  * 담당 화면
  * - give/talent/list.jsp   APPROVED 재능나눔 목록
  * - give/talent/detail.jsp APPROVED 재능나눔 상세
@@ -44,7 +42,7 @@ public class GiveTalentController {
     /**
      * 재능나눔 목록 — APPROVED(승인)만 노출
      * talentType: GROOMING / HOSPITAL / PHOTO / TRANSPORT / ETC (빈값=전체)
-     * 2026-07-13 박유정 — admin 승인 후 TB_TALENT STATUS_CD=APPROVED 건만 조회
+     * admin 승인 후 TB_TALENT STATUS_CD=APPROVED 건만 조회
      */
     @GetMapping("/list")
     public String talentList(
@@ -61,7 +59,7 @@ public class GiveTalentController {
 
 /**
  * 재능나눔 상세 — APPROVED(모집중) 또는 DONE(모집마감) 글 노출
- * 2026-08-10 박유정 — myApply, recruitmentOpen 추가 (STEP 4)
+ * myApply, recruitmentOpen
  */
 @GetMapping("/detail")
 public String talentDetail(@RequestParam long id,
@@ -97,7 +95,6 @@ public String talentDetail(@RequestParam long id,
 /**
  * 일반 회원 참여 신청
  * POST /give/talent/apply
- * 2026-08-10 박유정 — STEP 4
  */
 @PostMapping("/apply")
 public String applyTalent(@RequestParam long talentId,

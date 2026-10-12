@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%--
   역할: 관리자 배너 관리 목록
-  - 2026-08-06 박유정 — 대분류(메인/숙소/쇼핑/병원) + 중분류 탭(현재광고/광고대기/승인/승인대기/반려)
+  - 대분류(메인/숙소/쇼핑/병원) + 중분류 탭(현재광고/광고대기/승인/승인대기/반려)
   - 승인·대기·반려 AJAX, 상세 링크
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -13,7 +13,7 @@
 <%@ include file="/WEB-INF/views/admin/common/sidebar.jsp" %>
 
 <style>
-    /* 2026-08-06 박유정 — 대분류(세그먼트) / 중분류(밑줄 탭) 필터 UI */
+    /* 대분류(세그먼트) / 중분류(밑줄 탭) 필터 UI */
     /* ── 필터 영역 전체 ── */
     .banner-filter-wrap{
         background:#fff;border:1px solid #E4E6ED;border-radius:12px;
@@ -303,7 +303,6 @@ document.querySelectorAll('.btn-approve').forEach(function(btn) {
         xhr.open('POST', '${contextPath}/admin/cms/banner/approve');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         
-        //HYJ 26.08.05
         xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="_csrf"]').getAttribute('content'));
         
         xhr.onload = function() {
@@ -341,7 +340,7 @@ document.getElementById('holdConfirm').addEventListener('click', function() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '${contextPath}/admin/cms/banner/hold');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    // 2026/08/07 장우철 CSRF
+    // CSRF
     xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="_csrf"]').getAttribute('content'));
     xhr.onload = function() {
         var res = xhr.responseText.trim();
@@ -377,7 +376,6 @@ document.getElementById('rejectConfirm').addEventListener('click', function() {
     xhr.open('POST', '${contextPath}/admin/cms/banner/reject');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-    //HYJ 26.08.05
     xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="_csrf"]').getAttribute('content'));									
 	
     xhr.onload = function() {

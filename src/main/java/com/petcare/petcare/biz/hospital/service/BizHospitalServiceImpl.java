@@ -50,7 +50,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.selectHospitalByBizId(bizId);
     }
 
-    // 2026-07-10 장우철 — merge 전 승인 계정 등 TB_HOSPITAL 미생성 시 보정 INSERT
+    // 승인 계정 등 TB_HOSPITAL 미생성 시 보정 INSERT
     @Override
     @Transactional
     public HospitalVO resolveHospitalByBizId(String bizId) {
@@ -68,7 +68,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
     @Override
     @Transactional
     public void updateHospitalInfo(HospitalVO vo) {
-        // 2026-07-10 장우철 — 주소 있으면 좌표 변환 (유저 목록 '상세보기'는 LAT 필수)
+        // 주소 있으면 좌표 변환 (유저 목록 '상세보기'는 LAT 필수)
         if (vo.getAddr() != null && !vo.getAddr().isBlank()) {
             Map<String, Double> coords = kakaoMapService.geocodeAddress(vo.getAddr());
             if (coords != null) {
@@ -80,7 +80,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         bizHospitalMapper.updateHospitalInfo(vo);
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 목록 (F4)
+    // 사업자 예약 목록
     @Override
     @Transactional(readOnly = true)
     public List<ReservationVO> getReservationList(Long hospitalId, String tab) throws Exception {
@@ -91,15 +91,15 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.selectReservationList(hospitalId, safeTab);
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 상세 모달 (F6)
+    // 사업자 예약 상세 모달
     @Override
     @Transactional(readOnly = true)
     public ReservationVO getReservationDetail(Long hospitalId, Long resvId) throws Exception {
         return bizHospitalMapper.selectReservationDetail(resvId, hospitalId);
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 상태 변경 (F5)
-    // 2026/07/11 장우철 — [변경 후] PENDING→CONFIRMED→DONE 전이 + 확정/취소 알림 + 취소 사유
+    // 사업자 예약 상태 변경
+    // PENDING→CONFIRMED→DONE 전이 + 확정/취소 알림 + 취소 사유
     @Override
     @Transactional
     public void updateReservationStatus(Long hospitalId, Long resvId, String statusCd, String cancelReason)
@@ -152,13 +152,13 @@ public class BizHospitalServiceImpl implements BizHospitalService {
                     current.getMemberNo(), hospitalName, current.getResvDate(), current.getResvTime(),
                     rejectReason, resvId);
         } else if ("DONE".equals(next)) {
-            // 2026/07/13 장우철 — 진료완료 알림 (상세·리뷰 작성으로 이동)
+            // 진료완료 알림 (상세·리뷰 작성으로 이동)
             mypageNotifyService.sendReserveDoneNotification(
                     current.getMemberNo(), hospitalName, current.getResvDate(), current.getResvTime(), resvId);
         }
     }
 
-    /** 2026/07/11 장우철 — PENDING→CONFIRMED/CANCEL, CONFIRMED→DONE/CANCEL 만 허용 */
+    /** PENDING→CONFIRMED/CANCEL, CONFIRMED→DONE/CANCEL 만 허용 */
     private boolean isAllowedStatusTransition(String prev, String next) {
         if ("PENDING".equals(prev)) {
             return "CONFIRMED".equals(next) || "CANCEL".equals(next);
@@ -169,7 +169,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return false;
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 캘린더 (F7)
+    // 사업자 예약 캘린더
     @Override
     @Transactional(readOnly = true)
     public List<ReservationVO> getCalendarReservations(Long hospitalId, String fromDate, String toDate) throws Exception {
@@ -179,7 +179,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.selectReservationCalendarList(hospitalId, fromDate, toDate);
     }
 
-    // 2026/07/11 장우철 — 사이드바 PENDING 배지
+    // 사이드바 PENDING 배지
     @Override
     @Transactional(readOnly = true)
     public int countPendingReservations(Long hospitalId) throws Exception {
@@ -189,7 +189,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.countPendingReservations(hospitalId);
     }
 
-    // 2026/07/11 장우철 — 사이드바 캘린더 배지 (오늘 CONFIRMED)
+    // 사이드바 캘린더 배지 (오늘 CONFIRMED)
     @Override
     @Transactional(readOnly = true)
     public int countTodayConfirmedReservations(Long hospitalId) throws Exception {
@@ -199,7 +199,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.countTodayConfirmedReservations(hospitalId);
     }
 
-    // 2026/07/13 장우철 — CONFIRMED 예약 → 진료기록 INSERT + DONE
+    // CONFIRMED 예약 → 진료기록 INSERT + DONE
     @Override
     @Transactional
     public void completeReservationWithRecord(Long hospitalId, MedicalRecordVO record) throws Exception {
@@ -267,7 +267,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return memo.isEmpty() ? null : memo;
     }
 
-    // 2026/07/13 장우철 — 진료기록 목록
+    // 진료기록 목록
     @Override
     @Transactional(readOnly = true)
     public List<MedicalRecordVO> getMedicalRecords(Long hospitalId, String keyword, Integer periodMonths)
@@ -277,7 +277,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         }
         String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
         List<MedicalRecordVO> list = bizHospitalMapper.selectMedicalRecords(hospitalId, kw, periodMonths);
-        // 2026-07-28 박유정 — MEMO 태그 파싱 후 유형·신체계측·수의사메모 분리 (상세보기 모달용)
+        // MEMO 태그 파싱 후 유형·신체계측·수의사메모 분리 (상세보기 모달용)
         for (MedicalRecordVO r : list) {
             MedicalRecordMemoParser.parse(r);
         }
@@ -291,14 +291,14 @@ public class BizHospitalServiceImpl implements BizHospitalService {
             return null;
         }
         MedicalRecordVO record = bizHospitalMapper.selectMedicalRecordDetail(hospitalId, recordId);
-        // 2026-07-28 박유정 — MEMO 태그 파싱 (상세보기)
+        // MEMO 태그 파싱 (상세보기)
         if (record != null) {
             MedicalRecordMemoParser.parse(record);
         }
         return record;
     }
 
-    // 2026/07/13 장우철 — 진료기록 작성 모달용
+    // 진료기록 작성 모달용
     @Override
     @Transactional(readOnly = true)
     public List<ReservationVO> getConfirmedWithoutRecord(Long hospitalId) throws Exception {
@@ -308,7 +308,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.selectConfirmedWithoutRecord(hospitalId);
     }
 
-    // 2026/07/14 장우철 — 사업자 리뷰관리 목록
+    // 사업자 리뷰관리 목록
     @Override
     @Transactional(readOnly = true)
     public List<HospitalReviewVO> getBizHospitalReviews(Long hospitalId) throws Exception {
@@ -318,7 +318,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.selectBizHospitalReviews(hospitalId);
     }
 
-    // 2026/07/14 장우철 — 답글 작성/수정 + 회원 알림
+    // 답글 작성/수정 + 회원 알림
     @Override
     @Transactional
     public void saveReviewBizReply(Long hospitalId, Long reviewId, String bizReply) throws Exception {
@@ -348,7 +348,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
                 current.getMemberNo(), hospitalName, current.getResvId(), hospitalId);
     }
 
-    // 2026-07-24 박유정 — 리뷰 삭제 요청 INSERT (PENDING 중복 체크 → TB_REVIEW_DELETE_REQUEST)
+    // 리뷰 삭제 요청 INSERT (PENDING 중복 체크 → TB_REVIEW_DELETE_REQUEST)
     @Override
     @Transactional
     public void requestReviewDelete(Long hospitalId, Long bizNo, Long reviewId, String requestReason) throws Exception {
@@ -385,7 +385,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         }
     }
 
-    // 2026-07-24 박유정 — 사업자 리뷰관리 삭제요청 탭 목록
+    // 사업자 리뷰관리 삭제요청 탭 목록
     @Override
     @Transactional(readOnly = true)
     public List<ReviewDeleteRequestVO> getBizReviewDeleteRequests(Long hospitalId, Long bizNo) throws Exception {
@@ -395,7 +395,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return bizHospitalMapper.selectBizReviewDeleteRequests(hospitalId, bizNo);
     }
 
-    // 2026/07/16 장우철 고도화작업 — 병원 스케줄 CRUD
+    // 병원 스케줄 CRUD
     @Override
     @Transactional(readOnly = true)
     public List<HospitalTreatTypeVO> getTreatTypeList(Long hospitalId) throws Exception {
@@ -491,7 +491,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         }
     }
 
-    // 2026/07/16 장우철 고도화작업 — RESV_RULE 제거, 간격은 TB_HOSPITAL.RESV_INTERVAL_MIN
+    // RESV_RULE 제거, 간격은 TB_HOSPITAL.RESV_INTERVAL_MIN
     @Override
     @Transactional(readOnly = true)
     public Integer getResvIntervalMin(Long hospitalId) throws Exception {
@@ -598,7 +598,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         // 요약 카드
         dash.setTodayResvCount(bizHospitalMapper.countResvByDate(hospitalId, today));
         dash.setTodayResvYesterday(bizHospitalMapper.countResvByDate(hospitalId, yesterday));
-        // 지윤 26.08.13 추가: 오늘 예약 카드 옆 괄호용
+        // 오늘 예약 카드 옆 괄호용
         dash.setTodayCancelCount(bizHospitalMapper.countCancelByDate(hospitalId, today));
         dash.setPendingCount(bizHospitalMapper.countPendingReservations(hospitalId));
         dash.setPendingYesterday(0);
@@ -606,7 +606,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         dash.setDoneYesterday(bizHospitalMapper.countDoneByDate(hospitalId, yesterday));
         dash.setMonthRevenue(bizHospitalMapper.sumMonthRevenue(hospitalId, today));
         dash.setMonthRevenueYesterday(bizHospitalMapper.sumMonthRevenue(hospitalId, yesterday));
-        // 지윤 26.08.13 추가: 병원은 결제 연동이 없어 매출 대신 이번 달 진료완료 건수 사용
+        // 병원은 결제 연동이 없어 매출 대신 이번 달 진료완료 건수 사용
         dash.setMonthDoneCount(bizHospitalMapper.sumMonthDoneCount(hospitalId, today));
         dash.setMonthDoneYesterday(bizHospitalMapper.sumMonthDoneCount(hospitalId, yesterday));
 
@@ -626,7 +626,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         dash.setTotalStatusCount(total);
 
         // 차트 (일별)
-        // 지윤 26.08.13 수정: 매출 대신 진료완료/취소 건수로 변경
+        // 매출 대신 진료완료/취소 건수
         java.util.List<com.petcare.petcare.biz.vo.DailyStatVO> dailyList = bizHospitalMapper.selectDailyStats(hospitalId, chartDays);
         java.util.List<String> labels = new java.util.ArrayList<>();
         java.util.List<Integer> counts = new java.util.ArrayList<>();
@@ -646,7 +646,7 @@ public class BizHospitalServiceImpl implements BizHospitalService {
         return dash;
     }
 
-    // 지윤 26.08.13 추가: 일간/월간 버튼 전환용 - 차트 데이터만 따로 조회
+    // 일간/월간 버튼 전환용 - 차트 데이터만 따로 조회
     // period='monthly'면 최근 6개월(월 단위), 그 외(기본 daily)는 최근 7일(일 단위)
     @Override
     public java.util.List<com.petcare.petcare.biz.vo.DailyStatVO> getChartData(Long hospitalId, String period) {

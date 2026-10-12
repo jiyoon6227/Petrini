@@ -4,8 +4,6 @@
 
 <%--
   파일명: coupon/products.jsp
-  작성자: 지윤
-  작성일: 2026.08.06
 
   설명:
   쇼핑몰 쿠폰을 사용할 수 있는 상품 목록 화면.
@@ -24,7 +22,7 @@
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <style>
-  /* 지윤 26.08.06: 쿠폰 적용 상품 화면 본문만 흰색 적용 */
+  /* 쿠폰 적용 상품 화면 본문만 흰색 적용 */
 .coupon-products {
   max-width: 1200px;
   margin: 0 auto;
@@ -55,7 +53,7 @@
     font-size: 14px;
   }
 
-  /* 지윤 26.08.06: 선택한 쿠폰 정보 영역 */
+  /* 선택한 쿠폰 정보 영역 */
   .cp-summary {
     display: flex;
     align-items: center;
@@ -67,7 +65,7 @@
     background: #f4fbf8;
   }
 
-  /* 지윤 26.08.06: 쿠폰 티켓 모양 */
+  /* 쿠폰 티켓 모양 */
 .cp-summary-icon {
   position: relative;
   display: flex;
@@ -130,7 +128,7 @@
     font-weight: 700;
   }
 
-  /* 지윤 26.08.06: 쿠폰 적용 상품 검색창 */
+  /* 쿠폰 적용 상품 검색창 */
 .cp-product-search {
   display: flex;
   width: 420px;
@@ -205,7 +203,7 @@
     font-weight: 800;
   }
 
-  /* 지윤 26.08.06: 쿠폰 적용 상품 4열 배치 */
+  /* 쿠폰 적용 상품 4열 배치 */
   .cp-product-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -228,7 +226,7 @@
     box-shadow: 0 8px 24px rgba(30, 70, 55, 0.10);
   }
 
-  /* 지윤 26.08.06: 상품 카드를 가로로 넓어 보이도록 이미지 높이 조정 */
+  /* 상품 카드를 가로로 넓어 보이도록 이미지 높이 조정 */
 .cp-product-image {
   display: flex;
   align-items: center;
@@ -259,8 +257,8 @@
     font-size: 12px;
   }
 
-  /* 지윤 26.08.06: 상품명 글씨 진하게 표시 */
-  /* 지윤 26.08.06: 상품명과 별점 간격 축소 */
+  /* 상품명 글씨 진하게 표시 */
+  /* 상품명과 별점 간격 축소 */
 .cp-product-name {
   min-height: 21px;
   overflow: hidden;
@@ -270,7 +268,7 @@
   line-height: 1.4;
 }
 
-  /* 지윤 26.08.06: 상품명과 별점 사이 간격 축소 */
+  /* 상품명과 별점 사이 간격 축소 */
 .cp-product-rating {
   margin: 2px 0 7px;
   color: #7e8581;
@@ -288,14 +286,14 @@
     text-decoration: line-through;
   }
 
-  /* 지윤 26.08.06: 판매가격 주황색 표시 */
+  /* 판매가격 주황색 표시 */
   .cp-sale-price {
   color: #f97316;
   font-size: 17px;
   font-weight: 800;
 }
 
-  /* 지윤 26.08.06: 가격과 쿠폰 적용 배지를 한 줄로 배치 */
+  /* 가격과 쿠폰 적용 배지를 한 줄로 배치 */
   .cp-product-price {
   display: flex;
   align-items: center;
@@ -303,7 +301,7 @@
   min-height: 25px;
 }
 
- /* 지윤 26.08.06: 쿠폰 적용 배지를 가격 오른쪽에 표시 */
+ /* 쿠폰 적용 배지를 가격 오른쪽에 표시 */
 .cp-apply-badge {
   display: inline-block;
   margin-left: auto;
@@ -347,7 +345,7 @@
     이 쿠폰을 사용할 수 있는 상품이에요.
   </p>
 
-  <%-- 지윤 26.08.06: 선택한 쿠폰 정보 출력 --%>
+  <%-- 선택한 쿠폰 정보 출력 --%>
   <section class="cp-summary">
 
     <div class="cp-summary-icon">%</div>
@@ -385,7 +383,7 @@
 
   </section>
 
-<%-- 지윤 26.08.06: 현재 쿠폰 적용 상품 내 검색 --%>
+<%-- 현재 쿠폰 적용 상품 내 검색 --%>
 <form class="cp-product-search"
       method="get"
       action="${contextPath}/coupon/products">
@@ -417,7 +415,7 @@
       <strong>${productList.size()}개</strong>
     </div>
 
-    <%-- 지윤 26.08.06: 적용 상품 정렬 --%>
+    <%-- 적용 상품 정렬 --%>
     <nav class="cp-sort">
 
       <a class="${selectedSort eq 'popular' ? 'active' : ''}"
@@ -455,7 +453,7 @@
 
         <c:forEach var="p" items="${productList}">
 
-          <%-- 지윤 26.08.06: 기존 상품 상세 페이지로 이동 --%>
+          <%-- 기존 상품 상세 페이지로 이동 --%>
           <a class="cp-product-card"
              href="${contextPath}/store/detail?id=${p.productId}">
 
@@ -507,7 +505,7 @@
                 ${p.avgRating} (${p.reviewCount})
               </div>
 
-             <%-- 지윤 26.08.06: 가격과 쿠폰 적용 배지를 한 줄로 표시 --%>
+             <%-- 가격과 쿠폰 적용 배지를 한 줄로 표시 --%>
              <div class="cp-product-price">
 
                <c:if test="${p.price > p.salePrice}">

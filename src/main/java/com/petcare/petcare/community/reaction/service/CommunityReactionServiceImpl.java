@@ -1,8 +1,6 @@
 /**
  * 역할: CommunityReactionService 구현체 (@Service)
  *
- * - 박유정 / 2026-07-09
- *
  * [isLiked — 좋아요 여부 조회]
  * 1. TB_POST_LIKE 에 해당 postId + memberNo 존재 여부 확인
  * 2. DB 실패 시 세션 폴백 (communityLikedPosts:{memberNo})

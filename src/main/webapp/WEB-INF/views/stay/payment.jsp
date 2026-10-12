@@ -25,7 +25,7 @@
   .btn-pay:disabled{background:var(--border);cursor:not-allowed}
   .agree-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-sub);margin-top:14px}
   .agree-row input{accent-color:var(--primary);width:16px;height:16px}
-  /* 2026/07/27 장우철 — 결제수단 선택 UI */
+  /* 결제수단 선택 UI */
   .pay-type-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
   .pay-type-item{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition);background:#fff}
   .pay-type-item:has(input:checked){border-color:var(--primary);background:var(--primary-light)}
@@ -39,7 +39,7 @@
   .pay-card-preview .label{font-size:12px;font-weight:700;color:#166534;margin-bottom:6px}
   .pay-card-preview .num{font-size:16px;font-weight:800;color:var(--text-main)}
   .pay-card-preview .hint{font-size:12px;color:var(--text-muted);margin-top:8px}
-  /* 2026/08/11 장우철 — 등록카드 2장 이상 선택 */
+  /* 등록카드 2장 이상 선택 */
   .pay-card-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}
   .pay-card-option{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid #BBF7D0;border-radius:var(--radius-sm);cursor:pointer;background:#fff;margin:0}
   .pay-card-option:has(input:checked){border-color:var(--primary);background:var(--primary-light)}
@@ -75,7 +75,7 @@
     <div class="pay-row"><span>반려동물</span><span>${reservation.petName}</span></div>
   </div>
 
-  <%-- 결제 수단 — 2026/07/27 장우철: 등록카드 / 계좌이체 선택 UI --%>
+  <%-- 결제 수단 — 등록카드 / 계좌이체 선택 UI --%>
   <div class="pay-section" id="tossSection">
     <h3>
       <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -98,7 +98,7 @@
       </label>
     </div>
     <div id="panelCard" class="pay-panel">
-      <%-- 2026/08/11 장우철 — 등록카드 목록에서 결제 카드 선택 --%>
+      <%-- 등록카드 목록에서 결제 카드 선택 --%>
       <div class="pay-card-preview" id="payCardPreviewRegistered" style="display:none">
         <div class="label">결제할 카드를 선택하세요</div>
         <div class="pay-card-list" id="payCardList"></div>
@@ -126,7 +126,7 @@
       <span><fmt:formatNumber value="${reservation.totalAmount}" pattern="#,###"/>원</span>
     </div>
 
-    <%-- 지윤 26.08.07: 쿠폰 사용 --%>
+    <%-- 쿠폰 사용 --%>
     <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:14px 16px;margin:12px 0">
       <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:8px">보유 쿠폰</div>
       <select id="couponSelect" onchange="calcFinalAmount()"
@@ -165,7 +165,7 @@
     <div style="display:none"><span id="pointDiscountRow"></span></div>
 
     <div class="pay-total-box">
-        <%-- 지윤 26.08.07: 쿠폰 할인 표시 행 --%>
+        <%-- 쿠폰 할인 표시 행 --%>
         <div class="pay-row" id="couponDiscountDisplay" style="display:none;margin-bottom:10px">
           <span>쿠폰 할인</span>
           <span id="couponDiscountLabel" style="color:#D97706">-0원</span>
@@ -193,7 +193,7 @@
 <script src="${contextPath}/resources/js/billing-card.js"></script>
 <script>
   var totalAmount = ${reservation.totalAmount};
-  // 2026/07/27 장우철 — 보유 포인트(실잔액). 사용 상한만 0 이상·보유분 이내
+  // 보유 포인트(실잔액). 사용 상한만 0 이상·보유분 이내
   var memberPoint = ${memberPoint != null ? memberPoint : 0};
   var clientKey = "${tossApiKey}";
   var customerKey = "petcare_user_${memberInfo.memberId}";
@@ -201,13 +201,13 @@
   var resvNo = "${reservation.resvNo}";
   var contextPath = "${contextPath}";
   var usedPoint = 0;
-  // 지윤 26.08.07: 쿠폰 상태
+  // 쿠폰 상태
   var couponDiscount = 0;
   var couponMemberCouponId = 0;
 
   var tossPayments = TossPayments(clientKey);
   var widgets = tossPayments.widgets({ customerKey: customerKey });
-  // 2026/07/27 장우철 — 등록카드 목록 Ajax
+  // 등록카드 목록 Ajax
   var hasRegisteredCard = false;
   var selectedBillingCardId = null;
 
@@ -217,7 +217,7 @@
     await widgets.renderAgreement({ selector: "#agreement" });
   })();
 
-  /* 2026/07/27 장우철 — 결제수단 택1 + 등록카드 Ajax */
+  /* 결제수단 택1 + 등록카드 Ajax */
   (function () {
     var card = document.getElementById('payTypeCard');
     var transfer = document.getElementById('payTypeTransfer');
@@ -237,7 +237,7 @@
       }
     }
 
-    // 2026/08/11 장우철 — 등록카드 라디오 목록 렌더
+    // 등록카드 라디오 목록 렌더
     function renderCardList(cards) {
       listEl.innerHTML = '';
       cards.forEach(function (c, i) {
@@ -293,7 +293,7 @@
     refreshCards();
   })();
 
-  // 지윤 26.08.07: 선택된 쿠폰으로 할인 계산 (store/order.jsp와 동일 패턴)
+  // 선택된 쿠폰으로 할인 계산 (store/order.jsp와 동일 패턴)
   function calcCouponDiscount() {
     var couponSel = document.getElementById('couponSelect');
     var opt = couponSel.options[couponSel.selectedIndex];
@@ -331,8 +331,8 @@
   }
 
   function useAllPoints() {
-    // 2026/07/27 장우철 — 전액 사용도 보유분·결제액 이내
-    // 지윤 26.08.07 — 쿠폰 할인 반영한 금액 기준으로 상한 계산
+    // 전액 사용도 보유분·결제액 이내
+    // 쿠폰 할인 반영한 금액 기준으로 상한 계산
     var held = Math.max(0, memberPoint || 0);
     var payableAfterCoupon = totalAmount - couponDiscount;
     var maxUsable = Math.min(held, payableAfterCoupon);
@@ -341,7 +341,7 @@
   }
 
   function calcFinalAmount() {
-    // 지윤 26.08.07: 쿠폰 먼저 계산 -> 그 결과 금액 기준으로 포인트 계산
+    // 쿠폰 먼저 계산 -> 그 결과 금액 기준으로 포인트 계산
     calcCouponDiscount();
 
     var input = document.getElementById('pointInput');
@@ -392,7 +392,7 @@
   }
 
   async function requestPayment() {
-    // 지윤 26.08.07: 쿠폰 할인까지 반영한 최종 결제 금액
+    // 쿠폰 할인까지 반영한 최종 결제 금액
     var payableAfterCoupon = totalAmount - couponDiscount;
     var finalAmount = payableAfterCoupon - usedPoint;
 
@@ -403,7 +403,7 @@
       return;
     }
 
-    // 2026/07/27 장우철 — 등록카드 Ajax 빌링 승인
+    // 등록카드 Ajax 빌링 승인
     if (document.getElementById('payTypeCard').checked) {
       if (!hasRegisteredCard || !selectedBillingCardId) {
         alert('등록된 카드가 없습니다. 회원정보에서 카드를 등록해 주세요.');
@@ -418,7 +418,6 @@
           + '&resvId=' + encodeURIComponent(resvId)
           + '&usedPoint=' + encodeURIComponent(usedPoint)
           + '&couponMemberCouponId=' + encodeURIComponent(couponMemberCouponId);
-        //HYJ 26.08.05
         var res = await csrfFetch(contextPath + '/stay/payment/billing-card', {
           method: 'POST',
           credentials: 'same-origin',

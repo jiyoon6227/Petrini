@@ -1,6 +1,5 @@
 /**
  * 역할: TB_INQUIRY 매핑 VO (회원·관리자 공통)
- * 2026/07/31 장우철
  */
 package com.petcare.petcare.member.inquiry.vo;
 

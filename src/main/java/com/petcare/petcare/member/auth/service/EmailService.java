@@ -1,5 +1,5 @@
 /**
- * 2026/07/15 — 회원가입 이메일 인증
+ * 회원가입 이메일 인증
  *
  * 역할: Google SMTP 로 인증번호 발송 (@Service)
  *
@@ -34,12 +34,12 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // 2026/08/01 장우철 — mail.smtp-from 미설정 시 spring.mail.username 사용 (클린패키지/기동 실패 방지)
+    // mail.smtp-from 미설정 시 spring.mail.username 사용 (클린패키지/기동 실패 방지)
     @Value("${mail.smtp-from:${spring.mail.username}}")
     private String from;
 
     /**
-     * HYJ 26.07.28 공통 메일 발송
+     * 공통 메일 발송
      */
     public void send(String to, String subject, String htmlBody) throws MessagingException {
         if (mailSender instanceof JavaMailSenderImpl) {
@@ -82,7 +82,7 @@ public class EmailService {
     }
 
     /**
-     * HYJ 26.07.28 사업자 승인 알림
+     * 사업자 승인 알림
      */
     public void sendApproveNotice(String to, String bizName) throws MessagingException {
 
@@ -98,7 +98,7 @@ public class EmailService {
     }
 
     /**
-     * HYJ 26.07.28 사업자 반려 알림
+     * 사업자 반려 알림
      */
     public void sendRejectNotice(String to, String bizName, String reason) throws MessagingException {
         String subject = "[PetCare] 사업자 등록 반려 안내";
@@ -118,7 +118,7 @@ public class EmailService {
     }
 
     /**
-     * HYJ 26.07.28 예약 확인 알림
+     * 예약 확인 알림
      */
     public void sendReservationConfirm(String to, String bizName, String date) throws MessagingException {
         String subject = "[PetCare] 예약이 확인되었습니다";
@@ -141,8 +141,8 @@ public class EmailService {
         return String.valueOf(code);
     }
 
-    //지윤 26.08.05 추가: 상품 품절 알림 (기존 sendApproveNotice 패턴과 동일)
-    //지윤 26.08.05 수정: 사업자명까지 넣어서 인사말 추가 (3개 파라미터)
+    // 상품 품절 알림 (기존 sendApproveNotice 패턴과 동일)
+    // 인사말에 사업자명 포함 (3개 파라미터)
     public void sendSoldoutNotice(String to, String bizName, String productName) throws MessagingException {
     String subject = "[PetCare] 상품 품절 알림";
     String body = ""

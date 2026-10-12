@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 게시글 URL 처리 → Service 호출 → JSP 반환
  *
- * - 박유정 / 2026-07-08~10
- *
  * [목록 화면 흐름]
  * 1. GET /community?boardType=...&keyword=...&page=...
  * 2. communityPostService.getPostList() → TB_POST + 썸네일
@@ -21,7 +19,7 @@
  * [댓글]
  * 1. GET detail → communityCommentService.getCommentList()
  * 2. POST /community/comment → TB_POST_COMMENT INSERT
- * 3. LIFE + 일반댓글 성공 시 markLifeAnswered() → TAGS=ANSWERED (2026-07-10 STEP 4)
+ * 3. LIFE + 일반댓글 성공 시 markLifeAnswered() → TAGS=ANSWERED
  * 4. POST /community/comment/delete → IS_DELETED='Y' (작성자 본인)
  * 5. POST /community/comment/update → BODY 수정 (작성자 본인)
  * 6. POST /community/report → TB_POST_REPORT INSERT
@@ -153,13 +151,13 @@ public class CommunityPostController {
         if (member != null) {
             loginMemberNo = communityCommentService.resolveLoginMemberNo(member);
 
-            //HYJ 26.07.28 관리자권한 확인
+            // 관리자권한 확인
             model.addAttribute("loginMemberRole", member.getRole());
         }
 
         model.addAttribute("loginMemberNo", loginMemberNo);
 
-        // 2026/07/11 장우철 — LIFE 댓글 UI 권한 플래그 (서버 검증과 동일 규칙)
+        // LIFE 댓글 UI 권한 플래그 (서버 검증과 동일 규칙)
         // canWriteTopComment: 최상위 댓글 폼 / canWriteReply: 대댓글(답글) 폼
         boolean canWriteTopComment = false;
         boolean canWriteReply = false;
@@ -204,7 +202,7 @@ public class CommunityPostController {
         }
         try {
             communityCommentService.insertComment(postId, body, member, parentId);
-            // 2026-07-10 박유정 STEP 4 — LIFE 일반댓글 등록 시 답변완료 처리
+            // LIFE 일반댓글 등록 시 답변완료 처리
             if (parentId == null) {
                 communityPostService.markLifeAnswered(postId);
             }
@@ -217,7 +215,7 @@ public class CommunityPostController {
             if ("LOGIN_REQUIRED".equals(e.getMessage())) {
                 return "redirect:/login?redirect=/community/detail?id=" + postId;
             }
-            // 2026/07/11 장우철 — LIFE 댓글 권한 거부
+            // LIFE 댓글 권한 거부
             if ("LIFE_COMMENT_FORBIDDEN".equals(e.getMessage())) {
                 return "redirect:/community/detail?id=" + postId + "&error=lifeComment";
             }
@@ -266,7 +264,7 @@ public class CommunityPostController {
     }
 
     /**
-     * [댓글 수정] 2026-07-14 박유정
+     * [댓글 수정]
      * POST /community/comment/update — 작성자 본인만 BODY 수정
      */
     @PostMapping("/comment/update")
@@ -299,7 +297,7 @@ public class CommunityPostController {
     }
 
     /**
-     * [게시글 신고] 2026-07-14 박유정
+     * [게시글 신고]
      * POST /community/report — TB_POST_REPORT INSERT (PENDING)
      */
     @PostMapping("/report")
@@ -373,7 +371,7 @@ public class CommunityPostController {
 
 
     /**
-     * [게시글 수정 화면] 2026-07-23 HYJ
+     * [게시글 수정 화면]
      * GET /community/edit?id=번호 → 본인 글만 edit.jsp
      */
     @GetMapping("/edit")
@@ -400,9 +398,9 @@ public class CommunityPostController {
     }
 
     /**
-     * [게시글 수정 처리] 2026-07-23 HYJ
+     * [게시글 수정 처리]
      * POST /community/edit → updatePost() → 상세 redirect
-     * 2026-08-13 박유정 — photos(추가), removePhotoUrls(선택 삭제) multipart 전달
+     * photos(추가), removePhotoUrls(선택 삭제) multipart 전달
      */
     @PostMapping("/edit")
     public String editSubmit(
@@ -442,7 +440,7 @@ public class CommunityPostController {
     }
 
     /**
-     * [게시글 삭제] 2026-07-23 HYJ
+     * [게시글 삭제]
      * POST /community/delete → deletePost() → 목록 redirect
      */
     @PostMapping("/delete")
@@ -493,8 +491,8 @@ public class CommunityPostController {
     /** 게시글 등록 — TB_POST + 사진 저장 후 상세 또는 LIFE 목록 redirect */
     @PostMapping("/write")
     public String writeSubmit(
-            @Valid @ModelAttribute CommunityPostVO vo,      //HYJ 26.08.06 vo 검증 추가
-            BindingResult bindingResult,                   // 2026/08/10 장우철 — @Valid 실패를 ExHandler로 안 보내고 화면에 표시
+            @Valid @ModelAttribute CommunityPostVO vo,      // vo 검증 추가
+            BindingResult bindingResult,                   // @Valid 실패를 ExHandler로 안 보내고 화면에 표시
             @RequestParam(value = "photos", required = false) MultipartFile[] photos,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
@@ -503,7 +501,7 @@ public class CommunityPostController {
         String lifeListUrl = "/community?boardType=LIFE";
         String loginRedirect = isLife ? lifeListUrl : "/community/write";
 
-        // 2026/08/10 장우철 — 글자수 등 검증 실패 시 write 화면에 메시지 표시
+        // 글자수 등 검증 실패 시 write 화면에 메시지 표시
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("validationMessage", resolveValidationMessage(bindingResult));
             redirectAttributes.addFlashAttribute("communityPostVO", vo);
@@ -551,7 +549,7 @@ public class CommunityPostController {
         return null;
     }
 
-    /** 2026/08/10 장우철 — body/title Size 실패 메시지를 우선 노출 */
+    /** body/title Size 실패 메시지를 우선 노출 */
     private String resolveValidationMessage(BindingResult bindingResult) {
         FieldError bodyError = bindingResult.getFieldError("body");
         if (bodyError != null && bodyError.getDefaultMessage() != null) {

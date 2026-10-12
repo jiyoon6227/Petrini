@@ -1,6 +1,6 @@
 /**
  * 역할: TB_HOSPITAL_RESV_HOLD 만료 행 주기 삭제
- * 2026/07/20 장우철 — hold 만료 배치 (#10)
+ * hold 만료 배치
  *
  * 연결
  * - HospitalService.cleanupExpiredHolds()
@@ -20,7 +20,7 @@ public class HospitalResvHoldCleanupScheduler {
     @Autowired
     private HospitalService hospitalService;
 
-    /** 2026/07/20 장우철 — 5분마다 EXPIRE_DATE 지난 hold 삭제 */
+    /** 5분마다 EXPIRE_DATE 지난 hold 삭제 */
     @Scheduled(fixedDelayString = "${petcare.hospital.hold-cleanup-ms:300000}")
     public void purgeExpiredHolds() {
         try {

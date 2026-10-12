@@ -7,8 +7,8 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%-- 7/3, 사업자(쇼핑몰) 리뷰 관리 UI 구성 — 병원 reviews.jsp와 동일 구조로 재작성 --%>
-<%-- 지윤 26.07.20 수정: 목업 -> 실데이터 연동. "신고관리" 탭을 "삭제요청" 탭으로 변경 (신고관리는 제외하기로 결정, 대신 사업자 삭제요청/관리자 승인 플로우로 대체) --%>
+<%-- 사업자(쇼핑몰) 리뷰 관리 UI 구성 — 병원 reviews.jsp와 동일 구조로 재작성 --%>
+<%-- "삭제요청" 탭 (사업자 삭제요청 → 관리자 승인 플로우, 신고관리 탭 없음) --%>
 <main class="biz-main">
   <div class="biz-page-head">
     <h1 class="biz-page-title">리뷰 관리</h1>
@@ -39,16 +39,14 @@
   답글이 등록되었습니다.
 </div>
 
-<%-- 지윤 26.07.20 추가: 답글/삭제요청은 실제 서버로 POST해야 해서 숨김 폼 2개로 처리 (fetch/AJAX 대신 그냥 submit) --%>
+<%-- 답글/삭제요청은 숨김 폼 2개로 서버 POST (AJAX 대신 submit) --%>
 <form id="replyForm" method="post" action="${contextPath}/biz/store/reviews/reply" style="display:none">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
   
   <input type="hidden" name="reviewId" id="replyFormReviewId">
   <textarea name="bizReply" id="replyFormText"></textarea>
 </form>
 <form id="deleteReqForm" method="post" action="${contextPath}/biz/store/reviews/delete-request" style="display:none">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
 
   <input type="hidden" name="reviewId" id="delFormReviewId">
@@ -56,9 +54,9 @@
 </form>
 
 <script>
-  //지윤 26.07.22 추가: 썸네일 경로 조합용 (detail.jsp와 동일 패턴)
+  // 썸네일 경로 조합용 (detail.jsp와 동일 패턴)
   var contextPath = '${contextPath}';
-  //지윤 26.07.20 수정: 목업 배열 -> 컨트롤러가 내려주는 실데이터 JSON 그대로 사용
+  // 컨트롤러가 내려준 JSON 사용
   var reviews = ${empty reviewListJson ? '[]' : reviewListJson};
 
   var currentTab = 'all';
@@ -84,13 +82,13 @@
     renderList();
   }
 
-  //지윤 26.07.22 추가: "신고접수 N건" 뱃지 클릭 시에만 신고자 목록 보여주기 (renderList 다시 안 타므로 DOM에서 바로 토글)
+  // "신고접수 N건" 뱃지 클릭 시에만 신고자 목록 보여주기 (renderList 다시 안 타므로 DOM에서 바로 토글)
   function toggleReporters(id) {
     var el = document.getElementById('reporters-' + id);
     if (el) el.style.display = (el.style.display === 'none') ? 'block' : 'none';
   }
 
-  //지윤 26.07.20 수정: 신고(r.reported) 기준 -> 삭제요청(r.deleteRequested) 기준으로 필터 변경
+  // 삭제요청(r.deleteRequested) 기준 필터
   function renderList() {
     var list = reviews.filter(function (r) { return currentTab === 'all' || r.deleteRequested; });
 
@@ -127,7 +125,7 @@
           '</div>';
       }
 
-      //지윤 26.07.22 수정: 네이버 리뷰 스타일 참고해서 카드 레이아웃 재구성 - 썸네일+상품정보 상단 블록, 답글은 회색 박스로 정리
+      // 카드 레이아웃: 썸네일+상품정보 상단 블록, 답글은 회색 박스
     item.innerHTML =
         '<div class="biz-review-main">' +
           '<div class="biz-review-product-row">' +
@@ -158,7 +156,7 @@
     });
   }
 
-  //지윤 26.07.20 수정: 클라이언트에서 배열만 바꾸던 것 -> 실제 서버(TB_REVIEW.BIZ_REPLY) 저장하도록 폼 submit으로 변경
+  // 폼 submit으로 서버(TB_REVIEW.BIZ_REPLY) 저장
   function submitReply(id) {
     var text = document.getElementById('replyInput-' + id).value.trim();
     if (!text) { alert('답글 내용을 입력해주세요.'); return; }
@@ -167,7 +165,7 @@
     document.getElementById('replyForm').submit();
   }
 
-  //지윤 26.07.20 추가: 삭제요청 - 즉시 삭제 X, 서버에 사유와 함께 등록만 함 (TB_REVIEW_REPORT, 관리자 승인 후 실제 삭제됨)
+  // 삭제요청: 즉시 삭제 없이 사유와 함께 등록 (TB_REVIEW_REPORT, 관리자 승인 후 삭제)
   function requestDelete(id) {
     var reason = prompt('삭제 사유를 입력해주세요 (관리자 승인 후 삭제됩니다)');
     if (reason === null) return;

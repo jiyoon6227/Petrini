@@ -1,8 +1,7 @@
 <%-- community/list.jsp — 커뮤니티 게시판 목록 --%>
 <%--
-  - 박유정 / 2026-07-08~10
   - STEP 3: 목록 DB 연동 (작성자·페이징·검색·총 개수)
-  - STEP 4: LIFE ANSWERED 시 vet-answer 답변 미리보기 (2026-07-10)
+  - LIFE ANSWERED 시 vet-answer 답변 미리보기
 
   [목록 화면 흐름]
   1. GET /community?boardType=... → CommunityPostController.list()
@@ -167,7 +166,6 @@
             action="${contextPath}/community/write"
             enctype="multipart/form-data"
             onsubmit="return confirm('상담 글을 등록하시겠습니까?')">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="boardType" value="LIFE">
@@ -266,7 +264,7 @@
         </div>
         <div class="vet-card-title"><c:out value="${item.title}"/></div>
         <div class="vet-card-preview"><c:out value="${item.body}"/></div>
-        <%-- 2026-07-10 박유정 STEP 4 — 답변완료 카드 답변 미리보기 --%>
+        <%-- 답변완료 카드 답변 미리보기 --%>
         <c:if test="${fn:contains(item.tags, 'ANSWERED') && not empty item.answerBody}">
           <div class="vet-answer" onclick="event.stopPropagation()">
             <div class="vet-answer-head">
@@ -389,7 +387,7 @@ function toggleAskForm() {
   if (f.style.display === 'block') f.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-// 2026/08/18 장우철 — LIFE(수의사상담) 품종 select 동적 렌더링
+// LIFE(수의사상담) 품종 select 동적 렌더링
 (function initVetBreedSelect() {
   var breedSel = document.getElementById('vet-breed');
   if (!breedSel) return;

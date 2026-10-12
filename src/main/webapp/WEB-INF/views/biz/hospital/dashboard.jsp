@@ -9,8 +9,7 @@
 <%@ include file="/WEB-INF/views/biz/common/sidebar_hospital.jsp" %>
 
 
-<%--HYJ 26.08.06 DB 연동--%>
-<%--7/1, 곽지윤, 사업자(병원)대시보드 ui구성변경(after)--%>
+<%-- 사업자(병원) 대시보드 UI --%>
 <main class="biz-main hospital-dashboard">
   <div class="dashboard-top">
     <div>

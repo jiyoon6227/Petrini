@@ -31,14 +31,14 @@ public class CouponServiceImpl implements CouponService {
     return eventCouponMapper.countUsableCoupons(memberNo);
     }
 
-    // 지윤 26.08.06: 쿠폰과 발급 사업자 정보 조회
+    // 쿠폰과 발급 사업자 정보 조회
     @Override
     public CouponVO getCouponTarget(Long couponId) {
     return eventCouponMapper.selectCouponTarget(couponId);
     }
 
-    // 지윤 26.08.06: 쿠폰 발급 쇼핑몰의 적용 상품 조회
-    // 지윤 26.08.06: 쿠폰 적용 상품 검색 및 정렬
+    // 쿠폰 발급 쇼핑몰의 적용 상품 조회
+    // 쿠폰 적용 상품 검색 및 정렬
 @Override
 public List<StoreShopVO> getCouponProducts(
         String bizNo,
@@ -66,13 +66,13 @@ public void claimCoupon(Long memberNo, Long couponId) {
             throw new IllegalArgumentException("COUPON_NOT_FOUND");
         }
 
-        // 지윤 26.08.07: 사업자가 조기마감(INACTIVE)한 쿠폰은 발급 불가
+        // 사업자가 조기마감(INACTIVE)한 쿠폰은 발급 불가
         if ("INACTIVE".equals(coupon.getStatusCd())) {
             throw new IllegalStateException("COUPON_CLOSED");
         }
 
-        // 지윤 26.08.07: 수량 소진된 쿠폰은 발급 불가 (사전 체크, 최종 확정은 UPDATE에서)
-        // 2026-08-13 박유정 — issuedQty NULL을 0으로 간주
+        // 수량 소진된 쿠폰은 발급 불가 (사전 체크, 최종 확정은 UPDATE에서)
+        // issuedQty NULL을 0으로 간주
         if ("EXHAUSTED".equals(coupon.getStatusCd())) {
             throw new IllegalStateException("COUPON_EXHAUSTED");
         }
@@ -81,14 +81,14 @@ public void claimCoupon(Long memberNo, Long couponId) {
             throw new IllegalStateException("COUPON_EXHAUSTED");
         }
 
-        // 지윤 26.08.07: 사용기간 종료된 쿠폰은 발급 불가
+        // 사용기간 종료된 쿠폰은 발급 불가
         String today = java.time.LocalDate.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
         if (coupon.getUseEndDate() != null && coupon.getUseEndDate().compareTo(today) < 0) {
             throw new IllegalStateException("COUPON_EXPIRED");
         }
 
-        // 2026-08-13 박유정 — INSERT 전 예산·RATE 설정 사전 검증
+        // INSERT 전 예산·RATE 설정 사전 검증
         int budgetUnit = "RATE".equals(coupon.getCouponType())
                 ? (coupon.getMaxDiscountAmt() != null ? coupon.getMaxDiscountAmt() : 0)
                 : (coupon.getDiscountValue() != null ? coupon.getDiscountValue() : 0);
@@ -105,14 +105,14 @@ public void claimCoupon(Long memberNo, Long couponId) {
         }
         
         // 3) TB_MEMBER_COUPON INSERT
-        // 2026/08/13 장우철 — 예주 만료일(useEndDate) + 우철 조건부 INSERT(중복발급 방지)
+        // 만료일(useEndDate) 조건 + 조건부 INSERT(중복발급 방지)
         int inserted = eventCouponMapper.insertMemberCoupon(memberNo, couponId, coupon.getUseEndDate());
         if (inserted == 0) {
             throw new IllegalStateException("ALREADY_CLAIMED");
         }
 
         // 4) TB_COUPON 발급수량·예산 갱신
-        // 지윤 26.08.07: 동시요청으로 그 사이 소진됐으면 0건 갱신 → 트랜잭션 롤백(2번 INSERT도 취소)
+        // 동시요청으로 그 사이 소진됐으면 0건 갱신 → 트랜잭션 롤백(2번 INSERT도 취소)
         int updated = eventCouponMapper.updateCouponIssued(couponId, budgetUnit);
         if (updated == 0) {
             throw new IllegalStateException("COUPON_EXHAUSTED");

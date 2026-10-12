@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${contextPath}/resources/css/admin.css">
     
-    <%-- 2026-08-05 HYJ — CSRF 토큰: AJAX 에서 이 meta 태그를 읽어서 header 에 포함 --%>
+    <%-- CSRF 토큰: AJAX 에서 이 meta 태그를 읽어서 header 에 포함 --%>
     <meta name="_csrf" content="${_csrf}">    
 </head>
 <body>
@@ -37,12 +37,12 @@
         <a href="${contextPath}/admin/biz/list?status=PENDING">
             <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
             사업자 승인 대기
-            <%-- 2026/07/11 장우철 — PENDING 실건수 (더미 3 제거, 사이드바 배지와 동일) --%>
+            <%-- PENDING 실건수 (사이드바 배지와 동일) --%>
             <c:if test="${pendingBizApproveCount > 0}">
               <span class="adm-noti-badge">${pendingBizApproveCount}</span>
             </c:if>
         </a>
-        <%-- 2026/07/27 장우철 — 관리자 카드등록 (토스 빌링 모달) --%>
+        <%-- 관리자 카드등록 (토스 빌링 모달) --%>
         <button type="button" class="adm-header-card-btn" id="btnAdminCardReg" title="정산용 카드 등록">
             <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
             카드 등록
@@ -59,7 +59,7 @@
     </div>
 </header>
 
-<%-- 2026/07/27 장우철 — 관리자 카드등록 모달 (토스 빌링) --%>
+<%-- 관리자 카드등록 모달 (토스 빌링) --%>
 <div class="adm-card-modal-overlay" id="adminCardModal" style="display:none;" aria-hidden="true">
     <div class="adm-card-modal" role="dialog" aria-labelledby="adminCardModalTitle">
         <div class="adm-card-modal-head">
@@ -86,7 +86,7 @@
 <script src="https://js.tosspayments.com/v2/standard"></script>
 <script src="${contextPath}/resources/js/billing-card.js"></script>
 <script>
-/* 2026/07/27 장우철 — 관리자 카드등록 (Ajax 목록 + 토스 requestBillingAuth) */
+/* 관리자 카드등록 (Ajax 목록 + 토스 requestBillingAuth) */
 (function () {
   var modal = document.getElementById('adminCardModal');
   var empty = document.getElementById('adminCardEmpty');

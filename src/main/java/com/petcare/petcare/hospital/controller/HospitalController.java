@@ -80,10 +80,10 @@ public class HospitalController extends CommonConfigController {
 
         model.addAttribute("hospital", hospital);
         model.addAttribute("imgList", imgList);
-        // 2026/07/13 장우철 — 더미 리뷰 대신 DB 리뷰 목록
+        // DB 리뷰 목록
         model.addAttribute("reviewList", hospitalService.getHospitalReviews(hospitalId));
 
-        // 2026/08/11 장우철 — 병원 상세 예약카드: 대표의사(정렬1) 기준 오늘 남은 슬롯 표시
+        // 병원 상세 예약카드: 대표의사(정렬1) 기준 오늘 남은 슬롯 표시
         int todayAvailableSlots = 0;
         try {
             List<HospitalDoctorVO> doctors = hospitalService.getActiveDoctorsForReserve(hospitalId);
@@ -106,7 +106,7 @@ public class HospitalController extends CommonConfigController {
         return "hospital/detail";
     }
 
-    // 2026-07-10 장우철 — 병원 예약 폼 (F1~F2) hospitalId 필수 + 펫 목록
+    // 병원 예약 폼 (hospitalId 필수 + 펫 목록)
     @GetMapping("/reserve")
     public String reserve(@RequestParam("id") String id,
                           HttpSession session,
@@ -125,17 +125,13 @@ public class HospitalController extends CommonConfigController {
         model.addAttribute("hospitalId", hospitalId);
         model.addAttribute("hospital", hospital);
         model.addAttribute("petList", hospitalService.getPetListForReserve(member.getMemberNo()));
-        // 2026/07/16 장우철 — 예약 UI: 활성 의사·진료유형
+        // 예약 UI: 활성 의사·진료유형
         model.addAttribute("doctorList", hospitalService.getActiveDoctorsForReserve(hospitalId));
         model.addAttribute("treatTypeList", hospitalService.getActiveTreatTypesForReserve(hospitalId));
         return "hospital/reserve";
-
-        /* [변경 전] 2026-07-10 장우철 — id 하드코딩·목업만
-        model.addAttribute("id", id);
-        */
     }
 
-    // 2026/07/20 장우철 — 예약 날짜 정기 휴무 확인 (Ajax)
+    // 예약 날짜 정기 휴무 확인 (Ajax)
     @GetMapping("/reserve/day-check")
     @ResponseBody
     public Map<String, Object> reserveDayCheck(@RequestParam("hospitalId") Long hospitalId,
@@ -154,7 +150,7 @@ public class HospitalController extends CommonConfigController {
         }
     }
 
-    // 2026/07/16 장우철 — 예약 가능 시간 (Ajax)
+    // 예약 가능 시간 (Ajax)
     @GetMapping("/reserve/times")
     @ResponseBody
     public Map<String, Object> reserveTimes(@RequestParam("hospitalId") Long hospitalId,
@@ -177,7 +173,7 @@ public class HospitalController extends CommonConfigController {
         }
     }
 
-    // 2026/07/16 장우철 — 펫 단계 이동 시 시간 선점 (Ajax)
+    // 펫 단계 이동 시 시간 선점 (Ajax)
     @PostMapping("/reserve/hold")
     @ResponseBody
     public Map<String, Object> reserveHold(@RequestParam("hospitalId") Long hospitalId,
@@ -203,7 +199,7 @@ public class HospitalController extends CommonConfigController {
         }
     }
 
-    // 2026/07/20 장우철 — 2단계 이전 클릭 시 hold 해제 (Ajax)
+    // 2단계 이전 클릭 시 hold 해제 (Ajax)
     @PostMapping("/reserve/hold/release")
     @ResponseBody
     public Map<String, Object> releaseReserveHold(@RequestParam("hospitalId") Long hospitalId,
@@ -220,8 +216,8 @@ public class HospitalController extends CommonConfigController {
         }
     }
 
-    // 2026-07-10 장우철 — 병원 예약 저장 (F2)
-    // 2026-07-11 장우철 — resvDate 는 VO @DateTimeFormat 으로 바인딩 (별도 String 파싱 제거)
+    // 병원 예약 저장
+    // resvDate는 VO @DateTimeFormat으로 바인딩
     @PostMapping("/reserve")
     public String saveReserve(@ModelAttribute ReservationVO vo,
                               @RequestParam("hospitalId") Long hospitalId,
@@ -271,7 +267,7 @@ public class HospitalController extends CommonConfigController {
         return m;
     }
 
-    // 2026-07-10 장우철 — 예약 완료 (F3)
+    // 예약 완료
     @GetMapping("/complete")
     public String complete(@RequestParam("resvId") Long resvId, Model model) throws Exception {
         ReservationVO reservation = hospitalService.getReservationById(resvId);

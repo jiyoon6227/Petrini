@@ -9,7 +9,7 @@ import lombok.Setter;
 /**
  * 역할: 배너 광고 데이터 객체
  *
- * - 박유정 / 2026-08-06 — HOLD(노출예정), effectiveStatusLabel, displayScheduleNote
+ * - HOLD(노출예정), effectiveStatusLabel, displayScheduleNote
  *
  * 참고 테이블
  * - TB_BANNER
@@ -35,7 +35,7 @@ public class MainBannerVO {
     private String positionCd;      // POSITION_CD — 노출 위치 (MAIN_HERO/STORE 등)
     private Long fileId;            // FILE_ID — 배너 이미지 파일 FK
     private String linkUrl;         // LINK_URL — 클릭 시 이동 URL
-    // 2026/08/03 장우철 — 로컬 DDL START/END_DATE = DATE. INSERT는 Mapper TO_DATE 사용
+    // 로컬 DDL START/END_DATE = DATE. INSERT는 Mapper TO_DATE 사용
     private String startDate;       // START_DATE — 노출 시작일 (yyyy-MM-dd)
     private String endDate;         // END_DATE — 노출 종료일 (yyyy-MM-dd)
     private String statusCd;        // STATUS_CD — 승인·노출 상태
@@ -48,7 +48,7 @@ public class MainBannerVO {
     private String bizType;         // B.BIZ_TYPE — 업종 (알림 링크용)
     private String imageUrl;        // F.FILE_URL — 배너 이미지 URL
 
-    // 2026-08-06 박유정 — 위치 코드 → 한글 라벨 (STORE=쇼핑)
+    // 위치 코드 → 한글 라벨 (STORE=쇼핑)
     public String getPositionLabel() {
         if (positionCd == null) return "";
         switch (positionCd) {
@@ -75,7 +75,7 @@ public class MainBannerVO {
         }
     }
 
-    // 2026-08-06 박유정 — ACTIVE 시 기간 기준 실제 노출 라벨 (노출중/노출 예정/미노출)
+    // ACTIVE 시 기간 기준 실제 노출 라벨 (노출중/노출 예정/미노출)
     public String getEffectiveStatusLabel() {
         if (statusCd == null) return "";
         if (!"ACTIVE".equals(statusCd)) {
@@ -91,7 +91,7 @@ public class MainBannerVO {
         return "노출중";
     }
 
-    // 2026-08-06 박유정 — 관리자 상세 노출 안내 문구
+    // 관리자 상세 노출 안내 문구
     public String getDisplayScheduleNote() {
         if (!"ACTIVE".equals(statusCd)) {
             return "";
@@ -106,7 +106,7 @@ public class MainBannerVO {
         return getDisplayPageLabel() + "에 현재 노출 중입니다.";
     }
 
-    // 2026-08-06 박유정 — 노출 위치 → 실제 페이지 경로 안내
+    // 노출 위치 → 실제 페이지 경로 안내
     public String getDisplayPageLabel() {
         if (positionCd == null) return "";
         switch (positionCd) {

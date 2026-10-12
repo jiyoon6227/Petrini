@@ -1,6 +1,5 @@
 /**
  * 역할: 관리자 숙소 관리 DB
- * 2026/08/13 장우철
  */
 package com.petcare.petcare.admin.stay.mapper;
 

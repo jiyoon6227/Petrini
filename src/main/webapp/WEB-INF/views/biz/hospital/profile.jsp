@@ -3,7 +3,7 @@
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="bizTypeLabel" value="동물병원" />
-<%-- 2026/07/15 장우철 — 병원정보 페이지 active는 profile (info=사업자정보) --%>
+<%-- 병원정보 페이지 active는 profile (info=사업자정보) --%>
 <c:set var="bizPage" value="profile" />
 
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
@@ -189,7 +189,6 @@
       - enctype="multipart/form-data" : 파일 업로드 필수
       =================================== -->
     <form name="hospitalInfoForm" method="post" action="${contextPath}/biz/hospital/profile" enctype="multipart/form-data">
-		<!--HYJ 26.08.05-->
 		<input type="hidden" name="_csrf" value="${_csrf}">
 		
       <!--
@@ -199,35 +198,6 @@
           - Controller에서 : vo.setHoursJson()으로 자동 바인딩
       -->
       <input type="hidden" name="hoursJson" id="hoursJsonInput" value='${hospital.hoursJson}'>
-
-      <!-- 2026-07-10 장우철 — 기본 정보(이름/전화/주소)
-           이유: 유저 목록은 LAT 있을 때만 '상세보기' 노출. 주소 저장 시 지오코딩으로 LAT 세팅 -->
-      <%-- <div class="info-section">
-        <div class="info-stitle">
-          <svg viewBox="0 0 24 24">
-            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-          </svg>
-          기본 정보
-        </div>
-        <div class="info-grid">
-          <div class="info-group">
-            <label>병원명 <span class="req">*</span></label>
-            <input type="text" name="name" value="${hospital.name}" required>
-          </div>
-          <div class="info-group">
-            <label>전화번호 <span class="req">*</span></label>
-            <input type="tel" name="phone" value="${hospital.phone}" required>
-          </div>
-          <div class="info-group full">
-            <label>주소 <span class="req">*</span></label>
-            <div class="info-input-row">
-              <input type="text" name="addr" id="addrInput" value="${hospital.addr}" readonly required placeholder="주소 검색 버튼을 눌러 주세요">
-              <button type="button" class="btn-addr" onclick="searchAddr()">주소 검색</button>
-            </div>
-            <input type="text" name="addrDetail" value="${hospital.addrDetail}" style="margin-top:8px" placeholder="상세 주소 (동/호수 등)">
-          </div>
-        </div>
-      </div> --%>
 
       <div class="info-section">
         <div class="info-grid">

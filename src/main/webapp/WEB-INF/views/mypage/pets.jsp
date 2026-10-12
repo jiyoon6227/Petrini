@@ -13,7 +13,7 @@
 <%@ include file="/WEB-INF/views/mypage/sidebar.jsp" %>
 <div class="mypage-content">
 
-<%-- 2026/07/11 장우철 — 반려동물 목록 DB 연동 (더미 카드 제거) --%>
+<%-- 반려동물 목록 (DB) --%>
 <div class="mp-section active">
     <div class="pets-header">
         <div>
@@ -27,7 +27,7 @@
                 <div class="pet-thumb-wrap">
                     <c:choose>
                         <c:when test="${not empty p.photoUrl}">
-                            <%-- 2026/08/11 장우철 — /upload/... · 상대경로 · 외부 URL 분기 --%>
+                            <%-- /upload/... · 상대경로 · 외부 URL 분기 --%>
                             <c:choose>
                                 <c:when test="${fn:startsWith(p.photoUrl, 'http')}">
                                     <c:set var="petThumbSrc" value="${p.photoUrl}" />
@@ -195,7 +195,7 @@
     </div>
     <div class="pm-body">
       <div class="pm-photo-wrap">
-        <%-- 2026/08/11 장우철 — 대표사진 클릭 업로드 (추후 연동 제거) --%>
+        <%-- 대표사진 클릭 업로드 --%>
         <div class="pm-photo-circle" id="pm-photo-circle" onclick="document.getElementById('pm-photo').click()">
           <img id="pm-preview" src="" alt="미리보기">
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -244,7 +244,7 @@
           <input type="number" id="pm-weight" placeholder="예) 3.5" step="0.1" min="0" max="200">
         </div>
 
-        <%-- 2026-07-28 박유정 — TB_PET FUR_COLOR/NEUTER_YN/TRAITS/MEMO 폼 연동 --%>
+        <%-- TB_PET FUR_COLOR/NEUTER_YN/TRAITS/MEMO 폼 연동 --%>
         <div class="pm-group">
           <label>털 색상</label>
           <input type="text" id="pm-color" placeholder="예) 황갈색, 검은색" maxlength="50">
@@ -285,7 +285,7 @@
     </div>
   </div>
 </div>
-<%-- 2026-08-13 박유정 — 회원가입·마이페이지 공통 품종 목록 --%>
+<%-- 회원가입·마이페이지 공통 품종 목록 --%>
 <script src="${contextPath}/resources/js/pet-breeds.js"></script>
 <script>
 const CTX = '${contextPath}';
@@ -294,7 +294,7 @@ const PET_LIST = ${empty petListJson ? '[]' : petListJson};
 const PET_MAP = {};
 PET_LIST.forEach(function (p) { PET_MAP[p.petId] = p; });
 
-// 2026/08/11 장우철 — PHOTO_URL → 브라우저 src
+// PHOTO_URL → 브라우저 src
 function toPetPhotoSrc(url) {
     if (!url) return '';
     if (url.indexOf('http') === 0) return url;
@@ -352,12 +352,12 @@ function speciesToKind(species) {
     return 'etc';
 }
 
-// 2026-08-13 박유정 — 공통 pet-breeds.js 호출 (마이페이지 모달)
+// 공통 pet-breeds.js 호출 (마이페이지 모달)
 function updateBreed(selected) {
     updatePetBreedSelect('pm-kind', null, 'pm-breed', selected || null);
 }
 
-// 2026-07-28 박유정 — 중성화 선택 + hidden(pm-neuter) 동기화
+// 중성화 선택 + hidden(pm-neuter) 동기화
 function selNeuter(v) {
     ['Y','N','U'].forEach(function(k) {
         document.getElementById('neuter-' + k).classList.remove('on');
@@ -366,12 +366,12 @@ function selNeuter(v) {
     document.getElementById('pm-neuter').value = v;
 }
 
-// 2026-07-28 박유정 — 성격/특징 태그 토글
+// 성격/특징 태그 토글
 function toggleTrait(el) {
     el.classList.toggle('on');
 }
 
-// 2026-07-28 박유정 — 선택된 성격/특징 → 쉼표 문자열
+// 선택된 성격/특징 → 쉼표 문자열
 function getSelectedTraits() {
     var tags = document.querySelectorAll('#pm-trait-wrap .pm-trait.on');
     var list = [];
@@ -381,7 +381,7 @@ function getSelectedTraits() {
     return list.join(',');
 }
 
-// 2026-07-28 박유정 — 성격/특징 태그 초기화 후 선택 반영
+// 성격/특징 태그 초기화 후 선택 반영
 function setTraitSelection(traitsStr) {
     document.querySelectorAll('#pm-trait-wrap .pm-trait').forEach(function(el) {
         el.classList.remove('on');
@@ -396,7 +396,7 @@ function setTraitSelection(traitsStr) {
     });
 }
 
-// 2026-07-28 박유정 — 신규 등록 시 폼 초기화
+// 신규 등록 시 폼 초기화
 function resetExtraFields() {
     document.getElementById('pm-color').value = '';
     document.getElementById('pm-memo').value = '';
@@ -413,7 +413,7 @@ function openPetModal(petId) {
     document.getElementById('pm-birth').value = petData && petData.birthDate ? String(petData.birthDate).substring(0, 10) : '';
     document.getElementById('pm-weight').value = petData && petData.weight != null ? petData.weight : '';
 
-    // 2026/08/11 장우철 — 기존 대표사진 미리보기 / 신규는 초기화
+    // 기존 대표사진 미리보기 / 신규는 초기화
     clearPetPhotoPreview();
     if (petData && petData.photoUrl) {
         setPetPhotoPreview(toPetPhotoSrc(petData.photoUrl));
@@ -423,7 +423,7 @@ function openPetModal(petId) {
         const kind = speciesToKind(petData.species);
         document.getElementById('pm-kind').value = kind;
         updateBreed(petData.breed || '');
-        // 2026-07-28 박유정 — 추가 필드 불러오기
+        // 추가 필드 불러오기
         document.getElementById('pm-color').value = petData.furColor || '';
         document.getElementById('pm-memo').value = petData.memo || '';
         selNeuter(petData.neuterYn || 'U');
@@ -465,7 +465,7 @@ async function savePet() {
     const weight = document.getElementById('pm-weight').value;
     if (weight) fd.append('weight', weight);
 
-    // 2026-07-28 박유정 — 털색상·중성화·성격/특징·메모 저장
+    // 털색상·중성화·성격/특징·메모 저장
     const color = document.getElementById('pm-color').value.trim();
     if (color) fd.append('furColor', color);
 
@@ -478,7 +478,7 @@ async function savePet() {
     const memo = document.getElementById('pm-memo').value.trim();
     if (memo) fd.append('memo', memo);
 
-    // 2026/08/11 장우철 — 선택한 대표사진 전송
+    // 선택한 대표사진 전송
     const photoInput = document.getElementById('pm-photo');
     if (photoInput && photoInput.files && photoInput.files[0]) {
         fd.append('petPhoto', photoInput.files[0]);
@@ -487,7 +487,6 @@ async function savePet() {
     const btn = document.getElementById('pm-save-btn');
     btn.disabled = true;
     try {
-        //HYJ 26.08.05
         const res = await csrfFetch(CTX + '/mypage/pets/save', { method: 'POST', body: fd });
         const data = await res.json();
         if (!data.success) {
@@ -508,7 +507,6 @@ async function deletePet(petId, petName) {
     const fd = new FormData();
     fd.append('petId', petId);
     try {
-        //HYJ 26.08.05
         const res = await csrfFetch(CTX + '/mypage/pets/delete', { method: 'POST', body: fd });
         const data = await res.json();
         if (!data.success) {

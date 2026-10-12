@@ -17,8 +17,8 @@ import com.petcare.petcare.file.vo.FileVO;
 
 public interface AdminBizService {
 
-    // 2026-07-09 장우철 — 사업자 승인 목록·상세·처리 API
-    // 2026/07/28 장우철 — bizType: ALL 또는 HOSPITAL/STAY/STORE/GROOMING/STUDIO (승인/관리 필터)
+    // 사업자 승인 목록·상세·처리 API
+    // bizType: ALL 또는 HOSPITAL/STAY/STORE/GROOMING/STUDIO (승인/관리 필터)
     List<AdminBizVO> getBizApplyList(String statusCd, String bizType);
 
     AdminBizVO getBizApplyDetail(Long bizNo);
@@ -33,7 +33,7 @@ public interface AdminBizService {
 
     void rejectBiz(Long bizNo, String rejectReason);
 
-    //HYJ 26.07.29 쿠폰관리
+    // 쿠폰관리
     List<BizCouponVO> getCouponListByStatus(String approvalStatus);
 
     BizCouponVO getCouponDetail(Long couponId);
@@ -44,7 +44,7 @@ public interface AdminBizService {
 
     void rejectCoupon(Long couponId, String rejectReason);
 
-    // 2026-08-13 박유정 — 탭별 목록 (review / published / exhausted)
+    // 탭별 목록 (review / published / exhausted)
     List<BizCouponVO> getCouponListByTab(String tab, String status);
     Map<String, Integer> getCouponTabCounts();
 }

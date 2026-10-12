@@ -1,9 +1,6 @@
 /**
  * 역할: 사업자·재능나눔 승인 URL 처리 → Service 호출 → JSP 반환
  *
- * - 박유정 / 2026-07-13~14 (재능나눔 승인)
- * - 장우철 / 2026-07-09 (사업자 승인)
- *
  * 연결
  * - Service: AdminBizService, GiveTalentService
  * - 상속: AdminBaseController (관리자 로그인 체크)
@@ -43,16 +40,16 @@ import com.petcare.petcare.mypage.biz.mapper.MypageBizMapper;
 @RequestMapping("/admin/biz")
 public class AdminBizController extends AdminBaseController {
 
-    // 2026-07-09 장우철 — 사업자 승인 Service 주입
+    // 사업자 승인 Service 주입
     // 이유: 목록/상세/승인·반려는 Controller 가 아닌 Service·Mapper 에서 처리
     @Autowired
     private AdminBizService adminBizService;
 
-    // 2026-07-13 박유정 — 재능나눔 승인 Service (admin/biz/talent.jsp)
+    // 재능나눔 승인 Service (admin/biz/talent.jsp)
     @Autowired
     private GiveTalentService giveTalentService;
 
-    // HYJ 26.07.28 사업자승인 이메일 안내발송
+    // 사업자승인 이메일 안내발송
     @Autowired
     private EmailService emailService;
     @Autowired
@@ -70,8 +67,8 @@ public class AdminBizController extends AdminBaseController {
         if (getAdmin(session) == null)
             return redirectToLogin();
 
-        // 2026-07-09 장우철 — 상태 탭별 실데이터 목록 + 탭 건수
-        // 2026/07/28 장우철 — APPROVED(승인/관리) 일 때만 업종 필터 적용
+        // 상태 탭별 실데이터 목록 + 탭 건수
+        // APPROVED(승인/관리) 일 때만 업종 필터 적용
         String typeFilter = "APPROVED".equals(status) ? bizType : "ALL";
         model.addAttribute("list", adminBizService.getBizApplyList(status, typeFilter));
         model.addAttribute("status", status);
@@ -80,7 +77,7 @@ public class AdminBizController extends AdminBaseController {
         return "admin/biz/list";
     }
 
-    // ── 재능나눔 승인 (2026-07-13 박유정) ─────────────────────────────
+    // ── 재능나눔 승인 ─────────────────────────────
     // 이유: biz/hospital/talent.jsp 신청(PENDING) → 관리자 검토 → APPROVED 시 /give/talent/list 노출
     @GetMapping("/talent")
     public String cmsTalent(HttpSession session,
@@ -102,10 +99,7 @@ public class AdminBizController extends AdminBaseController {
         if (getAdmin(session) == null)
             return redirectToLogin();
 
-        // 2026-07-09 장우철 — [변경 전] JSP 더미 상세만 반환
-        // return "admin/biz/detail";
-
-        // 2026-07-09 장우철 — [변경 후] bizNo 기준 상세 + 제출 서류
+        // bizNo 기준 상세 + 제출 서류
         var biz = adminBizService.getBizApplyDetail(bizNo);
         if (biz == null) {
             redirectAttr.addFlashAttribute("errorMsg", "신청 정보를 찾을 수 없습니다.");
@@ -117,7 +111,7 @@ public class AdminBizController extends AdminBaseController {
         return "admin/biz/detail";
     }
 
-    // 2026-07-09 장우철 — 사업자 승인 POST
+    // 사업자 승인 POST
     // 이유: detail/list 에서 form submit 으로 TB_BUSINESS·TB_BUSINESS_AUTH 를 APPROVED 로 변경
     @PostMapping("/approve")
     public String approveBiz(HttpSession session,
@@ -130,7 +124,7 @@ public class AdminBizController extends AdminBaseController {
         try {
             adminBizService.approveBiz(bizNo);
 
-            //HYJ 26.07.28 이메일 안내
+            // 이메일 안내
             BusinessVO existing = mypageBizMapper.selectBusinessByBizId(bizId);
             String email = existing.getEmail();
             if (email == null || email.isEmpty()) {
@@ -156,7 +150,7 @@ public class AdminBizController extends AdminBaseController {
         return "redirect:/admin/biz/detail?bizNo=" + bizNo;
     }
 
-    // 2026-07-09 장우철 — 사업자 반려 POST
+    // 사업자 반려 POST
     @PostMapping("/reject")
     public String rejectBiz(HttpSession session,
                             @RequestParam Long bizNo,
@@ -169,7 +163,7 @@ public class AdminBizController extends AdminBaseController {
         try {
             adminBizService.rejectBiz(bizNo, rejectReason);
 
-            //HYJ 26.07.28 이메일 안내
+            // 이메일 안내
             BusinessVO existing = mypageBizMapper.selectBusinessByBizId(bizId);
             String email = existing.getEmail();
             if (email == null || email.isEmpty()) {
@@ -203,7 +197,7 @@ public class AdminBizController extends AdminBaseController {
         return "redirect:/admin/biz/detail?bizNo=" + bizNo;
     }
 
-    // 2026-07-14 박유정 — 재능나눔 승인 POST
+    // 재능나눔 승인 POST
     // 이유: admin.getAdminNo() 사용 (TB_ADMIN 로그인 세션 — memberNo 아님)
     @PostMapping("/talent/approve") 
     public String approveTalent(HttpSession session,
@@ -222,7 +216,7 @@ public class AdminBizController extends AdminBaseController {
     }
 }
 
-    // 2026-07-14 박유정 — 재능나눔 반려 POST
+    // 재능나눔 반려 POST
     @PostMapping("/talent/reject")
     public String rejectTalent(HttpSession session,
                            @RequestParam Long talentId,
@@ -246,7 +240,7 @@ public class AdminBizController extends AdminBaseController {
         }
     }
 
-    //HYJ 26.07.29 쿠폰관리
+    // 쿠폰관리
     // ── 쿠폰 승인 목록 ──
     @GetMapping("/coupon/list")
     public String couponList(HttpSession session,
@@ -255,7 +249,7 @@ public class AdminBizController extends AdminBaseController {
                              Model model) {
         if (getAdmin(session) == null) return redirectToLogin();
 
-        // 2026-08-13 박유정 — review / published(ACTIVE) / exhausted(EXHAUSTED)
+        // review / published(ACTIVE) / exhausted(EXHAUSTED)
         if (!"published".equals(tab) && !"exhausted".equals(tab)) {
             tab = "review";
         }

@@ -1,6 +1,6 @@
 /**
  * 역할: 정산 상세 (TB_SETTLEMENT_ITEM) — 숙소=예약 1건 / 쇼핑=주문상품 1건
- * 2026/07/30 장우철 — 숙소 정산 구현순서 1-2 VO
+ * 숙소 정산 VO
  *
  * 참고 테이블: TB_SETTLEMENT_ITEM
  * 중복방지: UX_SETTLE_ITEM_RESV / UX_SETTLE_ITEM_ORDER_ITEM
@@ -47,7 +47,7 @@ public class StaySettlementItemVO {
 
     private String statusCd;             // 상세상태 (INCLUDED/HOLD/EXCLUDED/REFUNDED)
     private String holdReason;           // 보류/제외 사유
-    // 2026/07/31 장우철 — STAY(숙박완료) / CANCEL_FEE(취소수수료·위약금)
+    // STAY(숙박완료) / CANCEL_FEE(취소수수료·위약금)
     private String itemType;
 
     private Date regDate;                // 등록일

@@ -31,7 +31,7 @@
                 <c:if test="${not empty param.remaining}">(남은 시도: ${param.remaining}회)</c:if>
             </p>
         </c:if>
-        <%-- 2026-07-22 박유정 — 탈퇴 회원 로그인 메시지 (정지는 로그인 허용 → 고객센터) --%>
+        <%-- 탈퇴 회원 로그인 메시지 (정지는 로그인 허용 → 고객센터) --%>
         <c:if test="${param.error eq 'suspended'}">
             <p class="login-error-msg">정지된 계정입니다. 관리자에게 문의해 주세요.</p>
         </c:if>
@@ -50,7 +50,6 @@
         <c:if test="${param.error eq 'kakao_already_member'}">
             <p class="login-error-msg">이미 가입된 카카오 계정입니다. 카카오 로그인을 이용해 주세요.</p>
         </c:if>
-        <!--HYJ 26.08.06 -->
         <c:if test="${param.error eq 'locked'}">
             <p class="login-error-msg">
                 로그인 시도 횟수를 초과했습니다. ${param.minutes}분 후 다시 시도해주세요.
@@ -89,7 +88,6 @@
 
         <%-- 로그인 폼 --%>
         <form class="member-form" action="${contextPath}/login" method="post" id="loginForm">
-            <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
 
             <c:if test="${not empty param.redirect}">

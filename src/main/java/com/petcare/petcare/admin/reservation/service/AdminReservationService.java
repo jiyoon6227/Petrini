@@ -1,6 +1,5 @@
 /**
  * 역할: 관리자 숙소 예약 관리 Service
- * 2026/07/31 장우철
  */
 package com.petcare.petcare.admin.reservation.service;
 

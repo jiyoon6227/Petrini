@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%--
   역할: 관리자 배너 광고 상세
-  - 2026-08-06 박유정 — 기간 변경, 광고 올리기/내리기, 승인·대기·반려
-  - 2026-08-07 박유정 — 배너 정보 수정 (제목·링크·이미지), 미리보기 URL 분기
+  - 기간 변경, 광고 올리기/내리기, 승인·대기·반려
+  - 배너 정보 수정 (제목·링크·이미지), 미리보기 URL 분기
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
@@ -74,7 +74,7 @@
             </div>
             <c:choose>
                 <c:when test="${not empty banner.imageUrl}">
-                    <%-- 2026-08-07 박유정 — 미리보기 이미지 URL (외부 http /upload/ 분기) --%>
+                    <%-- 미리보기 이미지 URL (외부 http /upload/ 분기) --%>
                     <c:set var="imgSrc" value="${banner.imageUrl}" />
                     <c:if test="${not fn:startsWith(banner.imageUrl, 'http')}">
                         <c:set var="imgSrc" value="${contextPath}/upload/${banner.imageUrl}" />
@@ -116,7 +116,7 @@
                 <div class="banner-info-row">
                     <span class="banner-info-label">상태</span>
                     <span class="banner-info-value">
-                        <%-- 2026-08-07 박유정 — effectiveStatusLabel (기간 반영) --%>
+                        <%-- effectiveStatusLabel (기간 반영) --%>
                         <c:choose>
                             <c:when test="${banner.effectiveStatusLabel eq '심사중'}"><span class="adm-badge warning">심사중</span></c:when>
                             <c:when test="${banner.effectiveStatusLabel eq '노출예정'}"><span class="adm-badge warning">노출예정</span></c:when>
@@ -151,13 +151,13 @@
 
         <div>
 
-         <%-- 2026-08-07 박유정 — 배너 정보 수정 (제목·링크·이미지) --%>
+         <%-- 배너 정보 수정 (제목·링크·이미지) --%>
             <div class="banner-side-card">
                 <h3 class="banner-side-title">배너 정보 수정</h3>
                 <form class="banner-side-form" method="post"
                       action="${contextPath}/admin/cms/banner/update"
                       enctype="multipart/form-data">
-                    <%-- 2026/08/07 장우철 CSRF --%>
+                    <%-- CSRF --%>
                     <input type="hidden" name="_csrf" value="${_csrf}">
                     <input type="hidden" name="bannerId" value="${banner.bannerId}">
                     <div>
@@ -180,7 +180,7 @@
             <div class="banner-side-card">
                 <h3 class="banner-side-title">광고 기간 재설정</h3>
                 <form class="banner-side-form" method="post" action="${contextPath}/admin/cms/banner/period">
-                    <%-- 2026/08/07 장우철 CSRF --%>
+                    <%-- CSRF --%>
                     <input type="hidden" name="_csrf" value="${_csrf}">
                     <input type="hidden" name="bannerId" value="${banner.bannerId}">
                     <div>
@@ -202,7 +202,7 @@
                         <c:when test="${banner.statusCd eq 'ACTIVE'}">
                             <form method="post" action="${contextPath}/admin/cms/banner/deactivate"
                                   onsubmit="return confirm('이 광고를 내리시겠습니까?')">
-                                <%-- 2026/08/07 장우철 CSRF --%>
+                                <%-- CSRF --%>
                                 <input type="hidden" name="_csrf" value="${_csrf}">
                                 <input type="hidden" name="bannerId" value="${banner.bannerId}">
                                 <button type="submit" class="adm-btn gray">광고 내리기</button>
@@ -211,7 +211,7 @@
                         <c:when test="${banner.statusCd eq 'EXPIRED'}">
                             <form method="post" action="${contextPath}/admin/cms/banner/activate"
                                   onsubmit="return confirm('이 광고를 다시 올리시겠습니까?')">
-                                <%-- 2026/08/07 장우철 CSRF --%>
+                                <%-- CSRF --%>
                                 <input type="hidden" name="_csrf" value="${_csrf}">
                                 <input type="hidden" name="bannerId" value="${banner.bannerId}">
                                 <button type="submit" class="adm-btn green">광고 올리기</button>
@@ -220,7 +220,7 @@
                     </c:choose>
                     <form method="post" action="${contextPath}/admin/cms/banner/delete"
                           onsubmit="return confirm('배너를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
-                        <%-- 2026/08/07 장우철 CSRF --%>
+                        <%-- CSRF --%>
                         <input type="hidden" name="_csrf" value="${_csrf}">
                         <input type="hidden" name="bannerId" value="${banner.bannerId}">
                         <button type="submit" class="adm-btn red">배너 삭제</button>
@@ -268,7 +268,7 @@ document.querySelectorAll('.btn-approve').forEach(function(btn) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '${contextPath}/admin/cms/banner/approve');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        // 2026/08/07 장우철 CSRF
+        // CSRF
         xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="_csrf"]').getAttribute('content'));
         xhr.onload = function() {
             var res = xhr.responseText.trim();
@@ -305,7 +305,7 @@ document.getElementById('holdConfirm').addEventListener('click', function() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '${contextPath}/admin/cms/banner/hold');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    // 2026/08/07 장우철 CSRF
+    // CSRF
     xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="_csrf"]').getAttribute('content'));
     xhr.onload = function() {
         var res = xhr.responseText.trim();
@@ -340,7 +340,7 @@ document.getElementById('rejectConfirm').addEventListener('click', function() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '${contextPath}/admin/cms/banner/reject');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    // 2026/08/07 장우철 CSRF
+    // CSRF
     xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="_csrf"]').getAttribute('content'));
     xhr.onload = function() {
         var res = xhr.responseText.trim();

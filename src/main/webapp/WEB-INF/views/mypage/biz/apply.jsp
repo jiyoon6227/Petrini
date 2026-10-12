@@ -11,7 +11,7 @@
     .field-error { font-size: 12px; color: #EF4444; margin-top: 5px; margin-left: 5px; display: none; }
     .field-ok.show    { display: block; }
     .field-error.show { display: block; }
-    /* 2026/08/07 장우철 — 사업자등록증·영업신고증 업로드 미리보기 */
+    /* 사업자등록증·영업신고증 업로드 미리보기 */
     .biz-upload-box.has-file { border-style: solid; border-color: var(--primary); background: var(--primary-light); }
     .biz-upload-placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
     .biz-upload-preview { display: none; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
@@ -42,7 +42,7 @@
     <%@ include file="/WEB-INF/views/mypage/sidebar.jsp" %>
 
         <div class="mypage-content">
-        <%-- 2026-07-09 장우철 — 재신청 모드 안내 / 오류 메시지 --%>
+        <%-- 재신청 모드 안내 / 오류 메시지 --%>
         <c:if test="${reapply}">
             <div style="background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:14px 18px;border-radius:8px;margin-bottom:16px;font-size:14px;line-height:1.6">
                 <strong>재신청</strong> — 아래 내용을 보완하여 다시 제출해 주세요.
@@ -143,7 +143,6 @@
             </div>
 
             <form name="bizApplyForm" method="post" action="${contextPath}/mypage/biz/apply" enctype="multipart/form-data">
-                <!--HYJ 26.08.05-->
                 <input type="hidden" name="_csrf" value="${_csrf}">
                 
                 <div class="biz-form-section">
@@ -188,7 +187,7 @@
                         <div class="biz-group full">
                             <label>사업장 주소 <span class="req">*</span></label>
                             <div class="biz-input-row">
-                                <!-- 2026-07-10 장우철 — VO(zipCode/addr/addrDetail)와 필드명 통일, DB 저장 -->
+                                <!-- VO(zipCode/addr/addrDetail)와 필드명 통일, DB 저장 -->
                                 <input type="text" name="zipCode" placeholder="우편번호" style="max-width:120px" readonly>
                                 <button class="btn-verify" id="btnAddr" type="button">주소 검색</button>
                             </div>
@@ -197,7 +196,7 @@
                         </div>
                     </div>
                 </div>
-                <%-- 2026/07/28 장우철 — 숙소·쇼핑 정산 계좌 (금결원 mock/실연동) --%>
+                <%-- 숙소·쇼핑 정산 계좌 (금결원 mock/실연동) --%>
                 <div class="biz-form-section" id="accountSection" style="display:none">
                     <div class="biz-form-title">
                         <svg viewBox="0 0 24 24">
@@ -252,7 +251,7 @@
                     <div class="biz-grid">
                         <div class="biz-group">
                             <label>사업자등록증 <span class="req">*</span></label>
-                            <%-- 2026/08/07 장우철 — 선택 파일 미리보기 --%>
+                            <%-- 선택 파일 미리보기 --%>
                             <div class="biz-upload-box" data-upload="docFile">
                                 <div class="biz-upload-placeholder">
                                     <svg viewBox="0 0 24 24">
@@ -322,7 +321,7 @@
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
     let bizVerified = false;
-    // 2026/07/28 장우철 — 계좌 인증 (서버 mock/금결원)
+    // 계좌 인증 (서버 mock/금결원)
     let accountVerified = false;
 
     function needsAccountVerify(bizType) {
@@ -458,7 +457,7 @@
         $(this).find("input[type='file']").click();
     });
 
-    // 2026/08/07 장우철 — 업로드 파일 미리보기 (이미지 썸네일 / PDF는 뱃지+파일명)
+    // 업로드 파일 미리보기 (이미지 썸네일 / PDF는 뱃지+파일명)
     var bizUploadObjectUrls = {};
     function updateBizUploadPreview(inputId) {
         var input = document.getElementById(inputId);
@@ -537,7 +536,7 @@
             return;
         }
 
-        // 2026/07/24 장우철 — 숙소·쇼핑은 계좌 인증 필수 (UI)
+        // 숙소·쇼핑은 계좌 인증 필수 (UI)
         if (needsAccountVerify($("select[name='bizType']").val()) && !accountVerified) {
             alert("정산 계좌 인증을 먼저 진행해주세요.");
             $("#bankAccount").focus();

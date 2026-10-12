@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026/08/13 장우철 — 관리자 숙소 관리 목록 --%>
+<%-- 관리자 숙소 관리 목록 --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="adminPage"   value="stay-list" />
 <%@ include file="/WEB-INF/views/admin/common/header.jsp" %>

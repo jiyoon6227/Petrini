@@ -1,9 +1,8 @@
   <%--
   역할: 관리자 정산 관리 UI
-  - 2026/07/24 장우철 — STORE 탭 더미
-  - 2026/07/30 장우철 — STAY 탭 3-2~3-5 + 중간요청 4-3~4-4
-  - 2026/08/05 장우철 — STORE 탭 S11 실데이터
-  - 2026/08/05 장우철 — S12 월정산·15일더미지급·FAIL 수동입금 UI
+  - STAY 탭 + 중간요청
+  - STORE 탭
+  - 월정산·15일더미지급·FAIL 수동입금 UI
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -79,7 +78,7 @@
     </div>
   </div>
 
-  <%-- 2026/08/05 장우철 — S12 배치 수동 실행 (스케줄: 1일 월정산 / 15일 자동지급) --%>
+  <%-- 배치 수동 실행 (스케줄: 1일 월정산 / 15일 자동지급) --%>
   <div class="settle-batch-bar">
     <strong style="font-size:13px">정기 배치</strong>
     <label style="font-size:12px;color:#666">정산월
@@ -321,7 +320,7 @@
     </div>
   </c:when>
   <c:otherwise>
-    <%-- 2026/08/05 장우철 — STORE 탭 실데이터 (S11) --%>
+    <%-- STORE 탭 --%>
     <div class="settle-toolbar" style="margin-bottom:8px">
       <strong style="font-size:14px">중간정산 요청</strong>
       <span style="font-size:12px;color:#999">대기 <c:out value="${storeRequestPendingCount}"/>건</span>
@@ -558,14 +557,14 @@
     return String(v).substring(0, 10);
   }
 
-  // 2026/08/05 장우철 — S12 배치 수동 실행
+  // 배치 수동 실행
   var btnMonthly = document.getElementById('btnMonthlyCreate');
   if (btnMonthly) {
     btnMonthly.addEventListener('click', function () {
       var monthEl = document.getElementById('batchSettleMonth');
       var month = monthEl && monthEl.value ? monthEl.value : '';
       if (!confirm('월정산(REGULAR)을 생성할까요?\n대상월: ' + (month || '전월') + '\n숙소·쇼핑 승인 사업자 전체')) return;
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       csrfFetch(CTX + '/admin/settlement/batch/monthly-create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -583,7 +582,7 @@
   if (btnAutoPay) {
     btnAutoPay.addEventListener('click', function () {
       if (!confirm('WAIT 상태 정산을 전부 더미 지급할까요?\n(FAIL은 제외 · 숙소+쇼핑)')) return;
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       csrfFetch(CTX + '/admin/settlement/batch/auto-pay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
@@ -605,7 +604,6 @@
       var id = Number(approveBtn.getAttribute('data-id'));
       var name = approveBtn.getAttribute('data-name') || '';
       if (!confirm('[' + name + '] 중간정산 요청을 승인할까요?\n승인 시 미정산 예약으로 정산 마스터가 생성됩니다.')) return;
-      //HYJ 26.08.05
       csrfFetch(CTX + '/admin/settlement/stay/request/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -626,7 +624,6 @@
       var reason = prompt('[' + rname + '] 거절 사유를 입력하세요.');
       if (reason == null) return;
       if (!String(reason).trim()) { alert('거절 사유가 필요합니다.'); return; }
-      //HYJ 26.08.05
       csrfFetch(CTX + '/admin/settlement/stay/request/reject', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -669,7 +666,6 @@
           ? '계좌 입금 확인 후 수동입금완료 처리할까요?\n[' + name + '] ' + fmt(amount)
           : '정말 정산(더미 지급) 하시겠습니까?\n[' + name + '] ' + fmt(amount);
         if (!confirm(msg)) return;
-        //HYJ 26.08.05
         csrfFetch(CTX + '/admin/settlement/stay/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -688,7 +684,7 @@
         var fid = Number(failBtn.getAttribute('data-id'));
         var fname = failBtn.getAttribute('data-name') || '';
         if (!confirm('[' + fname + '] 지급실패(FAIL)로 표시할까요?\n상세에서 계좌 확인 후 수동입금하세요.')) return;
-        // 2026/08/07 장우철 CSRF
+        // CSRF
         csrfFetch(CTX + '/admin/settlement/stay/mark-fail', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -768,7 +764,6 @@
           return;
         }
         if (!confirm('선택한 ' + ids.length + '건을 정말 정산(더미 지급) 하시겠습니까?')) return;
-        //HYJ 26.08.05
         csrfFetch(CTX + '/admin/settlement/stay/pay-bulk', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -794,7 +789,7 @@
       var id = Number(approveBtn.getAttribute('data-id'));
       var name = approveBtn.getAttribute('data-name') || '';
       if (!confirm('[' + name + '] 중간정산 요청을 승인할까요?\n승인 시 미정산 주문상품으로 정산 마스터가 생성됩니다.')) return;
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       csrfFetch(CTX + '/admin/settlement/store/request/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -815,7 +810,7 @@
       var reason = prompt('[' + rname + '] 거절 사유를 입력하세요.');
       if (reason == null) return;
       if (!String(reason).trim()) { alert('거절 사유가 필요합니다.'); return; }
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       csrfFetch(CTX + '/admin/settlement/store/request/reject', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -857,7 +852,7 @@
         ? '계좌 입금 확인 후 수동입금완료 처리할까요?\n[' + name + '] ' + fmt(amount)
         : '정말 정산(더미 지급) 하시겠습니까?\n[' + name + '] ' + fmt(amount);
       if (!confirm(msg)) return;
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       csrfFetch(CTX + '/admin/settlement/store/pay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -876,7 +871,7 @@
       var fid = Number(failBtn.getAttribute('data-id'));
       var fname = failBtn.getAttribute('data-name') || '';
       if (!confirm('[' + fname + '] 지급실패(FAIL)로 표시할까요?\n상세에서 계좌 확인 후 수동입금하세요.')) return;
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       csrfFetch(CTX + '/admin/settlement/store/mark-fail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -955,7 +950,7 @@
         return;
       }
       if (!confirm('선택한 ' + ids.length + '건을 더미 지급 완료할까요?')) return;
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       csrfFetch(CTX + '/admin/settlement/store/pay-bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },

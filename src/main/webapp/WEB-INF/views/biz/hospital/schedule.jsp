@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%-- 2026/07/16 장우철 고도화작업 — 병원 스케줄 UI (유형·의사·간격·예외 / RULE→병원 통합) --%>
+<%-- 병원 스케줄 UI (유형·의사·간격·예외 / RULE→병원 통합) --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="bizTypeLabel" value="동물병원" />
 <c:set var="bizPage" value="schedule" />
@@ -75,7 +75,7 @@
       <div class="biz-tabs">
         <button type="button" class="biz-tab active" data-panel="treat" onclick="switchSchTab('treat')">진료유형</button>
         <button type="button" class="biz-tab" data-panel="doctor" onclick="switchSchTab('doctor')">의사</button>
-        <%-- 2026/07/16 장우철 고도화작업 — RESV_RULE 제거: 간격만 스케줄에서 관리 --%>
+        <%-- RESV_RULE 제거: 간격만 스케줄에서 관리 --%>
         <button type="button" class="biz-tab" data-panel="interval" onclick="switchSchTab('interval')">예약간격</button>
         <button type="button" class="biz-tab" data-panel="exception" onclick="switchSchTab('exception')">예약예외</button>
       </div>
@@ -224,7 +224,7 @@
   </div>
 </div>
 
-<%-- 2026/07/16 장우철 고도화작업 — 예약예외 등록/수정 모달 --%>
+<%-- 예약예외 등록/수정 모달 --%>
 <div class="sch-modal-bg" id="excModalBg" onclick="if(event.target===this) closeModal('excModalBg')">
   <div class="sch-modal">
     <div class="sch-modal-head">
@@ -259,7 +259,7 @@
 <div class="sch-toast" id="schToast"></div>
 
 <script>
-  // 2026/07/16 장우철 고도화작업 — 병원 스케줄 API (유형·의사·간격·예외 / RULE 제거)
+  // 병원 스케줄 API (유형·의사·간격·예외 / RULE 제거)
   var contextPath = '${contextPath}';
 
   var treatList = [];
@@ -296,7 +296,7 @@
     return fetch(contextPath + url).then(function (res) { return res.json(); });
   }
   function apiPostJson(url, body) {
-    // 2026/08/07 장우철 — CSRF (저장 POST 403 → 「네트워크 오류」 방지)
+    // CSRF (저장 POST 403 → 「네트워크 오류」 방지)
     return csrfFetch(contextPath + url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -305,7 +305,6 @@
   }
   function apiPostParam(url, params) {
     var q = new URLSearchParams(params).toString();
-    //HYJ 26.08.05
     return csrfFetch(contextPath + url + '?' + q, { method: 'POST' })
       .then(function (res) { return res.json(); });
   }

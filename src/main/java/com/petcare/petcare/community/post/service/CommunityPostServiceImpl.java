@@ -1,13 +1,12 @@
 /**
  * 역할: CommunityPostService 구현체 (@Service)
  *
- * - 박유정 / 2026-07-08~10
- * - 2026/07/22 장우철 — 사진 저장/삭제 gcs.enabled 분기 (로컬 ↔ GCS)
+ * - 사진 저장/삭제 gcs.enabled 분기 (로컬 ↔ GCS)
  *
  * [getPostList — 목록]
  * 1. boardType·keyword·page 로 TB_POST 조회 (5건/페이지)
  * 2. 각 글의 첫 사진 URL → thumbUrl
- * 3. LIFE + ANSWERED → 첫 일반댓글 답변 미리보기 (2026-07-10 STEP 4)
+ * 3. LIFE + ANSWERED → 첫 일반댓글 답변 미리보기
  *
  * [getPostDetail — 상세]
  * 1. increaseViewCount() → VIEW_COUNT +1
@@ -17,12 +16,12 @@
  * 1. 로그인 회원 → MEMBER_NO
  * 2. TB_POST INSERT (SEQ_TB_POST)
  * 3. 사진 저장(로컬 또는 GCS) + TB_FILE INSERT (최대 5장)
- * 4. LIFE 등록 시 TAGS = WAITING (2026-07-10)
+ * 4. LIFE 등록 시 TAGS = WAITING
  *
- * [deletePhotosByPostId — 글 사진 삭제] 2026/07/22 장우철
+ * [deletePhotosByPostId — 글 사진 삭제]
  * - 관리자 글 삭제 시 버킷/로컬 + TB_FILE 정리
  *
- * [markLifeAnswered — LIFE 답변완료] 2026-07-10 STEP 4
+ * [markLifeAnswered — LIFE 답변완료]
  * 1. BOARD_TYPE = LIFE 인지 확인
  * 2. updatePostTags(postId, "ANSWERED")
  *
@@ -156,7 +155,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     }
 
     private void attachLifeAnswerPreview(CommunityPostVO item) {
-        // LIFE 목록 — ANSWERED 글에 vet-answer 미리보기 데이터 첨부 / 2026-07-10 STEP 4
+        // LIFE 목록 — ANSWERED 글에 vet-answer 미리보기 데이터 첨부
         if (item == null || item.getPostId() == null) {
             return;
         }
@@ -187,7 +186,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         return post;
     }
 
-    //HYJ 26.08.04 게시물 수정용(조회수X)
+    // 게시물 수정용(조회수X)
     public CommunityPostVO getPostDetailForEdit(long postId) {
         CommunityPostVO post = communityPostMapper.selectPostDetail(postId);
         if (post == null) {
@@ -219,12 +218,12 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         if ("LIFE".equalsIgnoreCase(vo.getBoardType())) {
             vo.setLostSpecies(normalizePetType(vo.getPetType()));
             vo.setLostFeature(buildPetFeature(vo.getBreed(), vo.getPetAge()));
-            vo.setTags("WAITING");  // LIFE 상담 등록 시 답변대기 / 2026-07-10
+            vo.setTags("WAITING");  // LIFE 상담 등록 시 답변대기
         }
 
         int result = communityPostMapper.insertPost(vo);
         if (result > 0) {
-            //HYJ 26.07.28 작성횟수 + 1
+            // 작성횟수 + 1
             communityPostMapper.updateMemberPostCount(loginMember.getMemberId());
 
             savePhotos(vo.getPostId(), photos);
@@ -279,7 +278,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         savePhotos(postId, photos, MAX_PHOTOS);
     }
 
-    // 2026-08-13 박유정 — 수정 시 남은 슬롯만큼만 저장
+    // 수정 시 남은 슬롯만큼만 저장
     private void savePhotos(Long postId, MultipartFile[] photos, int maxCount) {
         if (postId == null || photos == null || maxCount <= 0) {
             return;
@@ -300,7 +299,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             String fileUrl = "/upload/" + objectPath;
 
             if (gcsEnabled) {
-                // [GCS 업로드 — gcs.enabled=true] 2026/07/22 장우철
+                // [GCS 업로드 — gcs.enabled=true]
                 //#region구글 스토리지 GCS 전환코드 START
                 if (storage == null) {
                     throw new IllegalStateException("GCS enabled but Storage bean is missing");
@@ -319,7 +318,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                 }
                 //#endregion GCS 전환코드 END
             } else {
-                // [로컬 저장 — gcs.enabled=false] 2026/07/22 장우철
+                // [로컬 저장 — gcs.enabled=false]
                 //#region로컬 파일관리
                 Path dir = Paths.get(uploadDir, "community", "post", String.valueOf(postId));
                 try {
@@ -344,7 +343,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     /**
      * 게시글 사진 물리 삭제 + TB_FILE 삭제
-     * 관리자 글 삭제 시 호출 — 2026/07/22 장우철
+     * 관리자 글 삭제 시 호출
      */
     @Override
     public void deletePhotosByPostId(long postId) {
@@ -370,14 +369,14 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         }
         String objectPath = toObjectPath(fileUrl);
         if (gcsEnabled) {
-            // [GCS 삭제 — gcs.enabled=true] 2026/07/22 장우철
+            // [GCS 삭제 — gcs.enabled=true]
             //#region구글 스토리지 GCS 전환코드 START
             if (storage != null) {
                 storage.delete(BlobId.of(gcsBucket, objectPath));
             }
             //#endregion GCS 전환코드 END
         } else {
-            // [로컬 삭제 — gcs.enabled=false] 2026/07/22 장우철
+            // [로컬 삭제 — gcs.enabled=false]
             //#region로컬 파일관리
             try {
                 Files.deleteIfExists(Paths.get(uploadDir, objectPath));
@@ -417,7 +416,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Override
     public void markLifeAnswered(long postId) {
-        // LIFE + 일반댓글 등록 후 TAGS → ANSWERED / 2026-07-10 STEP 4
+        // LIFE + 일반댓글 등록 후 TAGS → ANSWERED
         CommunityPostVO post = communityPostMapper.selectPostDetail(postId);
         if (post == null || !"LIFE".equalsIgnoreCase(post.getBoardType())) {
             return;
@@ -426,10 +425,10 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     }
 
     /**
-     * 2026-07-23 HYJ — 게시글 수정 (본인 글만)
+     * 게시글 수정 (본인 글만)
      * 1. 로그인 확인 → MEMBER_NO 매칭
      * 2. UPDATE TB_POST SET TITLE, BODY WHERE POST_ID AND MEMBER_NO
-     * 2026-08-13 박유정 — 3. 기존 사진 선택 삭제 + 새 사진 추가 (전체 5장上限)
+     * 3. 기존 사진 선택 삭제 + 새 사진 추가 (전체 5장上限)
      */
     @Override
     @Transactional
@@ -457,7 +456,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             throw new IllegalStateException("UPDATE_FAILED");
         }
 
-        // 2026-08-13 박유정 — 체크한 기존 사진 삭제
+        // 체크한 기존 사진 삭제
         if (removePhotoUrls != null) {
             List<String> currentUrls = communityPostMapper.selectFileUrlsByPostId(vo.getPostId());
             for (String url : removePhotoUrls) {
@@ -472,16 +471,16 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             }
         }
 
-        // 2026-08-13 박유정 — 새 사진 추가 (전체 5장上限)
+        // 새 사진 추가 (전체 5장上限)
         List<String> remainUrls = communityPostMapper.selectFileUrlsByPostId(vo.getPostId());
         int remain = MAX_PHOTOS - (remainUrls == null ? 0 : remainUrls.size());
         savePhotos(vo.getPostId(), photos, remain);
     }
 
     /**
-     * 2026-07-23 HYJ — 게시글 삭제 (본인 글만)
+     * 게시글 삭제 (본인 글만)
      * - LIFE(수의사 상담): STATUS_CD='DELETED' + DELETE_DATE (유저/관리자 동일, 7일 보관 후 purge)
-     * 2026/08/03 장우철 — LIFE soft 삭제 시 댓글·사진은 유지, purge 시 일괄 정리
+     * LIFE soft 삭제 시 댓글·사진은 유지, purge 시 일괄 정리
      * - TOWN/SHARE: 즉시 물리 삭제 (댓글 → 파일 → 게시글 DELETE)
      */
     @Override
@@ -492,7 +491,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         }
         Long loginMemberNo = resolveMemberNoForUpdate(loginMember);
         if (loginMemberNo == null) {
-            //HYJ 26.07.28 관리자계정 통과
+            // 관리자계정 통과
             if (!"ADMIN".equals(loginMember.getRole())){
                 throw new IllegalStateException("MEMBER_NOT_FOUND");
             }
@@ -503,7 +502,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             throw new IllegalArgumentException("POST_NOT_FOUND");
         }
         if (loginMemberNo == null || !loginMemberNo.equals(existing.getMemberNo())) {
-            //HYJ 26.07.28 관리자계정 통과
+            // 관리자계정 통과
             if (!"ADMIN".equals(loginMember.getRole())){
                 throw new IllegalStateException("MEMBER_NOT_FOUND");
             }
@@ -517,7 +516,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             result = communityPostMapper.softDeletePostByUser(postId, existing.getMemberNo());
         } else {
             // TOWN, SHARE — 즉시 물리 삭제
-            // 2026/08/03 장우철 — 신고·좋아요 → 댓글 → 파일 → 게시글 (ORA-02292 FK_PTN65_0058 방지)
+            // 신고·좋아요 → 댓글 → 파일 → 게시글 (ORA-02292 FK_PTN65_0058 방지)
             clearPostChildRecords(postId);
             communityCommentService.hardDeleteCommentsByPostId(postId);
             deletePhotosByPostId(postId);
@@ -529,7 +528,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         }
 
         if ("ADMIN".equals(loginMember.getRole())) {
-            //HYJ 26.07.28 관리자 게시글삭제 회수반영
+            // 관리자 게시글삭제 회수반영
             adminCommunityMapper.updateMemberAdminPostDelCount(existing.getMemberNo());
         }
     }
@@ -542,7 +541,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     }
 
     /**
-     * 2026-07-23 HYJ — LIFE 7일 경과 DELETED 게시글 물리 삭제 (스케줄러)
+     * LIFE 7일 경과 DELETED 게시글 물리 삭제 (스케줄러)
      * STATUS_CD='DELETED' + DELETE_DATE 기준
      * 삭제 순서: 댓글 → 파일 → 게시글
      */
@@ -555,7 +554,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         int purged = 0;
         for (Long postId : expiredPostIds) {
-            // 2026/08/03 장우철 — 물리 삭제 전 신고·좋아요 정리
+            // 물리 삭제 전 신고·좋아요 정리
             clearPostChildRecords(postId);
             communityCommentService.hardDeleteCommentsByPostId(postId);
             deletePhotosByPostId(postId);
@@ -567,7 +566,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         return purged;
     }
 
-    /** 2026/08/03 장우철 — TB_POST 자식(신고·좋아요) 선삭제 */
+    /** TB_POST 자식(신고·좋아요) 선삭제 */
     private void clearPostChildRecords(long postId) {
         communityPostMapper.deleteReportsByPostId(postId);
         communityPostMapper.deleteLikesByPostId(postId);

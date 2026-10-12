@@ -1,7 +1,6 @@
 /**
  * 역할: GiveAnimalService 구현체 — 정부 유기동물 API 호출
  *
- * - 박유정 / 2026-07-06
  * - Controller 에 있던 API 호출 코드를 이 파일로 옮김
  * - @Cacheable 캐시 적용 (animalList, animalDetail)
  *

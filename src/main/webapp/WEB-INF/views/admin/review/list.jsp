@@ -1,5 +1,4 @@
 <%--
-  - 박유정 / 2026-07-24
   - GET  /admin/review/list   삭제 요청 목록
   - POST /admin/review/approve 승인(리뷰 삭제)
   - POST /admin/review/reject  반려(사유 입력 + 사업자 알림)
@@ -34,7 +33,7 @@
             <span class="adm-card-head-sub">총 ${totalCount}건</span>
         </div>
         <div class="adm-card-body" style="padding-bottom:0">
-            <%-- 2026-07-24 박유정 — GET 검색 (keyword, statusCd) --%>
+            <%-- GET 검색 (keyword, statusCd) --%>
             <form method="get" action="${contextPath}/admin/review/list" class="adm-filter-bar">
                 <input type="text" name="keyword" class="adm-filter-input"
                        placeholder="병원·숙소·상품명, 사업자명, 작성자, 사유 검색" value="${keyword}">
@@ -71,7 +70,7 @@
                             <c:forEach var="item" items="${list}">
                                 <tr>
                                     <td>${item.requestId}</td>
-                                    <%-- 2026/08/11 장우철 — 병원·숙소·쇼핑 유형 --%>
+                                    <%-- 병원·숙소·쇼핑 유형 --%>
                                     <td>
                                         <c:choose>
                                             <c:when test="${item.reviewType eq 'STAY'}">숙소</c:when>
@@ -114,21 +113,19 @@
                                     <td style="white-space:nowrap">
                                         <c:choose>
                                             <c:when test="${item.statusCd eq 'PENDING'}">
-                                                <%-- 2026-07-24 박유정 — 승인(리뷰 삭제) --%>
+                                                <%-- 승인(리뷰 삭제) --%>
                                                 <form method="post" action="${contextPath}/admin/review/approve"
                                                       class="js-admin-approve-form"
                                                       style="display:inline;margin:0">
-                                                    <!--HYJ 26.08.05-->
                                                     <input type="hidden" name="_csrf" value="${_csrf}">
                                                     <input type="hidden" name="requestId" value="${item.requestId}">
                                                     <input type="hidden" name="sourceCd" value="${item.sourceCd}">
                                                     <button type="submit" class="adm-btn red">승인(삭제)</button>
                                                 </form>
-                                                <%-- 2026-07-24 박유정 — 반려 (사유 입력 필수) --%>
+                                                <%-- 반려 (사유 입력 필수) --%>
                                                 <form method="post" action="${contextPath}/admin/review/reject"
                                                       style="display:inline-flex;gap:6px;margin-left:6px;align-items:center"
                                                       onsubmit="return confirm('반려하시겠습니까?')">
-                                                    <!--HYJ 26.08.05-->
                                                     <input type="hidden" name="_csrf" value="${_csrf}">
                                                     <input type="hidden" name="requestId" value="${item.requestId}">
                                                     <input type="hidden" name="sourceCd" value="${item.sourceCd}">
@@ -171,7 +168,7 @@
     </div>
 </main>
 
-<%-- 2026-07-28 박유정 — 승인 fetch(AJAX)·20초 타임아웃(락 대기 방지) --%>
+<%-- 승인 fetch(AJAX)·20초 타임아웃(락 대기 방지) --%>
 <script>
 (function () {
   function bindAjaxForm(selector, timeoutMsg) {
@@ -188,7 +185,6 @@
         }
         var ctrl = new AbortController();
         var timer = setTimeout(function () { ctrl.abort(); }, 20000);
-        //HYJ 26.08.05
         csrfFetch(form.action, {
           method: 'POST',
           body: new URLSearchParams(new FormData(form)),

@@ -7,7 +7,7 @@
   1. GET ?tab=review&status=PENDING|REJECTED
   2. GET ?tab=published (게시중 ACTIVE)
   3. GET ?tab=exhausted (예산·수량 소진 EXHAUSTED)
-  2026-08-13 박유정 — 3탭 분리 (승인대기 / 게시중 / 소진)
+  3탭 분리 (승인대기 / 게시중 / 소진)
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -104,7 +104,7 @@
         </div>
     </c:if>
 
-    <%-- 2026-08-13 박유정 — 관리자승인 / 승인(게시중) / 예산소진 --%>
+    <%-- 관리자승인 / 승인(게시중) / 예산소진 --%>
     <div class="cpn-tab-bar">
         <a href="${contextPath}/admin/biz/coupon/list?tab=review&status=PENDING"
            class="cpn-tab ${tab eq 'review' ? 'on' : ''}">
@@ -239,7 +239,6 @@
                                 <form method="post" action="${contextPath}/admin/biz/coupon/reject"
                                       style="display:flex;gap:8px;align-items:center"
                                       onsubmit="return confirm('반려하시겠습니까?')">
-                                    <!--HYJ 26.08.05-->
                                     <input type="hidden" name="_csrf" value="${_csrf}">
 
                                     <input type="hidden" name="couponId" value="${cpn.couponId}">
@@ -250,7 +249,6 @@
                                 <form method="post" action="${contextPath}/admin/biz/coupon/approve"
                                       style="display:inline"
                                       onsubmit="return confirm('승인하시겠습니까?\n이벤트/쿠폰 게시판에 노출됩니다.')">
-                                    <!--HYJ 26.08.05-->
                                     <input type="hidden" name="_csrf" value="${_csrf}">
 
                                     <input type="hidden" name="couponId" value="${cpn.couponId}">

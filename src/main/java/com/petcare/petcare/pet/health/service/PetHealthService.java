@@ -5,8 +5,6 @@
  * - mypage/health.jsp  건강수첩 (병원 진료기록 타임라인)
  *
  * 데이터 소스: TB_MEDICAL_RECORD (사업자 진료완료 시 저장)
- *
- * 2026/07/14 장우철
  */
 
 package com.petcare.petcare.pet.health.service;

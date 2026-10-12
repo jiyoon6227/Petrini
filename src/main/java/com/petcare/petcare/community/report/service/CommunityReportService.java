@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 게시글 신고 비즈니스 로직 (interface)
  *
- * - 박유정 / 2026-07-10
- *
  * [insertPostReport]
  * - 로그인 회원이 게시글 신고 → TB_POST_REPORT INSERT (PENDING)
  *

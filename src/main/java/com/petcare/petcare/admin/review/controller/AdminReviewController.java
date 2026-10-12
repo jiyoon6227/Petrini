@@ -1,7 +1,5 @@
 /**
  * 역할: 관리자 리뷰 삭제 요청 URL 처리 → Service 호출 → JSP 반환
- *
- * - 박유정 / 2026-07-24
  */
 
 package com.petcare.petcare.admin.review.controller;
@@ -32,7 +30,7 @@ public class AdminReviewController extends AdminBaseController {
     @Autowired
     private AdminReviewService adminReviewService;
 
-    // 2026-07-28 박유정 — adminNo 없으면 memberNo로 처리자 식별
+    // adminNo 없으면 memberNo로 처리자 식별
     private long resolveAdminNo(MemberVO admin) {
         if (admin.getAdminNo() != null) {
             return admin.getAdminNo();
@@ -43,7 +41,7 @@ public class AdminReviewController extends AdminBaseController {
         return 0L;
     }
 
-    // 2026-07-24 박유정 — 리뷰 삭제 요청 목록
+    // 리뷰 삭제 요청 목록
     @GetMapping("/list")
     public String reviewDeleteRequestList(HttpSession session,
             @RequestParam(defaultValue = "") String keyword,
@@ -54,7 +52,7 @@ public class AdminReviewController extends AdminBaseController {
         if (getAdmin(session) == null)
             return redirectToLogin();
 
-        // 2026-07-24 박유정 — 파라미터 없음=첫 진입(PENDING), ALL/빈값=상태 전체
+        // 파라미터 없음=첫 진입(PENDING), ALL/빈값=상태 전체
         if (statusCd == null) {
             statusCd = "PENDING";
         }
@@ -70,8 +68,8 @@ public class AdminReviewController extends AdminBaseController {
         return "admin/review/list";
     }
 
-    // 2026-07-24 박유정 — 삭제 요청 승인 (리뷰 삭제)
-    // 2026/08/11 장우철 — sourceCd(DELETE_REQ|REPORT) 로 병원·숙소·쇼핑 분기
+    // 삭제 요청 승인 (리뷰 삭제)
+    // sourceCd(DELETE_REQ|REPORT) 로 병원·숙소·쇼핑 분기
     @PostMapping("/approve")
     public String approveReviewDeleteRequest(HttpSession session,
             @RequestParam long requestId,
@@ -102,7 +100,7 @@ public class AdminReviewController extends AdminBaseController {
         }
     }
 
-    // 2026-07-24 박유정 — 삭제 요청 반려 (반려 사유 필수 + 사업자 알림)
+    // 삭제 요청 반려 (반려 사유 필수 + 사업자 알림)
     @PostMapping("/reject")
     public String rejectReviewDeleteRequest(HttpSession session,
             @RequestParam long requestId,

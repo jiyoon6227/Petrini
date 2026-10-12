@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.mypage.wishlist.mapper.MypageWishlistMapper">
 
-<!-- 2026/08/13 장우철 — 찜 목록. 가격은 전부 NUMBER로 맞춰 UNION 오류 방지 -->
+<!-- 찜 목록. 가격은 전부 NUMBER로 맞춰 UNION 오류 방지 -->
 <select id="selectMyWishlist" resultType="com.petcare.petcare.mypage.wishlist.vo.MypageWishlistVO">
     SELECT FAV_ID, MEMBER_NO, FAV_TYPE, TARGET_ID, REG_DATE,
            TITLE, PRICE, IMAGE_URL, LINK, WISH_KEY

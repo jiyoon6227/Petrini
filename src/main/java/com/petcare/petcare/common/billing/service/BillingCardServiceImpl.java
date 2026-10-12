@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — BillingCardService 구현체
+ * BillingCardService 구현체
  *
  * - TB_BILLING_CARD CRUD
  * - 삭제는 STATUS_CD=DELETED (물리 삭제 안 함)
@@ -26,7 +26,7 @@ public class BillingCardServiceImpl implements BillingCardService {
         this.billingCardMapper = billingCardMapper;
     }
 
-    // 2026/07/27 장우철 — 활성 카드 목록
+    // 활성 카드 목록
     @Override
     public List<BillingCardVO> getCardList(String ownerType, Long ownerNo) {
         if (ownerType == null || ownerType.isBlank() || ownerNo == null) {
@@ -35,7 +35,7 @@ public class BillingCardServiceImpl implements BillingCardService {
         return billingCardMapper.selectBillingCardList(ownerType, ownerNo);
     }
 
-    // 2026/07/27 장우철 — 단건
+    // 단건
     @Override
     public BillingCardVO getCard(Long billingCardId) {
         if (billingCardId == null) {
@@ -44,7 +44,7 @@ public class BillingCardServiceImpl implements BillingCardService {
         return billingCardMapper.selectBillingCard(billingCardId);
     }
 
-    // 2026/07/27 장우철 — 발급 결과 INSERT
+    // 발급 결과 INSERT
     @Override
     @Transactional
     public BillingCardVO registerCard(String ownerType, Long ownerNo, BillingIssueResultVO issueResult) {
@@ -69,7 +69,7 @@ public class BillingCardServiceImpl implements BillingCardService {
         return vo;
     }
 
-    // 2026/07/27 장우철 — 소유자 확인 후 논리삭제
+    // 소유자 확인 후 논리삭제
     @Override
     @Transactional
     public boolean removeCard(Long billingCardId, String ownerType, Long ownerNo) {

@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 public class HospitalResvHoldVO {
 
-    // 2026/07/16 장우철 — 펫 단계 이동 시 시간 선점
+    // 펫 단계 이동 시 시간 선점
     private Long holdId;
     private Long hospitalId;
     private Long doctorId;

@@ -6,7 +6,7 @@
 <%@ include file="/WEB-INF/views/admin/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/admin/common/sidebar.jsp" %>
 
-<%-- 2026/08/11 장우철 — 더미 상세 제거, 실주문 요약 표시 --%>
+<%-- 실주문 요약 표시 --%>
 <main class="adm-main">
     <div class="adm-page-head">
         <div class="adm-page-head-left">

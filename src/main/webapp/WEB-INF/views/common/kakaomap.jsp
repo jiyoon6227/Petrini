@@ -68,9 +68,6 @@
                      + 'style="color:inherit;text-decoration:none">' + h.name + '</a></div>'
           });
 
-          // kakao.maps.event.addListener(marker, 'click', function() {
-          //     infowindow.open(map, marker);
-          // });
           (function(m, iw) {
               kakao.maps.event.addListener(m, 'mouseover', function() {
                   iw.open(map, m);

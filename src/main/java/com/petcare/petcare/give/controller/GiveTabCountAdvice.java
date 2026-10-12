@@ -1,6 +1,6 @@
 /**
  * 역할: 가족찾기(Give) 탭바 건수 공통 주입 (give/index.jsp)
- * - 곽지윤 / 2026-09-23 — 재능나눔 탭 건수 추가, 재능나눔 페이지에서 분실·보호 0 표시 버그 수정
+ * - 재능나눔 탭 건수
  */
 package com.petcare.petcare.give.controller;
 

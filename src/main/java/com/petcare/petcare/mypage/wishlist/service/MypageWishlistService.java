@@ -1,6 +1,6 @@
 /**
  * 역할: 찜 목록·토글
- * 2026/08/13 장우철 — TB_FAVORITE
+ * TB_FAVORITE
  */
 package com.petcare.petcare.mypage.wishlist.service;
 

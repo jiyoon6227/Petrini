@@ -40,29 +40,29 @@ import com.petcare.petcare.admin.cms.vo.FaqVO;
 import com.petcare.petcare.admin.cms.vo.NoticeVO;
 
 public interface AdminCMSService {
-    // 2026-08-06 박유정 — 관리자 배너 목록·건수 (대분류 + 중분류 탭)
+    // 관리자 배너 목록·건수 (대분류 + 중분류 탭)
     List<MainBannerVO> getBannerListByTabAndCategory(String tab, String category);
     Map<String, Integer> getBannerTabCounts(String category);
     Map<String, Integer> getBannerCategoryCounts(String tab);
     int getPendingBannerCount();
 
-    // 2026-08-06 박유정 — 승인·대기·반려
+    // 승인·대기·반려
     String approveBanner(Long bannerId);
     void holdBanner(Long bannerId, String holdReason);
     void rejectBanner(Long bannerId, String rejectReason);
 
-    // 2026-08-07 박유정 — 관리자 배너 상세 조회
+    // 관리자 배너 상세 조회
     MainBannerVO getBannerDetail(Long bannerId);
     void updateBannerPeriod(Long bannerId, String startDate, String endDate);
 
-    // 2026-08-07 박유정 — 관리자 배너 정보 수정 (제목·링크·이미지)
+    // 관리자 배너 정보 수정 (제목·링크·이미지)
     void updateBannerInfo(Long bannerId, String title, String linkUrl,
                  MultipartFile bannerImage) throws Exception;
     void deactivateBanner(Long bannerId);
     String activateBanner(Long bannerId);
     void deleteBanner(Long bannerId);
 
-    // 2026-08-11 박유정 — FAQ CMS
+    // FAQ CMS
     List<FaqVO> getFaqList();
 
     FaqVO getFaqById(Long faqId);
@@ -73,7 +73,7 @@ public interface AdminCMSService {
 
     void deleteFaq(Long faqId);
 
-    // 2026-08-11 박유정 — 공지사항 CMS
+    // 공지사항 CMS
     List<NoticeVO> getNoticeList();
 
     NoticeVO getNoticeById(Long noticeId);

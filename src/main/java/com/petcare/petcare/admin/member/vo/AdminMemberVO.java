@@ -1,9 +1,6 @@
 /**
  * 역할: 관리자 회원 목록·상세 데이터 객체
  *
- * - 박유정 / 2026-07-16 (기본정보), 2026-07-20 (STEP 8 활동현황)
- * - 박유정 / 2026-07-21 (STEP 10 포인트 요약, STEP 11 주문)
- *
  * 참고 테이블
  * - TB_MEMBER, TB_BUSINESS
  * - TB_ORDER, TB_RESERVATION, TB_POST, TB_POST_REPORT
@@ -42,7 +39,7 @@ public class AdminMemberVO {
 
     private String roleType;            // (계산) — GENERAL(일반) / BIZ(사업자)
 
-    // ── 관리자 상세 활동 현황 / 2026-07-20 STEP 8 ─────────────
+    // ── 관리자 상세 활동 현황 ─────────────
 
     private Integer orderCount;          // (집계) — 총 주문 수
     private Long totalPayAmount;         // (집계) — 총 결제 금액
@@ -55,12 +52,12 @@ public class AdminMemberVO {
     private Integer petCount;            // (집계) — 등록 반려동물 수
     private String petNames;             // (집계) — 반려동물 이름 (쉼표 구분)
 
-    // ── 관리자 상세 포인트 요약 / 2026-07-21 STEP 10 ──────────
+    // ── 관리자 상세 포인트 요약 ──────────
 
     private Integer totalEarnPoint;    // (집계) — 총 적립 (TB_POINT EARN 합계)
     private Integer totalUsePoint;       // (집계) — 총 사용 (TB_POINT USE 합계)
 
-    // ── 활동 누적 / HYJ 26.07.28 ─────────────────────────────
+    // ── 활동 누적 ─────────────────────────────
 
     private int posts;                   // POST_COUNT — 게시글 수 (TB_MEMBER)
     private int comments;                // COMMENT_COUNT — 댓글 수 (TB_MEMBER)

@@ -6,7 +6,6 @@ import com.petcare.petcare.main.section.vo.MainCommunityPreviewVO;
 import com.petcare.petcare.main.section.vo.MainPopularProductVO;
 
 /*
- *  2026/07/06 장우철
  *  메인 섹션 인터페이스 
  */
 

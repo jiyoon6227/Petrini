@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — 토스 빌링 자동결제 승인 결과 VO
+ * 토스 빌링 자동결제 승인 결과 VO
  *
  * TossBillingService.approveBilling 성공 시 paymentKey·orderId 전달
  * → TB_PAYMENT.TOSS_PAYMENT_KEY / TOSS_ORDER_ID 저장용

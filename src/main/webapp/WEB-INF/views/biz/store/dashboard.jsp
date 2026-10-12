@@ -8,7 +8,7 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%-- 7/3, 사업자(쇼핑몰) 대시보드 UI 구성 — 병원/숙박 대시보드와 동일한 공용 클래스(summary-grid, dash-card 등) 재사용 --%>
+<%-- 사업자(쇼핑몰) 대시보드 UI 구성 — 병원/숙박 대시보드와 동일한 공용 클래스(summary-grid, dash-card 등) 재사용 --%>
 <main class="biz-main hospital-dashboard">
   <div class="dashboard-top">
     <div>

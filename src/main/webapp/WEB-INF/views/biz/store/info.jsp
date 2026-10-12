@@ -7,7 +7,7 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%-- 7/3, 사업자(쇼핑몰) 사업자 정보 UI 구성 — 매장 자체 정보와 별개로,
+<%-- 사업자(쇼핑몰) 사업자 정보 UI 구성 — 매장 자체 정보와 별개로,
      사업자 등록 정보(대표자명/사업자등록번호/업종/사업장 주소·전화번호/사업자등록증)를 관리하는 화면 --%>
 <main class="biz-main">
   <div class="biz-page-head">
@@ -19,7 +19,6 @@
     <div class="biz-card-head"><span>사업자 정보</span><small>* 표시 항목은 필수 입력입니다</small></div>
 
     <form id="bizInfoForm" method="post" action="${contextPath}/biz/store/info" enctype="multipart/form-data" style="padding:20px;max-width:640px">
-      <!--HYJ 26.08.05-->
       <input type="hidden" name="_csrf" value="${_csrf}">      
       
       <div class="biz-form-fields">
@@ -79,7 +78,7 @@
 </div>
 
 <script>
-  //지윤 26.07.23 추가: 저장 후 리다이렉트됐을 때 flash 메시지 있으면 토스트 자동으로 띄움
+  // 저장 후 리다이렉트 시 flash 메시지 토스트 표시
   <c:if test="${not empty msg}">
     window.addEventListener('DOMContentLoaded', function () {
       var toast = document.getElementById('saveToast');

@@ -1,8 +1,6 @@
 /**
  * 역할: CommunityReportService 구현체 (@Service)
  *
- * - 박유정 / 2026-07-10
- *
  * [insertPostReport]
  * 1. 로그인·사유 검증
  * 2. 본인 글 신고 불가 / 중복 대기 신고 불가
@@ -68,8 +66,7 @@ public class CommunityReportServiceImpl implements CommunityReportService {
         CommunityReportVO vo = new CommunityReportVO();
         vo.setPostId(postId);
         vo.setMemberNo(memberNo);
-        // 2026/07/11 장우철 — TB_POST_REPORT.REASON(VARCHAR2)에 사유코드(+상세) 저장
-        // [변경 전] REASON_CD / REASON_DETAIL 컬럼 가정 → 실제 DB에는 REASON 만 존재
+        // TB_POST_REPORT.REASON(VARCHAR2)에 사유코드(+상세) 저장
         if (reasonDetail != null && !reasonDetail.isBlank()) {
             String detail = reasonDetail.trim();
             if (detail.length() > 150) {

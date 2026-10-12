@@ -90,7 +90,7 @@ public interface BizStayService {
 
 
 
-    // 2026-07-10 장우철 — 승인됐는데 TB_HOSPITAL 없으면 껍데기 생성 후 반환
+    // 승인됐는데 TB_HOSPITAL 없으면 껍데기 생성 후 반환
 
     StayVO resolveStayByBizId(String bizId);
 
@@ -118,12 +118,12 @@ public interface BizStayService {
 
 
 
-    // 2026/08/13 장우철 — APPROVE / HOLD / CLOSED
+    // APPROVE / HOLD / CLOSED
     void changeRoomStatus(Long roomId, Long stayId, String statusCd);
 
 
 
-    // ── 2026-07-14 예약 관리 ──
+    // ── 예약 관리 ──
 
     List<ReservationVO> getReservationList(Long stayId, String tab) throws Exception;
 
@@ -141,7 +141,7 @@ public interface BizStayService {
 
 
 
-    // 2026-07-28 박유정 — 사이드바 예약관리 배지 (PENDING + CONFIRMED)
+    // 사이드바 예약관리 배지 (PENDING + CONFIRMED)
 
     int countPendingReservations(Long stayId) throws Exception;
 
@@ -151,9 +151,9 @@ public interface BizStayService {
 
 
 
-    //HYJ 26.07.29 쿠폰관리
+    // 쿠폰관리
 
-    // 2026/08/01 장우철 — BIZ_MEMBER_NO = TB_BUSINESS.BIZ_NO (NUMBER)
+    // BIZ_MEMBER_NO = TB_BUSINESS.BIZ_NO (NUMBER)
 
     // 사업자 본인 쿠폰 목록
 
@@ -182,12 +182,12 @@ public interface BizStayService {
     // 쿠폰 삭제 (PENDING 상태일 때만)
     void deleteCoupon(Long bizNo, Long couponId);
 
-    // 지윤 26.08.07: 쿠폰 조기 마감 (병원/숙소 공용)
+    // 쿠폰 조기 마감 (병원/숙소 공용)
     void closeCoupon(Long bizNo, Long couponId);
 
 
 
-    //HYJ 26.07.31 배너관리
+    // 배너관리
 
     Long getBizNo(String bizId);
 
@@ -197,7 +197,7 @@ public interface BizStayService {
 
 
 
-    // 2026-07-27 박유정 STEP 2 — 사업자 숙소 리뷰 관리
+    // 사업자 숙소 리뷰 관리
 
     List<StayReviewVO> getBizStayReviews(Long stayId) throws Exception;
 
@@ -218,7 +218,7 @@ public interface BizStayService {
     List<ReservationVO> getTodayCheckinList(Long stayId);
     List<StayReviewVO> getRecentReviews(Long stayId);
 
-    // 2026-08-11 박유정 — 사업자 숙소 환불신청
+    // 사업자 숙소 환불신청
     int countPendingStayRefundRequests(Long stayId);
     List<com.petcare.petcare.member.inquiry.vo.MemberInquiryVO> getStayRefundList(Long stayId, String statusCd);
     java.util.Map<String, Integer> getStayRefundStatusCounts(Long stayId);

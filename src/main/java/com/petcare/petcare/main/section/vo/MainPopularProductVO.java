@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 /*
- *  2026/07/06 장우철 추가
  *  메인페이지 인기상품 데이터
  */
 @Getter

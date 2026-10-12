@@ -49,7 +49,7 @@ public class FileService {
         String objectPath = subDir + "/" + savedName;
 
         if (gcsEnabled) {
-            // [GCS 업로드 — gcs.enabled=true] 2026/07/21 장우철
+            // [GCS 업로드 — gcs.enabled=true]
             //#region구글 스토리지 GCS 전환코드 START
             if (storage == null) {
                 throw new IllegalStateException("GCS enabled but Storage bean is missing");
@@ -64,7 +64,7 @@ public class FileService {
             storage.create(blobInfo, file.getBytes());
             //#endregion GCS 전환코드 END
         } else {
-            // [로컬 저장 — gcs.enabled=false] 2026/07/21 장우철
+            // [로컬 저장 — gcs.enabled=false]
             //#region로컬 파일관리
             File dir = new File(uploadDir + subDir);
             if (!dir.exists()) {
@@ -97,14 +97,14 @@ public class FileService {
         }
 
         if (gcsEnabled) {
-            // [GCS 삭제 — gcs.enabled=true] 2026/07/21 장우철
+            // [GCS 삭제 — gcs.enabled=true]
             //#region구글 스토리지 GCS 전환코드 START
             if (storage != null) {
                 storage.delete(BlobId.of(gcsBucket, file.getFileUrl()));
             }
             //#endregion GCS 전환코드 END
         } else {
-            // [로컬 삭제 — gcs.enabled=false] 2026/07/21 장우철
+            // [로컬 삭제 — gcs.enabled=false]
             //#region로컬 파일관리
             File diskFile = new File(uploadDir + file.getFileUrl());
             if (diskFile.exists()) {
@@ -125,7 +125,7 @@ public class FileService {
         return fileMapper.selectFileList(param);
     }
 
-    //지윤 26.07.15 추가: 상품 이미지 교체 시 기존 파일들(디스크+DB) 전부 삭제 - 새 이미지 올리기 전에 호출
+    // 상품 이미지 교체 시 기존 파일들(디스크+DB) 전부 삭제 - 새 이미지 올리기 전에 호출
     @Transactional
     public void deleteFilesByRef(String refType, Long refId) throws Exception {
         List<FileVO> files = getFileList(refType, refId);

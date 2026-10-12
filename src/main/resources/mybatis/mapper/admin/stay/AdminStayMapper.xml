@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!-- 2026/08/13 장우철 — 관리자 숙소 관리 (전체 숙소·객실 운영 상태) -->
+<!-- 관리자 숙소 관리 (전체 숙소·객실 운영 상태) -->
 <mapper namespace="com.petcare.petcare.admin.stay.mapper.AdminStayMapper">
 
   <sql id="roomCountJoin">

@@ -6,8 +6,8 @@
 <!--
   역할: AdminMainMapper SQL 정의
 
-  - 박유정 / 2026-07-30 — ADMIN-01 대시보드 통계·차트 / ADMIN-04 Phase 1
-  - 박유정 / 2026-07-31 — ADMIN-04 Phase 2~5-A: 차트·업종·지난달 SQL
+  - 대시보드 통계·차트
+  - 차트·업종·지난달 SQL
 
   테이블
   - TB_MEMBER
@@ -15,21 +15,21 @@
   - TB_RESERVATION
   - TB_BUSINESS
 -->
-  <!-- 2026-07-30 박유정 — Phase 2: 오늘 신규 가입자 (JOIN_DATE = SYSDATE 날짜) -->
+  <!-- 오늘 신규 가입자 (JOIN_DATE = SYSDATE 날짜) -->
   <select id="countTodayNewMembers" resultType="int">
     SELECT COUNT(*)
       FROM TB_MEMBER
      WHERE TRUNC(JOIN_DATE) = TRUNC(SYSDATE)
   </select>
 
-  <!-- 2026-07-30 박유정 — Phase 2: 오늘 주문 건수 (ORDER_DATE DATE, TRUNC 비교) -->
+  <!-- 오늘 주문 건수 (ORDER_DATE DATE, TRUNC 비교) -->
   <select id="countTodayOrders" resultType="int">
     SELECT COUNT(*)
       FROM TB_ORDER
      WHERE TRUNC(ORDER_DATE) = TRUNC(SYSDATE)
   </select>
 
-  <!-- 2026-07-30 박유정 — Phase 2: 오늘 매출 합(원), 취소 주문 제외 -->
+  <!-- 오늘 매출 합(원), 취소 주문 제외 -->
   <select id="sumTodaySalesAmount" resultType="long">
     SELECT NVL(SUM(NVL(PAY_AMOUNT, 0)), 0)
       FROM TB_ORDER
@@ -37,14 +37,14 @@
        AND ORDER_STATUS &lt;&gt; 'CANCEL'
   </select>
 
-  <!-- 2026-07-30 박유정 — Phase 2: 미처리 예약 (사업자 사이드바 배지와 동일 기준) -->
+  <!-- 미처리 예약 (사업자 사이드바 배지와 동일 기준) -->
   <select id="countPendingReservations" resultType="int">
     SELECT COUNT(*)
       FROM TB_RESERVATION
      WHERE STATUS_CD IN ('PENDING', 'CONFIRMED')
   </select>
 
-  <!-- 2026-07-30 박유정 — Phase 3-A: 최근 주문 5건 (TB_ORDER + TB_MEMBER, 새 DDL) -->
+  <!-- 최근 주문 5건 (TB_ORDER + TB_MEMBER, 새 DDL) -->
   <select id="selectRecentOrders"
           resultType="com.petcare.petcare.admin.main.vo.AdminMainOrderVO">
     SELECT
@@ -59,14 +59,14 @@
     FETCH FIRST 5 ROWS ONLY
   </select>
 
-    <!-- 2026-07-30 박유정 — Phase 3-B: 탈퇴 회원 (가장 단순, 먼저 이해) -->
+    <!-- 탈퇴 회원 (가장 단순, 먼저 이해) -->
   <select id="countMemberWithdrawn" resultType="int">
     SELECT COUNT(*)
       FROM TB_MEMBER
      WHERE STATUS_CD = 'WITHDRAWN'
   </select>
 
-  <!-- 2026-07-30 박유정 — Phase 3-B: 사업자 회원 (AdminMemberMapper roleType=BIZ 와 동일) -->
+  <!-- 사업자 회원 (AdminMemberMapper roleType=BIZ 와 동일) -->
   <select id="countMemberBiz" resultType="int">
     SELECT COUNT(*)
       FROM TB_MEMBER M
@@ -79,7 +79,7 @@
            )
   </select>
 
-  <!-- 2026-07-30 박유정 — Phase 3-B: 일반회원 (탈퇴·승인사업자 제외) -->
+  <!-- 일반회원 (탈퇴·승인사업자 제외) -->
   <select id="countMemberGeneral" resultType="int">
     SELECT COUNT(*)
       FROM TB_MEMBER M
@@ -92,7 +92,7 @@
            )
   </select>
 
-  <!-- 2026-07-30 박유정 — Phase 3-C: 최근 7일 일별 매출 (취소 제외, 오늘 포함) -->
+  <!-- 최근 7일 일별 매출 (취소 제외, 오늘 포함) -->
   <select id="selectWeeklySales"
           resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
     SELECT
@@ -106,7 +106,7 @@
     ORDER BY TRUNC(O.ORDER_DATE)
   </select>
 
-  <!-- 2026-07-30 박유정 — 월간 매출: 이번 달 1일~말일 일별 (취소 제외) -->
+  <!-- 월간 매출: 이번 달 1일~말일 일별 (취소 제외) -->
   <select id="selectMonthlySales"
           resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
     SELECT
@@ -120,7 +120,7 @@
     ORDER BY TRUNC(O.ORDER_DATE)
   </select>
 
-  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 총 매출(원), 취소 제외 -->
+  <!-- 이번 달 총 매출(원), 취소 제외 -->
   <select id="sumMonthSalesAmount" resultType="long">
     SELECT NVL(SUM(NVL(PAY_AMOUNT, 0)), 0)
       FROM TB_ORDER
@@ -129,7 +129,7 @@
        AND ORDER_STATUS &lt;&gt; 'CANCEL'
   </select>
 
-  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 신규 가입 -->
+  <!-- 이번 달 신규 가입 -->
   <select id="countMonthNewMembers" resultType="int">
     SELECT COUNT(*)
       FROM TB_MEMBER
@@ -137,7 +137,7 @@
        AND TRUNC(JOIN_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
   </select>
 
-  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 예약 건수 (등록일 기준) -->
+  <!-- 이번 달 예약 건수 (등록일 기준) -->
   <select id="countMonthReservations" resultType="int">
     SELECT COUNT(*)
       FROM TB_RESERVATION
@@ -145,7 +145,7 @@
        AND TRUNC(REG_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
   </select>
 
-  <!-- 2026-07-30 박유정 — ADMIN-04: 이번 달 주문 수 -->
+  <!-- 이번 달 주문 수 -->
   <select id="countMonthOrders" resultType="int">
     SELECT COUNT(*)
       FROM TB_ORDER
@@ -153,7 +153,7 @@
        AND TRUNC(ORDER_DATE) &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)
   </select>
 
-    <!-- 2026-07-31 박유정 — ADMIN-04 Phase 2: 최근 6개월 월별 매출 (취소 제외) -->
+    <!-- 최근 6개월 월별 매출 (취소 제외) -->
   <select id="selectLast6MonthsSales"
           resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
     SELECT
@@ -167,7 +167,7 @@
     ORDER BY TRUNC(O.ORDER_DATE, 'MM')
   </select>
 
-    <!-- 2026-07-31 박유정 — ADMIN-04 Phase 3: 최근 6개월 월별 신규 가입 -->
+    <!-- 최근 6개월 월별 신규 가입 -->
   <select id="selectLast6MonthsNewMembers"
           resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
     SELECT
@@ -180,7 +180,7 @@
     ORDER BY TRUNC(M.JOIN_DATE, 'MM')
   </select>
 
-  <!-- 2026-07-31 박유정 — ADMIN-04 Phase 4: 이번 달 업종별 예약/주문 (병원·숙소·쇼핑) -->
+  <!-- 이번 달 업종별 예약/주문 (병원·숙소·쇼핑) -->
   <select id="selectMonthCategoryResvOrderStats"
           resultType="com.petcare.petcare.admin.main.vo.AdminMainSalesDayVO">
     SELECT dayLabel, salesAmount
@@ -209,7 +209,7 @@
               END
   </select>
 
-  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 총 매출(원), 취소 제외 -->
+  <!-- 지난 달 총 매출(원), 취소 제외 -->
   <select id="sumPrevMonthSalesAmount" resultType="long">
     SELECT NVL(SUM(NVL(PAY_AMOUNT, 0)), 0)
       FROM TB_ORDER
@@ -218,7 +218,7 @@
        AND ORDER_STATUS &lt;&gt; 'CANCEL'
   </select>
 
-  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 신규 가입 -->
+  <!-- 지난 달 신규 가입 -->
   <select id="countPrevMonthNewMembers" resultType="int">
     SELECT COUNT(*)
       FROM TB_MEMBER
@@ -226,7 +226,7 @@
        AND TRUNC(JOIN_DATE) &lt; TRUNC(SYSDATE, 'MM')
   </select>
 
-  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 예약 건수 (등록일 기준) -->
+  <!-- 지난 달 예약 건수 (등록일 기준) -->
   <select id="countPrevMonthReservations" resultType="int">
     SELECT COUNT(*)
       FROM TB_RESERVATION
@@ -234,7 +234,7 @@
        AND TRUNC(REG_DATE) &lt; TRUNC(SYSDATE, 'MM')
   </select>
 
-  <!-- 2026-07-31 박유정 — Phase 5-A: 지난 달 주문 수 -->
+  <!-- 지난 달 주문 수 -->
   <select id="countPrevMonthOrders" resultType="int">
     SELECT COUNT(*)
       FROM TB_ORDER

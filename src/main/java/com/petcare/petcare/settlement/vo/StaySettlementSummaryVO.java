@@ -1,6 +1,6 @@
 /**
  * 역할: 사업자 정산 상단 요약 3칸 (예정/완료/수수료)
- * 2026/07/30 장우철 — 숙소 정산 구현순서 2-1
+ * 숙소 정산
  */
 package com.petcare.petcare.settlement.vo;
 

@@ -87,7 +87,6 @@
   </div>
 
   <form id="reserveForm" action="${contextPath}/stay/reserve" method="post">
-    <!--HYJ 26.08.05-->
     <input type="hidden" name="_csrf" value="${_csrf}">
     
     <input type="hidden" name="stayId" value="${stay.stayId}">
@@ -129,7 +128,7 @@
       <div id="availabilityMsg"></div>
     </div>
 
-    <%-- 반려동물 선택 — 2026/08/11 장우철: PET_LIMIT에 따라 단건/다건 --%>
+    <%-- 반려동물 선택 — PET_LIMIT에 따라 단건/다건 --%>
     <div class="res-section">
       <h3>
         <svg viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><circle cx="4" cy="8" r="2"/><path d="M12 10c-1.5 2-3 3.5-3 5a3 3 0 006 0c0-1.5-1.5-3-3-5z"/></svg>

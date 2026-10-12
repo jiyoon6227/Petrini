@@ -167,7 +167,7 @@
           AND  STAY_ID = #{stayId}
     </update>
 
-    <!-- 2026/08/13 장우철 — 객실 상태: APPROVE(운영중) / HOLD(운영중지) / CLOSED(운영종료) -->
+    <!-- 객실 상태: APPROVE(운영중) / HOLD(운영중지) / CLOSED(운영종료) -->
     <update id="updateRoomStatus">
         UPDATE TB_STAY_ROOM
            SET STATUS_CD = #{statusCd}
@@ -175,7 +175,7 @@
            AND STAY_ID = #{stayId}
     </update>
 
-    <!-- 2026/08/13 장우철 — 진행 중 예약이 있으면 객실 삭제 불가 -->
+    <!-- 진행 중 예약이 있으면 객실 삭제 불가 -->
     <select id="countActiveReservationsForRoom" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION
@@ -184,7 +184,7 @@
            AND STATUS_CD IN ('PENDING', 'CONFIRMED', 'CHECKIN', 'CHECKOUT')
     </select>
 
-    <!-- 2026-07-10 장우철 — 사업자 예약 목록 (F4), tab: all / wait / done / cancel -->
+    <!-- 사업자 예약 목록, tab: all / wait / done / cancel -->
     <select id="selectReservationList" resultType="com.petcare.petcare.stay.vo.ReservationVO">
         SELECT  R.RESV_ID      AS resvId,
                 R.RESV_NO      AS resvNo,
@@ -279,8 +279,8 @@
            AND  R.RESV_TYPE  = 'STAY'
     </select>
 
-    <!-- 2026-07-10 장우철 — 사업자 예약 상태 변경 (F5) -->
-    <!-- 2026/07/11 장우철 — CANCEL 시 REJECT_REASON(취소 사유) 저장 -->
+    <!-- 사업자 예약 상태 변경 -->
+    <!-- CANCEL 시 REJECT_REASON(취소 사유) 저장 -->
     <update id="updateReservationStatus">
         UPDATE TB_RESERVATION
            SET STATUS_CD = #{statusCd},
@@ -290,7 +290,7 @@
            AND RESV_TYPE = 'STAY'
     </update>
 
-    <!-- 2026-07-20 HYJ — 숙소 예약 캘린더 (F7) -->
+    <!-- 숙소 예약 캘린더 -->
     <select id="selectReservationCalendarList" resultType="com.petcare.petcare.stay.vo.ReservationVO">
         SELECT  R.RESV_ID        AS resvId,
                 R.RESV_NO        AS resvNo,
@@ -313,7 +313,7 @@
          ORDER BY R.CHECKIN_DATE
     </select>
 
-    <!-- 2026-07-28 박유정 — 사이드바 예약관리 배지 (결제 전 PENDING + 결제 후 CONFIRMED) -->
+    <!-- 사이드바 예약관리 배지 (결제 전 PENDING + 결제 후 CONFIRMED) -->
     <select id="countPendingReservations" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION R
@@ -322,7 +322,7 @@
            AND R.STATUS_CD IN ('PENDING', 'CONFIRMED')
     </select>
 
-    <!-- 2026/07/11 장우철 — 사이드바 캘린더 배지 (오늘 CONFIRMED) -->
+    <!-- 사이드바 캘린더 배지 (오늘 CONFIRMED) -->
     <select id="countTodayConfirmedReservations" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION R
@@ -333,14 +333,14 @@
            AND R.RESV_DATE &lt;  TRUNC(SYSDATE) + 1
     </select>
 
-    <!-- 2026/07/11 장우철 — 예약 알림용 숙소명 -->
+    <!-- 예약 알림용 숙소명 -->
     <select id="selectStayNameById" resultType="string">
         SELECT NAME
           FROM TB_STAY
          WHERE STAY_ID = #{stayId}
     </select>
-    <!-- HYJ 26.07.29 사업자 본인 쿠폰 목록 -->
-  <!-- 2026/08/01 장우철 — BIZ_MEMBER_NO = TB_BUSINESS.BIZ_NO -->
+    <!-- 사업자 본인 쿠폰 목록 -->
+  <!-- BIZ_MEMBER_NO = TB_BUSINESS.BIZ_NO -->
   <select id="selectCouponListByBizNo"
         parameterType="long"
         resultType="com.petcare.petcare.biz.vo.BizCouponVO">
@@ -369,8 +369,8 @@
      ORDER BY REG_DATE DESC
   </select>
 
-  <!-- HYJ 26.07.29 쿠폰 상세 1건 -->
-  <!-- 지윤 26.08.11: 정률쿠폰 최대할인금액(MAX_DISCOUNT_AMT) 조회 컬럼 추가 -->
+  <!-- 쿠폰 상세 1건 -->
+  <!-- 정률쿠폰 최대할인금액(MAX_DISCOUNT_AMT) 조회 -->
 <select id="selectCouponById"
         parameterType="long"
         resultType="com.petcare.petcare.biz.vo.BizCouponVO">
@@ -398,9 +398,9 @@
      WHERE COUPON_ID = #{couponId}
   </select>
 
-  <!-- HYJ 26.07.29 쿠폰 신청 INSERT -->
-<!-- 2026/08/01 장우철 — BIZ_MEMBER_NO/BIZ_NO 모두 TB_BUSINESS.BIZ_NO -->
-<!-- 지윤 26.08.11: 정률쿠폰 최대할인금액(MAX_DISCOUNT_AMT) 컬럼 추가 -->
+  <!-- 쿠폰 신청 INSERT -->
+<!-- BIZ_MEMBER_NO/BIZ_NO 모두 TB_BUSINESS.BIZ_NO -->
+<!-- 정률쿠폰 최대할인금액(MAX_DISCOUNT_AMT) 컬럼 -->
 <insert id="insertCoupon"
         parameterType="com.petcare.petcare.biz.vo.BizCouponVO">
   INSERT INTO TB_COUPON (
@@ -426,8 +426,8 @@
   )
 </insert>
 
-  <!-- HYJ 26.07.29 쿠폰 수정 (PENDING일 때만) -->
-  <!-- 지윤 26.08.11: 정률쿠폰 최대할인금액(MAX_DISCOUNT_AMT) 갱신 추가 -->
+  <!-- 쿠폰 수정 (PENDING일 때만) -->
+  <!-- 정률쿠폰 최대할인금액(MAX_DISCOUNT_AMT) 갱신 -->
 <update id="updateCoupon"
         parameterType="com.petcare.petcare.biz.vo.BizCouponVO">
   UPDATE TB_COUPON
@@ -446,7 +446,7 @@
      AND APPROVAL_STATUS = 'PENDING'
 </update>
 
-  <!-- HYJ 26.07.29 쿠폰 삭제 (PENDING일 때만) -->
+  <!-- 쿠폰 삭제 (PENDING일 때만) -->
   <delete id="deleteCoupon">
     DELETE FROM TB_COUPON
      WHERE COUPON_ID      = #{couponId}
@@ -455,7 +455,6 @@
   </delete>
 
   <!--
-    지윤 26.08.07
     병원/숙소 쿠폰 조기 마감 (store BizStoreMapper.closeCoupon과 동일 패턴)
     관리자 재승인 없이 사업자가 직접 마감. 기존 발급된 회원 쿠폰은 변경하지 않는다.
   -->
@@ -469,19 +468,19 @@
        AND STATUS_CD = 'ACTIVE'
   </update>
 
-  <!-- HYJ 26.07.31 쿠폰 삭제 (로그인 ID로 BIZ_NO 조회) -->
+  <!-- 쿠폰 삭제 (로그인 ID로 BIZ_NO 조회) -->
   <select id="selectBizNoByBizId" resultType="Long">
       SELECT BIZ_NO FROM TB_BUSINESS WHERE BIZ_ID = #{bizId}
   </select>
 
-    <!--HYJ 26.07.31 배너 신청-->
-    <!-- 2026/08/03 장우철 — 이미지 JOIN을 FILE_ID로 (신청 시 banner.fileId 저장) -->
+    <!-- 배너 신청-->
+    <!-- 이미지 JOIN을 FILE_ID로 (신청 시 banner.fileId 저장) -->
     <sql id="bannerImageJoin">
         LEFT JOIN TB_FILE f ON f.FILE_ID = b.FILE_ID
     </sql>
 
     <!-- ─── 사업자: 내 배너 목록 ─── -->
-    <!-- 2026/08/03 장우철 — DATE → TO_CHAR (VO String 매핑) -->
+    <!-- DATE → TO_CHAR (VO String 매핑) -->
     <select id="selectBannerList" parameterType="Long" resultType="com.petcare.petcare.main.banner.vo.MainBannerVO">
         SELECT
                 b.BANNER_ID, 
@@ -502,8 +501,8 @@
     </select>
 
     <!-- ─── 사업자: 배너 신청 INSERT ─── -->
-    <!-- 2026/08/03 장우철 — START/END_DATE가 DATE 타입 → TO_DATE로 바인딩 (문자열 INSERT ORA-01861 방지) -->
-    <!-- 2026-08-06 박유정 — BANNER_ID 시퀀스 누락 시 ORA-01400 방지 -->
+    <!-- START/END_DATE가 DATE 타입 → TO_DATE로 바인딩 (문자열 INSERT ORA-01861 방지) -->
+    <!-- BANNER_ID 시퀀스 누락 시 ORA-01400 방지 -->
     <insert id="insertBanner" parameterType="com.petcare.petcare.main.banner.vo.MainBannerVO">
         <selectKey keyProperty="bannerId" resultType="long" order="BEFORE">
             SELECT SEQ_TB_BANNER.NEXTVAL FROM DUAL
@@ -531,7 +530,7 @@
         )
     </insert>
 
-    <!-- 2026-07-27 박유정 STEP 2 — 사업자 숙소 리뷰 목록 -->
+    <!-- 사업자 숙소 리뷰 목록 -->
     <select id="selectBizStayReviews"
             resultType="com.petcare.petcare.stay.vo.StayReviewVO">
         SELECT  R.REVIEW_ID   AS reviewId,
@@ -554,7 +553,7 @@
          ORDER BY R.REG_DATE DESC, R.REVIEW_ID DESC
     </select>
 
-    <!-- 2026-07-27 박유정 STEP 2 — 답글/삭제요청 전 리뷰 소유 검증 -->
+    <!-- 답글/삭제요청 전 리뷰 소유 검증 -->
     <select id="selectBizStayReview"
             resultType="com.petcare.petcare.stay.vo.StayReviewVO">
         SELECT  R.REVIEW_ID   AS reviewId,
@@ -573,7 +572,7 @@
            AND  R.REVIEW_ID = #{reviewId}
     </select>
 
-    <!-- 2026-07-27 박유정 STEP 2 — 숙소 답글 저장 -->
+    <!-- 숙소 답글 저장 -->
     <update id="updateReviewBizReply">
         UPDATE TB_REVIEW
            SET BIZ_REPLY = #{bizReply, jdbcType=VARCHAR}
@@ -582,7 +581,7 @@
            AND REVIEW_ID = #{reviewId}
     </update>
 
-    <!-- 2026-07-27 박유정 STEP 2 — 리뷰 삭제 요청 INSERT -->
+    <!-- 리뷰 삭제 요청 INSERT -->
     <insert id="insertReviewDeleteRequest"
             parameterType="com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO">
         <selectKey keyProperty="requestId" resultType="long" order="BEFORE">
@@ -609,7 +608,7 @@
         )
     </insert>
 
-    <!-- 2026-07-27 박유정 STEP 2 — PENDING 중복 요청 체크 -->
+    <!-- PENDING 중복 요청 체크 -->
     <select id="countPendingReviewDeleteRequest" resultType="int">
         SELECT COUNT(*)
           FROM TB_REVIEW_DELETE_REQUEST
@@ -618,7 +617,7 @@
            AND STATUS_CD = 'PENDING'
     </select>
 
-    <!-- 2026-07-27 박유정 STEP 2 — 사업자 삭제요청 탭 -->
+    <!-- 사업자 삭제요청 탭 -->
     <select id="selectBizReviewDeleteRequests"
             resultType="com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO">
         SELECT DR.REQUEST_ID     AS requestId,
@@ -643,7 +642,7 @@
     </select>
 
    <!-- ══════════════════════════════════════════════
-        HYJ 26.08.06 대시보드 집계 쿼리
+        대시보드 집계 쿼리
     ══════════════════════════════════════════════ -->
 
     <!-- 특정 날짜 예약(체크인) 건수 -->

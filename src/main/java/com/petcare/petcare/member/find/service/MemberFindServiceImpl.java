@@ -37,7 +37,7 @@ public class MemberFindServiceImpl implements MemberFindService {
         /**
      * 아이디 찾기
      * 이름 + 전화번호로 회원을 찾아서 MEMBER_ID(로그인 아이디) 원문 반환
-     * 2026/08/11 장우철 — EMAIL 대신 MEMBER_ID / 마스킹 제거(찾기 목적상 원문 표시)
+     * MEMBER_ID 원문 표시 (찾기 목적상 마스킹 없음)
      */
     @Override
     @Transactional(readOnly = true)

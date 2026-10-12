@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 좋아요 비즈니스 로직 (interface)
  *
- * - 박유정 / 2026-07-09
- *
  * 담당 화면
  * - community/detail.jsp   좋아요 버튼 Ajax 토글
  *

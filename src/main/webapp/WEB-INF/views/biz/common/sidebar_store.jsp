@@ -37,7 +37,7 @@
       </svg>
       주문 관리<c:if test="${not empty paidOrderCount && paidOrderCount > 0}"><span class="biz-nav-badge">${paidOrderCount}</span></c:if>
     </a>
-    <%-- 2026/08/04 장우철 — 환불신청 처리 페이지 --%>
+    <%-- 환불신청 처리 페이지 --%>
     <a href="${contextPath}/biz/store/refunds?statusCd=REQUESTED" class="biz-nav-link ${bizPage eq 'refunds' ? 'active' : ''}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
@@ -77,7 +77,7 @@
       Q&A 관리
     </a>
 
-    <%-- 2026-08-06 박유정 — 배너 광고 --%>
+    <%-- 배너 광고 --%>
     <a href="${contextPath}/biz/store/banner" class="biz-nav-link ${bizPage eq 'banner' ? 'active' : ''}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">

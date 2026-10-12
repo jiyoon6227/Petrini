@@ -5,8 +5,8 @@
      - 다른 JSP에서 <%@ include file="/WEB-INF/views/common/ad-banner.jsp" %> 로 삽입
      - pageId 변수(store, hospital, stay, grooming)를 POSITION_CD로 매핑
      - /api/banners?position=STORE 등으로 해당 위치 배너만 조회
-     - 2026-08-06 박유정 — store/list.jsp 연동, 이미지 URL 처리
-     - 2026-08-07 박유정 — API imageUrl 직접 사용, 로드 실패 시 placeholder
+     - store/list.jsp 연동, 이미지 URL 처리
+     - API imageUrl 직접 사용, 로드 실패 시 placeholder
 ==================================================================== --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
@@ -64,7 +64,7 @@
   var position = pageMap[pageId] || pageId.toUpperCase();
   var ctx = '${contextPath}';
 
-  // 2026-08-07 박유정 — API가 내려준 URL 우선 (없으면 클라이언트에서 조합)
+  // API가 내려준 URL 우선 (없으면 클라이언트에서 조합)
   function resolveImgSrc(url) {
     if (!url) return '';
     var path = String(url).replace(/\\/g, '/');
@@ -96,7 +96,7 @@ for (var i = 0; i < list.length; i++) {
 
     slide.innerHTML =
         '<img src="' + imgSrc + '" alt="' + (b.title || '').replace(/"/g, '&quot;') + '"' +
-        // 2026-08-07 박유정 — 로드 실패 시 AD placeholder
+        // 로드 실패 시 AD placeholder
         ' onerror="this.src=\'https://placehold.co/1160x140/2BAB82/ffffff?text=AD\'">';
 
     track.appendChild(slide);

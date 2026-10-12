@@ -8,7 +8,7 @@ import com.petcare.petcare.common.filter.XssFilter;
 /**
  * 역할: 서블릿 필터 등록 설정
  *
- * - HYJ / 2026-08-05 — XSS 필터 등록
+ * - XSS 필터 등록
  *
  * [왜 FilterRegistrationBean 을 쓰는가?]
  * - @WebFilter 어노테이션은 필터 순서(order) 보장이 안 됨

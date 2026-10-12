@@ -1,7 +1,7 @@
 /**
  * 역할: 관리자 정산 비즈니스 로직 (interface)
- * 2026/07/30 장우철 — 숙소 STAY
- * 2026/08/05 장우철 — 쇼핑 STORE S11
+ * 숙소 STAY
+ * 쇼핑 STORE
  *
  * 담당 화면: admin/settlement/list.jsp
  */

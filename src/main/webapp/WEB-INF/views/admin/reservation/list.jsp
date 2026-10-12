@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026/07/31 장우철 — 관리자 숙소 예약 목록 --%>
-<%-- 2026/08/11 장우철 — 주문관리와 유사 레이아웃 + 결제수단·결제일·한글상태 --%>
+<%-- 관리자 숙소 예약 목록 --%>
+<%-- 주문관리와 유사 레이아웃 + 결제수단·결제일·한글상태 --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="adminPage"   value="reservation-list" />
 <%@ include file="/WEB-INF/views/admin/common/header.jsp" %>

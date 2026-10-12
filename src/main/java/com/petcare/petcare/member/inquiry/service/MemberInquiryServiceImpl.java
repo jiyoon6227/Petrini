@@ -1,6 +1,6 @@
 /**
  * 역할: 1:1 문의 Service
- * 2026/07/31 장우철 — TB_INQUIRY 연동 + 숙소 환불신청
+ * TB_INQUIRY 연동 + 숙소 환불신청
  */
 package com.petcare.petcare.member.inquiry.service;
 
@@ -114,7 +114,7 @@ public class MemberInquiryServiceImpl implements MemberInquiryService {
         return toInquiryVO(vo);
     }
 
-    // 2026-08-11 박유정 — 세션 memberNo 없을 때 로그인 ID로 조회
+    // 세션 memberNo 없을 때 로그인 ID로 조회
     private Long resolveMemberNo(MemberVO member) {
         if (member == null) {
             return null;
@@ -135,7 +135,7 @@ public class MemberInquiryServiceImpl implements MemberInquiryService {
 
     /**
      * 숙소 체크인 상태 환불신청 → 1:1 문의 INSERT
-     * 2026/08/01 장우철 — 체크아웃 이후 환불 신청 불가 (CHECKIN만)
+     * 체크아웃 이후 환불 신청 불가 (CHECKIN만)
      */
     @Transactional
     public InquiryVO createStayRefundInquiry(MemberVO member, Long resvId, String content) {
@@ -153,7 +153,7 @@ public class MemberInquiryServiceImpl implements MemberInquiryService {
         if (memberInquiryMapper.countOpenStayRefund(member.getMemberNo(), resvId) > 0) {
             throw new IllegalStateException("이미 처리 중인 환불 신청이 있습니다.");
         }
-        // 2026/08/06 장우철 — 승인·거절·레거시 DONE 이력 있으면 재신청 불가
+        // 승인·거절·레거시 DONE 이력 있으면 재신청 불가
         if (memberInquiryMapper.countRejectedStayRefund(member.getMemberNo(), resvId) > 0) {
             throw new IllegalStateException("이미 환불 처리가 끝난 예약입니다. 재신청할 수 없습니다.");
         }
@@ -163,7 +163,7 @@ public class MemberInquiryServiceImpl implements MemberInquiryService {
         String title = "숙소 환불신청 #" + (detail.getResvNo() != null ? detail.getResvNo() : resvId);
         InquiryVO created = create(member, "예약", title, body, "RESV", resvId);
 
-        // 2026-08-11 박유정 — 환불 신청 알림 (회원·사업자)
+        // 환불 신청 알림 (회원·사업자)
         try {
             String stayName = detail.getHospitalName() != null ? detail.getHospitalName() : "숙소";
             java.util.Date applyDate = created.getCreatedAt() != null
@@ -197,7 +197,7 @@ public class MemberInquiryServiceImpl implements MemberInquiryService {
         return "ETC";
     }
 
-    // 2026-08-11 박유정 — INQUIRY_TYPE → 화면 표시명 (회원/예약/기타)
+    // INQUIRY_TYPE → 화면 표시명 (회원/예약/기타)
     private String toCategoryLabel(String inquiryType) {
         if (inquiryType == null || inquiryType.isBlank()) {
             return "기타";

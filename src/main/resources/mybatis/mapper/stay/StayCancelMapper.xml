@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!-- 2026/07/31 장우철 — 숙소 전액 환불 취소 공통 -->
+<!-- 숙소 전액 환불 취소 공통 -->
 <mapper namespace="com.petcare.petcare.stay.mapper.StayCancelMapper">
 
   <select id="selectStayReservation" resultType="com.petcare.petcare.stay.vo.ReservationVO">
@@ -53,7 +53,7 @@
   </update>
 
   <!--
-    2026/07/31 장우철 — R3: allowDone=true 이면 DONE도 취소(관리자 환불승인)
+    allowDone=true 이면 DONE도 취소(관리자 환불승인)
   -->
   <update id="updateStayFullCancel">
     UPDATE TB_RESERVATION
@@ -77,7 +77,7 @@
     </if>
   </update>
 
-  <!-- 2026/08/06 장우철 — 환불승인·보상숙박: CANCEL 없이 REFUND_AMT만 -->
+  <!-- 환불승인·보상숙박: CANCEL 없이 REFUND_AMT만 -->
   <update id="updateStayRefundAmtKeepStatus">
     UPDATE TB_RESERVATION
        SET REFUND_AMT = #{refundAmt}
@@ -86,7 +86,7 @@
        AND STATUS_CD NOT IN ('CANCEL', 'REJECTED')
   </update>
 
-  <!-- 2026/08/07 장우철 — 취소/환불 포인트 복구 -->
+  <!-- 취소/환불 포인트 복구 -->
   <select id="selectMemberPointBalance" resultType="long">
     SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
   </select>

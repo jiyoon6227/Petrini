@@ -1,9 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026/07/31 장우철 — 관리자 숙소 환불신청 상세 --%>
-<%-- 2026/08/06 장우철 — 승인=전액환불+이용유지(보상숙박), STATUS APPROVED/REJECTED --%>
-<%-- 2026/08/11 장우철 — yujeong UI(rd-*) + HEAD 보상숙박 승인 문구 병합 --%>
+<%-- 관리자 숙소 환불신청 상세 --%>
+<%-- 승인=전액환불+이용유지(보상숙박), STATUS APPROVED/REJECTED --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="adminPage" value="stay-refund" />
 <%@ include file="/WEB-INF/views/admin/common/header.jsp" %>
@@ -90,7 +89,6 @@
       </p>
       <form method="post" action="${contextPath}/admin/inquiry/stay-refund/approve"
             onsubmit="return confirm('전액 환불 + 이용 유지(보상 숙박)로 승인할까요?');">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         <input type="hidden" name="inquiryId" value="${inquiry.inquiryId}">
         <textarea name="answer" placeholder="승인 안내 메모 (선택)"></textarea>
@@ -105,7 +103,6 @@
       </p>
       <form method="post" action="${contextPath}/admin/inquiry/stay-refund/reject"
             onsubmit="return confirm('환불 신청을 거절할까요?');">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         <input type="hidden" name="inquiryId" value="${inquiry.inquiryId}">
         <textarea name="answer" placeholder="거절 사유 (필수)" required></textarea>

@@ -25,7 +25,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
     private MypageNotifyMapper mypageNotifyMapper;
 
     // =====================================================================
-    // 2026/08/11 장우철 — 알림 메서드 도메인별 정리
+    // 알림 메서드 도메인별 정리
     // 병원 → 쇼핑 → 숙소 → 커뮤니티 → 기타(공통/관리자)
     // =====================================================================
 
@@ -33,7 +33,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 1-1. 유저 → 사업자 -----
 
-    // ── 2026/08/07 장우철 — 미구현 알림 보강 ──
+    // ── 미구현 알림 보강 ──
 
     @Override
     @Transactional
@@ -54,7 +54,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/07/13 장우철 — 리뷰 등록 → 사업자 알림
+    // 리뷰 등록 → 사업자 알림
     @Override
     @Transactional
     public void sendHospitalReviewToBizNotification(Long bizMemberNo, String hospitalName,
@@ -80,7 +80,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 1-2. 사업자 → 유저 -----
 
-    // 2026/07/11 장우철 — 병원 예약 확정 알림
+    // 병원 예약 확정 알림
     @Override
     @Transactional
     public void sendReserveConfirmNotification(Long memberNo, String hospitalName,
@@ -102,7 +102,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/07/11 장우철 — 병원 예약 취소 알림 (취소 사유 포함)
+    // 병원 예약 취소 알림 (취소 사유 포함)
     @Override
     @Transactional
     public void sendReserveCancelNotification(Long memberNo, String hospitalName,
@@ -130,7 +130,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-11 박유정 — 숙소 예약 취소 알림
+    // 숙소 예약 취소 알림
     @Override
     @Transactional
     public void sendStayReserveCancelNotification(Long memberNo, String stayName,
@@ -158,7 +158,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-11 박유정 — 숙소 환불 신청 → 사업자 알림
+    // 숙소 환불 신청 → 사업자 알림
     @Override
     @Transactional
     public void sendStayRefundRequestToBizNotification(Long bizMemberNo, String stayName,
@@ -184,7 +184,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-11 박유정 — 숙소 환불 신청 접수 → 회원 알림
+    // 숙소 환불 신청 접수 → 회원 알림
     @Override
     @Transactional
     public void sendStayRefundRequestToMemberNotification(Long memberNo, String stayName,
@@ -208,7 +208,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-11 박유정 — 숙소 환불 승인 → 회원 알림 (예약 취소 문구 없음)
+    // 숙소 환불 승인 → 회원 알림 (예약 취소 문구 없음)
     @Override
     @Transactional
     public void sendStayRefundApprovedToMemberNotification(Long memberNo, String stayName,
@@ -234,7 +234,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-11 박유정 — 숙소 환불 거절 → 회원 알림
+    // 숙소 환불 거절 → 회원 알림
     @Override
     @Transactional
     public void sendStayRefundRejectedToMemberNotification(Long memberNo, String stayName,
@@ -261,7 +261,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/07/13 장우철 — 진료완료 알림 (상세에서 리뷰 작성)
+    // 진료완료 알림 (상세에서 리뷰 작성)
     @Override
     @Transactional
     public void sendReserveDoneNotification(Long memberNo, String hospitalName,
@@ -284,7 +284,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/07/14 장우철 — 병원 답글 → 회원 알림
+    // 병원 답글 → 회원 알림
     @Override
     @Transactional
     public void sendHospitalReviewReplyNotification(Long memberNo, String hospitalName,
@@ -315,7 +315,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 2-1. 유저/시스템 → 사업자 -----
 
-     // 2026-07-21 지윤 추가 — 신규 주문 알림 (알림함 "주문" 탭은 NOTI_TYPE='ORDER' 기준으로 필터링됨)
+     // 신규 주문 알림 (알림함 "주문" 탭은 NOTI_TYPE='ORDER' 기준으로 필터링됨)
     @Override
     @Transactional
     public void sendNewOrderNotification(Long bizMemberNo, String orderNo, String productName, int itemCount) {
@@ -338,7 +338,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-07-16 지윤 — 상품 품절 시 사업자에게 알림 (NOTI_TYPE=STOCK)
+    // 상품 품절 시 사업자에게 알림 (NOTI_TYPE=STOCK)
     @Override
     @Transactional
     public void sendProductSoldoutNotification(Long bizMemberNo, String productName, Long productId) {
@@ -359,7 +359,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-07-23 지윤 추가 — 주문취소 신청 알림 (알림함 "주문" 탭은 NOTI_TYPE='ORDER' 기준으로 필터링됨)
+    // 주문취소 신청 알림 (알림함 "주문" 탭은 NOTI_TYPE='ORDER' 기준으로 필터링됨)
     @Override
     @Transactional
     public void sendCancelRequestNotification(Long bizMemberNo, String orderNo, String reason) {
@@ -381,7 +381,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/08/04 장우철 — 상품 환불 신청 → 사업자
+    // 상품 환불 신청 → 사업자
     @Override
     @Transactional
     public void sendRefundRequestNotification(Long bizMemberNo, String orderNo, String productName, String reasonCd) {
@@ -527,7 +527,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 2-3. 관리자 → 사업자 (정산) -----
 
-    // 2026/08/05 장우철 — 쇼핑 중간정산 승인 알림
+    // 쇼핑 중간정산 승인 알림
     @Override
     @Transactional
     public void sendStoreMidSettleApproveNotification(Long memberNo, String bizName,
@@ -555,7 +555,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/08/05 장우철 — 쇼핑 중간정산 거절 알림
+    // 쇼핑 중간정산 거절 알림
     @Override
     @Transactional
     public void sendStoreMidSettleRejectNotification(Long memberNo, String bizName,
@@ -583,7 +583,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/08/05 장우철 — 쇼핑 정산 더미 지급 완료 알림
+    // 쇼핑 정산 더미 지급 완료 알림
     @Override
     @Transactional
     public void sendStoreSettlementPaidNotification(Long memberNo, String bizName,
@@ -614,7 +614,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 3-1. 유저/시스템 → 사업자 -----
 
-    // 2026-07-28 박유정 — 숙소 예약 결제 완료 → 사업자 알림
+    // 숙소 예약 결제 완료 → 사업자 알림
     @Override
     @Transactional
     public void sendStayReserveToBizNotification(Long bizMemberNo, String stayName,
@@ -637,7 +637,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-07-28 박유정 — 리뷰 등록 → 사업자(숙소) 알림
+    // 리뷰 등록 → 사업자(숙소) 알림
     @Override
     @Transactional
     public void sendStayReviewToBizNotification(Long bizMemberNo, String stayName,
@@ -663,7 +663,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 3-2. 사업자/스케줄/취소 → 유저 -----
 
-    // 2026/08/11 장우철 — 숙소 예약 확정 알림 (병원 알림과 문구 분리)
+    // 숙소 예약 확정 알림 (병원 알림과 문구 분리)
     @Override
     @Transactional
     public void sendStayReserveConfirmNotification(Long memberNo, String stayName,
@@ -685,7 +685,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/08/11 장우철 — 숙소 예약 취소 알림
+    // 숙소 예약 취소 알림
     @Override
     @Transactional
     public void sendStayReserveCancelNotification(Long memberNo, String stayName,
@@ -784,7 +784,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-07-28 박유정 — 숙소 답글 → 회원 알림
+    // 숙소 답글 → 회원 알림
     @Override
     @Transactional
     public void sendStayReviewReplyNotification(Long memberNo, String stayName,
@@ -813,7 +813,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 3-3. 관리자 → 사업자 (정산) -----
 
-    // 2026/07/30 장우철 — 숙소 중간정산 승인 알림 (사이트 내, 이메일 아님)
+    // 숙소 중간정산 승인 알림 (사이트 내, 이메일 아님)
     @Override
     @Transactional
     public void sendStayMidSettleApproveNotification(Long memberNo, String bizName,
@@ -841,7 +841,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/07/30 장우철 — 숙소 중간정산 거절 알림 (사유 포함)
+    // 숙소 중간정산 거절 알림 (사유 포함)
     @Override
     @Transactional
     public void sendStayMidSettleRejectNotification(Long memberNo, String bizName,
@@ -869,7 +869,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026/07/30 장우철 — 숙소 정산 더미 지급 완료 알림 (사이트 내)
+    // 숙소 정산 더미 지급 완료 알림 (사이트 내)
     @Override
     @Transactional
     public void sendStaySettlementPaidNotification(Long memberNo, String bizName,
@@ -944,7 +944,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 관리자 → 신청자(유저) : 사업자 등록 -----
 
-    // 2026-07-10 장우철 — 사업자 승인 알림 TB_NOTIFICATION INSERT
+    // 사업자 승인 알림 TB_NOTIFICATION INSERT
     // 이유: approveBiz 트랜잭션 안에서 해당 MEMBER_NO 에만 등록 (이메일/푸시는 후속)
     @Override
     @Transactional
@@ -971,7 +971,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-07-09 장우철 — 사업자 반려 알림 TB_NOTIFICATION INSERT
+    // 사업자 반려 알림 TB_NOTIFICATION INSERT
     // 이유: CONTENT 컬럼 VARCHAR2(500) 이므로 반려사유 길이 제한, LINK 는 재신청 화면(2번) 경로
     @Override
     @Transactional
@@ -1001,7 +1001,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 관리자 → 사업자 : 리뷰삭제 -----
 
-    // 2026-07-24 박유정 — 리뷰 삭제 요청 승인 알림 (사업자)
+    // 리뷰 삭제 요청 승인 알림 (사업자)
     @Override
     @Transactional
     public void sendReviewDeleteApproveNotification(Long bizMemberNo, String targetName,
@@ -1022,7 +1022,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-07-24 박유정 — 리뷰 삭제 요청 반려 알림 (사업자)
+    // 리뷰 삭제 요청 반려 알림 (사업자)
     @Override
     @Transactional
     public void sendReviewDeleteRejectNotification(Long bizMemberNo, String targetName,
@@ -1046,7 +1046,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ----- 관리자 → 사업자 : 배너 -----
 
-    // 2026-08-06 박유정 — 배너 신청 승인 알림 (사업자)
+    // 배너 신청 승인 알림 (사업자)
     @Override
     @Transactional
     public void sendBannerApproveNotification(Long memberNo, String bannerTitle,
@@ -1070,7 +1070,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-06 박유정 — 배너 신청 대기(노출예정) 알림 (사업자)
+    // 배너 신청 대기(노출예정) 알림 (사업자)
     @Override
     @Transactional
     public void sendBannerHoldNotification(Long memberNo, String bannerTitle,
@@ -1098,7 +1098,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-06 박유정 — 배너 신청 반려 알림 (사업자)
+    // 배너 신청 반려 알림 (사업자)
     @Override
     @Transactional
     public void sendBannerRejectNotification(Long memberNo, String bannerTitle,
@@ -1128,7 +1128,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // ========== 6. 알림함 조회/읽음/삭제 (CRUD) ==========
 
-    // 2026-07-09 장우철 — 알림함 목록 (TB_NOTIFICATION)
+    // 알림함 목록 (TB_NOTIFICATION)
     @Override
     @Transactional(readOnly = true)
     public List<MypageNotifyVO> getNotificationList(Long memberNo) {
@@ -1138,7 +1138,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         return mypageNotifyMapper.selectNotificationList(memberNo);
     }
 
-    // 2026-07-09 장우철 — 알림 상세 + 읽음 처리
+    // 알림 상세 + 읽음 처리
     @Override
     @Transactional
     public MypageNotifyVO getNotificationDetail(Long notiId, Long memberNo) {
@@ -1153,7 +1153,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         return noti;
     }
 
-    // 2026-07-10 장우철 — 알림함 전체 읽음
+    // 알림함 전체 읽음
     @Override
     @Transactional
     public int markAllNotificationsRead(Long memberNo) {
@@ -1163,7 +1163,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         return mypageNotifyMapper.updateAllNotificationRead(memberNo);
     }
 
-    // 2026-07-10 장우철 — 알림함 전체 삭제
+    // 알림함 전체 삭제
     @Override
     @Transactional
     public int deleteAllNotifications(Long memberNo) {
@@ -1173,7 +1173,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         return mypageNotifyMapper.deleteAllNotificationsByMemberNo(memberNo);
     }
 
-    // 2026/07/11 장우철 — 헤더 미읽음 알림 배지
+    // 헤더 미읽음 알림 배지
     @Override
     @Transactional(readOnly = true)
     public int countUnreadNotifications(Long memberNo) {
@@ -1201,7 +1201,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         return checkin + " ~ " + checkout;
     }
 
-    // 2026-08-11 박유정 — 숙소 환불 알림 일시 포맷
+    // 숙소 환불 알림 일시 포맷
     private String formatDateTime(java.util.Date date) {
         if (date == null) {
             return "-";
@@ -1228,7 +1228,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         return (s == null || s.isBlank()) ? "-" : s;
     }
 
-    // 2026-08-10 박유정 — 재능나눔 참여 신청 → 병원 알림
+    // 재능나눔 참여 신청 → 병원 알림
     @Override
     @Transactional
     public void sendTalentApplyToBizNotification(Long bizMemberNo, String talentTitle,
@@ -1250,7 +1250,7 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
         mypageNotifyMapper.insertNotification(vo);
     }
 
-    // 2026-08-10 박유정 — 재능나눔 확인 → 회원 알림
+    // 재능나눔 확인 → 회원 알림
     @Override
     @Transactional
     public void sendTalentApplyConfirmNotification(Long memberNo, String talentTitle,

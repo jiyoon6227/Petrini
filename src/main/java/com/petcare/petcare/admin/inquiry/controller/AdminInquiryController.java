@@ -1,6 +1,5 @@
 /**
  * 역할: 관리자 숙소 환불 신청 URL (2-7)
- * 2026/07/31 장우철
  */
 package com.petcare.petcare.admin.inquiry.controller;
 
@@ -97,7 +96,7 @@ public class AdminInquiryController extends AdminBaseController {
         return "redirect:/admin/inquiry/stay-refund/detail?inquiryId=" + inquiryId;
     }
 
-    // 2026-08-11 박유정 — 관리자 일반 1:1 문의
+    // 관리자 일반 1:1 문의
 
     /** 목록 */
     @GetMapping("/general")

@@ -1,6 +1,6 @@
 /**
  * 역할: 숙소 취소/환불 시 실결제액 산정 + 포인트·쿠폰 복구
- * 2026/08/07 장우철 — TOTAL_AMOUNT 대신 PAY_AMOUNT 기준 환불, 혜택 복구
+ * TOTAL_AMOUNT 대신 PAY_AMOUNT 기준 환불, 혜택 복구
  */
 package com.petcare.petcare.stay.service;
 

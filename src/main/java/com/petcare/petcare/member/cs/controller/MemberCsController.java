@@ -34,7 +34,7 @@ public class MemberCsController {
         return "member/cs";
     }
 
-    // 2026/08/11 장우철 — 공지 상세: noticeId만 넘기면 JSP에서 비어 보임 → 노출 공지 조회
+    // 공지 상세: noticeId만 넘기면 JSP에서 비어 보임 → 노출 공지 조회
     @GetMapping("/member/cs/notice")
     public String csNotice(@RequestParam(defaultValue = "1") String id, Model model) {
         Long noticeId = null;

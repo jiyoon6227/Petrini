@@ -137,7 +137,6 @@
         </c:if>
 
         <form action="${contextPath}/member/cs/inquiry/write" method="post">
-            <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
             
             <c:if test="${stayRefund}">

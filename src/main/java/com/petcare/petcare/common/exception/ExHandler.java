@@ -1,8 +1,6 @@
 /**
  * 역할: 전역 예외 처리 (@ControllerAdvice)
  *
- * - 박유정 / 2026-07-09
- *
  * [예외 처리 흐름]
  * 1. Ajax API 요청 (/like/toggle 등) → JSON "error" 반환
  * 2. 일반 페이지 요청 → redirect (커뮤니티는 /community?error=server)

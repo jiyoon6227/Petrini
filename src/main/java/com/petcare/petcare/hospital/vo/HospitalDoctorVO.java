@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class HospitalDoctorVO {
 
-    // 2026/07/16 장우철 고도화작업 — 의사 VO
+    // 의사 VO
     private Long doctorId;
     private Long hospitalId;
     private String doctorName;

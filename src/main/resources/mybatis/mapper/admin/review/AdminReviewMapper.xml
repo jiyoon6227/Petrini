@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--
-  2026-07-24 박유정 — 관리자 리뷰 삭제 요청 (병원·숙소)
-  2026/08/11 장우철 — 쇼핑(TB_REVIEW_REPORT BIZ) 삭제요청 UNION 통합
+  관리자 리뷰 삭제 요청 (병원·숙소)
+  쇼핑(TB_REVIEW_REPORT BIZ) 삭제요청 UNION 통합
 -->
 <mapper namespace="com.petcare.petcare.admin.review.mapper.AdminReviewMapper">
 
@@ -197,7 +197,7 @@
    WHERE DR.REQUEST_ID = #{requestId}
   </select>
 
-  <!-- 2026/08/11 장우철 — 쇼핑 삭제요청 단건 -->
+  <!-- 쇼핑 삭제요청 단건 -->
   <select id="selectAdminStoreReviewReportDetail"
           resultType="com.petcare.petcare.admin.review.vo.AdminReviewDeleteRequestVO">
     SELECT

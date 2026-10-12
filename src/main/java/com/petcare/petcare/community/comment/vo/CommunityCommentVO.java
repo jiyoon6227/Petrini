@@ -1,8 +1,6 @@
 /**
  * 역할: 게시글 댓글 데이터 객체
  *
- * - 박유정 / 2026-07-09
- *
  * 담당 화면
  * - community/detail.jsp      커뮤니티 게시글 상세 댓글
  * - give/report/detail.jsp   분실·보호 신고 상세 댓글
@@ -34,7 +32,7 @@ public class CommunityCommentVO {
 
     // JOIN TB_MEMBER — 화면 표시용
     private String nickname;       // NICKNAME — 작성자 닉네임
-    //2026/08/06 장우철 — 댓글 아바타용 프로필 사진
+    // 댓글 아바타용 프로필 사진
     private String profileImgUrl;  // PROFILE_IMG_URL — TB_MEMBER
 
     // 대댓글 목록 — getCommentList() 에서 parentId 기준으로 묶음

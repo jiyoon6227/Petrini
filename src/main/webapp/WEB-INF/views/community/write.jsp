@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%--
-  - 박유정 / 2026-07-09
   - 게시글 작성 화면
 
   [작성 화면 흐름]
@@ -12,7 +11,7 @@
   [form 필드]
   - boardType : TOWN / SHARE / LIFE
   - title, body, photos(최대 5장)
-  2026-08-13 박유정 — 선택 이미지 미리보기 + X 삭제 (5장 제한)
+  선택 이미지 미리보기 + X 삭제 (5장 제한)
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -49,7 +48,6 @@
 <form method="post"
       action="${contextPath}/community/write"
       enctype="multipart/form-data">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
   
 <div class="write-wrap">
@@ -60,7 +58,7 @@
   <c:if test="${param.error eq 'save'}">
     <div class="write-error">등록에 실패했습니다. 잠시 후 다시 시도해 주세요. (이미지 용량·로그인 계정도 확인해 주세요)</div>
   </c:if>
-  <%-- 2026/08/10 장우철 — @Valid 글자수 등 검증 실패 메시지 --%>
+  <%-- @Valid 글자수 등 검증 실패 메시지 --%>
   <c:if test="${not empty validationMessage}">
     <div class="write-error">${validationMessage}</div>
   </c:if>
@@ -97,7 +95,7 @@
     <label>이미지 첨부 (최대 5장)</label>
     <p class="write-photo-count" id="write-photo-count"></p>
 
-    <%-- 2026-08-13 박유정 — 선택 이미지 미리보기 + X 삭제 --%>
+    <%-- 선택 이미지 미리보기 + X 삭제 --%>
     <div class="write-photo-list" id="write-photo-preview"></div>
 
     <label class="write-img-upload" id="photo-upload-btn" style="cursor:pointer">
@@ -116,7 +114,7 @@
 
 <script>
 (function () {
-  // 2026-08-13 박유정 — 이미지 미리보기 + X 삭제 + 5장 제한
+  // 이미지 미리보기 + X 삭제 + 5장 제한
   var MAX = 5;
   var section = document.getElementById('write-photo-section');
   if (!section) return;
@@ -206,7 +204,7 @@
       alert('사진은 최대 ' + MAX + '장까지입니다. (' + allowed + '장만 추가됩니다)');
     }
 
-    // 2026/08/14 장우철 — value='' 를 sync 뒤에 두면 DataTransfer로 넣은 files가 비워져 서버에 사진이 안 감
+    // value='' 를 sync 뒤에 두면 DataTransfer로 넣은 files가 비워져 서버에 사진이 안 감
     this.value = '';
     syncInputFiles();
     renderPreviews();

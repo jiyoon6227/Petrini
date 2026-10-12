@@ -1,7 +1,7 @@
 /**
  * 역할: 회원 로그인·가입 URL 처리 → Service 호출 → JSP/리다이렉트 반환
  *
- * - 박유정 / 2026-07-22 — 정지 회원 로그인 후 /member/cs 리다이렉트, 탈퇴 로그인 메시지
+ * - 정지 회원 로그인 후 /member/cs 리다이렉트, 탈퇴 로그인 메시지
  *
  * 연결
  * - Service: MemberAuthService
@@ -44,20 +44,20 @@ import jakarta.servlet.http.HttpSession;
 @Controller("memberController")
 public class MemberAuthController {
 
-    //HYJ 26.07.15 카카오로그인
+    // 카카오로그인
     @Autowired
     KakaoOAuthService kakaoOAuthService;
 
-    //HYJ 26.07.15 이메일 인증
+    // 이메일 인증
     @Autowired
     EmailService emailService;    
 
     private final MemberAuthService memberAuthService;
 
-    // 2026/07/27 장우철 — 가입 중 등록한 pending 카드를 가입 완료 시 DB 저장
+    // 가입 중 등록한 pending 카드를 가입 완료 시 DB 저장
     private final BillingCardService billingCardService;
 
-	//HYJ 26.07.15 카카오 로그인 추가
+	// 카카오 로그인
     public MemberAuthController(MemberAuthService memberAuthService,
                                 KakaoOAuthService kakaoOAuthService,
                                 BillingCardService billingCardService) {
@@ -66,7 +66,7 @@ public class MemberAuthController {
         this.billingCardService = billingCardService;
     }
 
-    // 2026/07/06 장우철 — login(로그인)
+    // login(로그인)
 
     /** login — 화면 (GET /login) */
     @GetMapping("/login")
@@ -87,7 +87,7 @@ public class MemberAuthController {
             return "redirect:/login?error=empty";
         }
 
-        // HYJ 26.08.06 잠금 상태 확인 — 5회 실패 후 30분간 차단
+        // 잠금 상태 확인 — 5회 실패 후 30분간 차단
         if (LoginAttemptUtil.isLocked(loginId)) {
             long remaining = LoginAttemptUtil.getRemainingLockMinutes(loginId);
             return "redirect:/login?error=locked&minutes=" + remaining;
@@ -97,25 +97,22 @@ public class MemberAuthController {
         try {
             MemberVO member = memberAuthService.login(loginId, loginPw);
             if (member == null) {
-                //HYJ 26.08.06 실패 기록
+                // 실패 기록
                 LoginAttemptUtil.recordFailure(loginId);
                 int remaining = LoginAttemptUtil.getRemainingAttempts(loginId);
                 if (remaining == 0) {
                     return "redirect:/login?error=locked&minutes=30";
                 }
                 return "redirect:/login?error=invalid&remaining=" + remaining;
-                
-                // 회원 없음 / 비밀번호 틀림 → error=invalid
-                // return "redirect:/login?error=invalid";
             }
 
-            // HYJ 26.08.06 성공 시 실패 기록 초기화
+            // 성공 시 실패 기록 초기화
             LoginAttemptUtil.resetAttempts(loginId);
 
             // [3] 로그인 성공 — 세션에 회원 정보 저장 (header.jsp에서 memberInfo로 로그아웃 표시)
             session.setAttribute("memberInfo", member);
 
-            // 2026-07-22 박유정 — 정지 회원은 고객센터로
+            // 정지 회원은 고객센터로
             if("SUSPENDED".equals(member.getStatus())) {
                 return "redirect:/member/cs";
             }
@@ -127,45 +124,13 @@ public class MemberAuthController {
             }
             return "redirect:/";
         } catch (MemberLoginBlockedException e) {
-            // 2026-07-22 박유정 — 정지·탈퇴 회원 전용 메시지
+            // 정지·탈퇴 회원 전용 메시지
             return "redirect:/login?error=" + mapLoginBlockedError(e.getErrorCode());
         }
-
-        /* ── [변경 전] 더미 로그인 ──
-         * DB·비밀번호 검증 없이 입력한 이메일만으로 세션을 만들던 코드
-         * 변경 이유: TB_MEMBER 실데이터 + BCrypt 검증으로 전환, 로직은 Service로 분리
-         *
-        String id = loginId.trim();
-
-        MemberVO member = new MemberVO();
-        member.setMemberId(id);
-        member.setEmail(id);
-        member.setMemberName(resolveDisplayName(id));
-        member.setRole("USER");
-        session.setAttribute("memberInfo", member);
-
-        if (redirect != null && !redirect.isBlank() && redirect.startsWith("/") && !redirect.startsWith("//")) {
-            return "redirect:" + redirect;
-        }
-        return "redirect:/";
-         */
     }
 
-    /* ── [변경 전] resolveDisplayName ──
-     * 더미 로그인 때 이메일 @ 앞 문자열을 이름으로 쓰던 헬퍼
-     * 변경 이유: DB에서 MEMBER_NAME, NICKNAME을 조회하므로 불필요
-     *
-    private String resolveDisplayName(String loginId) {
-        int at = loginId.indexOf('@');
-        if (at > 0) {
-            return loginId.substring(0, at);
-        }
-        return loginId;
-    }
-     */
-
-   // HYJ 26.07.15 — 카카오 로그인
-    // 2026/08/18 장우철 — 로그인(/oauth/kakao/login) vs 회원가입(/oauth/kakao/signup) intent 분리
+   // 카카오 로그인
+    // 로그인(/oauth/kakao/login) vs 회원가입(/oauth/kakao/signup) intent 분리
 
     /** 세션 키 — 카카오 OAuth 진입 경로 (login | signup) */
     public static final String SESSION_KAKAO_INTENT = "kakaoIntent";
@@ -183,7 +148,7 @@ public class MemberAuthController {
 
     /**
      * 카카오 연동 회원가입 — join.jsp 전용 (미가입 시 kakaoUserInfo 담아 /join)
-     * 2026/08/18 장우철 — 가입 진입 시에만 memberInfo 제거 (이전 로그인 잔존으로 가입 폼이 가려지지 않게)
+     * 가입 진입 시에만 memberInfo 제거 (이전 로그인 잔존으로 가입 폼이 가려지지 않게)
      */
     @GetMapping("/oauth/kakao/signup")
     public String kakaoSignup(HttpSession session) {
@@ -194,7 +159,7 @@ public class MemberAuthController {
 
     /**
      * 카카오 콜백 — 인가 코드 수신 → 토큰 교환 → 사용자 정보 → intent 에 따라 분기
-     * 2026/08/18 장우철 — 카카오가 돌려주는 state 를 우선 사용 (세션 intent 유실 시 로그인으로 오인 방지)
+     * 카카오가 돌려주는 state 를 우선 사용 (세션 intent 유실 시 로그인으로 오인 방지)
      */
     @GetMapping("/oauth/kakao/callback")
     public String kakaoCallback(
@@ -265,7 +230,7 @@ public class MemberAuthController {
     
     /**
      * join — 화면 (GET /join)
-     * 2026/07/27 장우철 — card=ok|fail(토스 복귀)가 아니면 임시저장·pending 카드 폐기
+     * card=ok|fail(토스 복귀)가 아니면 임시저장·pending 카드 폐기
      * → 다른 페이지 갔다가 다시 들어오면 처음부터
      * card=ok 이면 pending 카드 라벨을 모델에 넣어 JSP가 바로 「등록됨」 표시
      */
@@ -278,7 +243,7 @@ public class MemberAuthController {
             session.removeAttribute(SESSION_JOIN_DRAFT);
             session.removeAttribute(BillingCardController.SESSION_PENDING_CARD);
         } else if ("ok".equals(card)) {
-            // 2026/07/27 장우철 — Ajax race 전에 화면에 카드정보 표시
+            // Ajax race 전에 화면에 카드정보 표시
             BillingIssueResultVO pending = (BillingIssueResultVO) session.getAttribute(
                     BillingCardController.SESSION_PENDING_CARD);
             if (pending != null) {
@@ -291,7 +256,7 @@ public class MemberAuthController {
     }
 
     // =========================================================================
-    // 2026/07/27 장우철 — join 세션 임시저장 (토스 카드등록 왕복용)
+    // join 세션 임시저장 (토스 카드등록 왕복용)
     // =========================================================================
 
     /** 세션 키 — JoinDraftVO */
@@ -328,7 +293,7 @@ public class MemberAuthController {
 
     /**
      * join — 폼 임시저장 조회 (GET /join/draft)
-     * 2026/07/27 장우철 — 토스 복귀(card=ok|fail)일 때만 draft 반환, 그 외 null
+     * 토스 복귀(card=ok|fail)일 때만 draft 반환, 그 외 null
      */
     @GetMapping("/join/draft")
     @ResponseBody
@@ -346,7 +311,7 @@ public class MemberAuthController {
         return res;
     }
 
-    // 2026/07/07 장우철 — join(회원가입)
+    // join(회원가입)
 
     /**
      * join — 이메일 중복 확인 (GET /join/check-email)
@@ -368,7 +333,7 @@ public class MemberAuthController {
         return memberAuthService.checkMemberId(id);
     }
 
-       // 2026/07/15 — 이메일 인증
+       // 이메일 인증
 
     /**
      * join — 인증번호 발송 (POST /join/send-code)
@@ -447,7 +412,7 @@ public class MemberAuthController {
      * join — 가입 처리 (POST /join)
      * join.jsp [가입 완료] FormData → MemberRegisterVO 자동 매핑
      * 성공: "OK" / 실패: "ERROR:코드" (join.jsp 에서 분기 — JSP 수정은 직접 적용)
-     * HYJ 26.07.15 — 카카오 → 회원가입 흐름: 가입 성공 후 세션의 kakaoUserInfo 로 SOCIAL_ID 연동
+     * 카카오 → 회원가입 흐름: 가입 성공 후 세션의 kakaoUserInfo 로 SOCIAL_ID 연동
      */
     @PostMapping("/join")
     @ResponseBody
@@ -460,7 +425,7 @@ public class MemberAuthController {
         if (kakaoUser != null) {
             vo.setSocialId(kakaoUser.getKakaoId());
         }
-        // 2026/08/11 장우철 — Step3 펫 성별(petGender)·대표사진(petPhoto) 저장
+        // Step3 펫 성별(petGender)·대표사진(petPhoto) 저장
         String error = memberAuthService.register(vo, petPhoto);
         if (error != null) {
             return "ERROR:" + error;
@@ -476,7 +441,7 @@ public class MemberAuthController {
             }
             session.removeAttribute(BillingCardController.SESSION_PENDING_CARD);
         }
-        // 2026/07/27 장우철 — 가입 성공 시 임시저장·이메일인증 세션 정리
+        // 가입 성공 시 임시저장·이메일인증 세션 정리
         session.removeAttribute(SESSION_JOIN_DRAFT);
         session.removeAttribute("emailVerified");
         session.removeAttribute("emailVerifiedAddr");
@@ -488,7 +453,7 @@ public class MemberAuthController {
         return "OK";
     }
 
-    // 2026/07/06 장우철 — login(로그아웃)
+    // login(로그아웃)
 
     // ── 로그아웃 ──
     // 서버 세션만 제거 (브라우저 자동로그인용 sessionStorage는 login.jsp에서 별도 처리 예정)
@@ -498,7 +463,7 @@ public class MemberAuthController {
         return "redirect:/";
     }
 
-    // 2026-07-22 박유정 — STATUS_CD → login.jsp error 파라미터
+    // STATUS_CD → login.jsp error 파라미터
     private String mapLoginBlockedError(String statusCd) {
         if ("SUSPENDED".equals(statusCd)) {
             return "suspended";

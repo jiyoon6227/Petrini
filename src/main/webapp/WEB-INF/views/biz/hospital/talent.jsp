@@ -2,7 +2,6 @@
 <%--
   역할: 사업자(병원) 재능나눔 신청 (biz/hospital/talent)
 
-  - 박유정 / 2026-07-14 STEP 4
 
   [화면 흐름]
   1. GET /biz/hospital/talent → ${talentList} 이력 + 신청 폼
@@ -52,7 +51,7 @@
 </style>
 <main class="biz-main">
   <c:if test="${not empty msg}">
-    <%-- 2026-07-14 박유정 — 신청 성공 flash (BizHospitalController POST redirect) --%>
+    <%-- 신청 성공 flash (BizHospitalController POST redirect) --%>
     <div style="margin-bottom:12px;padding:12px 16px;background:#E8F8F1;color:#1F8464;border-radius:8px;font-size:14px;font-weight:600">${msg}</div>
   </c:if>
   <c:if test="${not empty errorMsg}">
@@ -79,9 +78,8 @@
     </div>
     <div class="bt-section">
       <div class="bt-stitle"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>재능나눔 신청서</div>
-      <%-- 2026-07-14 박유정 STEP 4 — POST /biz/hospital/talent (talentType=HOSPITAL 고정) --%>
+      <%-- POST /biz/hospital/talent (talentType=HOSPITAL 고정) --%>
       <form method="post" action="${contextPath}/biz/hospital/talent" enctype="multipart/form-data">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         <div class="bt-grid">
           <div class="bt-group full"><label>재능나눔 제목 <span class="req">*</span></label><input type="text" name="title" required value="${memberInfo.memberName} 무료 진료 재능나눔"></div>
@@ -94,7 +92,7 @@
           <div class="bt-group full"><label>상세 설명 <span class="req">*</span></label><textarea name="body" required placeholder="제공 서비스 내용, 신청 방법, 대상 동물, 주의사항 등을 작성해 주세요."></textarea></div>
           <div class="bt-group full">
             <label>대표 이미지</label>
-            <%-- 2026-08-10 박유정 — FileService 업로드 연동 (선택, 최대 10MB) --%>
+            <%-- FileService 업로드 연동 (선택, 최대 10MB) --%>
             <label class="bt-img-box" id="talentThumbBox" for="talentThumbInput">
               <input type="file" name="thumbImage" id="talentThumbInput" accept="image/jpeg,image/png,image/webp,image/*" style="display:none">
               <span id="talentThumbPlaceholder">
@@ -112,7 +110,7 @@
         </div>
       </form>
     </div>
-    <%-- 2026-08-10 박유정 — STEP 6: 참여 신청자 목록 + 확인 --%>
+    <%-- 참여 신청자 목록 + 확인 --%>
     <div class="bt-section">
       <div class="bt-stitle">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
@@ -185,7 +183,7 @@
         </tbody>
       </table>
     </div>
-    <%-- 2026-07-14 박유정 — 사업자 본인 재능나눔 이력 (getTalentListByBizId) --%>
+    <%-- 사업자 본인 재능나눔 이력 (getTalentListByBizId) --%>
     <div class="bt-section">
       <div class="bt-stitle">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -235,7 +233,7 @@
                     </c:choose>
                   </td>
                   <td>
-                    <%-- 2026-08-10 박유정 — 게시 중일 때만 수동 모집 마감 --%>
+                    <%-- 게시 중일 때만 수동 모집 마감 --%>
                     <c:if test="${item.statusCd eq 'APPROVED'}">
                       <form method="post" action="${contextPath}/biz/hospital/talent/close" style="display:inline">
                         <input type="hidden" name="_csrf" value="${_csrf}">

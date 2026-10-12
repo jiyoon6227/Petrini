@@ -30,18 +30,18 @@ import com.petcare.petcare.mypage.notify.service.MypageNotifyService;
 @Service
 public class MypageOrderServiceImpl implements MypageOrderService {
 
-    //지윤 26.07.23 추가: 취소신청 시 사업자에게 알림 보내기 위함
+    // 취소신청 시 사업자 알림용
     @Autowired
     private MypageNotifyService mypageNotifyService;
 
     @Autowired
     private MypageOrderMapper mypageOrderMapper;
 
-    //지윤 26.07.20 추가: 리뷰 사진 첨부용 (biz 상품이미지 업로드와 동일한 서비스 재사용)
+    // 리뷰 사진 첨부용 (biz 상품이미지 업로드와 동일한 서비스 재사용)
     @Autowired
     private FileService fileService;
 
-    //지윤 26.07.20 추가: 주문 목록 조회 + 주문마다 상품목록도 같이 채워넣음 (화면에서 카드 하나에 상품 여러 개 보여줘야 해서)
+    // 주문 목록 조회 + 주문별 상품목록 채우기 (카드 하나에 상품 여러 개 표시)
   @Override
     public List<MypageOrderVO> getOrderList(Long memberNo, String statusCd) {
         List<MypageOrderVO> list = mypageOrderMapper.selectOrderList(memberNo, statusCd);
@@ -52,21 +52,21 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         return list;
     }
 
-   //지윤 26.07.20 수정: 사진 첨부 처리 추가. 리뷰 등록 성공하면 REVIEW_ID 재조회해서 이미지마다 FileService로 저장
-    //지윤 26.07.28 수정: 50자 미만이라고 등록 자체를 막던 것 -> 절대 최소치(10자)만 등록 차단하도록 완화.
+   // 사진 첨부: 리뷰 등록 성공 시 REVIEW_ID 재조회 후 이미지별 FileService 저장
+    // 절대 최소치(10자) 미만만 등록 차단
     //10자 이상~REVIEW_MIN_LENGTH(정책값, 기본 50) 미만이면 등록은 허용하되 포인트는 지급 안 함(0 반환).
     //정상적으로 등록됐는데 포인트가 0인 경우와, 아예 등록 실패(null)를 구분해야 해서 반환값 의미가 달라짐:
     //null = 등록 자체 실패(10자 미만/본인주문아님/중복작성), 0 이상 숫자 = 등록 성공(지급 포인트, 0일 수도 있음)
     @Override
     public Integer writeReview(Long memberNo, Long orderItemId, Double rating, String content,
                                 List<MultipartFile> images) throws Exception {
-        final int ABSOLUTE_MIN_LENGTH = 10; //지윤 26.07.28 추가: 이 밑으로는 포인트 여부와 무관하게 등록 자체를 차단하는 절대 최소치
+        final int ABSOLUTE_MIN_LENGTH = 10; // 포인트 여부와 무관하게 등록을 차단하는 절대 최소 글자 수
         int pointMinLength = Integer.parseInt(mypageOrderMapper.selectPolicyValue("REVIEW_MIN_LENGTH"));
         if (content == null || content.trim().length() < ABSOLUTE_MIN_LENGTH) {
             return null;
         }
 
-        // 2026/08/13 장우철 — INSERT에서 구매확정·환불상태 검증. 미확정/환불건은 0건
+        // INSERT에서 구매확정·환불상태 검증. 미확정/환불건은 0건
         int inserted = mypageOrderMapper.insertProductReview(orderItemId, memberNo, rating, content);
         if (inserted == 0) return null;
 
@@ -81,7 +81,7 @@ public class MypageOrderServiceImpl implements MypageOrderService {
             }
         }
 
-        //지윤 26.07.28 추가: 포인트 지급 최소 글자수(정책값)를 못 채웠으면 등록은 되지만 포인트는 0으로 처리
+        // 포인트 지급 최소 글자수(정책값) 미달 시 등록은 하되 포인트 0
         if (content.trim().length() < pointMinLength) {
             return 0;
         }
@@ -96,7 +96,7 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         return earnPoint;
     }
 
-    //지윤 26.07.20 추가: 주문상세보기 1건 + 상품목록 (본인 주문 아니면 null 그대로 반환)
+    // 주문상세보기 1건 + 상품목록 (본인 주문 아니면 null 그대로 반환)
     @Override
     public MypageOrderVO getOrderDetail(Long memberNo, Long orderId) {
         MypageOrderVO order = mypageOrderMapper.selectOrderDetail(orderId, memberNo);
@@ -107,7 +107,7 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         return order;
     }
 
-    //지윤 26.07.30 추가: 같은 결제(orderGroupId)로 묶인 사업자별 주문을 전부 모아서 반환.
+    // 같은 결제(orderGroupId)로 묶인 사업자별 주문을 전부 모아서 반환.
     //클릭한 orderId가 그룹에 속하지 않는(orderGroupId가 없는) 예전 단일주문 데이터면, 그 주문 하나만 담긴 리스트로 대체함
     @Override
     public java.util.List<MypageOrderVO> getOrderGroupDetail(Long memberNo, Long orderId) {
@@ -129,7 +129,7 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         return group;
     }
 
-    // 2026/08/13 장우철 — #7: 전부환불완료/부분환불/환불진행중 뱃지
+    // 전부환불완료/부분환불/환불진행중 뱃지
     private void fillStatusBadge(MypageOrderVO o) {
         if (o == null) {
             return;
@@ -178,8 +178,8 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         o.setStatusBadge(o.getOrderStatus());
     }
 
-//지윤 26.07.22 추가: 주문취소 신청 (실제 조건 체크는 매퍼 UPDATE의 WHERE절에서 함, 여기선 결과만 판단)
-    //지윤 26.07.23 수정: 성공하면 사업자에게 알림도 같이 전송
+// 주문취소 신청 (조건 체크는 매퍼 UPDATE의 WHERE절, 여기선 결과만 판단)
+    // 성공 시 사업자 알림 전송
     @Override
     public boolean requestCancel(Long memberNo, Long orderId, String reason) {
         int updated = mypageOrderMapper.requestCancel(orderId, memberNo, reason);
@@ -191,8 +191,8 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         return updated > 0;
     }
 
-    //지윤 26.07.23 추가: 구매확정 처리 (DONE 상태 주문만, 정책 % 적립)
-    // 2026/08/04 장우철 — 부분 확정: 환불중/완료 상품 제외, 확정 대상 TOTAL_PRICE 합계 기준 적립
+    // 구매확정 처리 (DONE 상태 주문만, 정책 % 적립)
+    // 부분 확정: 환불중/완료 상품 제외, 확정 대상 TOTAL_PRICE 합계 기준 적립
     @Override
     public Integer confirmPurchase(Long memberNo, Long orderId) {
         int confirmableAmount = mypageOrderMapper.selectConfirmableItemsAmount(orderId);
@@ -214,13 +214,13 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         return earnPoint;
     }
 
-    // 2026/08/04 장우철 — 환불 가능 상품 조회
+    // 환불 가능 상품 조회
     @Override
     public MypageOrderItemVO getRefundableItem(Long memberNo, Long orderItemId) {
         return mypageOrderMapper.selectRefundableItem(orderItemId, memberNo);
     }
 
-    // 2026/08/13 장우철 — 반송비 3,000원 기록 (단순변심 USER 선불·환불 미차감 / 상품이상 BIZ 환급)
+    // 반송비 3,000원 기록 (단순변심 USER 선불·환불 미차감 / 상품이상 BIZ 환급)
     private static final int RETURN_FEE_FIXED = 3000;
 
     @Override

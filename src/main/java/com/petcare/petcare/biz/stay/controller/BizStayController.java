@@ -72,15 +72,15 @@ public class BizStayController extends BizBaseController {
     private ObjectMapper objectMapper;
     @Autowired
     private FileService fileService;
-    // 2026/07/30 장우철 — 숙소 정산 요약/목록
+    // 숙소 정산 요약/목록
     @Autowired
     private StaySettlementService staySettlementService;
-    // 2026/08/06 장우철 — 정산계좌(TB_BUSINESS.SETTLE_*)는 쇼핑과 동일 테이블·서비스 재사용
+    // 정산계좌(TB_BUSINESS.SETTLE_*)는 쇼핑과 동일 테이블·서비스 재사용
     @Autowired
     private BizStoreService bizStoreService;
 
-    // 2026-07-14 — 사이드바 예약관리 배지: PENDING 건수
-    // 2026-07-28 박유정 — PENDING + CONFIRMED 합산 (BizStayMapper.countPendingReservations)
+    // 사이드바 예약관리 배지: PENDING 건수
+    // PENDING + CONFIRMED 합산 (BizStayMapper.countPendingReservations)
     @ModelAttribute("pendingReserveCount")
     public int pendingReserveCount(HttpSession session) {
         try {
@@ -94,7 +94,7 @@ public class BizStayController extends BizBaseController {
         }
     }
 
-    // 2026-07-14 — 사이드바 캘린더 배지: 오늘 체크인 CONFIRMED 건수
+    // 사이드바 캘린더 배지: 오늘 체크인 CONFIRMED 건수
     @ModelAttribute("todayConfirmedCount")
     public int todayConfirmedCount(HttpSession session) {
         try {
@@ -108,7 +108,7 @@ public class BizStayController extends BizBaseController {
         }
     }
 
-    // 2026-08-11 박유정 — 사이드바 환불신청 배지: 대기 건수
+    // 사이드바 환불신청 배지: 대기 건수
     @ModelAttribute("stayRefundRequestCount")
     public int stayRefundRequestCount(HttpSession session) {
         try {
@@ -128,7 +128,7 @@ public class BizStayController extends BizBaseController {
         if (member == null) 
             return "redirect:/login";
 
-        //HYJ 26.08.06 대시보드
+        // 대시보드
         StayVO stay = bizStayService.resolveStayByBizId(member.getMemberId());
         if (stay == null || stay.getStayId() == null) {
             return "redirect:/mypage/biz";
@@ -142,7 +142,7 @@ public class BizStayController extends BizBaseController {
         return "biz/stay/dashboard";
     }
 
-    // 2026-07-14 — 사업자 숙소 예약 관리 (DB 연동)
+    // 사업자 숙소 예약 관리 (DB 연동)
     @GetMapping("/reserve")
     public String stayReserve(HttpSession session, Model model) throws Exception {
         MemberVO member = getBizMember(session);
@@ -159,7 +159,7 @@ public class BizStayController extends BizBaseController {
         return "biz/stay/reserve";
     }
 
-    // 2026-07-14 — 사업자 숙소 예약 상태 변경
+    // 사업자 숙소 예약 상태 변경
     @PostMapping("/reserve/status")
     public String updateReservationStatus(@RequestParam("resvId") Long resvId,
                                           @RequestParam("statusCd") String statusCd,
@@ -188,7 +188,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/reserve";
     }
 
-    // 2026-07-14 — 사업자 숙소 예약 상세 모달 API
+    // 사업자 숙소 예약 상세 모달 API
     @GetMapping("/reserve/detail")
     @ResponseBody
     public ReservationVO reservationDetail(@RequestParam("resvId") Long resvId,
@@ -202,7 +202,7 @@ public class BizStayController extends BizBaseController {
         return bizStayService.getReservationDetail(stay.getStayId(), resvId);
     }
 
-    // 2026-07-14 — 사업자 숙소 예약 캘린더 (DB 연동)
+    // 사업자 숙소 예약 캘린더 (DB 연동)
     @GetMapping("/calendar")
     public String stayCalendar(@RequestParam(value = "from", required = false) String fromDate,
                                @RequestParam(value = "to", required = false) String toDate,
@@ -229,7 +229,7 @@ public class BizStayController extends BizBaseController {
         return "biz/stay/calendar";
     }
 
-    // 2026-08-11 박유정 — 사업자 숙소 환불신청 목록 (조회 전용, 승인은 관리자)
+    // 사업자 숙소 환불신청 목록 (조회 전용, 승인은 관리자)
     @GetMapping("/refunds")
     public String stayRefunds(HttpSession session, Model model,
                               @RequestParam(value = "status", defaultValue = "WAIT") String status) {
@@ -253,7 +253,7 @@ public class BizStayController extends BizBaseController {
         return "biz/stay/refunds";
     }
 
-    // 2026-07-28 박유정 — 사업자 숙소 리뷰관리 (DB 목록 → JSP JSON)
+    // 사업자 숙소 리뷰관리 (DB 목록 → JSP JSON)
     @GetMapping("/reviews")
     public String stayReviews(HttpSession session, Model model) throws Exception {
 
@@ -275,14 +275,14 @@ public class BizStayController extends BizBaseController {
 
     // ═══════════════════════════════════════
     // ③ DB에서 리뷰 목록 조회
-    // 2026-07-27 박유정 — TB_REVIEW(STAY) 사업자 숙소 리뷰
+    // TB_REVIEW(STAY) 사업자 숙소 리뷰
     // ═══════════════════════════════════════
     List<StayReviewVO> reviewList =
             bizStayService.getBizStayReviews(stay.getStayId());
 
     // ═══════════════════════════════════════
     // ④ DB에서 삭제 요청 목록 조회
-    // 2026-07-27 박유정 — TB_REVIEW_DELETE_REQUEST (bizNo 기준)
+    // TB_REVIEW_DELETE_REQUEST (bizNo 기준)
     // ═══════════════════════════════════════
     List<ReviewDeleteRequestVO> deleteRequests = List.of();
     if (stay.getBizNo() != null) {
@@ -292,7 +292,7 @@ public class BizStayController extends BizBaseController {
 
     // ═══════════════════════════════════════
     // ⑤ "삭제 요청 대기 중"인 리뷰 ID 모으기
-    // 2026-07-27 박유정 — PENDING 건은 답글·삭제요청 버튼 숨김용
+    // PENDING 건은 답글·삭제요청 버튼 숨김용
     // ═══════════════════════════════════════
     Set<Long> pendingReviewIds = new HashSet<>();
     for (ReviewDeleteRequestVO dr : deleteRequests) {
@@ -303,7 +303,7 @@ public class BizStayController extends BizBaseController {
 
     // ═══════════════════════════════════════
     // ⑥ 리뷰 목록 → JSP용 Map 리스트로 변환
-    // 2026-07-27 박유정 — reviews.jsp var reviews (id/author/date/rating/content/reply/deleteRequestPending)
+    // reviews.jsp var reviews (id/author/date/rating/content/reply/deleteRequestPending)
     // ═══════════════════════════════════════
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     List<Map<String, Object>> rows = new ArrayList<>();
@@ -323,7 +323,7 @@ public class BizStayController extends BizBaseController {
 
     // ═══════════════════════════════════════
     // ⑦ 삭제 요청 목록 → JSP용 Map 리스트로 변환
-    // 2026-07-27 박유정 — reviews.jsp var deleteRequests (statusCd·reqDate·processDate 등)
+    // reviews.jsp var deleteRequests (statusCd·reqDate·processDate 등)
     // ═══════════════════════════════════════
     List<Map<String, Object>> deleteRows = new ArrayList<>();
 
@@ -345,7 +345,7 @@ public class BizStayController extends BizBaseController {
 
     // ═══════════════════════════════════════
     // ⑧ JSP에 데이터 넘기고 화면 반환
-    // 2026-07-27 박유정 — reviewListJson / deleteRequestListJson (ObjectMapper)
+    // reviewListJson / deleteRequestListJson (ObjectMapper)
     // ═══════════════════════════════════════
     model.addAttribute("stay", stay);
     model.addAttribute("reviewListJson", objectMapper.writeValueAsString(rows));
@@ -353,7 +353,7 @@ public class BizStayController extends BizBaseController {
     return "biz/stay/reviews";
 }
 
-// 2026-07-28 박유정 - 리뷰 답글 작성/수정
+// 리뷰 답글 작성/수정
     @PostMapping("/reviews/reply")
     public String saveReviewReply(@RequestParam("reviewId") Long reviewId,
                                   @RequestParam("bizReply") String bizReply,
@@ -376,7 +376,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/reviews";
     }
 
-// 2026-07-28 박유정 - 리뷰 삭제 요청
+// 리뷰 삭제 요청
     @PostMapping("/reviews/delete-request")
     public String requestReviewDelete(@RequestParam("reviewId") Long reviewId,
                                       @RequestParam("requestReason") String requestReason,
@@ -408,7 +408,7 @@ public class BizStayController extends BizBaseController {
             return "redirect:/login";
         return "biz/stay/contract";
     }
-/* 사업자(숙소) 정산관리 — 2026/07/30 장우철 2-1 요약 / 2-2 목록 */
+/* 사업자(숙소) 정산관리 — 요약 / 목록 */
     @GetMapping("/settlement")
     public String staySettlement(HttpSession session, Model model,
                                  @RequestParam(value = "month", required = false, defaultValue = "all") String month,
@@ -427,7 +427,7 @@ public class BizStayController extends BizBaseController {
         StaySettlementSummaryVO summary = staySettlementService.getStaySettlementSummary(bizNo);
         List<StaySettlementVO> settlements = staySettlementService.getStaySettlementList(bizNo, month, status);
         List<String> settleMonths = staySettlementService.getStaySettlementMonths(bizNo);
-        // 2026/07/30 장우철 — 4-1 중간정산 요청 폼용 객실 목록 (저장은 4-2)
+        // 중간정산 요청 폼용 객실 목록
         List<StayRoomVO> roomList = (stay.getStayId() != null)
                 ? bizStayService.getRoomList(stay.getStayId())
                 : java.util.Collections.emptyList();
@@ -439,7 +439,7 @@ public class BizStayController extends BizBaseController {
         model.addAttribute("filterMonth", month);
         model.addAttribute("filterStatus", status);
         model.addAttribute("roomList", roomList);
-        //2026/08/06 장우철 — 정산계좌 모달용 (숙소·쇼핑 공통 SETTLE_*)
+        // 정산계좌 모달용 (숙소·쇼핑 공통 SETTLE_*)
         BizInfoVO settleAcc = bizStoreService.getSettleAccount(bizNo);
         model.addAttribute("settleAccountInfo",
                 settleAcc != null ? settleAcc : new BizInfoVO());
@@ -447,7 +447,7 @@ public class BizStayController extends BizBaseController {
     }
 
     /**
-     * 2026/08/06 장우철 — 숙소 정산 계좌 변경
+     * 숙소 정산 계좌 변경
      * POST /biz/stay/settlement/account
      */
     @PostMapping("/settlement/account")
@@ -484,7 +484,7 @@ public class BizStayController extends BizBaseController {
     }
 
     /**
-     * 2026/07/30 장우철 — 2-4 정산 상세 ITEM JSON
+     * 정산 상세 ITEM JSON
      * GET /biz/stay/settlement/items?settleId=
      */
     @GetMapping("/settlement/items")
@@ -514,7 +514,7 @@ public class BizStayController extends BizBaseController {
     }
 
     /**
-     * 2026/07/30 장우철 — 4-2 중간정산 요청 저장
+     * 중간정산 요청 저장
      * POST /biz/stay/settlement/request
      * body: { requestScope, roomId?, targetEnd, requestMemo? }
      * TARGET_START 는 서버에서 해당 월 1일로 고정
@@ -587,7 +587,7 @@ public class BizStayController extends BizBaseController {
 
     }
 
-    /*사업자 숙소관리 메뉴 0702지윤*/
+    /*사업자 숙소관리 메뉴*/
     @GetMapping("/profile")
     public String stayLodge(HttpSession session, Model model) throws Exception {
         MemberVO member = getBizMember(session);
@@ -738,8 +738,8 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/rooms";
     }
     //
-    // HYJ 26.07.29 ── 쿠폰 신청 목록 ──
-    // 2026/08/01 장우철 — BIZ_MEMBER_NO = BIZ_NO
+    // ── 쿠폰 신청 목록 ──
+    // BIZ_MEMBER_NO = BIZ_NO
     //
     @GetMapping({"/coupon", "/coupon/"})
     public String couponList(HttpSession session, Model model) {
@@ -835,7 +835,7 @@ public class BizStayController extends BizBaseController {
         return "redirect:/biz/stay/coupon";
     }
 
-    // ── 쿠폰 조기 마감 POST (지윤 26.08.07, store closeCoupon과 동일 패턴) ──
+    // ── 쿠폰 조기 마감 POST (store closeCoupon과 동일 패턴) ──
     @PostMapping("/coupon/close")
     public String closeCoupon(@RequestParam Long couponId,
                               HttpSession session,
@@ -868,7 +868,7 @@ public class BizStayController extends BizBaseController {
     }
 
     //
-    //HYJ 26.07.31 배너신청
+    // 배너신청
     //
     // 배너 신청 목록 페이지
     @GetMapping("/banner")
@@ -912,7 +912,7 @@ public class BizStayController extends BizBaseController {
             banner.setTitle(title);
             banner.setLinkUrl(linkUrl);
             banner.setPositionCd(positionCd);
-            // 2026/08/01 장우철 — DDL VARCHAR2(YYYY-MM-DD), input type=date 값 그대로 저장
+            // DDL VARCHAR2(YYYY-MM-DD), input type=date 값 그대로 저장
             banner.setStartDate(startDate);
             banner.setEndDate(endDate);
             banner.setStatusCd("PENDING");
@@ -926,7 +926,7 @@ public class BizStayController extends BizBaseController {
         }
         return "redirect:/biz/stay/banner";
     }
-    // 2026-08-13 박유정 — 빈 숫자칸("") → null (Integer 바인딩 오류 방지)
+    // 빈 숫자칸("") → null (Integer 바인딩 오류 방지)
     @InitBinder
     public void initBinder(WebDataBinder binder) {
       binder.registerCustomEditor(Integer.class, new CustomNumberEditor(Integer.class, true));

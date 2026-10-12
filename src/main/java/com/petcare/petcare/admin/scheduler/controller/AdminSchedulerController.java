@@ -1,6 +1,6 @@
 /**
  * 역할: 관리자 스케줄러 수동 실행 (QA·디버깅)
- * 2026/08/12 장우철 — ADMIN + CSRF, 정산 2건은 정산관리 버튼 사용
+ * ADMIN + CSRF, 정산 2건은 정산관리 버튼 사용
  */
 package com.petcare.petcare.admin.scheduler.controller;
 

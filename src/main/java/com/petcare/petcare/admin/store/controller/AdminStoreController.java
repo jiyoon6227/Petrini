@@ -34,7 +34,7 @@ public class AdminStoreController extends AdminBaseController {
     @Autowired
     private AdminStoreService adminStoreService;
 
-    // 2026/08/11 장우철 — 리뷰관리 메뉴 제거, 사업자 리뷰(/admin/review/list)로 통합
+    // 리뷰관리 메뉴 제거, 사업자 리뷰(/admin/review/list)로 통합
     @GetMapping("/review-report")
     public String reviewReport() {
         return "redirect:/admin/review/list?statusCd=PENDING";
@@ -61,7 +61,7 @@ public class AdminStoreController extends AdminBaseController {
         return "redirect:/admin/review/list?statusCd=REJECTED";
     }
 
-    // ── ADMIN-02 상품 관리 (2026/08/11 장우철 — 전 사업자 실데이터) ──
+    // ── 상품 관리 (전 사업자 실데이터) ──
     @GetMapping("/product-list")
     public String productList(
             @RequestParam(required = false) String keyword,
@@ -87,7 +87,7 @@ public class AdminStoreController extends AdminBaseController {
         return "admin/store/product-list";
     }
 
-    // ── ADMIN-02 주문 관리 (2026/08/11 장우철 — 전 사업자 실데이터) ──
+    // ── 주문 관리 (전 사업자 실데이터) ──
     @GetMapping("/order-list")
     public String orderList(
             @RequestParam(required = false) String keyword,
@@ -112,9 +112,6 @@ public class AdminStoreController extends AdminBaseController {
         model.addAttribute("statusCd", statusCd);
         return "admin/store/order-list";
     }
-
-    // ── 상품 카테고리 관리 — 2026/08/11 장우철: 미사용(더미 카테고리만 사용) → 메뉴/라우트 제거
-    // @GetMapping("/category") 삭제
 
     @GetMapping("/order-detail")
     public String orderDetail(

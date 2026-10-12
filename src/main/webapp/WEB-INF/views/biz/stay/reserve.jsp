@@ -21,7 +21,7 @@
   .rv-row span:last-child{color:#1A1A2E;font-weight:600;text-align:right}
 </style>
 
-<%-- 2026-07-14 — 사업자(숙소) 예약 관리 DB 연동 --%>
+<%-- 사업자(숙소) 예약 관리 DB 연동 --%>
 <main class="biz-main">
   <div class="biz-page-head">
     <h1 class="biz-page-title">예약 관리</h1>
@@ -114,7 +114,7 @@
 
 <script>
   // 서버 데이터 → JS 배열
-  // 2026/08/06 장우철 — CSRF는 문자열로 보관 (UUID 미인용 삽입 시 스크립트 파싱 깨짐)
+  // CSRF는 문자열로 보관 (UUID 미인용 삽입 시 스크립트 파싱 깨짐)
   // meta 우선 (헤더에 항상 있음)
   var csrfToken = (document.querySelector('meta[name="_csrf"]') || {}).content
       || '<c:out value="${_csrf}"/>';

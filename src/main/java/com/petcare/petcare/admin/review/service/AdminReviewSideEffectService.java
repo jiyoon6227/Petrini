@@ -12,7 +12,7 @@ import com.petcare.petcare.mypage.notify.service.MypageNotifyService;
 import com.petcare.petcare.mypage.reserve.service.MypageReserveRatingService;
 
 /**
- * 2026-07-28 박유정 — 승인/반려 후 평점·알림 (별도 트랜잭션, 메인 처리와 분리)
+ * 승인/반려 후 평점·알림 (별도 트랜잭션, 메인 처리와 분리)
  */
 @Service
 public class AdminReviewSideEffectService {

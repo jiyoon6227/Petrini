@@ -1,7 +1,7 @@
 /**
  * 역할: 숙소 예약 자동 DONE 스케줄러
- * 2026/07/31 장우철 — CHECKOUT + 체크아웃일 경과 → DONE (하루 1회 의미, 감지 주기 1분)
- * 2026/08/07 장우철 — DONE 전환 시 회원 알림
+ * CHECKOUT + 체크아웃일 경과 → DONE (하루 1회 의미, 감지 주기 1분)
+ * DONE 전환 시 회원 알림
  */
 package com.petcare.petcare.stay.scheduler;
 
@@ -35,7 +35,7 @@ public class StayReservationScheduler {
     @Scheduled(cron = "0 * * * * *")
     public void autoCompleteStayReservations() {
         try {
-            // 2026/08/07 장우철 — UPDATE 전에 대상 조회 후 알림
+            // UPDATE 전에 대상 조회 후 알림
             List<ReservationVO> dueList = stayMapper.selectCheckoutDueForDone();
             int updatedCount = stayMapper.updateConfirmedToDone();
             if (updatedCount > 0) {
@@ -59,7 +59,7 @@ public class StayReservationScheduler {
     }
 
     /**
-     * HYJ 26.07.28 — 5분마다 실행
+     * 5분마다 실행
      * 생성 후 15분 경과한 PENDING 예약 → CANCEL 자동 취소
      * 결제 없이 이탈한 "유령 예약"을 정리하여 객실 가용성 복구
      */

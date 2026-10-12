@@ -28,21 +28,21 @@ import com.petcare.petcare.mypage.account.vo.MypageAccountVO;
 @Mapper
 public interface MypageAccountMapper {
 
-    // 2026-07-28 박유정 — 회원정보 수정 화면용 프로필 조회
+    // 회원정보 수정 화면용 프로필 조회
     MypageAccountVO selectMemberProfile(@Param("memberNo") Long memberNo);
 
     /** 회원정보 수정 (전화번호, 닉네임, 주소) */
     int updateMemberProfile(MypageAccountVO vo);
 
-    // 2026-08-04 박유정 — 프로필 사진 URL UPDATE (TB_MEMBER.PROFILE_IMG_URL)
-    // 2026/08/06 장우철 — yeju updateMemberProfile 과 id 분리
+    // 프로필 사진 URL UPDATE (TB_MEMBER.PROFILE_IMG_URL)
+    // updateMemberProfile 과 id 분리
     int updateProfileImageUrl(MypageAccountVO vo);
 
     /** 비밀번호 변경 */
     int updatePassword(@Param("memberNo") Long memberNo,
                        @Param("newPassword") String newPassword);
 
-    // HYJ 26.07.29 회원 탈퇴
+    // 회원 탈퇴
 
     /** 비밀번호 확인용 — TB_MEMBER.MEMBER_PWD 조회 */
     String selectPasswordByMemberNo(@Param("memberNo") Long memberNo);
@@ -53,7 +53,7 @@ public interface MypageAccountMapper {
     /** 회원정보 복사 + WITHDRAW_DATE = SYSDATE */
     int insertMemberWithdraw(@Param("memberNo") Long memberNo);
 
-    // HYJ 26.07.29 7일 경과 탈퇴 회원 개인정보 삭제 (스케줄러용)
+    // 7일 경과 탈퇴 회원 개인정보 삭제 (스케줄러용)
 
     /** 7일 경과 탈퇴 회원 MEMBER_NO 목록 */
     List<Long> selectExpiredWithdrawnMemberNos();

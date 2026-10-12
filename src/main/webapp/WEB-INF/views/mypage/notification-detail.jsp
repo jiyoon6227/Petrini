@@ -38,7 +38,7 @@
         알림함으로
     </a>
 
-    <%-- 2026-07-09 장우철 — TB_NOTIFICATION 상세 (열람 시 읽음 처리) --%>
+    <%-- TB_NOTIFICATION 상세 (열람 시 읽음 처리) --%>
     <div class="noti-detail-card">
         <c:set var="typeClass" value="noti-type-notice" />
         <c:set var="typeLabel" value="시스템 알림" />
@@ -64,7 +64,7 @@
         </div>
         <div class="noti-detail-body"><c:out value="${noti.content}"/></div>
 
-        <%-- 2026/07/13 장우철 — 알림 종류별 CTA 문구 --%>
+        <%-- 알림 종류별 CTA 문구 --%>
         <c:if test="${not empty noti.linkUrl}">
         <c:set var="ctaLabel" value="관련 화면으로 이동"/>
         <c:choose>
@@ -92,14 +92,6 @@
         <button type="button" class="btn-noti-outline" style="margin-top:12px" onclick="location.href='${contextPath}/mypage/notifications'">목록으로</button>
     </div>
 </div>
-
-<%--
-[변경 전 더미 UI] 2026-07-09 장우철 — param.type 분기 (order/resv/notice/chat)
-    <c:choose>
-        <c:when test="${notiType eq 'order'}"> ... </c:when>
-        ...
-    </c:choose>
---%>
 
 </div>
 </div>

@@ -109,7 +109,6 @@
     <form id="roomForm" action="${contextPath}/biz/stay/rooms" method="post"
           style="padding:20px;max-width:640px">
 
-      <!--HYJ 26.08.05-->
       <input type="hidden" name="_csrf" value="${_csrf}">
 
       <input type="hidden" id="rRoomId" name="roomId" value="">

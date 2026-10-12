@@ -4,7 +4,7 @@
  * URL: /mypage/health
  * 화면: mypage/health.jsp
  *
- * 2026/07/14 장우철 — TB_MEDICAL_RECORD 연동 (목업 제거)
+ * TB_MEDICAL_RECORD 조회
  */
 
 package com.petcare.petcare.pet.health.controller;
@@ -36,7 +36,7 @@ public class PetHealthController {
     @Autowired
     private PetProfileService petProfileService;
 
-    // 2026/07/14 장우철 — 건강수첩: 반려견 탭 + 진료 타임라인
+    // 건강수첩: 반려견 탭 + 진료 타임라인
     @GetMapping("/health")
     public String health(@RequestParam(value = "petId", required = false) Long petId,
                          HttpSession session,

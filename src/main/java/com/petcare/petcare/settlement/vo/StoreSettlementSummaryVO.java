@@ -1,6 +1,6 @@
 /**
  * 역할: 쇼핑 사업자 정산 상단 요약 (예정/완료/수수료)
- * 2026/08/04 장우철 — 쇼핑 정산 S8 VO (S9에서 조회 연결)
+ * 쇼핑 정산 VO (사업자 화면 조회)
  */
 package com.petcare.petcare.settlement.vo;
 

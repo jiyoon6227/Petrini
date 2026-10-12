@@ -19,10 +19,10 @@ public interface CouponService {
     // 쿠폰 받기
     void claimCoupon(Long memberNo, Long couponId);
 
-    // 지윤 26.08.06: 쿠폰과 발급 사업자 정보 조회
+    // 쿠폰과 발급 사업자 정보 조회
     CouponVO getCouponTarget(Long couponId);
 
-    // 지윤 26.08.06: 쿠폰 적용 상품 검색 및 정렬
+    // 쿠폰 적용 상품 검색 및 정렬
     List<StoreShopVO> getCouponProducts(
     String bizNo,
     String sort,

@@ -1,8 +1,6 @@
 /**
  * 역할: 유기동물 제보 DB 접근 (MyBatis interface)
  *
- * - 박유정 / 2026-07-06~07
- *
  * XML: resources/mybatis/mapper/give/report/GiveReportMapper.xml
  * namespace: com.petcare.petcare.give.report.mapper.GiveReportMapper
  *

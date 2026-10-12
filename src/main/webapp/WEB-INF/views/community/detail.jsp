@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%--
-  - 박유정 / 2026-07-09~10
   - 커뮤니티 게시글 상세
 
   [상세 화면 흐름]
@@ -11,7 +10,7 @@
   5. POST /community/comment/delete — 본인 댓글 삭제
   6. POST /community/comment/update — 본인 댓글 수정
   7. POST /community/report — 게시글 신고
-  8. LIFE + ANSWERED → vet-answer 답변 박스 표시 (2026-07-10 STEP 4)
+  8. LIFE + ANSWERED → vet-answer 답변 박스 표시
 
   [model]
   - post, comments, commentCount, liked, isLoggedIn, successMessage(flash)
@@ -137,14 +136,11 @@
     </span>
   </div>
 
-  <%-- 2026-07-23 HYJ — 본인 글일 때 수정/삭제 버튼 --%>
-  <%-- <c:if test="${loginMemberNo != null && loginMemberNo == post.memberNo}"> --%>
-  <%-- 2026-07-28 HYJ — 관리자 권한 수정/삭제 버튼 --%>
+  <%-- 관리자 권한 수정/삭제 버튼 --%>
   <c:if test="${(loginMemberNo != null && loginMemberNo == post.memberNo) || loginMemberRole eq 'ADMIN'}">
     <div class="cdetail-author-actions">
       <a href="${contextPath}/community/edit?id=${post.postId}" class="cdetail-edit-btn">수정</a>
       <form method="post" action="${contextPath}/community/delete" style="display:inline;margin:0;padding:0">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="postId" value="${post.postId}">
@@ -168,7 +164,7 @@
 
   <div class="cdetail-content"><c:out value="${post.body}"/></div>
 
-  <%-- 2026-07-10 박유정 STEP 4 — LIFE 답변완료 시 수의사 답변 박스 --%>
+  <%-- LIFE 답변완료 시 수의사 답변 박스 --%>
   <c:if test="${post.boardType eq 'LIFE' && fn:contains(post.tags, 'ANSWERED') && not empty comments}">
     <div class="vet-answer">
       <div class="vet-answer-head">
@@ -231,21 +227,20 @@
   <c:if test="${param.error eq 'seq'}">
     <p class="comment-error">댓글 시퀀스(SEQ_TB_POST_COMMENT)가 DB에 없습니다. DBA 또는 팀원에게 시퀀스 생성을 요청해 주세요.</p>
   </c:if>
-  <%-- 2026/07/11 장우철 — LIFE 댓글 권한 거부 안내 --%>
+  <%-- LIFE 댓글 권한 거부 안내 --%>
   <c:if test="${param.error eq 'lifeComment'}">
     <p class="comment-error">수의사 상담 글에는 병원 사업자만 답변할 수 있고, 질문자는 답글(추가 질문)만 작성할 수 있습니다.</p>
   </c:if>
 
-  <%-- 2026/07/11 장우철 — LIFE: 최상위 댓글은 병원 사업자만 (canWriteTopComment) --%>
+  <%-- LIFE: 최상위 댓글은 병원 사업자만 (canWriteTopComment) --%>
   <c:choose>
     <c:when test="${canWriteTopComment}">
       <form method="post" action="${contextPath}/community/comment">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="postId" value="${post.postId}">
         <div class="comment-write">
-          <%-- 2026/08/06 장우철 — 로그인 회원 프로필 아바타 --%>
+          <%-- 로그인 회원 프로필 아바타 --%>
           <img class="comment-avatar"
                src="${not empty memberInfo.profileImgUrl ? contextPath.concat(memberInfo.profileImgUrl) : 'https://placehold.co/36x36/EAF7F2/2BAB82?text=ME'}"
                alt="내 아바타"
@@ -269,7 +264,7 @@
 
   <c:forEach var="cmt" items="${comments}">
     <div class="comment-item">
-      <%-- 2026/08/06 장우철 — 댓글 작성자 프로필 아바타 --%>
+      <%-- 댓글 작성자 프로필 아바타 --%>
       <img class="comment-avatar"
            src="${not empty cmt.profileImgUrl ? contextPath.concat(cmt.profileImgUrl) : 'https://placehold.co/36x36/EAF7F2/2BAB82?text=U'}"
            alt="댓글러"
@@ -291,14 +286,13 @@
                 <c:otherwise>-</c:otherwise>
               </c:choose>
             </span>
-            <%-- 2026/08/03 장우철 — 삭제된 댓글은 수정/삭제 숨김 --%>
+            <%-- 삭제된 댓글은 수정/삭제 숨김 --%>
             <c:if test="${cmt.isDeleted ne 'Y' && ((loginMemberNo != null && loginMemberNo == cmt.memberNo) || loginMemberRole eq 'ADMIN')}">
               <span class="comment-meta-sep" style="color:#999">·</span>
               <button type="button" class="comment-edit-btn"
                       onclick="toggleEditForm(${cmt.commentId})">수정</button>
               <span class="comment-meta-sep" style="color:#999">·</span>
               <form method="post" action="${contextPath}/community/comment/delete" style="display:inline;margin:0;padding:0">
-                <!--HYJ 26.08.05-->
                 <input type="hidden" name="_csrf" value="${_csrf}">
                 
                 <input type="hidden" name="commentId" value="${cmt.commentId}">
@@ -318,7 +312,6 @@
             <div class="comment-text" id="commentText-${cmt.commentId}"><c:out value="${cmt.body}"/></div>
             <div id="editForm-${cmt.commentId}" class="edit-form">
               <form method="post" action="${contextPath}/community/comment/update">
-              <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
                 <input type="hidden" name="commentId" value="${cmt.commentId}">
                 <input type="hidden" name="postId" value="${post.postId}">
@@ -332,7 +325,7 @@
           </c:otherwise>
         </c:choose>
         <div class="comment-actions">
-          <%-- 2026/07/11 장우철 — LIFE: 답글은 병원 사업자 또는 질문자만 (canWriteReply) --%>
+          <%-- LIFE: 답글은 병원 사업자 또는 질문자만 (canWriteReply) --%>
           <c:if test="${canWriteReply}">
             <button type="button" class="reply-btn" onclick="toggleReplyForm(${cmt.commentId})">↳ 답글</button>
           </c:if>
@@ -340,7 +333,6 @@
         <c:if test="${canWriteReply}">
         <div id="replyForm-${cmt.commentId}" class="reply-form">
           <form method="post" action="${contextPath}/community/comment">
-            <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
             
             <input type="hidden" name="postId" value="${post.postId}">
@@ -357,7 +349,7 @@
 
     <c:forEach var="reply" items="${cmt.replies}">
       <div class="comment-item reply-item">
-        <%-- 2026/08/06 장우철 — 답글 작성자 프로필 아바타 --%>
+        <%-- 답글 작성자 프로필 아바타 --%>
         <img class="comment-avatar"
              src="${not empty reply.profileImgUrl ? contextPath.concat(reply.profileImgUrl) : 'https://placehold.co/36x36/EAF7F2/2BAB82?text=R'}"
              alt="답글러"
@@ -385,7 +377,6 @@
                         onclick="toggleEditForm(${reply.commentId})">수정</button>
                 <span class="comment-meta-sep" style="color:#999">·</span>
                 <form method="post" action="${contextPath}/community/comment/delete" style="display:inline;margin:0;padding:0">
-                  <!--HYJ 26.08.05-->
                   <input type="hidden" name="_csrf" value="${_csrf}">
                   
                   <input type="hidden" name="commentId" value="${reply.commentId}">
@@ -405,7 +396,6 @@
               <div class="comment-text" id="commentText-${reply.commentId}"><c:out value="${reply.body}"/></div>
               <div id="editForm-${reply.commentId}" class="edit-form">
                 <form method="post" action="${contextPath}/community/comment/update">
-                <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
                   <input type="hidden" name="commentId" value="${reply.commentId}">
                   <input type="hidden" name="postId" value="${post.postId}">
@@ -432,7 +422,6 @@
   <div class="report-modal" role="dialog" aria-labelledby="reportModalTitle">
     <h3 id="reportModalTitle">게시글 신고</h3>
     <form method="post" action="${contextPath}/community/report">
-      <!--HYJ 26.08.05-->
       <input type="hidden" name="_csrf" value="${_csrf}">
 
       <input type="hidden" name="postId" value="${post.postId}">
@@ -454,7 +443,7 @@
 
 <script>
   const isLoggedIn = ${isLoggedIn == true};
-  // 2026/07/11 장우철 — LIFE 답글 권한 (서버 canWriteReply 와 동일)
+  // LIFE 답글 권한 (서버 canWriteReply 와 동일)
   const canWriteReply = ${canWriteReply == true};
 
   function toggleReplyForm(commentId) {
@@ -517,7 +506,6 @@
       return;
     }
     
-    //HYJ 26.08.05
     csrfFetch('${contextPath}/community/like/toggle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

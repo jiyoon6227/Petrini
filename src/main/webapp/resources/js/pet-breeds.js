@@ -1,4 +1,4 @@
-// 2026-08-13 박유정 — 회원가입·마이페이지 공통 반려동물 품종 목록
+// 회원가입·마이페이지 공통 반려동물 품종 목록
 var PET_BREEDS = {
     dog: ['골든 리트리버','래브라도 리트리버','비숑 프리제','말티즈','푸들','시바이누','진돗개','포메라니안','치와와','코기','불독','허스키','닥스훈트','슈나우저','믹스견 (모름)'],
     cat: ['코리안숏헤어','페르시안','메인쿤','브리티시숏헤어','러시안블루','스코티시폴드','아비시니안','벵갈','샴','믹스묘 (모름)'],
@@ -31,7 +31,7 @@ function updatePetBreedSelect(kindSelectId, kindValue, breedSelectId, selectedBr
         var b = list[i];
         html += '<option value="' + b + '">' + b + '</option>';
     }
-    // 2026/07/11 장우철 — 목록에 없는 기존 품종(예: 예전 가입 자유입력) 유지
+    // 목록에 없는 기존 품종(예: 예전 가입 자유입력) 유지
     if (selectedBreed && list.indexOf(selectedBreed) < 0) {
         html = '<option value="' + selectedBreed + '">' + selectedBreed + '</option>' + html;
     }

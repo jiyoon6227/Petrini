@@ -20,7 +20,7 @@ public class TossPaymentService {
     @Value("${toss.secret-key}")
     private String tossSecretKey;
 
-    // 2026/08/01 장우철 — 빌링키 결제는 위젯 시크릿과 분리 (섞으면 cancel FORBIDDEN_REQUEST)
+    // 빌링키 결제는 위젯 시크릿과 분리 (섞으면 cancel FORBIDDEN_REQUEST)
     @Value("${toss.billing.secret-key}")
     private String tossBillingSecretKey;
 
@@ -29,7 +29,7 @@ public class TossPaymentService {
     }
 
     /**
-     * 2026/07/31 장우철 — 숙소 부분환불: cancelAmount 있으면 해당 금액만 취소
+     * 숙소 부분환불: cancelAmount 있으면 해당 금액만 취소
      * @param cancelAmount null이면 전액 취소
      */
     public String cancelPayment(String paymentKey, String cancelReason, Long cancelAmount) {
@@ -37,7 +37,7 @@ public class TossPaymentService {
     }
 
     /**
-     * 2026/08/01 장우철 — 빌링키로 승인된 결제는 billingSecret 으로 취소
+     * 빌링키로 승인된 결제는 billingSecret 으로 취소
      * @param billingPayment true면 toss.billing.secret-key 사용
      */
     public String cancelPayment(String paymentKey, String cancelReason, Long cancelAmount,
@@ -52,7 +52,7 @@ public class TossPaymentService {
                     .encodeToString((secret + ":").getBytes(StandardCharsets.UTF_8));
             conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
             conn.setRequestProperty("Content-Type", "application/json");
-            // 2026/07/31 장우철 — 토스 권장 멱등키 (중복 취소 방지)
+            // 토스 권장 멱등키 (중복 취소 방지)
             conn.setRequestProperty("Idempotency-Key", java.util.UUID.randomUUID().toString());
             conn.setDoOutput(true);
 
@@ -96,7 +96,7 @@ public class TossPaymentService {
     }
 
     /**
-     * 2026/08/11 장우철 — 카드 실결제 키가 아니면 토스 취소 스킵 (포인트·가짜키)
+     * 카드 실결제 키가 아니면 토스 취소 스킵 (포인트·가짜키)
      */
     public static boolean isSkipCancelPaymentKey(String paymentKey) {
         if (paymentKey == null || paymentKey.isBlank()) return true;
@@ -105,7 +105,7 @@ public class TossPaymentService {
     }
 
     /**
-     * 2026/08/11 장우철 — PAY_METHOD로 시크릿 선택.
+     * PAY_METHOD로 시크릿 선택.
      * 과거 쇼핑 주문이 빌링인데 PAY_METHOD=TOSS 로 잘못 저장된 건 → FORBIDDEN 시 반대 시크릿 1회 재시도.
      */
     public String cancelPaymentSmart(String paymentKey, String cancelReason, Long cancelAmount,

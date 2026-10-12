@@ -51,7 +51,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/stay")
 public class StayController {
 
-    // 2026/08/10 장우철 — 결제 실패 원인 로그용
+    // 결제 실패 원인 로그용
     private static final Logger log = LoggerFactory.getLogger(StayController.class);
 
     @Value("${toss.client-key}")
@@ -64,18 +64,17 @@ public class StayController {
     @Autowired
     private FileService fileService;
 
-    // 2026/07/27 장우철 — 등록카드(빌링) 결제
+    // 등록카드(빌링) 결제
     @Autowired
     private BillingCardService billingCardService;
     @Autowired
     private TossBillingService tossBillingService;
-    // 지윤 26.08.07: 등록카드 결제 시 쿠폰 할인 미리계산용
+    // 등록카드 결제 시 쿠폰 할인 미리계산용
     @Autowired
     private CouponMapper couponMapper;
 
     @GetMapping({"", "/"})
     public String list(@ModelAttribute("search") StayVO searchVO, Model model) throws Exception {
-        //List<StayVO> stayList = stayService.getStayList();
         List<StayVO> stayList = stayService.getStayListBySearch(searchVO);
         kakaoMapService.addMapAttributes(model, stayList);
         
@@ -121,7 +120,7 @@ public class StayController {
         return "stay/reserve";
     }
 
-    // ── HYJ 26.07.20 가용성 체크 API (AJAX) ──
+    // ── 가용성 체크 API (AJAX) ──
     @GetMapping("/checkAvailability")
     @ResponseBody
     public Map<String, Object> checkAvailability(@RequestParam("roomId") Long roomId,
@@ -144,8 +143,8 @@ public class StayController {
     }
 
         
-    // ── HYJ 26.07.20 예약 저장 → 결제 페이지로 이동──
-    // 2026/08/11 장우철 — 다펫: petIds → 대표 petId + petCnt
+    // ── 예약 저장 → 결제 페이지로 이동──
+    // 다펫: petIds → 대표 petId + petCnt
     @PostMapping("/reserve")
     public String saveReserve(@ModelAttribute ReservationVO vo,
                               @RequestParam("stayId") Long stayId,
@@ -168,8 +167,7 @@ public class StayController {
 
         try {
             
-            //HYJ 26.07.23 결제 없이 예약버튼만 눌러도 예약처리됨 -> 수정필요
-            //HYJ 26.07.28 예약후 15분 이내 결제 없을 경우 취소안내 후, 예약처리
+            // 15분 안에 결제가 없으면 스케줄러가 자동 취소
             Long resvId = stayService.createStayReservation(vo);
             // 결제 페이지로 리다이렉트
             return "redirect:/stay/payment?resvId=" + resvId;
@@ -179,7 +177,7 @@ public class StayController {
         }
     }
 
-    // ── HYJ 26.07.20 결제 페이지 ──
+    // ── 결제 페이지 ──
     @GetMapping("/payment")
     public String payment(@RequestParam("resvId") Long resvId,
                             HttpSession session,
@@ -198,14 +196,14 @@ public class StayController {
 
         model.addAttribute("reservation", reservation);
         model.addAttribute("tossApiKey", tossApiKey);
-        // 2026/07/27 장우철 — 결제 화면 보유포인트 = DB 실잔액 (세션 동기화)
+        // 결제 화면 보유포인트 = DB 실잔액 (세션 동기화)
         Long dbPoint = stayService.getMemberPointBalance(member.getMemberNo());
         long held = dbPoint != null ? dbPoint : 0L;
         member.setPointBalance(held);
         session.setAttribute("memberInfo", member);
         model.addAttribute("memberPoint", held);
 
-        // 지윤 26.08.07: 이 숙소가 발급한, 회원이 사용 가능한 쿠폰 목록
+        // 이 숙소가 발급한, 회원이 사용 가능한 쿠폰 목록
         StayVO stay = stayService.getStayById(Long.valueOf(reservation.getTargetId()));
         Long stayBizNo = stay != null ? stay.getBizNo() : null;
         model.addAttribute("usableCoupons", stayService.getUsableCoupons(member.getMemberNo(), stayBizNo));
@@ -213,7 +211,7 @@ public class StayController {
         return "stay/payment";
     }
 
-    // ── HYJ 26.07.20 결제 성공 콜백 (Toss → 여기로 리다이렉트) ──
+    // ── 결제 성공 콜백 (Toss → 여기로 리다이렉트) ──
     @GetMapping("/payment/success")
     public String paymentSuccess(@RequestParam("orderId") String orderId,
                                     @RequestParam("paymentKey") String paymentKey,
@@ -225,7 +223,7 @@ public class StayController {
         if (member == null) return "redirect:/login";
 
         // orderId 형식: stay-{resvId}-{usedPoint}-{couponMemberCouponId}-{timestamp}
-        // 지윤 26.08.07: couponMemberCouponId 추가 (4번째 조각). 기존 형식(4개 조각)도 하위호환 처리
+        // couponMemberCouponId는 4번째 조각 (기존 형식도 하위호환)
         String[] parts = orderId.split("-");
         Long resvId = Long.parseLong(parts[1]);
         long usedPoint = parts.length >= 4 ? Long.parseLong(parts[2]) : 0;
@@ -233,16 +231,16 @@ public class StayController {
 
         try {
             String kakaoToken = (String) session.getAttribute("kakaoAccessToken");
-            // 2026/07/31 장우철 — amount 는 토스 위젯 실결제액(confirm 필수)
+            // amount 는 토스 위젯 실결제액(confirm 필수)
             stayService.confirmPayment(resvId, paymentKey, orderId, "CARD", kakaoToken,
                     member.getMemberNo(), usedPoint, amount, couponMemberCouponId);
 
-            // 2026/07/27 장우철 — 세션 포인트 = DB 실잔액
+            // 세션 포인트 = DB 실잔액
             syncSessionPointBalance(session, member);
 
             return "redirect:/stay/complete?resvId=" + resvId;
         } catch (RuntimeException e) {
-            // 2026/08/10 장우철 — redirect 시 model 은 유실되므로 flash + 로그로 원인 남김
+            // redirect 시 model 은 유실되므로 flash + 로그로 원인 남김
             // printStackTrace 는 stderr 무단 출력·스택 노출이라 사용하지 않음 (log.error 로 충분)
             log.error("[Stay paymentSuccess] 결제 확정 실패 orderId={}, amount={}, message={}",
                     orderId, amount, e.getMessage(), e);
@@ -252,7 +250,7 @@ public class StayController {
     }
 
     /**
-     * 2026/07/27 장우철 — 등록카드(빌링키) Ajax 결제
+     * 등록카드(빌링키) Ajax 결제
      * POST /stay/payment/billing-card
      */
     @PostMapping("/payment/billing-card")
@@ -297,7 +295,7 @@ public class StayController {
 
         long total = reservation.getTotalAmount() != null ? reservation.getTotalAmount() : 0L;
 
-        // 지윤 26.08.07: 등록카드 결제도 쿠폰 할인 반영 (실제 확정 검증은 confirmPayment에서 다시 함)
+        // 등록카드 결제도 쿠폰 할인 반영 (확정 검증은 confirmPayment에서 재수행)
         // 여기선 청구 금액 산정용으로만 미리 계산
         long couponDiscountPreview = 0L;
         if (couponMemberCouponId != null && couponMemberCouponId > 0) {
@@ -305,7 +303,7 @@ public class StayController {
             if (couponPreview != null) {
                 if ("RATE".equals(couponPreview.getCouponType())) {
                     long rawDiscount = total * couponPreview.getDiscountValue() / 100;
-                    // 지윤 26.08.11 수정: 최대할인금액 캡 적용 (실제 확정은 confirmPayment/StayServiceImpl에서 재검증)
+                    // 최대할인금액 캡 적용 (실제 확정은 confirmPayment/StayServiceImpl에서 재검증)
                     Integer maxAmt = couponPreview.getMaxDiscountAmt();
                     couponDiscountPreview = (maxAmt != null && maxAmt > 0)
                             ? Math.min(rawDiscount, (long) maxAmt)
@@ -320,7 +318,7 @@ public class StayController {
 
         if (usedPoint < 0) usedPoint = 0;
         if (usedPoint > payableAfterCoupon) usedPoint = payableAfterCoupon;
-        // 2026/07/27 장우철 — 보유 포인트 초과 사용 불가
+        // 보유 포인트 초과 사용 불가
         Long heldBal = stayService.getMemberPointBalance(member.getMemberNo());
         long held = heldBal != null ? Math.max(0L, heldBal) : 0L;
         if (usedPoint > held) usedPoint = held;
@@ -361,7 +359,7 @@ public class StayController {
                     stayService.confirmPayment(resvId, paymentKey, tossOrderId, "BILLING",
                             kakaoToken, member.getMemberNo(), usedPoint, (long) chargeAmount, couponMemberCouponId);
 
-            // 2026/07/27 장우철 — 세션 포인트 = DB 실잔액
+            // 세션 포인트 = DB 실잔액
             syncSessionPointBalance(session, member);
 
             res.put("ok", true);
@@ -374,7 +372,7 @@ public class StayController {
         }
     }
 
-    // ── HYJ 26.07.21 전액 포인트 결제 (Toss 없이 직접 처리) ──
+    // ── 전액 포인트 결제 (Toss 없이 직접 처리) ──
     @GetMapping("/payment/point-only")
     public String paymentPointOnly(@RequestParam("resvId") Long resvId,
                                     @RequestParam("usedPoint") Long usedPoint,
@@ -390,7 +388,7 @@ public class StayController {
             stayService.confirmPayment(resvId, "POINT_ONLY", "point-" + resvId + "-" + System.currentTimeMillis(),
                     "POINT", kakaoToken, member.getMemberNo(), usedPoint, 0L, couponMemberCouponId);
 
-            // 2026/07/27 장우철 — 세션 포인트 = DB 실잔액
+            // 세션 포인트 = DB 실잔액
             syncSessionPointBalance(session, member);
 
             return "redirect:/stay/complete?resvId=" + resvId;
@@ -400,7 +398,7 @@ public class StayController {
         }
     }
 
-    // ── HYJ 26.07.20 결제 실패 콜백 ──
+    // ── 결제 실패 콜백 ──
     @GetMapping("/payment/fail")
     public String paymentFail(@RequestParam(required = false) String code,
                                 @RequestParam(required = false) String message,
@@ -420,7 +418,7 @@ public class StayController {
     }
 
     /**
-     * 2026/07/27 장우철 — 결제 후 세션 포인트를 DB 실잔액과 맞춤
+     * 결제 후 세션 포인트를 DB 실잔액과 맞춤
      */
     private void syncSessionPointBalance(HttpSession session, MemberVO member) {
         if (member == null || member.getMemberNo() == null) {

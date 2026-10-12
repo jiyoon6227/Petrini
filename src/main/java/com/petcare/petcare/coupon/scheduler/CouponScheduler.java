@@ -12,7 +12,6 @@ public class CouponScheduler {
     @Autowired
     private CouponMapper couponMapper;
 
-    //@Scheduled(cron = "0 0 0 * * *") // 매일 00:00
     @Scheduled(cron = "0 * * * * *")
     public void expireOverdueCoupons() {
         couponMapper.expireOverdueCoupons();

@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%-- 지윤 26.07.15 수정: 하드코딩(JS mock 배열) -> 실데이터 연동. 등록/수정은 모달로 처리, 옵션별 재고 지원 --%>
+<%-- 등록/수정은 모달로 처리, 옵션별 재고 지원 --%>
 <style>
   .biz-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;align-items:center;justify-content:center}
   .biz-modal-overlay.on{display:flex}
@@ -59,7 +59,7 @@
       </select>
       <input type="text" name="keyword" value="${selectedKeyword}" placeholder="상품명을 입력하세요.">
       <span style="font-size:13px;color:#666;margin-left:6px">카테고리</span>
-      <%-- 2026/08/06 장우철: 필터는 카테고리명 1개씩(강아지/사료/시니어). 등록 모달용 categoryList와 분리 --%>
+      <%-- 필터는 카테고리명 1개씩(강아지/사료/시니어). 등록 모달용 categoryList와 분리 --%>
       <select name="categoryName">
         <option value="">전체</option>
         <c:forEach var="catName" items="${filterCategoryNames}">
@@ -112,7 +112,7 @@
                   <td>${p.categoryName}</td>
                   <td><c:if test="${not empty opt.optionColor && opt.optionColor != '기본'}">${opt.optionColor} / </c:if>${opt.optionSize}</td>
                   
-                  <%-- 지윤 26.07.15 수정: 옵션별 최종가 = 판매가 + 해당 옵션 추가금액 --%>
+                  <%-- 옵션별 최종가 = 판매가 + 해당 옵션 추가금액 --%>
                   <c:set var="finalPrice" value="${p.salePrice + opt.addPrice}"/>
                   <td>
                     <div class="prod-price">
@@ -149,8 +149,8 @@
       </tbody>
     </table>
 
-    <%-- 2026/08/06 장우철: 필터 없을 때 pageBaseUrl에 ?가 없어 &page= 가 깨지던 문제 수정 (? / & 분기) --%>
-    <%-- 2026/08/06 장우철: 카테고리 필터 파라미터 categoryId → categoryName --%>
+    <%-- 필터 없을 때 pageBaseUrl ? / & 분기 (&page= 깨짐 방지) --%>
+    <%-- 카테고리 필터 파라미터는 categoryName --%>
     <c:url var="pageBaseUrl" value="/biz/store/products">
       <c:if test="${not empty selectedKeyword}"><c:param name="keyword" value="${selectedKeyword}"/></c:if>
       <c:if test="${not empty selectedCategoryName}"><c:param name="categoryName" value="${selectedCategoryName}"/></c:if>
@@ -253,25 +253,25 @@
   var contextPath = '${contextPath}';
   var editingId = null;
 
-  //지윤 26.07.15 추가: 동물→타입→나이대 연동 드롭다운용 카테고리 전체 데이터 (2~4단계)
+  // 동물→타입→나이대 연동 드롭다운용 카테고리 전체 데이터 (2~4단계)
   var categoryTree = [
     <c:forEach var="cat" items="${categoryList}" varStatus="vs">
     {categoryId:${cat.categoryId}, parentId:${cat.parentId}, categoryName:'${cat.categoryName}', depth:${cat.depth}}<c:if test="${!vs.last}">,</c:if>
     </c:forEach>
   ];
 
-  //지윤 26.07.15 추가: categoryId로 카테고리 트리에서 노드 하나 찾기
+  // categoryId로 카테고리 트리에서 노드 하나 찾기
   function getCatNode(id) {
     return categoryTree.find(function(c){ return c.categoryId == id; });
   }
 
-  //지윤 26.07.15 추가: select 박스에 옵션 리스트 채우는 공통 함수
+  // select 박스에 옵션 리스트 채우는 공통 함수
   function fillSelect(sel, list, placeholder) {
     sel.innerHTML = '<option value="">' + placeholder + '</option>' +
       list.map(function(c){ return '<option value="' + c.categoryId + '">' + c.categoryName + '</option>'; }).join('');
   }
 
-  //지윤 26.07.15 추가: 타입(사료/간식/용품) 선택 시 나이대 채우기.
+  // 타입(사료/간식/용품) 선택 시 나이대 채우기.
   //나이대(4단계)가 없는 타입(용품 등)은 나이대 없이 타입 자체를 최종 카테고리로 확정 + 드롭다운 잠금
   function onTypeChange(typeId, presetAgeId) {
     var pCategory = document.getElementById('pCategory');
@@ -290,7 +290,7 @@
     }
   }
 
-  //지윤 26.07.15 추가: 상품등록 모달 열 때 카테고리 3단 드롭다운 초기화(전부 빈 값)
+  // 상품등록 모달 열 때 카테고리 3단 드롭다운 초기화(전부 빈 값)
   function initCategorySelects() {
     fillSelect(document.getElementById('pSpecies'), categoryTree.filter(function(c){ return c.depth == 2; }), '동물 선택');
     fillSelect(document.getElementById('pType'), [], '타입 선택');
@@ -298,7 +298,7 @@
     document.getElementById('pCategory').disabled = false;
   }
 
-  //지윤 26.07.15 추가: 상품수정 모달 열 때 저장된 categoryId 하나로 동물/타입/나이대 3단을 역으로 채움
+  // 상품수정 모달 열 때 저장된 categoryId 하나로 동물/타입/나이대 3단을 역으로 채움
   //categoryId가 4단계(나이대)든 3단계(용품처럼 나이대 없는 타입)든 둘 다 처리
   function setCategorySelection(categoryId) {
     var leaf = getCatNode(categoryId);
@@ -322,23 +322,23 @@
     onTypeChange(typeId, presetAgeId);
   }
 
-  //지윤 26.07.15 추가: 동물 바뀌면 타입 목록 다시 채우고, 나이대는 초기화
+  // 동물 바뀌면 타입 목록 다시 채우고, 나이대는 초기화
   document.getElementById('pSpecies').addEventListener('change', function() {
     var speciesId = Number(this.value);
     fillSelect(document.getElementById('pType'), categoryTree.filter(function(c){ return c.depth == 3 && c.parentId == speciesId; }), '타입 선택');
     fillSelect(document.getElementById('pCategory'), [], '나이대 선택');
     document.getElementById('pCategory').disabled = false;
   });
-  //지윤 26.07.15 추가: 타입 바뀌면 나이대 목록 다시 채움 (또는 용품처럼 나이대 없으면 잠금 처리)
+  // 타입 바뀌면 나이대 목록 다시 채움 (또는 용품처럼 나이대 없으면 잠금 처리)
   document.getElementById('pType').addEventListener('change', function() {
     onTypeChange(Number(this.value), null);
   });
 
 
-  //지윤 26.07.15 수정: 한 줄 나열 -> 라벨 붙은 4칸 그리드로 변경, 삭제 버튼 제거
-  //지윤 26.07.24 수정: optionId 파라미터 추가 (기존 옵션이면 값 있음, 새로 추가한 행이면 빈 값 -> 서버에서 이걸로 UPDATE/INSERT 구분)
+  // 라벨 붙은 4칸 그리드 (삭제 버튼 없음)
+  // optionId: 기존 옵션은 값 있음, 신규 행은 빈 값 (서버에서 UPDATE/INSERT 구분)
   function optRowHtml(color, size, addPrice, stockQty, optionId) {
-    // 2026/08/13 장우철 — 신규 옵션은 optionId 필드를 안 보냄(빈 값이 Long 변환 실패). 추가금액 기본 0
+    // 신규 옵션은 optionId 필드를 안 보냄(빈 값이 Long 변환 실패). 추가금액 기본 0
     var idInput = (optionId != null && optionId !== '')
       ? '<input type="hidden" name="optionId" value="' + optionId + '">'
       : '';
@@ -384,7 +384,7 @@
     editingId = null;
     document.getElementById('prodForm').reset();
     document.getElementById('optionRows').innerHTML = '';
-    //지윤 26.07.15 추가: 등록 모달 열 때 카테고리 3단 드롭다운 초기화
+    // 등록 모달 열 때 카테고리 3단 드롭다운 초기화
     initCategorySelects();
     addOptionRow();
     document.getElementById('imgPreviewBox').style.display = 'none';
@@ -446,17 +446,16 @@
     reader.readAsDataURL(file);
   });
 
- //용품 상품등록안되는거 해결 26/7/30지윤
+ // 상품 등록/수정 제출 (용품 카테고리 포함)
  function submitProduct() {
     var form = document.getElementById('prodForm');
     if (!form.checkValidity()) { form.reportValidity(); return; }
-    //지윤 26.07.16 추가: disabled된 상태 드롭다운은 폼에 안 실려서 제출 직전 잠깐 풀어줌
+    // disabled 드롭다운은 폼에 안 실리므로 제출 직전 해제
     document.getElementById('pStatus').disabled = false;
-    //지윤 26.07.30 추가: pCategory도 disabled 상태면 categoryId가 통째로 안 실려서 서버에서 "파라미터 없음" 에러 남 -> 똑같이 풀어줌
+    // pCategory도 disabled면 categoryId 누락("파라미터 없음" 에러)이라 동일하게 해제
     document.getElementById('pCategory').disabled = false;
     var formData = new FormData(form);
     var url = contextPath + '/biz/store/products' + (editingId ? '/' + editingId : '');
-    //HYJ 26.08.05
     csrfFetch(url, { method: 'POST', body: formData })
       .then(function () { location.href = contextPath + '/biz/store/products'; });
   }

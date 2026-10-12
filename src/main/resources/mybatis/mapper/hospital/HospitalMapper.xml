@@ -105,14 +105,14 @@
          WHERE  HOSPITAL_ID = #{hospitalId}
     </select>
 
-    <!-- 2026/07/16 장우철 — 예약 간격(컬럼 없을 수 있어 단건 조회에서 분리) -->
+    <!-- 예약 간격(컬럼 없을 수 있어 단건 조회에서 분리) -->
     <select id="selectResvIntervalMin" resultType="java.lang.Integer">
         SELECT NVL(RESV_INTERVAL_MIN, 15)
           FROM TB_HOSPITAL
          WHERE HOSPITAL_ID = #{hospitalId}
     </select>
 
-    <!-- 2026-07-10 장우철 — 예약 폼 반려동물 목록 (F2) -->
+    <!-- 예약 폼 반려동물 목록 -->
     <select id="selectPetListByMemberNo" parameterType="long"
             resultType="com.petcare.petcare.hospital.vo.HospitalPetVO">
         SELECT  P.PET_ID     AS petId,
@@ -126,7 +126,7 @@
          ORDER BY P.IS_REPRESENT DESC, P.PET_ID ASC
     </select>
 
-    <!-- 2026-07-10 장우철 — 병원 예약 INSERT (F2), SEQ_RESERVATION 사용 -->
+    <!-- 병원 예약 INSERT, SEQ_RESERVATION 사용 -->
     <insert id="insertReservation" parameterType="com.petcare.petcare.hospital.vo.ReservationVO">
         <selectKey keyProperty="resvId" resultType="long" order="BEFORE">
             SELECT SEQ_RESERVATION.NEXTVAL FROM DUAL
@@ -168,7 +168,7 @@
         )
     </insert>
 
-    <!-- 2026/07/16 장우철 — 예약 제출: 진료유형 조회 -->
+    <!-- 예약 제출: 진료유형 조회 -->
     <select id="selectTreatType"
             resultType="com.petcare.petcare.hospital.vo.HospitalTreatTypeVO">
         SELECT TREAT_TYPE_ID AS treatTypeId,
@@ -183,7 +183,7 @@
            AND TREAT_TYPE_ID = #{treatTypeId}
     </select>
 
-    <!-- 2026/07/16 장우철 — 예약 제출: 의사 조회 -->
+    <!-- 예약 제출: 의사 조회 -->
     <select id="selectDoctor"
             resultType="com.petcare.petcare.hospital.vo.HospitalDoctorVO">
         SELECT DOCTOR_ID   AS doctorId,
@@ -198,7 +198,7 @@
            AND DOCTOR_ID   = #{doctorId}
     </select>
 
-    <!-- 2026/07/20 장우철 — 동시예약 방지: 선점·예약 INSERT 직전 의사 행 FOR UPDATE -->
+    <!-- 동시예약 방지: 선점·예약 INSERT 직전 의사 행 FOR UPDATE -->
     <select id="lockDoctorForUpdate" resultType="long">
         SELECT DOCTOR_ID
           FROM TB_HOSPITAL_DOCTOR
@@ -207,7 +207,7 @@
            FOR UPDATE
     </select>
 
-    <!-- 2026/07/16 장우철 — 예약 제출: PENDING·CONFIRMED 겹침 (같은 의사·같은 날 [start,end)) -->
+    <!-- 예약 제출: PENDING·CONFIRMED 겹침 (같은 의사·같은 날 [start,end)) -->
     <select id="countOverlappingReservations" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION R
@@ -228,7 +228,7 @@
                ) &gt; #{resvTime}
     </select>
 
-    <!-- 2026/07/16 장우철 — 예약 UI: 활성 진료유형·의사 -->
+    <!-- 예약 UI: 활성 진료유형·의사 -->
     <select id="selectActiveTreatTypeList"
             resultType="com.petcare.petcare.hospital.vo.HospitalTreatTypeVO">
         SELECT TREAT_TYPE_ID AS treatTypeId,
@@ -259,7 +259,7 @@
          ORDER BY NVL(SORT_ORDR, 9999), DOCTOR_ID
     </select>
 
-    <!-- 2026/07/16 장우철 — 해당일 예약예외 (병원 공통 + 의사별) -->
+    <!-- 해당일 예약예외 (병원 공통 + 의사별) -->
     <select id="selectResvExceptionsByDate"
             resultType="com.petcare.petcare.hospital.vo.HospitalResvExceptionVO">
         SELECT E.EXC_ID       AS excId,
@@ -280,7 +280,7 @@
            AND NVL(E.STATUS_CD, 'Y') = 'Y'
     </select>
 
-    <!-- 2026/07/16 장우철 — PENDING·CONFIRMED 예약 점유 (의사별) -->
+    <!-- PENDING·CONFIRMED 예약 점유 (의사별) -->
     <select id="selectOccupiedReservationBlocks"
             resultType="com.petcare.petcare.hospital.vo.HospitalTimeBlockVO">
         SELECT R.RESV_TIME AS startTime,
@@ -302,7 +302,7 @@
            AND R.STATUS_CD IN ('PENDING', 'CONFIRMED')
     </select>
 
-    <!-- 2026/07/16 장우철 — 유효 선점 점유 (홀드 테이블 없으면 Service에서 무시) -->
+    <!-- 유효 선점 점유 (홀드 테이블 없으면 Service에서 무시) -->
     <select id="selectOccupiedHoldBlocks"
             resultType="com.petcare.petcare.hospital.vo.HospitalTimeBlockVO">
         SELECT H.RESV_TIME AS startTime,
@@ -316,7 +316,7 @@
            AND H.EXPIRE_DATE &gt; SYSDATE
     </select>
 
-    <!-- 2026/07/16 장우철 — 예약·선점 통합 겹침 (제출·선점 시) -->
+    <!-- 예약·선점 통합 겹침 (제출·선점 시) -->
     <select id="countOverlappingWithHolds" resultType="int">
         SELECT (
             SELECT COUNT(*)
@@ -396,7 +396,7 @@
            AND EXPIRE_DATE &gt; SYSDATE
     </select>
 
-    <!-- 2026/07/20 장우철 — hold 최종 제출 시 선점 행 FOR UPDATE (중복 제출 방지) -->
+    <!-- hold 최종 제출 시 선점 행 FOR UPDATE (중복 제출 방지) -->
     <select id="selectResvHoldByIdForUpdate"
             resultType="com.petcare.petcare.hospital.vo.HospitalResvHoldVO">
         SELECT HOLD_ID       AS holdId,
@@ -421,7 +421,7 @@
          WHERE HOLD_ID = #{holdId}
     </delete>
 
-    <!-- 2026-07-10 장우철 — 예약 완료 화면 조회 (F3) -->
+    <!-- 예약 완료 화면 조회 -->
     <select id="selectReservationById" parameterType="long"
             resultType="com.petcare.petcare.hospital.vo.ReservationVO">
         SELECT  R.RESV_ID        AS resvId,
@@ -457,7 +457,7 @@
          WHERE  R.RESV_ID = #{resvId}
     </select>
 
-    <!-- 2026/07/13 장우철 — 병원 상세 진료 리뷰 목록 -->
+    <!-- 병원 상세 진료 리뷰 목록 -->
     <select id="selectHospitalReviews" parameterType="long"
             resultType="com.petcare.petcare.hospital.vo.HospitalReviewVO">
         SELECT  R.REVIEW_ID   AS reviewId,

@@ -1,7 +1,6 @@
 /**
  * 역할: MypageHomeService 구현체 (@Service)
  *
- * 2026/07/08 장우철 — 마이페이지 B단계
  * - Controller 요청 → Mapper COUNT 조회 → JSP 전달
  */
 
@@ -19,7 +18,7 @@ public class MypageHomeServiceImpl implements MypageHomeService {
         this.mypageHomeMapper = mypageHomeMapper;
     }
 
-    // 2026/07/08 장우철 — 이용중인 쿠폰 = STATUS_CD 'UNUSED' (1회성 미사용)
+    // 이용중인 쿠폰 = STATUS_CD 'UNUSED' (1회성 미사용)
     @Override
     public int countUsableCoupon(Long memberNo) {
         if (memberNo == null) {
@@ -28,7 +27,7 @@ public class MypageHomeServiceImpl implements MypageHomeService {
         return mypageHomeMapper.countUsableCoupon(memberNo);
     }
 
-    // 2026/07/08 장우철 — 관심상품 = TB_FAVORITE 상품 찜만
+    // 관심상품 = TB_FAVORITE 상품 찜만
     @Override
     public int countFavoriteProduct(Long memberNo) {
         if (memberNo == null) {

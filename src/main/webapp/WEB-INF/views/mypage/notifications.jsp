@@ -12,24 +12,22 @@
 <%@ include file="/WEB-INF/views/mypage/sidebar.jsp" %>
 <div class="mypage-content">
 
-<%-- 2026-07-09 장우철 — 알림함 TB_NOTIFICATION 목록 연동 (이메일/푸시 API 없이 DB만) --%>
+<%-- 알림함 TB_NOTIFICATION 목록 연동 (이메일/푸시 API 없이 DB만) --%>
 <div class="mp-section active">
     <h2 class="mp-title">알림함</h2>
     <p class="mp-desc">주문, 예약, 공지 알림을 확인하세요.</p>
-    <%-- 2026-07-10 장우철 — 전체 읽음 / 전체 삭제 POST 연동 --%>
+    <%-- 전체 읽음 / 전체 삭제 POST 연동 --%>
     <c:if test="${not empty msg}">
         <div style="background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px">${msg}</div>
     </c:if>
     <div class="noti-actions">
         <form method="post" action="${contextPath}/mypage/notifications/read-all" style="display:inline">
-            <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
             
             <button type="submit" class="btn-sm">전체 읽음</button>
         </form>
         <form method="post" action="${contextPath}/mypage/notifications/delete-all" style="display:inline"
               onsubmit="return confirm('알림을 모두 삭제할까요?');">
-            <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
             
             <button type="submit" class="btn-sm danger">전체 삭제</button>
@@ -117,14 +115,6 @@
         </c:choose>
     </div>
 </div>
-
-<%--
-[변경 전 더미 UI] 2026-07-09 장우철
-    <div class="noti-list">
-        <div class="noti-item unread" ... onclick="...detail?type=order"> ... </div>
-        ...
-    </div>
---%>
 
 <script>
 (function() {

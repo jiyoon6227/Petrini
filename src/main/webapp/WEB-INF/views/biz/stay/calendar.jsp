@@ -8,7 +8,7 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_stay.jsp" %>
 
-<%-- 2026-07-14 — 사업자(숙소) 예약 캘린더 DB 연동 --%>
+<%-- 사업자(숙소) 예약 캘린더 DB 연동 --%>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 

@@ -29,12 +29,12 @@ import com.petcare.petcare.admin.cms.vo.NoticeVO;
 
 public interface MemberCsService {
 
-    // 2026-08-11 박유정 — 고객센터 FAQ 목록
+    // 고객센터 FAQ 목록
     List<FaqVO> getVisibleFaqList();
 
-    // 2026-08-11 박유정 — 고객센터 공지 목록
+    // 고객센터 공지 목록
     List<NoticeVO> getVisibleNoticeList();
     
-    // 2026-08-11 박유정 — 공지 상세 (조회수 +1)
+    // 공지 상세 (조회수 +1)
     NoticeVO getVisibleNoticeDetail(Long noticeId);
 }

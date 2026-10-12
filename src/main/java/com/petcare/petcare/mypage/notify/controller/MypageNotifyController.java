@@ -29,7 +29,7 @@ public class MypageNotifyController {
     @Autowired
     private MypageNotifyService mypageNotifyService;
 
-    // 2026-07-09 장우철 — [변경 후] TB_NOTIFICATION 목록 연동
+    // TB_NOTIFICATION 목록 연동
     @GetMapping("/notifications")
     public String notifications(HttpSession session, Model model) {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
@@ -39,13 +39,9 @@ public class MypageNotifyController {
         List<MypageNotifyVO> list = mypageNotifyService.getNotificationList(member.getMemberNo());
         model.addAttribute("list", list);
         return "mypage/notifications";
-
-        /* [변경 전] 2026-07-09 장우철 — 더미 JSP 만 반환
-        return "mypage/notifications";
-        */
     }
 
-    // 2026-07-09 장우철 — [변경 후] notiId 기준 상세 + 읽음 처리
+    // notiId 기준 상세 + 읽음 처리
     @GetMapping("/notifications/detail")
     public String notificationDetail(@RequestParam Long notiId,
                                      HttpSession session,
@@ -60,13 +56,9 @@ public class MypageNotifyController {
         }
         model.addAttribute("noti", noti);
         return "mypage/notification-detail";
-
-        /* [변경 전] 2026-07-09 장우철 — param.type 더미 분기만
-        return "mypage/notification-detail";
-        */
     }
 
-    // 2026-07-10 장우철 — 알림함 전체 읽음
+    // 알림함 전체 읽음
     @PostMapping("/notifications/read-all")
     public String readAllNotifications(HttpSession session, RedirectAttributes rttr) {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
@@ -78,7 +70,7 @@ public class MypageNotifyController {
         return "redirect:/mypage/notifications";
     }
 
-    // 2026-07-10 장우철 — 알림함 전체 삭제
+    // 알림함 전체 삭제
     @PostMapping("/notifications/delete-all")
     public String deleteAllNotifications(HttpSession session, RedirectAttributes rttr) {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
@@ -90,7 +82,7 @@ public class MypageNotifyController {
         return "redirect:/mypage/notifications";
     }
 
-    // 2026/07/11 장우철 — 헤더 미읽음 알림 배지 (장바구니 /store/cart/count 와 동일 패턴)
+    // 헤더 미읽음 알림 배지 (장바구니 /store/cart/count 와 동일 패턴)
     @GetMapping("/notifications/count")
     @ResponseBody
     public int unreadNotificationCount(HttpSession session) {

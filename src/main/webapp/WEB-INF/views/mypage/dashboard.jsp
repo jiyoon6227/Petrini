@@ -15,31 +15,21 @@
 <%-- ── 마이홈 ── --%>
 <div class="mp-section active">
     <h2 class="mp-title">마이홈</h2>
-    <%-- 2026/07/08 장우철 — 인사말: 세션 memberInfo.memberName (로그인 시 TB_MEMBER) --%>
+    <%-- 인사말: 세션 memberInfo.memberName (로그인 시 TB_MEMBER) --%>
     <p class="mp-desc">안녕하세요, <strong>${memberInfo.memberName}</strong>님 반갑습니다.</p>
     <div class="dash-cards">
-        <%-- 2026/07/08 장우철 --%>
         <div class="dash-card">
             <div class="dc-label">보유 포인트</div>
             <div class="dc-value"><fmt:formatNumber value="${memberInfo.pointBalance != null ? memberInfo.pointBalance : 0}" pattern="#,###" /> <span class="dc-unit">P</span></div>
         </div>
-        <%-- [변경 전] 보유 포인트 더미
-        <div class="dc-value">1,200 <span class="dc-unit">P</span></div>
-        --%>
         <div class="dash-card">
             <div class="dc-label">이용중인 쿠폰</div>
             <div class="dc-value">${couponCount != null ? couponCount : 0} <span class="dc-unit">장</span></div>
         </div>
-        <%-- [변경 전] 이용중인 쿠폰 더미
-        <div class="dc-value">2 <span class="dc-unit">장</span></div>
-        --%>
         <div class="dash-card">
             <div class="dc-label">관심상품</div>
             <div class="dc-value">${wishlistCount != null ? wishlistCount : 0} <span class="dc-unit">개</span></div>
         </div>
-        <%-- [변경 전] 관심상품 더미
-        <div class="dc-value">5 <span class="dc-unit">개</span></div>
-        --%>
     </div>
     <div class="dash-shortcuts">
         <a href="${contextPath}/mypage/orders" class="dash-sc">

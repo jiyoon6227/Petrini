@@ -1,6 +1,5 @@
 /**
  * 역할: 마이페이지 찜 DB (TB_FAVORITE)
- * 2026/08/13 장우철
  */
 package com.petcare.petcare.mypage.wishlist.mapper;
 

@@ -1,8 +1,6 @@
 /**
  * 역할: AdminMemberService 구현체 (@Service)
  *
- * - 박유정 / 2026-07-16 (목록·상세), 2026-07-20 (STEP 7·8)
- *
  * [getAdminMemberDetail — 상세]
  * 1. selectAdminMemberDetail → TB_MEMBER 기본정보
  * 2. selectAdminMemberActivityStats → 주문·예약·게시글 등 COUNT (STEP 8)
@@ -53,19 +51,19 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         this.adminMemberMapper = adminMemberMapper;
     }
 
-    // 2026-07-16 박유정 — 관리자 회원 목록 (검색·필터·페이징)
+    // 관리자 회원 목록 (검색·필터·페이징)
     @Override
     public List<AdminMemberVO> getAdminMemberList(String keyword, String statusCd, String roleType, int page) {
         int safePage = page < 1 ? 1 : page;
         int offset = (safePage - 1) * PAGE_SIZE;
         return adminMemberMapper.selectAdminMemberList(keyword, statusCd, roleType, offset, PAGE_SIZE);
     }
-    // 2026-07-16 박유정 — 목록 총 건수
+    // 목록 총 건수
     @Override
     public int getAdminMemberCount(String keyword, String statusCd, String roleType) {
         return adminMemberMapper.selectAdminMemberCount(keyword, statusCd, roleType);
     }
-    // 2026-07-16 박유정 — 관리자 회원 상세 (기본정보)
+    // 관리자 회원 상세 (기본정보)
     @Override
     public AdminMemberVO getAdminMemberDetail(long memberNo) {
         AdminMemberVO member = adminMemberMapper.selectAdminMemberDetail(memberNo);
@@ -73,7 +71,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
             return null;
         }
 
-        // 2026-07-20 박유정 STEP 8 — 활동 현황 통계 합치기
+        // 활동 현황 통계 합치기
         AdminMemberVO stats = adminMemberMapper.selectAdminMemberActivityStats(memberNo);
         if (stats != null) {
             member.setOrderCount(stats.getOrderCount());
@@ -88,7 +86,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
             member.setPetNames(stats.getPetNames());
         }
 
-        // 2026-07-21 박유정 STEP 10 — 포인트 요약 합치기
+        // 포인트 요약 합치기
         AdminMemberVO pointSummary = adminMemberMapper.selectAdminMemberPointSummary(memberNo);
         if (pointSummary != null) {
             member.setTotalEarnPoint(pointSummary.getTotalEarnPoint());
@@ -96,8 +94,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         }
         return member;
     }
-    // 2026-07-20 박유정 STEP 7 — 계정 정지
-    // 2026-07-21 박유정 STEP ② — 기간 정지 (SUSPEND_END_DATE 설정)
+    // 계정 정지
+    // 기간 정지 (SUSPEND_END_DATE 설정)
     @Override
     public void suspendMember(long memberNo, String suspendType) {
         LocalDateTime endDate = resolveSuspendEndDate(suspendType);
@@ -106,7 +104,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
             throw new IllegalArgumentException("MEMBER_NOT_FOUND");
         }
     }
-    // 2026-07-20 박유정 STEP 7 — 계정 복구
+    // 계정 복구
     @Override
     public void restoreMember(long memberNo) {
         int updated = adminMemberMapper.restoreMemberStatus(memberNo);
@@ -115,7 +113,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         }
     }
 
-    // 2026-07-20 박유정 STEP 7 — 강제 탈퇴
+    // 강제 탈퇴
     @Override
     public void withdrawMember(long memberNo) {
         int updated = adminMemberMapper.updateMemberStatus(memberNo, "WITHDRAWN");
@@ -124,7 +122,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         }
     }
 
-    // 2026-07-21 박유정 STEP 9 — 등급 변경
+    // 등급 변경
     @Override
     public void updateMemberGrade(long memberNo, String gradeCd) {
         if (gradeCd == null || gradeCd.isBlank()) {
@@ -140,13 +138,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         }
     }
 
-    // 2026-07-21 박유정 STEP 10 — 포인트 이력 목록
+    // 포인트 이력 목록
     @Override
     public List<AdminMemberPointVO> getAdminMemberPointHistory(long memberNo) {
         return adminMemberMapper.selectAdminMemberPointHistory(memberNo);
     }
 
-    // 2026-07-21 박유정 STEP 10 — 포인트 지급·차감
+    // 포인트 지급·차감
     @Override
     @Transactional
     public void adjustMemberPoint(long memberNo, String adjustType, int amount, String reason) {
@@ -188,14 +186,14 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         }
     }
 
-    // 2026-07-21 박유정 STEP 11 — 회원 최근 주문 목록
+    // 회원 최근 주문 목록
     @Override
     public List<AdminMemberOrderVO> getAdminMemberRecentOrders(long memberNo) {
         return adminMemberMapper.selectAdminMemberRecentOrders(memberNo);
     }
 
-    // 2026-07-21 박유정 STEP 12 — 선택 회원 일괄 정지
-    // 2026-07-21 박유정 STEP ② — 일괄 기간 정지 (suspendType)
+    // 선택 회원 일괄 정지
+    // 일괄 기간 정지 (suspendType)
     @Override
     @Transactional
     public int bulkSuspendMembers(List<Long> memberNos, String suspendType) {
@@ -206,7 +204,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return adminMemberMapper.updateMemberSuspendBulk(memberNos, endDate);
     }
 
-    // 2026-07-21 박유정 STEP 12 — 선택 회원 일괄 탈퇴
+    // 선택 회원 일괄 탈퇴
     @Override
     @Transactional
     public int bulkWithdrawMembers(List<Long> memberNos) {
@@ -216,7 +214,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return adminMemberMapper.updateMemberStatusBulk(memberNos, "WITHDRAWN");
     }
 
-    // 2026-07-22 박유정 — 선택 회원 일괄 복구 (SUSPENDED → NORMAL)
+    // 선택 회원 일괄 복구 (SUSPENDED → NORMAL)
     @Override
     @Transactional
     public int bulkRestoreMembers(List<Long> memberNos) {
@@ -229,7 +227,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     private static final DateTimeFormatter EXPORT_DATE =
             DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-    // 2026-07-21 박유정 — 회원 목록 CSV보내기
+    // 회원 목록 CSV보내기
     @Override
     public void exportMemberCsv(String keyword, String statusCd, String roleType,
                                 OutputStream out) throws IOException {
@@ -301,7 +299,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         };
     }
 
-    // 2026-07-21 박유정 STEP ② — 정지 기간 → SUSPEND_END_DATE (영구=null, 해제일 00:00)
+    // 정지 기간 → SUSPEND_END_DATE (영구=null, 해제일 00:00)
     private LocalDateTime resolveSuspendEndDate(String suspendType) {
         if (suspendType == null || suspendType.isBlank()) {
             throw new IllegalArgumentException("INVALID_SUSPEND_TYPE");
@@ -315,7 +313,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         };
     }
 
-    // 2026-07-21 박유정 — 기간 정지 만료 자동 복구
+    // 기간 정지 만료 자동 복구
     @Override
     public void releaseExpiredSuspensions() {
         adminMemberMapper.releaseExpiredSuspensions();

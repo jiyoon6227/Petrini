@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class MemberAuthBizVO {
 
-    // 2026-07-09 장우철 — 승인된 사업자 세션(role=BIZ) 세팅용 필드
+    // 승인된 사업자 세션(role=BIZ) 세팅용 필드
     // 이유: BIZ_ID(=회원 이메일)로 TB_BUSINESS 조회 후 bizType 으로 /biz/* 화면 분기
     private Long   bizNo;
     private String bizType;   // HOSPITAL / STAY / STORE / GROOMING / STUDIO / RESTAURANT

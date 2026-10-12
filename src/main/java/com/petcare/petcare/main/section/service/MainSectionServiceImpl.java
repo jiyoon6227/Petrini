@@ -10,7 +10,6 @@ import com.petcare.petcare.main.section.vo.MainCommunityPreviewVO;
 import com.petcare.petcare.main.section.vo.MainPopularProductVO;
 
 /*
- *  2026/07/06 장우철
  *  @Service 서비스 구현체
  *  구현 내용 : 인기상품 목록 조회 , 할인율 계산 , 커뮤니티 최신글 미리보기 조회
  */
@@ -41,7 +40,7 @@ public class MainSectionServiceImpl implements MainSectionService {
     @Override
     public List<MainCommunityPreviewVO> getLatestPosts(int limit) {
         List<MainCommunityPreviewVO> list = mainSectionMapper.selectCommunityPreview(limit);
-        //HYJ 26.08.04 메인 커뮤니티 썸네일
+        // 메인 커뮤니티 썸네일
         for (MainCommunityPreviewVO item : list) {
             List<String> urls = communityPostMapper.selectFileUrlsByPostId(item.getPostId());
             if (urls != null && !urls.isEmpty()) {

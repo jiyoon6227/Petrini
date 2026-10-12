@@ -18,7 +18,7 @@
     <c:if test="${not empty errorMsg}">
       <p class="mp-desc" style="color:#B91C1C">${errorMsg}</p>
     </c:if>
-    <%-- 2026/08/13 장우철 — TB_FAVORITE 실데이터 --%>
+    <%-- TB_FAVORITE 목록 --%>
     <p class="mp-desc">찜한 항목 <strong id="wishCount">${fn:length(wishList)}</strong>개</p>
     <div class="wishlist-grid" id="wishlistGrid" data-server="true">
         <c:choose>

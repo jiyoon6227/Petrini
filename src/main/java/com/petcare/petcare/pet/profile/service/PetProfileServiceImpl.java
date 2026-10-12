@@ -1,6 +1,6 @@
 /**
- * 2026/07/11 장우철 — PetProfileService 구현
- * 2026/08/11 장우철 — 대표사진 Multipart 업로드 → TB_PET.PHOTO_URL
+ * PetProfileService 구현
+ * 대표사진 Multipart 업로드 → TB_PET.PHOTO_URL
  */
 
 package com.petcare.petcare.pet.profile.service;
@@ -71,7 +71,7 @@ public class PetProfileServiceImpl implements PetProfileService {
         return savePetPhoto(vo.getPetId(), memberNo, petPhoto);
     }
 
-    /** 2026/08/11 장우철 — FileService 업로드 후 PHOTO_URL 저장 (선택) */
+    /** FileService 업로드 후 PHOTO_URL 저장 (선택) */
     private String savePetPhoto(Long petId, Long memberNo, MultipartFile petPhoto) {
         if (petId == null || memberNo == null || petPhoto == null || petPhoto.isEmpty()) {
             return null;

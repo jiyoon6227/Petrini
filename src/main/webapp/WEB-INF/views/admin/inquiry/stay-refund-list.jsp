@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026/07/31 장우철 — 관리자 숙소 환불신청 목록 (숙소 예약 관리 UI 통일) --%>
+<%-- 관리자 숙소 환불신청 목록 (숙소 예약 관리 UI 통일) --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="adminPage" value="stay-refund" />
 <%@ include file="/WEB-INF/views/admin/common/header.jsp" %>

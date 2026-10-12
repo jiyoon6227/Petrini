@@ -1,6 +1,5 @@
 /**
  * 역할: 월정산 생성·15일 자동지급 배치 결과
- * 2026/08/05 장우철 — S12
  */
 package com.petcare.petcare.settlement.vo;
 

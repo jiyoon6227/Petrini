@@ -4,7 +4,7 @@
 </div><%-- /biz-page --%>
 </body>
 
-<%-- 2026-08-05 HYJ — CSRF 토큰 공통 처리 (AJAX fetch 용) --%>
+<%-- CSRF 토큰 공통 처리 (AJAX fetch 용) --%>
 <script>
 /**
  * CSRF 토큰을 자동으로 포함하는 fetch 래퍼
@@ -32,7 +32,7 @@ window.csrfFetch = function(url, options) {
     return fetch(url, options);
 };
 
-// HYJ 26.08.05 모든 $.ajax POST 요청에 CSRF 토큰 자동 포함
+// 모든 $.ajax POST 요청에 CSRF 토큰 자동 포함
 if (typeof $ !== 'undefined' && $.ajaxSetup) {
     $.ajaxSetup({
         beforeSend: function(xhr) {

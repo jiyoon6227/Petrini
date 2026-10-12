@@ -86,7 +86,7 @@
         WHERE  HOSPITAL_ID  = #{hospitalId}
     </update>
 
-    <!-- 2026-07-10 장우철 — 사업자 예약 목록 (F4), tab: all / wait / done / cancel -->
+    <!-- 사업자 예약 목록, tab: all / wait / done / cancel -->
     <select id="selectReservationList" resultType="com.petcare.petcare.hospital.vo.ReservationVO">
         SELECT  R.RESV_ID      AS resvId,
                 R.RESV_NO      AS resvNo,
@@ -136,7 +136,7 @@
          ORDER BY R.RESV_DATE DESC, R.RESV_TIME DESC, R.RESV_ID DESC
     </select>
 
-    <!-- 2026-07-10 장우철 — 사업자 예약 상세 모달 (F6) -->
+    <!-- 사업자 예약 상세 모달 -->
     <select id="selectReservationDetail" resultType="com.petcare.petcare.hospital.vo.ReservationVO">
         SELECT  R.RESV_ID      AS resvId,
                 R.RESV_NO      AS resvNo,
@@ -172,8 +172,8 @@
            AND  R.RESV_TYPE  = 'HOSPITAL'
     </select>
 
-    <!-- 2026-07-10 장우철 — 사업자 예약 상태 변경 (F5) -->
-    <!-- 2026/07/11 장우철 — CANCEL 시 REJECT_REASON(취소 사유) 저장 -->
+    <!-- 사업자 예약 상태 변경 -->
+    <!-- CANCEL 시 REJECT_REASON(취소 사유) 저장 -->
     <update id="updateReservationStatus">
         UPDATE TB_RESERVATION
            SET STATUS_CD = #{statusCd},
@@ -183,7 +183,7 @@
            AND RESV_TYPE = 'HOSPITAL'
     </update>
 
-    <!-- 2026-07-10 장우철 — 사업자 예약 캘린더 (F7) -->
+    <!-- 사업자 예약 캘린더 -->
     <select id="selectReservationCalendarList" resultType="com.petcare.petcare.hospital.vo.ReservationVO">
         SELECT  R.RESV_ID      AS resvId,
                 R.RESV_NO      AS resvNo,
@@ -208,7 +208,7 @@
          ORDER BY R.RESV_DATE, R.RESV_TIME
     </select>
 
-    <!-- 2026/07/11 장우철 — 사이드바 예약관리 배지 (PENDING만) -->
+    <!-- 사이드바 예약관리 배지 (PENDING만) -->
     <select id="countPendingReservations" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION R
@@ -217,7 +217,7 @@
            AND R.STATUS_CD  = 'PENDING'
     </select>
 
-    <!-- 2026/07/11 장우철 — 사이드바 캘린더 배지 (오늘 CONFIRMED) -->
+    <!-- 사이드바 캘린더 배지 (오늘 CONFIRMED) -->
     <select id="countTodayConfirmedReservations" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION R
@@ -228,21 +228,21 @@
            AND R.RESV_DATE &lt;  TRUNC(SYSDATE) + 1
     </select>
 
-    <!-- 2026/07/11 장우철 — 예약 알림용 병원명 -->
+    <!-- 예약 알림용 병원명 -->
     <select id="selectHospitalNameById" resultType="string">
         SELECT NAME
           FROM TB_HOSPITAL
          WHERE HOSPITAL_ID = #{hospitalId}
     </select>
 
-    <!-- 2026/07/13 장우철 — 리뷰 알림 수신자 (병원 MEMBER_NO) -->
+    <!-- 리뷰 알림 수신자 (병원 MEMBER_NO) -->
     <select id="selectHospitalMemberNo" resultType="long">
         SELECT MEMBER_NO
           FROM TB_HOSPITAL
          WHERE HOSPITAL_ID = #{hospitalId}
     </select>
 
-    <!-- 2026/07/13 장우철 — 기록 미작성 CONFIRMED 예약 (작성 모달용) -->
+    <!-- 기록 미작성 CONFIRMED 예약 (작성 모달용) -->
     <select id="selectConfirmedWithoutRecord"
             resultType="com.petcare.petcare.hospital.vo.ReservationVO">
         SELECT  R.RESV_ID      AS resvId,
@@ -268,7 +268,7 @@
          ORDER BY R.RESV_DATE DESC, R.RESV_TIME DESC
     </select>
 
-    <!-- 2026/07/13 장우철 — 진료기록 등록 (MAX+1) -->
+    <!-- 진료기록 등록 (MAX+1) -->
     <insert id="insertMedicalRecord"
             parameterType="com.petcare.petcare.hospital.vo.MedicalRecordVO">
         <selectKey keyProperty="recordId" resultType="long" order="BEFORE">
@@ -291,7 +291,7 @@
          WHERE RESV_ID = #{resvId}
     </select>
 
-    <!-- 2026/07/13 장우철 — 진료기록 목록 -->
+    <!-- 진료기록 목록 -->
     <select id="selectMedicalRecords"
             resultType="com.petcare.petcare.hospital.vo.MedicalRecordVO">
         SELECT  MR.RECORD_ID     AS recordId,
@@ -353,7 +353,7 @@
            AND  MR.RECORD_ID = #{recordId}
     </select>
 
-    <!-- 2026/07/14 장우철 — 사업자 리뷰관리 목록 -->
+    <!-- 사업자 리뷰관리 목록 -->
     <select id="selectBizHospitalReviews"
             resultType="com.petcare.petcare.hospital.vo.HospitalReviewVO">
         SELECT  R.REVIEW_ID   AS reviewId,
@@ -376,7 +376,7 @@
          ORDER BY R.REG_DATE DESC, R.REVIEW_ID DESC
     </select>
 
-    <!-- 2026/07/14 장우철 — 답글 대상 리뷰 확인 (병원 소유 검증) -->
+    <!-- 답글 대상 리뷰 확인 (병원 소유 검증) -->
     <select id="selectBizHospitalReview"
             resultType="com.petcare.petcare.hospital.vo.HospitalReviewVO">
         SELECT  R.REVIEW_ID   AS reviewId,
@@ -395,7 +395,7 @@
            AND  R.REVIEW_ID = #{reviewId}
     </select>
 
-    <!-- 2026/07/14 장우철 — 병원 답글 저장 (작성·수정 동일 UPDATE) -->
+    <!-- 병원 답글 저장 (작성·수정 동일 UPDATE) -->
     <update id="updateReviewBizReply">
         UPDATE TB_REVIEW
            SET BIZ_REPLY = #{bizReply, jdbcType=VARCHAR}
@@ -404,7 +404,7 @@
            AND REVIEW_ID = #{reviewId}
     </update>
 
-    <!-- 2026-07-24 박유정 — 사업자 리뷰 삭제 요청 INSERT -->
+    <!-- 사업자 리뷰 삭제 요청 INSERT -->
     <insert id="insertReviewDeleteRequest"
             parameterType="com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO">
         <selectKey keyProperty="requestId" resultType="long" order="BEFORE">
@@ -431,7 +431,7 @@
         )
     </insert>
 
-    <!-- 2026-07-24 박유정 — PENDING 중복 요청 체크 -->
+    <!-- PENDING 중복 요청 체크 -->
     <select id="countPendingReviewDeleteRequest" resultType="int">
         SELECT COUNT(*)
           FROM TB_REVIEW_DELETE_REQUEST
@@ -440,7 +440,7 @@
            AND STATUS_CD = 'PENDING'
     </select>
 
-    <!-- 2026-07-24 박유정 — 사업자 삭제요청 탭 (승인 후 리뷰 삭제돼도 LEFT JOIN으로 목록 유지) -->
+    <!-- 사업자 삭제요청 탭 (승인 후 리뷰 삭제돼도 LEFT JOIN으로 목록 유지) -->
     <select id="selectBizReviewDeleteRequests"
             resultType="com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO">
         SELECT DR.REQUEST_ID     AS requestId,
@@ -465,7 +465,7 @@
     </select>
 
     <!-- =========================================================
-         2026/07/16 장우철 고도화작업 — 병원 스케줄 (유형·의사·규칙·예외)
+         병원 스케줄 (유형·의사·규칙·예외)
          ========================================================= -->
 
     <select id="selectTreatTypeList"
@@ -586,7 +586,7 @@
            AND DOCTOR_ID = #{doctorId}
     </delete>
 
-    <!-- 2026/07/16 장우철 고도화작업 — RESV_RULE 제거, 병원 시작 간격 -->
+    <!-- RESV_RULE 제거, 병원 시작 간격 -->
     <select id="selectResvIntervalMin" resultType="java.lang.Integer">
         SELECT NVL(RESV_INTERVAL_MIN, 15)
           FROM TB_HOSPITAL
@@ -690,7 +690,7 @@
     </delete>
 
     <!-- ══════════════════════════════════════════════
-        HYJ 26.08.06 대시보드 집계 쿼리
+        대시보드 집계 쿼리
     ══════════════════════════════════════════════ -->
 
     <!-- 특정 날짜 예약 건수 -->
@@ -703,7 +703,7 @@
            AND STATUS_CD NOT IN ('CANCEL', 'REJECTED')
     </select>
 
-    <!-- 지윤 26.08.13 추가: 오늘 예약 카드 옆 괄호용 - 오늘 취소·노쇼 건수 -->
+    <!-- 오늘 예약 카드 옆 괄호용 - 오늘 취소·노쇼 건수 -->
     <select id="countCancelByDate" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION
@@ -734,8 +734,8 @@
            AND RESV_DATE &lt;= TO_DATE(#{dt}, 'YYYY-MM-DD')
     </select>
 
-    <!-- 지윤 26.08.13 추가: 이번 달 진료완료 건수 (매출 대신 상단 카드에 표시) -->
-    <!-- 지윤 26.08.13 수정: RESV_DATE에 시간까지 저장돼있어서 TRUNC 안 하면 오늘자 DONE 건이 집계에서 빠짐 -->
+    <!-- 이번 달 진료완료 건수 (매출 대신 상단 카드에 표시) -->
+    <!-- RESV_DATE에 시간이 포함되어 TRUNC 필요 (없으면 오늘자 DONE 건 누락) -->
     <select id="sumMonthDoneCount" resultType="int">
         SELECT COUNT(*)
           FROM TB_RESERVATION
@@ -757,7 +757,7 @@
     </select>
 
     <!-- 일별 예약 건수 + 진료완료 + 취소·노쇼 (최근 N일) -->
-    <!-- 지윤 26.08.13 수정: 병원은 결제 연동 없어 매출 대신 완료/취소 건수로 변경 -->
+    <!-- 병원은 결제 연동이 없어 매출 대신 완료/취소 건수 -->
     <select id="selectDailyStats" resultType="com.petcare.petcare.biz.vo.DailyStatVO">
         SELECT TO_CHAR(D.DT, 'MM-DD') AS dt,
                NVL(R.CNT, 0)          AS resvCount,
@@ -781,7 +781,7 @@
          ORDER BY D.DT
     </select>
 
-    <!-- 지윤 26.08.13 수정: 월별 예약 건수 + 진료완료 + 취소·노쇼 (최근 N개월, 한 달 단위 그룹핑) -->
+    <!-- 월별 예약 건수 + 진료완료 + 취소·노쇼 (최근 N개월, 한 달 단위 그룹핑) -->
     <select id="selectMonthlyStats" resultType="com.petcare.petcare.biz.vo.DailyStatVO">
         SELECT TO_CHAR(M.MN, 'YYYY-MM') AS dt,
                NVL(R.CNT, 0)            AS resvCount,

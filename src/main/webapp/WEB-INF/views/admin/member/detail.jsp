@@ -1,5 +1,4 @@
 <%--
-  - 박유정 / 2026-07-16 (기본정보), 2026-07-20 (STEP 7·8), 2026-07-21 (STEP 9~11·② 기간정지)
   - GET  /admin/member/detail?id= → ${member}, ${pointList}, ${orderList}
   - STEP 7: POST 정지·복구·강제탈퇴 (위험 영역)
   - STEP 8: 활동 현황 DB 연동
@@ -132,7 +131,7 @@
                     <c:when test="${member.statusCd eq 'NORMAL'}">
                         <span class="mem-badge mb-active">활성</span>
                     </c:when>
-                    <%-- 2026-07-21 박유정 STEP ② — 기간 정지 뱃지 (영구 / ~종료일) --%>
+                    <%-- 기간 정지 뱃지 (영구 / ~종료일) --%>
                     <c:when test="${member.statusCd eq 'SUSPENDED'}">
                         <span class="mem-badge mb-banned">
                             <c:choose>
@@ -173,7 +172,7 @@
 
     <div class="mem-detail-grid">
 
-        <%-- 기본 정보 — 2026-07-16 박유정 DB 연동 --%>
+        <%-- 기본 정보 --%>
         <div class="mem-info-section">
             <div class="mis-title">
                 <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -211,7 +210,7 @@
             <div class="mis-row"><label>가입 경로</label><span>—</span></div>
         </div>
 
-        <%-- 활동 현황 — 2026-07-20 박유정 STEP 8 DB 연동 --%>
+        <%-- 활동 현황 --%>
         <div class="mem-info-section">
             <div class="mis-title">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -233,39 +232,8 @@
                 </span>
             </div>
         </div>
-        <%-- 등급 변경 — 2026-07-21 박유정 STEP 9 DB 연동 --%>
+        <%-- 등급 변경 --%>
         <div class="mem-info-section">
-            <!--HYJ 26.07.28 임시주석 후 활동이력으로 대체-->
-            <%-- <div class="mis-title">
-                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                등급 변경
-            </div>
-            <p style="font-size:13px;color:#999;margin:0 0 14px">
-                현재 등급:
-                <strong style="color:#F59E0B">
-                    <c:choose>
-                        <c:when test="${member.gradeCd eq 'GOLD'}">골드</c:when>
-                        <c:when test="${member.gradeCd eq 'SILVER'}">실버</c:when>
-                        <c:otherwise>브론즈</c:otherwise>
-                    </c:choose>
-                </strong>
-            </p>
-            <form method="post" action="${contextPath}/admin/member/grade"
-                  class="grade-select-row"
-                  onsubmit="return confirm('등급을 변경하시겠습니까?')">
-                <input type="hidden" name="memberNo" value="${member.memberNo}">
-                <select name="gradeCd" required>
-                    <option value="BRONZE" ${member.gradeCd eq 'BRONZE' ? 'selected' : ''}>브론즈</option>
-                    <option value="SILVER" ${member.gradeCd eq 'SILVER' ? 'selected' : ''}>실버</option>
-                    <option value="GOLD"   ${member.gradeCd eq 'GOLD'   ? 'selected' : ''}>골드</option>
-                </select>
-                <button type="submit" class="adm-btn blue">변경</button>
-            </form>
-            <div style="margin-top:14px;font-size:12px;color:#999;line-height:1.6">
-                · 브론즈: 기본 등급<br>
-                · 실버: 1만 포인트 이상<br>
-                · 골드: 5만 포인트 이상
-            </div> --%>
             <div class="mis-title">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 활동 이력
@@ -275,7 +243,7 @@
             <div class="mis-row"><label>관리자 게시글 삭제 누적</label><span>${member.adminPostDelCount != null ? member.adminPostDelCount : 0}건</span></div>
             <div class="mis-row"><label>관리자 댓글 삭제 누적</label><span>${member.adminCommentDelCount != null ? member.adminCommentDelCount : 0}건</span></div>
         </div>
-        <%-- 포인트 관리 — 2026-07-21 박유정 STEP 10 DB 연동 --%>
+        <%-- 포인트 관리 --%>
         <div class="mem-info-section">
             <div class="mis-title">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
@@ -296,7 +264,6 @@
                 </div>
             </div>
             <form method="post" action="${contextPath}/admin/member/point" class="point-input-row">
-                <!--HYJ 26.08.05-->
                 <input type="hidden" name="_csrf" value="${_csrf}">
                 
                 <input type="hidden" name="memberNo" value="${member.memberNo}">
@@ -354,7 +321,7 @@
                 </table>
             </div>
         </div>
-        <%-- 최근 주문 — 2026-07-21 박유정 STEP 11 DB 연동 --%>
+        <%-- 최근 주문 --%>
         <div class="mem-info-section full">
             <div class="mis-title">
                 <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -426,14 +393,13 @@
             </div>
              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
-                <%-- 2026-07-21 박유정 STEP ② — 기간 정지 (3일/7일/영구) --%>
+                <%-- 기간 정지 (3일/7일/영구) --%>
                 <c:if test="${member.statusCd eq 'NORMAL'}">
                     <div class="danger-zone">
                         <p><strong>계정 정지</strong><br>정지 기간을 선택한 뒤 처리합니다.</p>
                         <form method="post" action="${contextPath}/admin/member/suspend"
                               style="display:flex;gap:8px;align-items:center"
                               onsubmit="return confirm('${member.memberName} 회원을 정지하시겠습니까?')">
-                            <!--HYJ 26.08.05-->
                             <input type="hidden" name="_csrf" value="${_csrf}">
                             
                             <input type="hidden" name="memberNo" value="${member.memberNo}">
@@ -453,7 +419,6 @@
                         <div class="danger-btns">
                             <form method="post" action="${contextPath}/admin/member/restore"
                                   onsubmit="return confirm('${member.memberName} 회원을 복구하시겠습니까?')">
-                                <!--HYJ 26.08.05-->
                                 <input type="hidden" name="_csrf" value="${_csrf}">  
                                 
                                 <input type="hidden" name="memberNo" value="${member.memberNo}">
@@ -469,7 +434,6 @@
                         <div class="danger-btns">
                             <form method="post" action="${contextPath}/admin/member/withdraw"
                                   onsubmit="return confirm('정말 강제 탈퇴 처리하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')">
-                                <!--HYJ 26.08.05-->
                                 <input type="hidden" name="_csrf" value="${_csrf}">  
                                 
                                 <input type="hidden" name="memberNo" value="${member.memberNo}">

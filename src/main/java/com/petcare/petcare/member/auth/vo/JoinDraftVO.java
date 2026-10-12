@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — 회원가입 세션 임시저장 VO
+ * 회원가입 세션 임시저장 VO
  *
  * 용도
  * - 토스 카드등록으로 /join 을 떠날 때 폼·약관·이메일인증 상태 보관
@@ -42,6 +42,6 @@ public class JoinDraftVO {
     // ── 이메일 인증 플래그 (JS 변수 복원용) ──
     private Boolean emailChecked;
     private Boolean emailVerified;
-    // 2026/08/11 장우철 — 아이디 중복확인 플래그 (카드등록 왕복 시 복원)
+    // 아이디 중복확인 플래그 (카드등록 왕복 시 복원)
     private Boolean idChecked;
 }

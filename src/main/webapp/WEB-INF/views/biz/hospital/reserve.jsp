@@ -20,7 +20,7 @@
   .rv-row span:first-child{color:#888;flex-shrink:0}
   .rv-row span:last-child{color:#1A1A2E;font-weight:600;text-align:right}
 
-  /* 2026/07/13 장우철 — 진료완료 풀모달 (records 와 동일) */
+  /* 진료완료 풀모달 (records 와 동일) */
   .rm-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
   .rm-modal-bg.open{display:flex}
   .rm-modal{background:#fff;border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -57,7 +57,7 @@
   @media (max-width:600px){.rm-grid{grid-template-columns:1fr}}
 </style>
 
-<%-- 2026-07-10 장우철 — 사업자 예약 관리 DB 연동 (F4~F6) --%>
+<%-- 사업자 예약 관리 --%>
 <main class="biz-main">
   <div class="biz-page-head">
     <h1 class="biz-page-title">예약 관리</h1>
@@ -73,7 +73,7 @@
 
   <div class="biz-card">
     <div style="padding:20px 20px 0">
-      <%-- 2026/07/11 장우철 — 예약신청(PENDING) / 예약확정(CONFIRMED) 탭 분리 --%>
+      <%-- 예약신청(PENDING) / 예약확정(CONFIRMED) 탭 분리 --%>
       <div class="biz-tabs">
         <button type="button" class="biz-tab active" data-tab="all" onclick="switchTab('all')">전체<span class="biz-tab-count" id="cntAll"></span></button>
         <button type="button" class="biz-tab" data-tab="pending" onclick="switchTab('pending')">예약신청<span class="biz-tab-count" id="cntPending"></span></button>
@@ -124,7 +124,7 @@
   </div>
 </div>
 
-<%-- 2026/07/13 장우철 — 진료완료 + 풀 진료기록 모달 (records 와 동일 필드) --%>
+<%-- 진료완료 + 풀 진료기록 모달 (records 와 동일 필드) --%>
 <div class="rm-modal-bg" id="completeModalBg" onclick="if(event.target===this) closeCompleteModal()">
   <div class="rm-modal">
     <div class="rm-header">
@@ -132,7 +132,6 @@
       <button type="button" class="rm-close" onclick="closeCompleteModal()">×</button>
     </div>
     <form id="completeRecordForm" method="post" action="${contextPath}/biz/hospital/records/complete">
-      <!--HYJ 26.08.05-->
       <input type="hidden" name="_csrf" value="${_csrf}">
 
       <input type="hidden" name="resvId" id="cmResvId" value="">
@@ -229,7 +228,7 @@
   </div>
 </div>
 
-<%-- 2026/07/11 장우철 — 예약취소 사유 필수 모달 --%>
+<%-- 예약취소 사유 필수 모달 --%>
 <div class="rv-modal-bg" id="cancelModalBg" onclick="if(event.target===this) closeCancelModal()">
   <div class="rv-modal">
     <div class="rv-modal-head">
@@ -250,9 +249,9 @@
 </div>
 
 <script>
-  // 2026-07-10 장우철 — 서버 목록 → JS (탭 필터·모달)
-  // 2026/07/11 장우철 — PENDING/CONFIRMED 분리, 신청→확정→완료 버튼
-  // 2026/08/06 장우철 — CSRF는 문자열로 보관 (UUID 미인용 삽입 시 스크립트 파싱 깨짐)
+  // 서버 목록 → JS (탭 필터·모달)
+  // PENDING/CONFIRMED 분리, 신청→확정→완료 버튼
+  // CSRF는 문자열로 보관 (UUID 미인용 삽입 시 스크립트 파싱 깨짐)
   var csrfToken = (document.querySelector('meta[name="_csrf"]') || {}).content
       || '<c:out value="${_csrf}"/>';
   var reservations = [
@@ -347,7 +346,7 @@
 
   function postStatus(resvId, statusCd) {
     if (statusCd === 'CONFIRMED' && !confirm('예약을 확정하시겠습니까?')) return;
-    // 2026/07/13 장우철 — DONE 은 openCompleteModal 로 분리 (바로 postStatus 호출 안 함)
+    // DONE 은 openCompleteModal 로 분리 (바로 postStatus 호출 안 함)
 
     var form = document.createElement('form');
     form.method = 'POST';
@@ -360,7 +359,7 @@
     form.submit();
   }
 
-  // 2026/07/13 장우철 — 진료완료: 상세 조회 후 풀모달 자동채움
+  // 진료완료: 상세 조회 후 풀모달 자동채움
   function syncCmTreatType() {
     var checked = document.querySelector('input[name="cmRecType"]:checked');
     document.getElementById('cmTreatType').value = checked ? checked.value : '진료';
@@ -405,7 +404,7 @@
     document.getElementById('completeRecordForm').submit();
   }
 
-  // 2026/07/11 장우철 — 취소 사유 모달
+  // 취소 사유 모달
   var cancelTargetResvId = null;
 
   function openCancelModal(resvId) {

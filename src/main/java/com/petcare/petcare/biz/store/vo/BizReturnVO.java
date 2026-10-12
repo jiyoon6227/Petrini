@@ -1,6 +1,5 @@
 /**
  * 역할: 사업자 환불신청 목록/상세용 VO (ORDER + ORDER_ITEM JOIN)
- * 2026/08/04 장우철
  */
 package com.petcare.petcare.biz.store.vo;
 
@@ -48,11 +47,11 @@ public class BizReturnVO {
     private Date returnDoneAt;
 
     private String tossPaymentKey;
-    private String payMethod; // 2026/08/11 장우철 — BILLING 여부 (토스 취소 시크릿 분기)
+    private String payMethod; // BILLING 여부 (토스 취소 시크릿 분기)
     private Integer payAmount;
     private Integer pointUsed;
     private Long memberCouponId;
-    // 2026/08/13 장우철 — 주문 결제 내역·이 상품 환불 배분
+    // 주문 결제 내역·이 상품 환불 배분
     private Integer orderProductTotal;
     private Integer deliveryFee;
     private Integer discountAmount;

@@ -1,6 +1,6 @@
 <%--
   역할: 공통 헤더 (일반 회원·고객센터 등)
-  - 박유정 / 2026-07-22 — 정지 회원 안내 배너 (SUSPENDED + role=USER)
+  - 정지 회원 안내 배너 (SUSPENDED + role=USER)
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -21,11 +21,11 @@
     <link rel="stylesheet" href="${contextPath}/resources/css/petcare.css?v=20260724">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <%-- 2026-08-05 HYJ — CSRF 토큰: AJAX 에서 이 meta 태그를 읽어서 header 에 포함 --%>
+    <%-- CSRF 토큰: AJAX 에서 이 meta 태그를 읽어서 header 에 포함 --%>
     <meta name="_csrf" content="${_csrf}">
 </head>
 <body>
-<%-- 2026-07-22 박유정 — 정지 회원 안내 (일반 회원 화면) --%>
+<%-- 정지 회원 안내 (일반 회원 화면) --%>
 <c:if test="${not empty memberInfo and memberInfo.status eq 'SUSPENDED' and memberInfo.role eq 'USER'}">
     <div class="suspended-banner">
         정지된 회원입니다. 고객센터 탭만 이용 가능합니다.
@@ -36,12 +36,12 @@
     <div class="header-top">
         <div class="header-top-inner">
             <nav class="header-top-nav">
-            <!-- 2026/07/07 장우철: 관리자 헤더 버튼 (role=ADMIN 일 때만 /admin 링크) -->
+            <!-- 관리자 헤더 버튼 (role=ADMIN 일 때만 /admin 링크) -->
             <c:choose>
             <c:when test="${not empty memberInfo}">
                 <c:if test="${memberInfo.role eq 'ADMIN'}">
                     <a href="${contextPath}/admin">관리자페이지</a>
-                    <%-- 2026/08/12 장우철 — 스케줄러 QA 수동 실행 --%>
+                    <%-- 스케줄러 QA 수동 실행 --%>
                     <a href="${contextPath}/admin/scheduler">스케줄러</a>
                 </c:if>
                 <a href="${contextPath}/member/logout">로그아웃</a>
@@ -51,7 +51,6 @@
                 <a href="${contextPath}/join">회원가입</a>
             </c:otherwise>
             </c:choose>
-            <!-- [변경 전] 로그인 시 로그아웃만 표시 (관리자 전용 링크 없음) -->
                 <a href="${contextPath}/member/cs">고객센터</a>
             
             </nav>
@@ -73,7 +72,7 @@
                 <span class="logo-text">펫린이</span>
             </a>
 
-            <!-- HYJ 26.08.06 검색 + 자동완성 -->
+            <!-- 검색 + 자동완성 -->
             <div class="header-search">
                 <input type="text" class="search-input" id="headerSearchInput"
                        placeholder="검색어를 입력하세요" value="${param.q}"
@@ -117,7 +116,7 @@
                         <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                         <path d="M13.73 21a2 2 0 01-3.46 0"/>
                     </svg>
-                    <%-- 2026/07/11 장우철 — 미읽음 알림 배지 (장바구니 cart-count 와 동일 UX) --%>
+                    <%-- 미읽음 알림 배지 (장바구니 cart-count 와 동일 UX) --%>
                     <span class="noti-count" style="display:none">0</span>
                     <span>알림</span>
                 </a>
@@ -139,7 +138,7 @@
     </nav>
 </header>
 
-<%-- ── HYJ 26.08.06 헤더 검색 + 자동완성 JS ── --%>
+<%-- ── 헤더 검색 + 자동완성 JS ── --%>
 <script>
 $(function () {
     var CTX   = '${contextPath}';

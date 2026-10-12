@@ -12,8 +12,6 @@ import jakarta.servlet.http.HttpSession;
 /**
  * 역할: 정지 회원 URL 접근 제어 (Interceptor)
  *
- * - 박유정 / 2026-07-22
- *
  * [동작]
  * 1. 세션 memberInfo.status = SUSPENDED 이면
  * 2. /member/cs/**, /member/logout, 정적 리소스만 허용
@@ -52,8 +50,8 @@ public class SuspendedMemberInterceptor implements HandlerInterceptor {
             uri = "/";
         }
 
-        // 2026-07-22 박유정 — 정지 회원 허용 경로 (/member/cs, 로그아웃, 정적 파일)
-        // 2026/07/23 장우철 — cart/noti count Ajax 가 HTML 리다이렉트되면 헤더 뱃지에 페이지 소스가 덤프됨
+        // 정지 회원 허용 경로 (/member/cs, 로그아웃, 정적 파일)
+        // cart/noti count Ajax 가 HTML 리다이렉트되면 헤더 뱃지에 페이지 소스가 덤프됨
         if (uri.startsWith("/member/cs")
                 || uri.equals("/member/logout")
                 || uri.startsWith("/resources/")

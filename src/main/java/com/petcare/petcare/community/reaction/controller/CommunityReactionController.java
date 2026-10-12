@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 좋아요 Ajax API 처리
  *
- * - 박유정 / 2026-07-09
- *
  * [좋아요 토글 화면 흐름]
  * 1. detail.jsp 에서 fetch POST /community/like/toggle (postId)
  * 2. communityReactionService.toggleLike() 호출

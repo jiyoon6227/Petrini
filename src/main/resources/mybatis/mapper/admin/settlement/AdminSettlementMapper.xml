@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--
   역할: 관리자 정산 SQL (사업자 settlement 매퍼와 분리)
-  2026/07/30 장우철 — 숙소 정산 구현순서 3-1 ~ 3-5
+  숙소 정산
 -->
 <mapper namespace="com.petcare.petcare.admin.settlement.mapper.AdminSettlementMapper">
 
@@ -114,7 +114,7 @@
          ORDER BY SI.CHECKOUT_DATE ASC, SI.SETTLE_ITEM_ID ASC
     </select>
 
-    <!-- 3-4 단건 더미/수동입금 완료 — WAIT·FAIL → DONE (2026/08/05 장우철 S12 FAIL 수동입금) -->
+    <!-- 단건 더미/수동입금 완료 — WAIT·FAIL → DONE (FAIL 수동입금 포함) -->
     <update id="updateStaySettlementPaid">
         UPDATE TB_SETTLEMENT
            SET PAY_STATUS    = 'DONE',
@@ -139,7 +139,7 @@
         </foreach>
     </update>
 
-    <!-- 2026/08/05 장우철 — S12 FAIL 표시 (실지급 실패 시·테스트용) -->
+    <!-- FAIL 표시 (실지급 실패 시·테스트용) -->
     <update id="updateStaySettlementFail">
         UPDATE TB_SETTLEMENT
            SET PAY_STATUS = 'FAIL'
@@ -148,7 +148,7 @@
            AND NVL(PAY_STATUS, 'WAIT') = 'WAIT'
     </update>
 
-    <!-- 2026/08/05 장우철 — S12 15일 자동지급: WAIT 전체 SETTLE_ID -->
+    <!-- 15일 자동지급: WAIT 전체 SETTLE_ID -->
     <select id="selectStayWaitSettleIds" resultType="long">
         SELECT SETTLE_ID
           FROM TB_SETTLEMENT
@@ -201,7 +201,7 @@
          ORDER BY R.REQUESTED_AT DESC, R.REQUEST_ID DESC
     </select>
 
-    <!-- 2026/08/05 장우철 — S11 쇼핑 STORE -->
+    <!-- 쇼핑 STORE -->
     <select id="countStoreSettlements" resultType="int">
         SELECT COUNT(*)
           FROM TB_SETTLEMENT
@@ -305,7 +305,7 @@
          ORDER BY SI.CONFIRMED_AT ASC, SI.SETTLE_ITEM_ID ASC
     </select>
 
-    <!-- 2026/08/05 장우철 — S12 WAIT·FAIL → DONE (수동입금 포함) -->
+    <!-- WAIT·FAIL → DONE (수동입금 포함) -->
     <update id="updateStoreSettlementPaid">
         UPDATE TB_SETTLEMENT
            SET PAY_STATUS    = 'DONE',
@@ -316,7 +316,7 @@
            AND NVL(PAY_STATUS, 'WAIT') IN ('WAIT', 'FAIL')
     </update>
 
-    <!-- 2026/08/05 장우철 — S12 FAIL 표시 -->
+    <!-- FAIL 표시 -->
     <update id="updateStoreSettlementFail">
         UPDATE TB_SETTLEMENT
            SET PAY_STATUS = 'FAIL'
@@ -325,7 +325,7 @@
            AND NVL(PAY_STATUS, 'WAIT') = 'WAIT'
     </update>
 
-    <!-- 2026/08/05 장우철 — S12 15일 자동지급 대상 -->
+    <!-- 15일 자동지급 대상 -->
     <select id="selectStoreWaitSettleIds" resultType="long">
         SELECT SETTLE_ID
           FROM TB_SETTLEMENT

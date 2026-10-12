@@ -1,11 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
-<%-- 2026/07/27 장우철 — 토스 카드등록 복귀 시 Step2 부터 표시 (약관 깜빡임 방지) --%>
+<%-- 토스 카드등록 복귀 시 Step2 부터 표시 (약관 깜빡임 방지) --%>
 <c:set var="joinFromCard" value="${param.card eq 'ok' or param.card eq 'fail'}" />
 
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
-<%-- 2026/08/11 장우철 — join.css 는 header(petcare.css) 이후에 로드해야 .form-input padding 이 덮이지 않음 --%>
+<%-- join.css 는 header(petcare.css) 이후에 로드해야 .form-input padding 이 덮이지 않음 --%>
 <link rel="stylesheet" href="${contextPath}/resources/css/join.css?v=4">
 
 <main>
@@ -51,7 +51,7 @@
           <h2 class="join-card-title">약관 동의</h2>
           <p class="join-card-sub">서비스 이용을 위해 약관에 동의해 주세요.</p>
 
-          <%-- 2026/08/18 장우철 — 카카오 연동 회원가입 (로그인 페이지와 intent 분리) --%>
+          <%-- 카카오 연동 회원가입 (로그인 페이지와 intent 분리) --%>
           <c:if test="${param.error eq 'kakao_cancel'}">
             <p class="field-error show" style="margin-bottom:12px;">카카오 연동이 취소되었습니다.</p>
           </c:if>
@@ -136,7 +136,7 @@
           <p class="join-card-sub">회원 정보를 입력해 주세요.</p>
 
           <form id="joinForm" novalidate>
-            <!--HYJ 26.08.04 아이디 중복확인-->
+            <!-- 아이디 중복확인-->
             <div class="form-field">
               <label class="form-label" for="id">아이디 <span class="req">*</span></label>
               <div class="field-btn-wrap">
@@ -265,7 +265,7 @@
                      class="form-input no-icon" placeholder="상세 주소 (동, 호수 등)">
             </div>
 
-            <%-- 2026/07/27 장우철 — 카드등록 (토스 빌링). 가입 전엔 세션 임시저장, 가입 완료 시 DB 저장 --%>
+            <%-- 카드등록 (토스 빌링). 가입 전엔 세션 임시저장, 가입 완료 시 DB 저장 --%>
             <div class="form-field" id="joinCardSection" style="margin-top:8px;">
               <label class="form-label">결제 카드 등록 <span style="font-weight:500;color:#888;font-size:12px;">(선택)</span></label>
               <%-- card=ok 복귀 시 pendingCardLabel 있으면 서버에서 오면 「등록됨」부터 표시 --%>
@@ -369,7 +369,7 @@
                        class="form-input" placeholder="반려동물 이름">
               </div>
             </div>
-            <%-- 2026/08/11 장우철 — TB_PET.GENDER (회원가입 Step3에 성별 선택 추가) --%>
+            <%-- TB_PET.GENDER (회원가입 Step3에 성별 선택 추가) --%>
             <div class="form-field">
               <label class="form-label" for="petGender">성별</label>
               <select id="petGender" name="petGender" class="form-select no-icon">
@@ -472,7 +472,7 @@
             </div>
           </div>
 
-          <%-- 2026/07/07 장우철 — Step3: 넘어가기(펫 없이 가입) + 가입완료(펫 포함) 50:50 --%>
+          <%-- Step3: 넘어가기(펫 없이 가입) + 가입완료(펫 포함) 50:50 --%>
           <div class="join-nav">
             <button type="button" class="btn-prev" id="btnStep3Prev">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -493,14 +493,6 @@
               </button>
             </div>
           </div>
-          <%--
-            [변경 전] Step3 버튼 — 가입 완료 단일 버튼 (UI 목업, DB 미연동)
-            변경 이유: 2026/07/07 서버 POST /join 연동 + 넘어가기(펫 선택) 2분할
-            <div class="join-nav">
-              <button type="button" class="btn-prev" id="btnStep3Prev">… 이전</button>
-              <button type="button" class="btn-submit" id="btnSubmit">가입 완료</button>
-            </div>
-          --%>
 
           <p style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:14px;">
             반려동물 정보는 나중에 마이페이지에서 추가하실 수 있습니다.
@@ -547,19 +539,19 @@
      회원가입 스크립트
 ══════════════════════════════════════ -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<%-- 2026/07/27 장우철 — 토스 빌링 SDK + 카드등록 Ajax --%>
+<%-- 토스 빌링 SDK + 카드등록 Ajax --%>
 <script src="https://js.tosspayments.com/v2/standard"></script>
 <script src="${contextPath}/resources/js/billing-card.js"></script>
 <script src="${contextPath}/resources/js/billing-card.js"></script>
-<%-- 2026-08-13 박유정 — 회원가입·마이페이지 공통 품종 목록 --%>
+<%-- 회원가입·마이페이지 공통 품종 목록 --%>
 <script src="${contextPath}/resources/js/pet-breeds.js"></script>
 <script>
 (function () {
 
   /* ── 현재 스텝 상태 ── */
-  // 2026/07/27 장우철 — 토스 복귀면 Step2 부터
+  // 토스 복귀면 Step2 부터
   var cur = ${joinFromCard ? 2 : 1};
-  var idChecked = false;      //HYJ 26.08.04 id 중복확인
+  var idChecked = false;      // id 중복확인
   var emailChecked = false;
   var emailVerified = false;
   var timerInterval = null;
@@ -660,7 +652,7 @@
   /* ──────────────────────────────
      STEP 2 : 기본 정보 입력
   ────────────────────────────── */
-    //HYJ 26.08.04 id 중복체크
+    // id 중복체크
     document.getElementById('btnCheckId').addEventListener('click', function () {
       var id = document.getElementById('id');
       if (!id.value.trim()) {
@@ -741,7 +733,7 @@
     else            err('errPwConfirm', 'okPwConfirm');
   });
 
-  /* ── 2026/07/07 장우철 — join(회원가입) 이메일 중복 확인 Ajax ──
+  /* ── join(회원가입) 이메일 중복 확인 Ajax ──
    * GET /join/check-email → EmailCheckResultVO JSON
    */
   document.getElementById('btnCheckEmail').addEventListener('click', function () {
@@ -778,13 +770,12 @@
       });
   });
 
-  /* ── 2026/07/15 — 이메일 인증번호 발송 ── */
+  /* ── 이메일 인증번호 발송 ── */
   function sendVerificationCode(email) {
     var ctx = '${contextPath}';
     var fd = new FormData();
     fd.append('email', email);
 
-    //HYJ 26.08.05
     csrfFetch(ctx + '/join/send-code', { method: 'POST', body: fd })
       .then(function (res) { return res.json(); })
       .then(function (data) {
@@ -841,7 +832,6 @@
     fd.append('email', email);
     fd.append('code', code);
 
-    //HYJ 26.08.05
     csrfFetch(ctx + '/join/verify-code', { method: 'POST', body: fd })
       .then(function (res) { return res.json(); })
       .then(function (data) {
@@ -874,24 +864,6 @@
     sendVerificationCode(email);
   });
 
-  /* ── [변경 전] 이메일 중복 확인 (시뮬레이션) ──
-   * 변경 이유: 2026/07/07 서버 GET /join/check-email 실조회로 교체
-   *
-  document.getElementById('btnCheckEmail').addEventListener('click', function () {
-    var emailEl = document.getElementById('email');
-    var v = emailEl.value.trim();
-    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!re.test(v)) {
-      err('errEmail', 'okEmail');
-      return;
-    }
-    clearMsg('errEmail', 'okEmail');
-    ok('errEmail', 'okEmail');
-    emailChecked = true;
-    emailEl.classList.add('is-valid');
-  });
-   */
-
   /* 이메일 변경 시 중복 확인 + 인증 초기화 */
   document.getElementById('email').addEventListener('input', function () {
     emailChecked = false;
@@ -904,7 +876,7 @@
     if (timerInterval) clearInterval(timerInterval);
   });
 
-  /* HYJ 26.07.16 주소 찾기 (카카오 주소 API 연동) */
+  /* 주소 찾기 (카카오 주소 API 연동) */
   $("#btnSearchAddr").click(function(){
       new daum.Postcode({
           oncomplete:function(data){
@@ -934,7 +906,7 @@
       }).open();
   });
 
-  /* 2026/07/27 장우철 — 가입 세션 임시저장 + 카드등록 (토스 왕복 시 폼 유지) */
+  /* 가입 세션 임시저장 + 카드등록 (토스 왕복 시 폼 유지) */
   (function () {
     var empty = document.getElementById('joinCardEmpty');
     var registered = document.getElementById('joinCardRegistered');
@@ -989,7 +961,6 @@
         addr2: val('addr2'),
         emailChecked: !!emailChecked,
         emailVerified: !!emailVerified,
-        //HYJ 26.08.04
         idChecked: !!idChecked
       };
     }
@@ -1022,7 +993,6 @@
 
       emailChecked = !!d.emailChecked;
       emailVerified = !!d.emailVerified;
-      //HYJ 26.08.04
       idChecked = !!d.idChecked;
 
       var emailEl = document.getElementById('email');
@@ -1050,7 +1020,7 @@
 
     /** 서버 세션에 임시저장 */
     async function saveDraftToServer() {
-      // 2026/08/07 장우철 CSRF
+      // CSRF
       var res = await csrfFetch(ctx + '/join/draft', {
         method: 'POST',
         credentials: 'same-origin',
@@ -1116,7 +1086,7 @@
       });
     }
 
-    // 2026/07/27 장우철 — draft 복원은 토스 복귀(card=ok|fail)일 때만
+    // draft 복원은 토스 복귀(card=ok|fail)일 때만
     var cardParam = new URLSearchParams(location.search).get('card');
     (async function initJoinDraftAndCard() {
       if (cardParam === 'ok' || cardParam === 'fail') {
@@ -1158,7 +1128,6 @@
       clearMsg('errEmail', 'okEmail');
     }
 
-    //HYJ 26.08.04
     if (!idChecked) {
       document.getElementById('errId').textContent = '아이디 중복 확인을 해주세요.';
       err('errId', 'okId'); 
@@ -1195,11 +1164,11 @@
 
   /* ──────────────────────────────
      STEP 3 : 반려동물 등록
-     2026/07/07 장우철 — 서버 연동(POST /join), 넘어가기 버튼
+     서버 연동(POST /join), 넘어가기 버튼
   ────────────────────────────── */
 
   /* 동물 종류 버튼 */
-  /* 2026-08-13 박유정 — 종류 선택 시 품종 select 갱신 (pet-breeds.js) */
+  /* 종류 선택 시 품종 select 갱신 (pet-breeds.js) */
   document.querySelectorAll('.pet-type-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       document.querySelectorAll('.pet-type-btn').forEach(function (b) { b.classList.remove('selected'); });
@@ -1224,7 +1193,7 @@
     reader.readAsDataURL(this.files[0]);
   });
 
-  /* ── 2026/07/07 장우철 — join(회원가입) POST /join 공통 처리 ──
+  /* ── join(회원가입) POST /join 공통 처리 ──
    * skipPet=true  → 반려동물 필드 미전송 (넘어가기) — Service 가 TB_PET INSERT 스킵
    * skipPet=false → 펫 필드 전송 — petName 있을 때만 TB_PET INSERT (백엔드 hasPetInfo)
    * Java 수정 불필요: MemberAuthServiceImpl.register() 가 petName 빈 값이면 펫 등록 안 함
@@ -1250,7 +1219,7 @@
     fd.append('password', document.getElementById('password').value);
     fd.append('passwordConfirm', document.getElementById('passwordConfirm').value);
     fd.append('phone', document.getElementById('phone').value.trim());
-    // 2026-07-28 박유정 — 생년월일·성별 TB_MEMBER 저장 (BIRTH_DATE, GENDER)
+    // 생년월일·성별 TB_MEMBER 저장 (BIRTH_DATE, GENDER)
     fd.append('birthDate', document.getElementById('birthDate').value);
     fd.append('gender', document.getElementById('gender').value);
     fd.append('zipcode', document.getElementById('zipcode').value);
@@ -1266,7 +1235,7 @@
       fd.append('petBirthDate', document.getElementById('petBirthDate').value);
       fd.append('petAge', document.getElementById('petAge').value);
       fd.append('petWeight', document.getElementById('petWeight').value);
-      // 2026/08/11 장우철 — 대표사진 실제 업로드 (미리보기만 하던 문제 수정)
+      // 대표사진 실제 업로드
       var petPhotoEl = document.getElementById('petPhoto');
       if (petPhotoEl && petPhotoEl.files && petPhotoEl.files[0]) {
         fd.append('petPhoto', petPhotoEl.files[0]);
@@ -1274,7 +1243,6 @@
     }
 
     var ctx = '${contextPath}';
-    //HYJ 26.08.05
     csrfFetch(ctx + '/join', { method: 'POST', body: fd })
       .then(function (res) { return res.text(); })
       .then(function (text) {
@@ -1288,7 +1256,7 @@
             id: '아이디를 입력해 주세요.',
             id_duplicate: '이미 사용 중인 아이디입니다.',
             duplicate: '이미 가입된 이메일입니다.',
-            withdrawn_email: '탈퇴한 이메일은 재가입할 수 없습니다.', // 2026-07-22 박유정 — 탈퇴 이메일 재가입 차단
+            withdrawn_email: '탈퇴한 이메일은 재가입할 수 없습니다.', // 탈퇴 이메일 재가입 차단
             password: '비밀번호 규칙을 확인해 주세요.',
             password_mismatch: '비밀번호가 일치하지 않습니다.',
             terms: '필수 약관에 동의해 주세요.',
@@ -1309,15 +1277,15 @@
 
   document.getElementById('btnStep3Prev').addEventListener('click', function () { goStep(2); });
 
-  /* 2026/07/07 장우철 — 넘어가기: 회원+약관만 가입, 반려동물은 마이페이지에서 추후 등록 */
+  /* 넘어가기: 회원+약관만 가입, 반려동물은 마이페이지에서 추후 등록 */
   document.getElementById('btnSkip').addEventListener('click', function () {
     submitJoin(true);
   });
 
-  /* 2026/07/07 장우철 — 가입 완료: 입력한 반려동물 정보가 있으면 함께 등록 */
+  /* 가입 완료: 입력한 반려동물 정보가 있으면 함께 등록 */
   document.getElementById('btnSubmit').addEventListener('click', function () {
     var petName = document.getElementById('petName').value.trim();
-    /* 2026-08-13 박유정 — 펫 정보 입력 시 종류·품종 필수 (마이페이지와 동일) */
+    /* 펫 정보 입력 시 종류·품종 필수 (마이페이지와 동일) */
     if (petName) {
       var petType = document.getElementById('petType').value;
       var petBreed = document.getElementById('petBreed').value;
@@ -1332,15 +1300,6 @@
     }
     submitJoin(false);
   });
-
-  /* ── [변경 전] 가입 완료 — UI 목업만 (DB 저장 없이 step4 로 이동) ──
-   * 변경 이유: 2026/07/07 POST /join 서버 연동 (submitJoin 함수로 분리)
-   *
-  document.getElementById('btnStep3Prev').addEventListener('click', function () { goStep(2); });
-  document.getElementById('btnSubmit').addEventListener('click', function () {
-    goStep(4);
-  });
-   */
 
 })();
 </script>

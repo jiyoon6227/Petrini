@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 좋아요 DB 접근 (MyBatis interface)
  *
- * - 박유정 / 2026-07-09
- *
  * XML: resources/mybatis/mapper/community/reaction/CommunityReactionMapper.xml
  *
  * 쿼리

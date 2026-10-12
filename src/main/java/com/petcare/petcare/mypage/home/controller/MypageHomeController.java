@@ -28,7 +28,7 @@ public class MypageHomeController {
         this.mypageHomeService = mypageHomeService;
     }
 
-    // 2026/07/08 장우철 — 마이페이지 B단계: 쿠폰·관심상품 COUNT DB 연동
+    // 쿠폰·관심상품 COUNT
     @GetMapping({"", "/"})
     public String dashboard(HttpSession session, Model model) {
         MemberVO memberInfo = (MemberVO) session.getAttribute("memberInfo");
@@ -43,6 +43,6 @@ public class MypageHomeController {
         return "mypage/dashboard";
     }
 
-    // 2026/07/11 장우철 — /mypage/pets 는 PetProfileController 로 이동
-    // 2026/07/14 장우철 — /mypage/health 는 PetHealthController 로 이동
+    // /mypage/pets 는 PetProfileController 로 이동
+    // /mypage/health 는 PetHealthController 로 이동
 }

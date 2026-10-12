@@ -23,7 +23,6 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * GCS 파일 서빙 — /upload/** 요청을 버킷 객체로 스트리밍
  * gcs.enabled=true 일 때만 로드 (WebConfig 로컬 /upload 매핑과 역할 분리)
- * 2026/07/21 장우철
  */
 @RestController
 @ConditionalOnProperty(name = "gcs.enabled", havingValue = "true")

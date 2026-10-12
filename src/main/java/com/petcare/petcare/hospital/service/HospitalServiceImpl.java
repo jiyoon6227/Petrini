@@ -40,7 +40,7 @@ public class HospitalServiceImpl implements HospitalService {
     private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
     private static final String[] DAY_LABELS = {"월", "화", "수", "목", "금", "토", "일"};
-    private static final int HOLD_TTL_MINUTES = 5; // 2026/07/20 장우철 — 선점 유효 5분
+    private static final int HOLD_TTL_MINUTES = 5; // 선점 유효 5분
 
     @Autowired
     private HospitalMapper hospitalMapper;
@@ -88,7 +88,7 @@ public class HospitalServiceImpl implements HospitalService {
         return hospitalMapper.selectActiveTreatTypeList(hospitalId);
     }
 
-    // 2026/07/16 장우철 — HOURS_JSON·예외·점유 반영 가능 시작시각 목록
+    // HOURS_JSON·예외·점유 반영 가능 시작시각 목록
     // noRollbackFor: hold 테이블 미존재 등 조회 실패를 catch 해도 트랜잭션 롤백 마킹 방지
     @Override
     @Transactional(readOnly = true, noRollbackFor = Exception.class)
@@ -119,7 +119,7 @@ public class HospitalServiceImpl implements HospitalService {
 
         List<TimeRange> openWindows = resolveOpenWindows(hospital, doctorId, date, intervalMin);
         if (openWindows.isEmpty()) {
-            // 2026/07/20 장우철 — 정기 휴무(HOURS_JSON에 없는 요일)면 명확한 메시지
+            // 정기 휴무(HOURS_JSON에 없는 요일)면 명확한 메시지
             String closedMsg = resolveRegularClosedMessage(hospital, date);
             if (closedMsg != null) {
                 throw new IllegalStateException(closedMsg);
@@ -158,7 +158,7 @@ public class HospitalServiceImpl implements HospitalService {
         return slots;
     }
 
-    // 2026/07/20 장우철 — 예약 날짜 정기 휴무 여부 (유저 날짜 선택)
+    // 예약 날짜 정기 휴무 여부 (유저 날짜 선택)
     @Override
     @Transactional(readOnly = true)
     public Map<String, Object> checkReserveDate(Long hospitalId, Date resvDate) throws Exception {
@@ -185,8 +185,8 @@ public class HospitalServiceImpl implements HospitalService {
         return result;
     }
 
-    // 2026/07/16 장우철 — 펫 단계 이동 시 임시 선점
-    // 2026/07/20 장우철 — 의사 행 FOR UPDATE 로 동시 선점 race 방지
+    // 펫 단계 이동 시 임시 선점
+    // 의사 행 FOR UPDATE 로 동시 선점 race 방지
     @Override
     @Transactional
     public Long createReserveHold(Long hospitalId, Long memberNo, Long doctorId, Long treatTypeId,
@@ -246,7 +246,7 @@ public class HospitalServiceImpl implements HospitalService {
         return hold.getHoldId();
     }
 
-    // 2026/07/16 장우철 — 선점 기반 최종 예약 저장
+    // 선점 기반 최종 예약 저장
     @Override
     @Transactional
     public Long createHospitalReservation(ReservationVO vo) throws Exception {
@@ -273,7 +273,7 @@ public class HospitalServiceImpl implements HospitalService {
         }
 
         if (vo.getPetId() == null) {
-            // 2026/07/20 장우철 — 제출 실패 시 hold 해제 → 다른 회원 재선택 가능
+            // 제출 실패 시 hold 해제 → 다른 회원 재선택 가능
             releaseHoldSafe(hold.getHoldId());
             throw new IllegalArgumentException("반려동물을 선택해 주세요.");
         }
@@ -309,7 +309,7 @@ public class HospitalServiceImpl implements HospitalService {
             throw e;
         }
         releaseHoldSafe(hold.getHoldId());
-        // 2026/08/07 장우철 — 병원 신규 예약 → 사업자 알림
+        // 병원 신규 예약 → 사업자 알림
         notifyHospitalBizNewReserve(vo);
         return vo.getResvId();
     }
@@ -361,12 +361,12 @@ public class HospitalServiceImpl implements HospitalService {
             vo.setResvNo(buildResvNo());
         }
         hospitalMapper.insertReservation(vo);
-        // 2026/08/07 장우철 — 병원 신규 예약 → 사업자 알림
+        // 병원 신규 예약 → 사업자 알림
         notifyHospitalBizNewReserve(vo);
         return vo.getResvId();
     }
 
-    /** 2026/08/07 장우철 — PENDING 예약 생성 시 병원 사업자 알림 */
+    /** PENDING 예약 생성 시 병원 사업자 알림 */
     private void notifyHospitalBizNewReserve(ReservationVO vo) {
         try {
             if (vo == null || vo.getTargetId() == null || vo.getTargetId().isBlank()) {
@@ -400,14 +400,14 @@ public class HospitalServiceImpl implements HospitalService {
         return hospitalMapper.selectHospitalReviews(hospitalId);
     }
 
-    // 2026/07/20 장우철 — 만료 hold 일괄 삭제 (스케줄·예약 API 공용)
+    // 만료 hold 일괄 삭제 (스케줄·예약 API 공용)
     @Override
     @Transactional
     public int cleanupExpiredHolds() throws Exception {
         return hospitalMapper.deleteExpiredHolds();
     }
 
-    // 2026/07/20 장우철 — 2단계 이전: 본인 hold 해제 (다른 회원 즉시 재선택)
+    // 2단계 이전: 본인 hold 해제 (다른 회원 즉시 재선택)
     @Override
     @Transactional
     public void releaseMemberReserveHolds(Long hospitalId, Long memberNo) throws Exception {
@@ -421,7 +421,7 @@ public class HospitalServiceImpl implements HospitalService {
         }
     }
 
-    /** 2026/07/20 장우철 — 동시예약 방지: 의사 단위 직렬화 */
+    /** 동시예약 방지: 의사 단위 직렬화 */
     private void lockDoctorSchedule(Long hospitalId, Long doctorId) throws Exception {
         Long locked = hospitalMapper.lockDoctorForUpdate(hospitalId, doctorId);
         if (locked == null) {
@@ -429,7 +429,7 @@ public class HospitalServiceImpl implements HospitalService {
         }
     }
 
-    /** 2026/07/20 장우철 — 겹침 시 사용자 메시지 (락 이후 재검사) */
+    /** 겹침 시 사용자 메시지 (락 이후 재검사) */
     private void assertNoScheduleOverlap(Long hospitalId, Long doctorId, Date resvDate,
                                          String resvTime, String endTime, Long excludeHoldId) {
         int overlap = countOverlapSafe(hospitalId, doctorId, resvDate, resvTime, endTime, excludeHoldId);
@@ -438,7 +438,7 @@ public class HospitalServiceImpl implements HospitalService {
         }
     }
 
-    /** 2026/07/20 장우철 — hold 해제 (실패·완료 공통) */
+    /** hold 해제 (실패·완료 공통) */
     private void releaseHoldSafe(Long holdId) {
         if (holdId == null) {
             return;
@@ -455,7 +455,7 @@ public class HospitalServiceImpl implements HospitalService {
             Integer interval = hospitalMapper.selectResvIntervalMin(hospitalId);
             return interval != null && interval > 0 ? interval : 15;
         } catch (Exception e) {
-            // 2026/07/16 장우철 — RESV_INTERVAL_MIN 미적용 DB도 기본 15분으로 동작
+            // RESV_INTERVAL_MIN 미적용 DB도 기본 15분으로 동작
             return 15;
         }
     }
@@ -477,7 +477,7 @@ public class HospitalServiceImpl implements HospitalService {
                 occupied.addAll(reservations);
             }
         } catch (Exception e) {
-            // 2026/07/16 장우철 — DOCTOR_ID/END_TIME 미적용 시 점유 없이 슬롯만 표시
+            // DOCTOR_ID/END_TIME 미적용 시 점유 없이 슬롯만 표시
             System.out.println("[reserve/times] 예약 점유 조회 실패(스키마 확인): " + e.getMessage());
         }
         try {
@@ -487,7 +487,7 @@ public class HospitalServiceImpl implements HospitalService {
                 occupied.addAll(holds);
             }
         } catch (Exception e) {
-            // 2026/07/16 장우철 — TB_HOSPITAL_RESV_HOLD 미생성 시 무시
+            // TB_HOSPITAL_RESV_HOLD 미생성 시 무시
             System.out.println("[reserve/times] 선점 점유 조회 실패(hold 테이블 확인): " + e.getMessage());
         }
         return occupied;
@@ -528,7 +528,7 @@ public class HospitalServiceImpl implements HospitalService {
         }
     }
 
-    // 2026/07/16 장우철 — REPLACE 우선, 없으면 HOURS_JSON 요일
+    // REPLACE 우선, 없으면 HOURS_JSON 요일
     private List<TimeRange> resolveOpenWindows(HospitalVO hospital, Long doctorId,
                                                LocalDate date, int defaultInterval) throws Exception {
         List<HospitalResvExceptionVO> exceptions = loadExceptionsSafe(hospital.getHospitalId(), toDate(date));
@@ -621,11 +621,11 @@ public class HospitalServiceImpl implements HospitalService {
         if (!dayNode.isMissingNode() && !dayNode.isNull()) {
             return dayNode;
         }
-        // 2026/07/20 장우철 — JSON에 없는 요일 = 정기 휴무 (공휴일 키로 대체하지 않음)
+        // JSON에 없는 요일 = 정기 휴무 (공휴일 키로 대체하지 않음)
         return null;
     }
 
-    /** 2026/07/20 장우철 — HOURS_JSON 기준 정기 휴무 메시지 (없으면 null) */
+    /** HOURS_JSON 기준 정기 휴무 메시지 (없으면 null) */
     private String resolveRegularClosedMessage(HospitalVO hospital, LocalDate date) throws Exception {
         JsonNode dayNode = resolveDayHoursNode(hospital.getHoursJson(), date);
         if (dayNode == null || dayNode.isMissingNode() || dayNode.isNull()) {
@@ -676,7 +676,7 @@ public class HospitalServiceImpl implements HospitalService {
     }
 
     private LocalDate toLocalDate(Date date) {
-        // 2026/07/16 장우철 — 타임존 보정 (java.util.Date 자정 바인딩 → 전날로 밀리는 문제 방지)
+        // 타임존 보정 (java.util.Date 자정 바인딩 → 전날로 밀리는 문제 방지)
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         return LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));

@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%-- 2026/08/13 장우철 — 주문내역/상세 공통 상태 뱃지 --%>
+<%-- 주문내역/상세 공통 상태 뱃지 --%>
 <c:choose>
   <c:when test="${o.statusBadge == 'CANCEL_REQUEST'}"><span class="badge-status badge-cancel">결제취소신청</span></c:when>
   <c:when test="${o.statusBadge == 'REFUND_DONE'}"><span class="badge-status badge-cancel">환불완료</span></c:when>

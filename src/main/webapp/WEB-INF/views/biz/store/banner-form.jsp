@@ -16,7 +16,7 @@
     <div class="biz-card">
         <div class="biz-card-body" style="padding:24px">
             <form action="${contextPath}/biz/store/banner" method="post" enctype="multipart/form-data" id="bannerForm">
-                <%-- 2026/08/07 장우철 CSRF --%>
+                <%-- CSRF --%>
                 <input type="hidden" name="_csrf" value="${_csrf}">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 20px">
 
@@ -35,7 +35,7 @@
                             <option value="">위치를 선택하세요</option>
                             <option value="MAIN_HERO">메인 히어로 - 1200 × 360px (메인페이지 상단 슬라이드)</option>
                             <option value="MAIN_MID">메인 중간 - 1200 × 200px (메인페이지 섹션 사이)</option>
-                            <option value="STORE">쇼핑 - 728 x 100px(쇼핑 목록 상단)</option> <%-- 2026-08-06 박유정 쇼핑몰→쇼핑 --%>
+                            <option value="STORE">쇼핑 - 728 x 100px(쇼핑 목록 상단)</option>
                             <option value="HOSPITAL">병원 - 730 x 100px(병원 목록 상단)</option>
                             <option value="STAY">숙소 - 730 x 100px(숙소 목록 상단)</option>
                         </select>

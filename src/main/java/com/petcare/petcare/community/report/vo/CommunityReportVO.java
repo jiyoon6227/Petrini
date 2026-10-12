@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 게시글 신고 데이터 객체
  *
- * - 박유정 / 2026-07-10
- *
  * 담당 화면
  * - community/detail.jsp   게시글 신고 팝업
  *
@@ -29,6 +27,6 @@ public class CommunityReportVO {
     private String statusCd;     // STATUS_CD — 처리 상태 (PENDING/DISMISSED 등)
     private LocalDateTime regDate; // REG_DATE — 신고 접수일 (조회 시)
 
-    //2026/08/06 장우철 — 관리자 신고내역 표시용
+    // 관리자 신고내역 표시용
     private String reporterNickname; // 신고자 닉네임
 }

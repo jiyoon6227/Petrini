@@ -1,6 +1,6 @@
 /**
  * 역할: 마이페이지 배송지록 URL 처리 (AJAX 전용, JSON 응답)
- * 지윤 26.07.29 추가: 주문서(order.jsp)의 "배송지 목록" 모달에서 호출
+ * 주문서(order.jsp)의 "배송지 목록" 모달에서 호출
  */
 package com.petcare.petcare.mypage.address.controller;
 
@@ -26,7 +26,7 @@ public class MypageAddressController {
     @Autowired
     private MypageAddressService mypageAddressService;
 
-    //지윤 26.07.29 추가: 배송지 목록 조회 (AJAX)
+    // 배송지 목록 조회 (AJAX)
     @GetMapping("/list")
     @ResponseBody
     public List<MypageAddressVO> list(HttpSession session) {
@@ -35,7 +35,7 @@ public class MypageAddressController {
         return mypageAddressService.getAddressList(member.getMemberNo());
     }
 
-    //지윤 26.07.29 추가: 배송지 신규 등록 (AJAX)
+    // 배송지 신규 등록 (AJAX)
     @PostMapping("/add")
     @ResponseBody
     public String add(@RequestParam String recvName, @RequestParam String recvPhone,
@@ -49,7 +49,7 @@ public class MypageAddressController {
         return "OK";
     }
 
-    //지윤 26.07.29 추가: 배송지를 기본배송지로 선택 (AJAX)
+    // 배송지를 기본배송지로 선택 (AJAX)
     @PostMapping("/select")
     @ResponseBody
     public String select(@RequestParam Long addrId, HttpSession session) {
@@ -59,7 +59,7 @@ public class MypageAddressController {
         return ok ? "OK" : "FAILED";
     }
 
-    //지윤 26.07.29 추가: 배송지 수정 (AJAX)
+    // 배송지 수정 (AJAX)
     @PostMapping("/update")
     @ResponseBody
     public String update(@RequestParam Long addrId, @RequestParam String recvName, @RequestParam String recvPhone,
@@ -71,7 +71,7 @@ public class MypageAddressController {
         return ok ? "OK" : "FAILED";
     }
 
-    //지윤 26.07.29 추가: 배송지 삭제 (AJAX)
+    // 배송지 삭제 (AJAX)
     @PostMapping("/delete")
     @ResponseBody
     public String delete(@RequestParam Long addrId, HttpSession session) {

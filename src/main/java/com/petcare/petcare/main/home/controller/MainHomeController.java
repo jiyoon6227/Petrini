@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.petcare.petcare.main.section.service.MainSectionService;
 
 /*
- *  2026/07/06 장우철
  *  메인 홈 URL "/" 처리 (service 호출)
  */
 @Controller

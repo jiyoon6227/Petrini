@@ -1,9 +1,7 @@
 /**
  * 역할: 커뮤니티 게시글 비즈니스 로직 (interface)
  *
- * - 박유정 / 2026-07-08~10
- *
- * [markLifeAnswered — LIFE 답변완료] 2026-07-10 STEP 4
+ * [markLifeAnswered — LIFE 답변완료]
  * - 일반 댓글 등록 시 TAGS = ANSWERED (Controller 에서 호출)
  *
  * 담당 화면
@@ -44,26 +42,26 @@ public interface CommunityPostService {
     // 게시글 상세 1건 (TB_POST + 사진 URL 목록)
     CommunityPostVO getPostDetail(long postId);
 
-    //HYJ 26.08.04 게시물 수정용
+    // 게시물 수정용
     CommunityPostVO getPostDetailForEdit(long postId);
 
     // 게시글 등록 (TB_POST + 사진 TB_FILE)
     void insertPost(CommunityPostVO vo, MemberVO loginMember, MultipartFile[] photos);
 
-    // LIFE 상담 — 답변 완료 (TAGS = ANSWERED) / 2026-07-10 STEP 4
+    // LIFE 상담 — 답변 완료 (TAGS = ANSWERED)
     void markLifeAnswered(long postId);
 
-    // 2026-07-23 HYJ — 게시글 수정 (본인 글만)
-    // 2026-08-13 박유정 — 수정 시 사진 삭제·추가
+    // 게시글 수정 (본인 글만)
+    // 수정 시 사진 삭제·추가
     void updatePost(CommunityPostVO vo, MemberVO loginMember,
                     MultipartFile[] photos, List<String> removePhotoUrls);
 
-    // 2026-07-23 HYJ — 게시글 삭제 (LIFE: STATUS_CD='DELETED' / TOWN·SHARE: 즉시 물리 삭제)
+    // 게시글 삭제 (LIFE: STATUS_CD='DELETED' / TOWN·SHARE: 즉시 물리 삭제)
     void deletePost(long postId, MemberVO loginMember);
 
-    // 2026-07-23 HYJ — LIFE 7일 경과 DELETED 게시글 물리 삭제 (스케줄러)
+    // LIFE 7일 경과 DELETED 게시글 물리 삭제 (스케줄러)
     int purgeExpiredDeletedPosts(int days);
 
-    // 2026/07/22 장우철 — 글 사진 물리 삭제(로컬/GCS) + TB_FILE 삭제 (관리자 글 삭제 시)
+    // 글 사진 물리 삭제(로컬/GCS) + TB_FILE 삭제 (관리자 글 삭제 시)
     void deletePhotosByPostId(long postId);
 }

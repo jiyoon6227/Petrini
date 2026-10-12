@@ -23,19 +23,19 @@ public interface MypageBizMapper {
 
     public BusinessVO selectBizAuthStatus(String bizId) throws Exception;
 
-    // 2026-07-09 장우철 — 회원 이메일(BIZ_ID) 기준 TB_BUSINESS 1건
+    // 회원 이메일(BIZ_ID) 기준 TB_BUSINESS 1건
     // 이유: 재신청 시 INSERT 대신 UPDATE 판단용
     BusinessVO selectBusinessByBizId(@Param("bizId") String bizId) throws Exception;
 
-    // 2026-07-09 장우철 — 반려 후 재신청 UPDATE
+    // 반려 후 재신청 UPDATE
     // 이유: UK(BIZ_ID, BIZ_REG_NO) 충돌 없이 같은 행을 PENDING 으로 되돌림
     int updateBusinessForReapply(BusinessVO vo) throws Exception;
 
-    // 2026-07-09 장우철 — 다른 사람이 쓰는 활성 사업자번호인지
+    // 다른 사람이 쓰는 활성 사업자번호인지
     // 이유: 본인(bizId) 제외, PENDING/APPROVED 만 중복 체크
     int countActiveBizRegNo(@Param("bizRegNo") String bizRegNo,
                             @Param("bizId") String bizId) throws Exception;
 
-    //HYJ 26.08.04 사업자번호 중복검사
+    // 사업자번호 중복검사
     int countBizRegNo(@Param("bizRegNo") String bizRegNo) throws Exception;
 }

@@ -1,7 +1,7 @@
 /**
  * 역할: 병원 리뷰(TB_REVIEW, REVIEW_TYPE=HOSPITAL) 데이터 객체
  *
- * 2026/07/13 장우철 — 유저 리뷰 작성·병원 상세 리뷰 목록용
+ * 유저 리뷰 작성·병원 상세 리뷰 목록용
  */
 
 package com.petcare.petcare.hospital.vo;

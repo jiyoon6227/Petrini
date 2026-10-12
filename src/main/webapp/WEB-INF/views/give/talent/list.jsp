@@ -2,7 +2,6 @@
   역할: 사용자 재능나눔 목록 (give/talent/list)
   - give/index.jsp 에서 include (가족찾기 > 재능나눔 탭)
 
-  - 박유정 / 2026-07-13~14
 
   [화면 흐름]
   1. GET /give/talent/list?talentType=...
@@ -216,7 +215,7 @@
               </c:if>
               <span class="talent-tag tt-new">사업자 제공</span>
 
-        <%-- 2026-08-10 박유정 — 모집중/모집마감 뱃지 --%>
+        <%-- 모집중/모집마감 뱃지 --%>
         <c:choose>
          <c:when test="${item.statusCd eq 'APPROVED' && item.capacity != null && item.currentCnt != null && item.currentCnt < item.capacity}">
            <span class="talent-tag tt-recruit-open">모집중</span>

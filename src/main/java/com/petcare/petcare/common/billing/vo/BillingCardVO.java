@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — TB_BILLING_CARD (토스 빌링키/등록카드) VO
+ * TB_BILLING_CARD (토스 빌링키/등록카드) VO
  *
  * 역할
  * - 회원(MEMBER) / 관리자(ADMIN) 등록카드 1건을 담음

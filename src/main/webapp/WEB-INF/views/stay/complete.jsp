@@ -59,7 +59,7 @@
             <span style="color:#D97706">-<fmt:formatNumber value="${reservation.couponDiscount}" pattern="#,###"/>원</span>
           </div>
         </c:if>
-        <%-- 지윤 26.08.07: 포인트 사용 내역 표시 --%>
+        <%-- 포인트 사용 내역 표시 --%>
         <c:if test="${not empty reservation.pointUsed && reservation.pointUsed > 0}">
           <div class="complete-row"><span>포인트 사용</span>
             <span style="color:#16A34A">-<fmt:formatNumber value="${reservation.pointUsed}" pattern="#,###"/>P</span>

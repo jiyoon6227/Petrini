@@ -106,7 +106,6 @@
         // 탈퇴 요청
         var fd = new FormData();
         fd.append('password', pwd);
-        //HYJ 26.08.05
         csrfFetch(ctx + '/mypage/withdraw', { method: 'POST', body: fd })
             .then(function (res) { return res.text(); })
             .then(function (data) {

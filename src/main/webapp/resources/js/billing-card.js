@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — 토스 빌링 카드등록 공통 JS (Ajax)
+ * 토스 빌링 카드등록 공통 JS (Ajax)
  *
  * 사용
  * - join.jsp / mypage/edit.jsp / admin header.jsp
@@ -32,7 +32,6 @@
     return res.json();
   }
 
-  //HYJ 26.08.05
   async function postForm(url, data) {
     var headers = { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' };
     var csrfMeta = document.querySelector('meta[name="_csrf"]');

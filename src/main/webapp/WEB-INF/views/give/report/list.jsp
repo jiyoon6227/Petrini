@@ -1,6 +1,5 @@
 <%-- give/report/list.jsp — 분실/보호 게시판 탭 --%>
 <%--
-  - 박유정 / 2026-07-06~07
 
   [목록 화면 흐름]
   1. GET /give/report/list?status= → giveReportService.getReportList()

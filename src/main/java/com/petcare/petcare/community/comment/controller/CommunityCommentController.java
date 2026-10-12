@@ -1,8 +1,6 @@
 /**
  * 역할: 커뮤니티 댓글 API 처리 → Service 호출
  *
- * - 박유정 / 2026-07-09~10
- *
  * [현재 구조]
  * - 댓글 등록은 give/report 와 동일하게 CommunityPostController 에서 처리
  *   POST /community/comment → communityCommentService.insertComment()

@@ -43,12 +43,12 @@ public interface HospitalMapper {
     List<HospitalVO> selectHospitalListBySearch(HospitalVO searchVO) throws Exception;
     HospitalVO selectHospitalById(Long hospitalId) throws Exception;
 
-    // 2026-07-10 장우철 — 병원 예약 1차 (F0~F3) 유저 측 Mapper
+    // 병원 예약 유저 측 Mapper
     List<HospitalPetVO> selectPetListByMemberNo(Long memberNo) throws Exception;
     int insertReservation(ReservationVO vo) throws Exception;
     ReservationVO selectReservationById(Long resvId) throws Exception;
 
-    // 2026/07/16 장우철 — 예약 제출: 진료유형·의사 조회, 겹침 검사
+    // 예약 제출: 진료유형·의사 조회, 겹침 검사
     HospitalTreatTypeVO selectTreatType(@Param("hospitalId") Long hospitalId,
                                         @Param("treatTypeId") Long treatTypeId) throws Exception;
     HospitalDoctorVO selectDoctor(@Param("hospitalId") Long hospitalId,
@@ -59,7 +59,7 @@ public interface HospitalMapper {
                                      @Param("resvTime") String resvTime,
                                      @Param("endTime") String endTime) throws Exception;
 
-    // 2026/07/16 장우철 — 예약 UI: 활성 유형·의사·예외·점유·선점
+    // 예약 UI: 활성 유형·의사·예외·점유·선점
     List<HospitalTreatTypeVO> selectActiveTreatTypeList(@Param("hospitalId") Long hospitalId) throws Exception;
     List<HospitalDoctorVO> selectActiveDoctorList(@Param("hospitalId") Long hospitalId) throws Exception;
     Integer selectResvIntervalMin(@Param("hospitalId") Long hospitalId) throws Exception;
@@ -84,13 +84,13 @@ public interface HospitalMapper {
     HospitalResvHoldVO selectResvHoldById(@Param("holdId") Long holdId) throws Exception;
     int deleteResvHoldById(@Param("holdId") Long holdId) throws Exception;
 
-    // 2026/07/20 장우철 — 동시예약 방지: 의사 행 비관적 락
+    // 동시예약 방지: 의사 행 비관적 락
     Long lockDoctorForUpdate(@Param("hospitalId") Long hospitalId,
                              @Param("doctorId") Long doctorId) throws Exception;
 
-    // 2026/07/20 장우철 — hold 최종 제출 시 선점 행 락
+    // hold 최종 제출 시 선점 행 락
     HospitalResvHoldVO selectResvHoldByIdForUpdate(@Param("holdId") Long holdId) throws Exception;
 
-    // 2026/07/13 장우철 — 병원 상세 리뷰 목록 (REVIEW_TYPE=HOSPITAL)
+    // 병원 상세 리뷰 목록 (REVIEW_TYPE=HOSPITAL)
     List<HospitalReviewVO> selectHospitalReviews(Long hospitalId) throws Exception;
 }

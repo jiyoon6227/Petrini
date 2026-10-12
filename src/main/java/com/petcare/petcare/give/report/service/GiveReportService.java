@@ -1,8 +1,6 @@
 /**
  * 역할: 유기동물 제보 비즈니스 로직 (interface)
  *
- * - 박유정 / 2026-07-06~07
- *
  * 담당 화면
  * - give/report/list.jsp      제보 목록
  * - give/report/detail.jsp    제보 상세
@@ -44,6 +42,6 @@ public interface GiveReportService {
     // 5. 진행 상태 변경 (FINDING / RESCUED / OWNER_FOUND)
     void updateFindingStatus(long postId, String findingStatus, MemberVO loginMember);
 
-    // 2026/07/22 장우철 — 제보 사진 물리 삭제(로컬/GCS) + TB_FILE 삭제
+    // 제보 사진 물리 삭제(로컬/GCS) + TB_FILE 삭제
     void deletePhotosByPostId(long postId);
 }

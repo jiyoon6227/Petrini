@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026-08-11 박유정 — 사업자 숙소 환불신청 조회 (승인은 관리자) --%>
-<%-- 2026/08/18 장우철 — 탭 건수·처리완료(APPROVED)/거절(REJECTED) 목록 분리 --%>
+<%-- 사업자 숙소 환불신청 조회 (승인은 관리자) --%>
+<%-- 탭 건수·처리완료(APPROVED)/거절(REJECTED) 목록 분리 --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="bizPage" value="refunds" />
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>

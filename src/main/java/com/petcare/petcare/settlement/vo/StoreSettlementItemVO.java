@@ -1,6 +1,6 @@
 /**
  * 역할: 정산 상세 (TB_SETTLEMENT_ITEM) — 쇼핑=주문상품 1건
- * 2026/08/04 장우철 — 쇼핑 정산 S8 VO
+ * 쇼핑 정산 VO
  *
  * 참고 테이블: TB_SETTLEMENT_ITEM
  * 중복방지: UX_SETTLE_ITEM_ORDER_ITEM

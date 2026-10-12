@@ -100,12 +100,12 @@
       <h1 style="font-size:24px;font-weight:800;color:var(--text-main);margin-bottom:4px">커뮤니티</h1>
       <p style="font-size:14px;color:var(--text-muted)">반려동물 이야기를 나눠보세요</p>
     </div>
-    <%-- 2026-07-16 박유정 — 수의사상담(LIFE) 탭에서는 글쓰기 숨김 --%>
+    <%-- 수의사상담(LIFE) 탭에서는 글쓰기 숨김 --%>
     <c:if test="${boardType ne 'LIFE'}">
       <button class="btn-write" onclick="location.href='${contextPath}/community/write'"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>글쓰기</button>
     </c:if>
   </div>
-    <%-- 2026-07-16 박유정 — 재능나눔 탭 제거(give 모듈로 이동), 전체·집사생활·무료나눔·수의사상담 --%>
+    <%-- 탭: 전체·집사생활·무료나눔·수의사상담 (재능나눔은 give 모듈) --%>
     <div class="comm-tabs">
         <a href="${contextPath}/community"
            class="comm-tab ${empty boardType ? 'on' : ''}">전체</a>

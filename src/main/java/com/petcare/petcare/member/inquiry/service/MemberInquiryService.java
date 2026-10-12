@@ -1,6 +1,6 @@
 /**
  * 역할: 1:1 문의 비즈니스 로직 (interface)
- * 2026/07/31 장우철 — 숙소 환불신청 추가
+ * 숙소 환불신청
  */
 package com.petcare.petcare.member.inquiry.service;
 

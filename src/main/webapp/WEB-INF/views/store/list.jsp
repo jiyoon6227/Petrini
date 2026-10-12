@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%-- 지윤 26.07.06 추가: 가격에 콤마(#,###) 찍으려고 fmt 태그 사용 필요해서 taglib 추가 --%>
+<%-- 가격 콤마(#,###) 표시용 fmt taglib --%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 지윤 26.07.15 추가: 이미지 URL이 http로 시작하는지 검사용 (외부 URL vs 로컬 업로드 구분) --%>
+<%-- 이미지 URL이 http로 시작하는지 검사용 (외부 URL vs 로컬 업로드 구분) --%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId" value="store" />
@@ -20,7 +20,7 @@
 .store-cat-list .cat-count { font-size:12px; color:var(--text-muted); }
 .store-cat-list li label { padding:8px 10px; border-radius:var(--radius-sm); transition:var(--transition); }
 .store-cat-list li label:hover { background:var(--primary-light); }
-/* 지윤 26.07.30 추가: 브랜드 li가 모달(div)로 옮겨지면 ul의 list-style:none 상속이 끊겨서 점(•)이 다시 생김 -> li 자체에 직접 지정 */
+/* 브랜드 li가 모달(div)로 옮겨지면 ul의 list-style:none 상속이 끊기므로 li에 직접 지정 */
 .brand-item { list-style:none; }
 .price-range { display:flex; flex-direction:column; gap:8px; }
 .price-range input[type=range] { width:100%; accent-color:var(--primary); }
@@ -61,7 +61,7 @@
 .page-btn:hover { border-color:var(--primary); color:var(--primary); }
 .page-btn.active { background:var(--primary); border-color:var(--primary); color:#fff; font-weight:700; }
 .page-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-/* 지윤 26.07.06 검색창 스타일 추가 */
+/* 검색창 스타일 */
 .store-search-box { display:flex; gap:8px; margin-bottom:16px; }
 .store-search-box input[type=text] { flex:1; padding:9px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:14px; }
 .store-search-box button { padding:9px 20px; border:none; border-radius:var(--radius-sm); background:var(--primary); color:#fff; font-size:13px; font-weight:700; cursor:pointer; }
@@ -71,7 +71,7 @@
 .age-filter { display:flex; gap:6px; margin-bottom:14px; }
 .age-chip { padding:6px 14px; border:1px solid var(--border); border-radius:20px; font-size:12px; color:var(--text-sub); text-decoration:none; }
 .age-chip.active { border-color:var(--primary); background:var(--primary-light); color:var(--primary-dark); font-weight:700; }
-/* 2026-08-06 박유정 — 쇼핑 목록 히어로 (stay-hero 패턴) */
+/* 쇼핑 목록 히어로 (stay-hero 패턴) */
 .store-hero {
     background: linear-gradient(135deg, #1A1A2E 0%, #2D5E4F 60%, #2BAB82 100%);
     padding: 48px 0;
@@ -99,7 +99,7 @@
 <div class="store-wrap">
   <%-- 사이드바 --%>
   <aside class="store-sidebar">
-    <%-- 지윤 26.07.06 카테고리 트리 적용: 강아지/고양이 탭 추가 --%>
+    <%-- 카테고리 트리: 강아지/고양이 탭 --%>
     <div class="species-tabs">
       <c:forEach var="sp" items="${categoryTree}">
         <c:if test="${sp.depth == 2}">
@@ -128,7 +128,7 @@
         </c:forEach>
       </ul>
     </div>
-    <%-- 지윤 26.07.12 수정: 가격대 슬라이더 -> maxPrice 파라미터로 실제 필터링 (최소값은 0 고정, 슬라이더 놓을 때 기존 필터 유지한 채 이동) --%>
+    <%-- 가격대 슬라이더: maxPrice 파라미터 필터 (최소값 0 고정, 슬라이더 놓을 때 기존 필터 유지) --%>
     <div class="store-sidebar-card">
       <div class="store-sidebar-title">가격대</div>
       <div class="price-range">
@@ -143,7 +143,7 @@
       </div>
     </div>
     <%-- After: 체크박스 다중선택 + 상위 5개만 노출 + 더보기 + 전체보기 모달 --%>
-    <%-- 지윤 26.07.30 수정: 단일선택 링크 -> 체크박스 다중선택. 상위 5개 노출, 나머지는 더보기/전체보기 --%>
+    <%-- 브랜드 체크박스 다중선택 (상위 5개 노출, 나머지는 더보기/전체보기) --%>
     <div class="store-sidebar-card">
       <div class="store-sidebar-title" style="display:flex;justify-content:space-between;align-items:center;">
         브랜드
@@ -165,7 +165,7 @@
           <c:forEach var="b" items="${brandList}" varStatus="vs">
             <li class="brand-item${vs.index >= 5 ? ' brand-extra' : ''}" style="${vs.index >= 5 ? 'display:none;' : ''}">
               
-              <%-- 지윤 26.07.30 수정: 모달 안에서 체크할 땐 즉시제출 안 되게 분기, 재고숫자 표시 제거 --%>
+              <%-- 모달 안에서 체크할 땐 즉시제출 안 함 --%>
               <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
                 <input type="checkbox" name="brand" value="${b.brandName}"
                        ${not empty selectedBrand and selectedBrand.contains(b.brandName) ? 'checked' : ''}
@@ -183,7 +183,7 @@
       </c:if>
     </div>
 
-    <%-- 지윤 26.07.30 추가: 브랜드 전체보기 모달 (그리드로 한눈에 보기, sidebar 체크박스를 그대로 옮겨서 재사용 -> 상태 동기화 문제 없음) --%>
+    <%-- 브랜드 전체보기 모달 (그리드, sidebar 체크박스를 옮겨 재사용해 상태 동기화 불필요) --%>
     <div id="brandModalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
       <div style="background:#fff;border-radius:12px;padding:24px;width:640px;max-height:80vh;overflow-y:auto;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -202,7 +202,7 @@
 
   <%-- 상품 목록 --%>
   <div class="store-content">
-    <%-- 지윤 26.07.06 수정: species 파라미터 누락으로 고양이 탭에서 검색시 강아지로 초기화되던 버그 수정 --%>
+    <%-- species 파라미터 유지 (고양이 탭 검색 시 강아지로 초기화 방지) --%>
 <form method="get" action="${contextPath}/store" class="store-search-box">
   <input type="hidden" name="species" value="${selectedSpecies}">
   <c:if test="${not empty selectedCategory}">
@@ -215,7 +215,7 @@
   <button type="submit">검색</button>
 </form>
 
-    <%-- 지윤 26.07.06 나이 필터: 선택된 카테고리에 나이 하위카테고리 있을 때만 표시 --%>
+    <%-- 나이 필터: 선택된 카테고리에 나이 하위카테고리 있을 때만 표시 --%>
     <c:set var="hasAgeOptions" value="false"/>
     <c:forEach var="cat" items="${categoryTree}">
       <c:if test="${not empty selectedCategory && cat.parentId == selectedCategory}">
@@ -243,34 +243,21 @@
     </c:if>
     <div class="store-toolbar">
 
-      <%--<div class="store-result-count">총 <strong>248</strong>개 상품</div>
-      26.07.06 지윤. 하드코딩된 숫자 -> productList.size()로 실제 조회된 상품 개수 자동 표시하도록 변경 --%>
       <div class="store-result-count">총 <strong>${totalCount}</strong>개 상품</div>
-      <%-- 지윤 26.07.06 정렬 기능 추가: 버튼 -> 링크로 변경, 카테고리/검색어 유지한 채 정렬만 바뀌게 처리 --%>
-<%--<c:url var="sortBaseUrl" value="/store">
-  <c:if test="${not empty selectedCategory}"><c:param name="category" value="${selectedCategory}"/></c:if>
-  <c:if test="${not empty selectedKeyword}"><c:param name="keyword" value="${selectedKeyword}"/></c:if>
-</c:url>--%>
+      <%-- 정렬 링크 (카테고리/검색어 유지한 채 정렬만 변경) --%>
 <%-- After: selectedBrand가 이제 List라서 c:forEach로 여러 개를 각각 brand 파라미터로 추가 --%>
 <c:url var="sortBaseUrl" value="/store">
   <c:param name="species" value="${selectedSpecies}"/>
   <c:if test="${not empty selectedCategory}"><c:param name="category" value="${selectedCategory}"/></c:if>
   <c:if test="${not empty selectedAge}"><c:param name="age" value="${selectedAge}"/></c:if>
   <c:if test="${not empty selectedKeyword}"><c:param name="keyword" value="${selectedKeyword}"/></c:if>
-  <%-- 지윤 26.07.12 추가: 정렬 바뀌어도 가격/브랜드 필터 유지 --%>
+  <%-- 정렬 바뀌어도 가격/브랜드 필터 유지 --%>
   <c:if test="${not empty selectedMaxPrice}"><c:param name="maxPrice" value="${selectedMaxPrice}"/></c:if>
-  <%-- 지윤 26.07.30 수정: selectedBrand String -> List, 여러 개 각각 param으로 추가 --%>
+  <%-- selectedBrand(List) 각각 brand param으로 추가 --%>
   <c:forEach var="sb" items="${selectedBrand}"><c:param name="brand" value="${sb}"/></c:forEach>
 </c:url>
 
-<%--<div class="store-sort">
-  <a href="${sortBaseUrl}${empty selectedCategory && empty selectedKeyword ? '?' : '&'}sort=popular" class="sort-btn ${selectedSort == 'popular' ? 'on' : ''}">인기순</a>
-  <a href="${sortBaseUrl}${empty selectedCategory && empty selectedKeyword ? '?' : '&'}sort=latest" class="sort-btn ${selectedSort == 'latest' ? 'on' : ''}">최신순</a>
-  <a href="${sortBaseUrl}${empty selectedCategory && empty selectedKeyword ? '?' : '&'}sort=priceAsc" class="sort-btn ${selectedSort == 'priceAsc' ? 'on' : ''}">낮은가격</a>
-  <a href="${sortBaseUrl}${empty selectedCategory && empty selectedKeyword ? '?' : '&'}sort=priceDesc" class="sort-btn ${selectedSort == 'priceDesc' ? 'on' : ''}">높은가격</a>
-</div>--%>
-<%-- 지윤 26.07.06 수정: sortBaseUrl에 species가 항상 포함되어 이미 완성된 URL(?species=5...)로 나옴
-     기존 '?'/'&' 조건 분기를 두면 물음표가 두 번 붙어서 URL이 깨짐 -> 무조건 '&'로 고정 --%>
+<%-- sortBaseUrl에 species가 항상 포함(?species=...)되므로 구분자는 '&' 고정 --%>
 <div class="store-sort">
   <a href="${sortBaseUrl}&sort=popular" class="sort-btn ${selectedSort == 'popular' ? 'on' : ''}">인기순</a>
   <a href="${sortBaseUrl}&sort=latest" class="sort-btn ${selectedSort == 'latest' ? 'on' : ''}">최신순</a>
@@ -280,17 +267,17 @@
 </div>
 
    
-   <%-- 지윤 26.07.06: 하드코딩 카드 6개 -> productList 실데이터 forEach로 교체 (USER-03) --%>
+   <%-- productList forEach 렌더링 --%>
 <div class="product-grid">
   <c:forEach var="p" items="${productList}">
     <div class="product-card" onclick="location.href='${contextPath}/store/detail?id=${p.productId}'">
     
       <div class="product-thumb-wrap">
-        <%-- 지윤 26.07.15 수정: 로컬 업로드 이미지는 /upload/ 접두사 필요, 외부(목업) URL은 그대로 --%>
+        <%-- 로컬 업로드 이미지는 /upload/ 접두사 필요, 외부(목업) URL은 그대로 --%>
         <c:set var="thumbSrc" value="${fn:startsWith(p.thumbnailUrl,'http') ? p.thumbnailUrl : contextPath.concat('/upload/').concat(p.thumbnailUrl)}"/>
         <img class="product-thumb" src="${thumbSrc}" alt="${p.productName}" onerror="this.src='https://placehold.co/400x400/EAF7F2/2BAB82?text=상품'">
         
-        <%-- 지윤 26.07.06: 원래 있던 BEST/NEW/SALE 뱃지는 DB에 근거 데이터가 없어서, 할인율 있을 때만 SALE 뱃지 표시하도록 단순화 --%>
+        <%-- 할인율 있을 때만 SALE 뱃지 (BEST/NEW는 근거 데이터 없음) --%>
         <c:if test="${p.discountRate > 0}"><span class="product-badge">SALE</span></c:if>
         <button type="button" class="product-wish wish-btn" data-wish-id="store:${p.productId}" aria-label="찜하기"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg></button>
       </div>
@@ -299,11 +286,11 @@
         <div class="product-name">${p.productName}</div>
         <div class="product-rating">
           <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <%-- 지윤 26.07.06: TB_REVIEW 더미데이터가 아직 없어서 지금은 항상 0.0 (0)으로 뜸. 리뷰 기능 붙이면 자동으로 채워짐 --%>
+          <%-- 리뷰 평점·개수 (리뷰 없으면 0.0 (0)) --%>
           <span>${p.avgRating} (${p.reviewCount})</span>
         </div>
         <div class="product-price">
-          <%-- 지윤 26.07.06: 할인율 있으면 정가+할인율 같이 표시, 없으면 판매가만 표시 --%>
+          <%-- 할인율 있으면 정가+할인율 같이 표시, 없으면 판매가만 표시 --%>
           <c:if test="${p.discountRate > 0}">
             <span class="price-rate">${p.discountRate}%</span>
             <span class="price-sale"><fmt:formatNumber value="${p.salePrice}" pattern="#,###"/>원</span>
@@ -314,7 +301,6 @@
           </c:if>
         </div>
       </div>
-      <%--<div class="product-footer"><button class="btn-cart" data-product-id="${p.productId}" data-price="${p.salePrice}">장바구니 담기</button></div> 상품목록에서 장바구니담기 제거 옵션걸려서 애매함--%>
     </div>
   </c:forEach>
 </div>
@@ -326,14 +312,13 @@
   <c:if test="${not empty selectedAge}"><c:param name="age" value="${selectedAge}"/></c:if>
   <c:if test="${not empty selectedKeyword}"><c:param name="keyword" value="${selectedKeyword}"/></c:if>
   <c:if test="${not empty selectedSort}"><c:param name="sort" value="${selectedSort}"/></c:if>
-  <%-- 지윤 26.07.12 추가: 페이지 이동해도 가격/브랜드 필터 유지 --%>
+  <%-- 페이지 이동해도 가격/브랜드 필터 유지 --%>
   <c:if test="${not empty selectedMaxPrice}"><c:param name="maxPrice" value="${selectedMaxPrice}"/></c:if>
-  <%-- 지윤 26.07.30 수정: selectedBrand String -> List --%>
+  <%-- selectedBrand(List) --%>
   <c:forEach var="sb" items="${selectedBrand}"><c:param name="brand" value="${sb}"/></c:forEach>
 </c:url>
 
-<%--<c:set var="pageSep" value="${empty selectedCategory && empty selectedKeyword && empty selectedSort ? '?' : '&'}"/>--%>
-<%-- 지윤 26.07.06 수정: pageBaseUrl도 species가 항상 포함되어 이미 완성된 URL로 나옴 -> 무조건 '&'로 고정 --%>
+<%-- pageBaseUrl에도 species가 항상 포함되므로 구분자는 '&' 고정 --%>
 <c:set var="pageSep" value="&"/>
 
 <div class="pagination">
@@ -356,7 +341,7 @@ document.querySelectorAll('.sort-btn').forEach(b => b.addEventListener('click', 
   this.classList.add('on');
 }));
 
-//지윤 26.07.12 가격대 슬라이더: 드래그 중엔 라벨만 갱신, 손 뗄 때(change) 기존 필터 유지한 채 maxPrice로 이동
+// 가격대 슬라이더: 드래그 중엔 라벨만 갱신, 손 뗄 때(change) 기존 필터 유지한 채 maxPrice로 이동
 var priceRangeInput = document.getElementById('priceRangeInput');
 var priceRangeLabel = document.getElementById('priceRangeLabel');
 if (priceRangeInput) {
@@ -378,7 +363,7 @@ if (priceRangeInput) {
   });
 }
 
-//지윤 26.07.30 추가: 브랜드 더보기 (사이드바 안에서 6번째부터 펼치기/접기)
+// 브랜드 더보기 (사이드바 안에서 6번째부터 펼치기/접기)
 function toggleBrandMore() {
   var extras = document.querySelectorAll('#brandListAll .brand-extra');
   var btn = document.getElementById('brandMoreBtn');
@@ -387,7 +372,7 @@ function toggleBrandMore() {
   btn.textContent = showing ? '더보기 ⌄' : '접기 ⌃';
 }
 
-//지윤 26.07.30 수정: 모달 열 때 체크 상태를 스냅샷으로 저장 -> X로 닫으면 이걸로 복구
+// 모달 열 때 체크 상태 스냅샷 저장 (X로 닫으면 복구)
 var brandCheckedSnapshot = [];
 function openBrandModal() {
   var items = document.querySelectorAll('#brandListAll .brand-item');
@@ -400,7 +385,7 @@ function openBrandModal() {
   document.getElementById('brandModalBg').style.display = 'flex';
 }
 
-//지윤 26.07.30 추가: X(취소)로 닫을 때 스냅샷으로 체크 상태 되돌림
+// X(취소)로 닫을 때 스냅샷으로 체크 상태 되돌림
 function cancelBrandModal() {
   var checkboxes = document.querySelectorAll('#brandModalGrid input[name=brand]');
   checkboxes.forEach(function (cb, idx) { cb.checked = brandCheckedSnapshot[idx]; });

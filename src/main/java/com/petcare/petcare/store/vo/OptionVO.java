@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
-//지윤 26.07.07 상품 옵션(TB_PRODUCT_OPTION) 조회용 VO
+// 상품 옵션(TB_PRODUCT_OPTION) 조회용 VO
 @Getter @Setter
 @ToString
 @NoArgsConstructor

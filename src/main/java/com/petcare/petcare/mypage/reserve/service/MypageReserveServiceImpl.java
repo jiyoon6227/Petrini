@@ -1,9 +1,9 @@
 /**
  * 역할: MypageReserveService 구현체 (@Service)
  *
- * 2026/07/11 장우철 — 마이페이지 예약 목록·상세 (2차)
- * - 박유정 / 2026-07-29 — addStayReview 후 TB_STAY AVG_RATING·REVIEW_CNT 갱신
- * - 박유정 / 2026-08-10 — 재능나눔 참여 신청 예약내역 통합·취소
+ * 마이페이지 예약 목록·상세
+ * - addStayReview 후 TB_STAY AVG_RATING·REVIEW_CNT 갱신
+ * - 재능나눔 참여 신청 예약내역 통합·취소
  */
 
 package com.petcare.petcare.mypage.reserve.service;
@@ -42,11 +42,11 @@ public class MypageReserveServiceImpl implements MypageReserveService {
     private TossPaymentService tossPaymentService;
     @Autowired
     private MypageReservePointService mypageReservePointService;
-    // 2026-08-10 박유정 — 재능나눔 신청 취소 위임
+    // 재능나눔 신청 취소 위임
     @Autowired
     private GiveTalentService giveTalentService;
 
-    // 2026-08-10 박유정 — 예약 + 재능나눔 신청 목록 병합 (type=talent 필터)
+    // 예약 + 재능나눔 신청 목록 병합 (type=talent 필터)
     @Override
     @Transactional(readOnly = true)
     public List<MypageReserveVO> getMyReservationList(Long memberNo, String statusFilter, String typeFilter) {
@@ -76,7 +76,7 @@ public class MypageReserveServiceImpl implements MypageReserveService {
         return list;
     }
 
-    // 2026-08-10 박유정 — resvType=TALENT 이면 TB_TALENT_APPLY 상세
+    // resvType=TALENT 이면 TB_TALENT_APPLY 상세
     @Override
     @Transactional(readOnly = true)
     public MypageReserveVO getMyReservationDetail(Long memberNo, Long resvId, String resvType) {
@@ -99,7 +99,7 @@ public class MypageReserveServiceImpl implements MypageReserveService {
         return detail;
     }
 
-    // 2026-08-10 박유정 — 마이페이지에서 재능나눔 신청 취소
+    // 마이페이지에서 재능나눔 신청 취소
     @Override
     @Transactional
     public void cancelTalentApply(Long memberNo, Long applyId) {
@@ -117,8 +117,8 @@ public class MypageReserveServiceImpl implements MypageReserveService {
         }
     }
 
-    /** 2026/07/31 장우철 — CONFIRMED 숙소면 취소 수수료 미리보기 채움 */
-    /** 2026/08/07 장우철 — 수수료·환불 미리보기는 실결제(PAY_AMOUNT) 기준 */
+    /** CONFIRMED 숙소면 취소 수수료 미리보기 채움 */
+    /** 수수료·환불 미리보기는 실결제(PAY_AMOUNT) 기준 */
     private void fillStayCancelPreview(MypageReserveVO detail) {
         if (!"STAY".equalsIgnoreCase(detail.getResvType())
                 || !"CONFIRMED".equalsIgnoreCase(detail.getStatusCd())
@@ -146,8 +146,8 @@ public class MypageReserveServiceImpl implements MypageReserveService {
         }
     }
 
-    // 2026/07/31 장우철 — 유저 숙소 취소 (1-4) + 위약금(1-6)
-    // 2026/08/07 장우철 — 실결제 기준 수수료/환불 + 포인트·쿠폰 복구
+    // 유저 숙소 취소 + 위약금
+    // 실결제 기준 수수료/환불 + 포인트·쿠폰 복구
     @Override
     @Transactional
     public void cancelStayReservation(Long memberNo, Long resvId, String cancelReason) {
@@ -220,14 +220,14 @@ public class MypageReserveServiceImpl implements MypageReserveService {
             throw new IllegalStateException("예약을 취소할 수 없습니다. 상태를 확인해 주세요.");
         }
 
-        // 3) 알림 (본인) — 2026-08-11 박유정 — 숙소 전용 취소 알림 (병원 문구 분리)
+        // 3) 알림 (본인) — 숙소 전용 취소 알림 (병원 문구 분리)
         String stayName = detail.getHospitalName() != null ? detail.getHospitalName() : "숙소";
-        // 2026/08/11 장우철 — 숙소 전용 취소 알림 (checkin~checkout 기간 표시)
+        // 숙소 전용 취소 알림 (checkin~checkout 기간 표시)
         mypageNotifyService.sendStayReserveCancelNotification(
                 memberNo, stayName, detail.getCheckinDate(), detail.getCheckoutDate(), reason, resvId);
     }
 
-    // 2026/07/13 장우철 — DONE + 미작성 예약만 병원 리뷰 INSERT 후 평점 갱신
+    // DONE + 미작성 예약만 병원 리뷰 INSERT 후 평점 갱신
     @Override
     @Transactional
     public void addHospitalReview(Long memberNo, Long resvId, Double rating, String content) {
@@ -267,15 +267,15 @@ public class MypageReserveServiceImpl implements MypageReserveService {
         mypageReserveMapper.insertHospitalReview(review);
         mypageReserveMapper.updateHospitalRatingSummary(hospitalId);
 
-        // 2026/07/13 장우철 — 사업자에게 리뷰 등록 알림
+        // 사업자에게 리뷰 등록 알림
         Long bizMemberNo = mypageReserveMapper.selectHospitalMemberNo(hospitalId);
         String nickname = mypageReserveMapper.selectMemberNickname(memberNo);
         mypageNotifyService.sendHospitalReviewToBizNotification(
                 bizMemberNo, detail.getHospitalName(), nickname, rating, resvId);
     }
 
-    // HYJ 26.07.20 — DONE + 미작성 예약만 숙소 리뷰 INSERT
-    // 2026-07-28 박유정 — 사업자 알림·결제금액 3% 포인트 적립·결과 VO 반환 (별도 TX)
+    // DONE + 미작성 예약만 숙소 리뷰 INSERT
+    // 사업자 알림·결제금액 3% 포인트 적립·결과 VO 반환 (별도 TX)
     @Override
     @Transactional(timeout = 15)
     public StayReviewRegisterResult addStayReview(Long memberNo, Long resvId, Double rating, String content,
@@ -315,16 +315,16 @@ public class MypageReserveServiceImpl implements MypageReserveService {
         review.setContent(content.trim());
 
         mypageReserveMapper.insertStayReview(review);
-        // 2026-07-29 박유정 — TB_STAY AVG_RATING·REVIEW_CNT 갱신 (병원 addHospitalReview와 동일)
+        // TB_STAY AVG_RATING·REVIEW_CNT 갱신 (병원 addHospitalReview와 동일)
         mypageReserveMapper.updateStayRatingSummary(review.getTargetId());
 
-        // 2026-07-28 박유정 — 사업자에게 리뷰 등록 알림
+        // 사업자에게 리뷰 등록 알림
         Long bizMemberNo = mypageReserveMapper.selectStayMemberNo(review.getTargetId());
         String nickname = mypageReserveMapper.selectMemberNickname(memberNo);
         mypageNotifyService.sendStayReviewToBizNotification(
                 bizMemberNo, detail.getStayName(), nickname, rating, resvId);
 
-        // 2026-07-28 박유정 — 숙소 리뷰 포인트 적립 (결제금액 3%, MypageReservePointService 별도 TX)
+        // 숙소 리뷰 포인트 적립 (결제금액 3%, MypageReservePointService 별도 TX)
         long earnedPoint = 0;
         if (detail.getTotalAmount() != null && detail.getTotalAmount() > 0) {
             earnedPoint = (long) Math.floor(detail.getTotalAmount() * 0.03);

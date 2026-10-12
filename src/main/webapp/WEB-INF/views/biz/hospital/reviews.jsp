@@ -16,7 +16,7 @@
 
 
 
-<%-- 7/2, 사업자(병원) 리뷰 관리 UI — 2026/07/14 장우철 DB 목록·답글 저장 연동 --%>
+<%-- 사업자(병원) 리뷰 관리 UI — DB 목록·답글 저장 --%>
 
 <main class="biz-main">
 
@@ -50,7 +50,7 @@
 
       <div class="biz-tabs">
 
-        <%-- 2026-07-24 박유정 — 삭제요청 상태별 탭 --%>
+        <%-- 삭제요청 상태별 탭 --%>
 
         <button type="button" class="biz-tab active" data-tab="pending" onclick="switchTab('pending')">삭제요청<span class="biz-tab-count" id="cntPending"></span></button>
 
@@ -97,7 +97,6 @@
 
 
 <form id="replyForm" method="post" action="${contextPath}/biz/hospital/reviews/reply" style="display:none">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
 
   <input type="hidden" name="reviewId" id="replyReviewId" value="">
@@ -108,10 +107,9 @@
 
 
 
-<%-- 2026-07-24 박유정 — 리뷰 삭제 요청 --%>
+<%-- 리뷰 삭제 요청 --%>
 
 <form id="deleteRequestForm" method="post" action="${contextPath}/biz/hospital/reviews/delete-request" style="display:none">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
   
   <input type="hidden" name="reviewId" id="deleteReviewId" value="">
@@ -322,7 +320,7 @@
 
 
 
-  // 2026-07-24 박유정 — 삭제요청 탭: 답글·신규 요청 + 대기 내역
+  // 삭제요청 탭: 답글·신규 요청 + 대기 내역
 
   function renderPendingTab(box) {
 
@@ -402,7 +400,7 @@
 
 
 
-  // 2026-07-24 박유정 — 삭제승인·삭제반려 탭
+  // 삭제승인·삭제반려 탭
 
   function renderDeleteRequestHistory(box, statusCd, emptyMsg) {
 

@@ -40,12 +40,12 @@ public interface HospitalService {
     List<HospitalVO> getHospitalListBySearch(HospitalVO searchVO) throws Exception;
     HospitalVO getHospitalById(Long hospitalId) throws Exception;
 
-    // 2026-07-10 장우철 — 병원 예약 1차 (F2~F3)
+    // 병원 예약
     List<HospitalPetVO> getPetListForReserve(Long memberNo) throws Exception;
     Long createHospitalReservation(ReservationVO vo) throws Exception;
     ReservationVO getReservationById(Long resvId) throws Exception;
 
-    // 2026/07/16 장우철 — 예약 UI: 가능시간·선점
+    // 예약 UI: 가능시간·선점
     List<HospitalDoctorVO> getActiveDoctorsForReserve(Long hospitalId) throws Exception;
     List<HospitalTreatTypeVO> getActiveTreatTypesForReserve(Long hospitalId) throws Exception;
     List<String> getAvailableReserveTimes(Long hospitalId, Long doctorId, Long treatTypeId,
@@ -53,15 +53,15 @@ public interface HospitalService {
     Long createReserveHold(Long hospitalId, Long memberNo, Long doctorId, Long treatTypeId,
                            Date resvDate, String resvTime) throws Exception;
 
-    // 2026/07/20 장우철 — 만료 hold 일괄 삭제 (스케줄·예약 API 공용)
+    // 만료 hold 일괄 삭제 (스케줄·예약 API 공용)
     int cleanupExpiredHolds() throws Exception;
 
-    // 2026/07/20 장우철 — 2단계 이전 클릭 시 본인 hold 해제
+    // 2단계 이전 클릭 시 본인 hold 해제
     void releaseMemberReserveHolds(Long hospitalId, Long memberNo) throws Exception;
 
-    // 2026/07/20 장우철 — 정기 휴무일 여부 (예약 날짜 선택)
+    // 정기 휴무일 여부 (예약 날짜 선택)
     Map<String, Object> checkReserveDate(Long hospitalId, Date resvDate) throws Exception;
 
-    // 2026/07/13 장우철 — 병원 상세 리뷰 목록
+    // 병원 상세 리뷰 목록
     List<HospitalReviewVO> getHospitalReviews(Long hospitalId) throws Exception;
 }

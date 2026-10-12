@@ -26,7 +26,7 @@ public class MypageBizServiceImpl implements MypageBizService {
     @Autowired
     private FileMapper fileMapper;
 
-    // 2026-07-09 장우철 — [변경 후] 최초 INSERT / 반려 후 재신청 UPDATE 분기
+    // 최초 INSERT / 반려 후 재신청 UPDATE 분기
     // 이유: UK(BIZ_ID, BIZ_REG_NO) — 재신청은 TB_BUSINESS UPDATE + TB_BUSINESS_AUTH INSERT
     @Override
     @Transactional
@@ -60,15 +60,9 @@ public class MypageBizServiceImpl implements MypageBizService {
             fv.setRefId(vo.getBizNo());
             fileMapper.insertFile(fv);
         }
-
-        /* [변경 전] 2026-07-09 장우철 — 항상 INSERT 만 수행 (재신청 시 UK 위반)
-        mypageBizMapper.insertBusiness(vo);
-        mypageBizMapper.insertBusinessAuth(vo);
-        for (FileVO fv : fileList) { ... }
-        */
     }
 
-    // 2026-07-09 장우철 — 재신청 시 기존 제출 서류 교체
+    // 재신청 시 기존 제출 서류 교체
   private void replaceBizFiles(Long bizNo, List<FileVO> fileList) throws Exception {
         FileVO delAuth = new FileVO();
         delAuth.setRefType("BIZ_AUTH");

@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--
   역할: 쇼핑 정산 대상 조회 + 저장 SQL
-  2026/08/04 장우철 — 쇼핑 정산 S8 (1-2 / 1-5 / 1-6)
+  쇼핑 정산
 
   규칙 요약
   - 집계 기준일 = ORDER_ITEM.CONFIRMED_AT
@@ -12,7 +12,7 @@
   - 택배비: 같은 ORDER 에서 정산 대상 중 1건에만 부여 (이미 배송비가 잡힌 정산 ITEM 있으면 0)
   - productId 있으면 해당 상품만 (중간정산 PRODUCT)
   - 저장 시퀀스: SEQ_TB_SETTLEMENT / SEQ_TB_SETTLEMENT_ITEM
-  2026/08/05 장우철 — S9 요약/목록/상세 조회 추가
+  요약/목록/상세 조회
 -->
 <mapper namespace="com.petcare.petcare.settlement.mapper.StoreSettlementMapper">
 
@@ -224,7 +224,7 @@
     </insert>
 
     <!--
-      2026/08/05 장우철 — S9 2-1 상단 요약
+      상단 요약
       pending = 미정산 구매확정 실정산금 + PAY_STATUS=WAIT 정산마스터
       paid    = 이번 달 PAY_STATUS=DONE
       fee     = STORE 정산 누적 TOTAL_FEE
@@ -305,7 +305,7 @@
           FROM DUAL
     </select>
 
-    <!-- 2026/08/05 장우철 — S9 2-2 정산 목록 -->
+    <!-- 정산 목록 -->
     <select id="selectStoreSettlementList"
             resultType="com.petcare.petcare.settlement.vo.StoreSettlementVO">
         SELECT  ST.SETTLE_ID      AS settleId,
@@ -356,7 +356,7 @@
          ORDER BY ST.SETTLE_MONTH DESC
     </select>
 
-    <!-- 2026/08/05 장우철 — S9 2-3 정산 상세 (주문상품 단위) -->
+    <!-- 정산 상세 (주문상품 단위) -->
     <select id="selectStoreSettlementItems"
             resultType="com.petcare.petcare.settlement.vo.StoreSettlementItemVO">
         SELECT  SI.SETTLE_ITEM_ID AS settleItemId,
@@ -393,7 +393,7 @@
          ORDER BY SI.CONFIRMED_AT ASC, SI.SETTLE_ITEM_ID ASC
     </select>
 
-    <!-- 2026/08/05 장우철 — S10 중간정산 요청 -->
+    <!-- 중간정산 요청 -->
     <select id="selectProductsByBiz"
             resultType="com.petcare.petcare.biz.store.vo.BizProductVO">
         SELECT PRODUCT_ID   AS productId,
@@ -518,7 +518,7 @@
          WHERE BIZ_NO = #{bizNo}
     </select>
 
-    <!-- 2026/08/05 장우철 — S12 월정산 배치: 승인 쇼핑 사업자 -->
+    <!-- 월정산 배치: 승인 쇼핑 사업자 -->
     <select id="selectApprovedStoreBizNos" resultType="long">
         SELECT B.BIZ_NO
           FROM TB_BUSINESS B
@@ -527,7 +527,7 @@
          ORDER BY B.BIZ_NO
     </select>
 
-    <!-- 2026/08/05 장우철 — S12: 동일 월 REGULAR 월정산 중복 방지 -->
+    <!-- 동일 월 REGULAR 월정산 중복 방지 -->
     <select id="countRegularByBizAndMonth" resultType="int">
         SELECT COUNT(*)
           FROM TB_SETTLEMENT

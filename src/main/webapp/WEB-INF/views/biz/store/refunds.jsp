@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026/08/04 장우철 — 사업자 환불신청 처리 목록 --%>
-<%-- 2026/08/11 장우철 — P8: 숙소 예약관리와 유사한 탭·카드·뱃지 UI --%>
+<%-- 사업자 환불신청 처리 목록 --%>
+<%-- 숙소 예약관리와 유사한 탭·카드·뱃지 UI --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="bizTypeLabel" value="반려동물 쇼핑몰" />
 <c:set var="bizPage" value="refunds" />

@@ -1,5 +1,5 @@
 /**
- * 2026/08/11 장우철 — 관리자 주문 목록 (전 사업자)
+ * 관리자 주문 목록 (전 사업자)
  * 참고: TB_ORDER + TB_MEMBER + TB_BUSINESS + TB_PAYMENT
  */
 package com.petcare.petcare.admin.store.vo;

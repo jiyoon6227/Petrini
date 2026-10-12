@@ -42,7 +42,7 @@ public class AdminCommunityController extends AdminBaseController {
     @Autowired
     private AdminCommunityService adminCommunityService;
 
-    // 2026-07-15 박유정 — 관리자 게시글 목록 (DB 연동)
+    // 관리자 게시글 목록 (DB 연동)
     @GetMapping("/list")
     public String communityList(HttpSession session,
                                 @RequestParam(defaultValue = "") String keyword,
@@ -65,7 +65,7 @@ public class AdminCommunityController extends AdminBaseController {
         return "admin/community/list";
     }
 
-    // 2026-07-15 박유정 — 관리자 게시글 상세
+    // 관리자 게시글 상세
     @GetMapping("/detail")
     public String communityDetail(HttpSession session,
                                   @RequestParam long id,
@@ -79,14 +79,14 @@ public class AdminCommunityController extends AdminBaseController {
             return "redirect:/admin/community/list";
         }
         model.addAttribute("post", post);
-        //2026/08/06 장우철 — 신고 내역
+        // 신고 내역
         model.addAttribute("reportList", adminCommunityService.getPostReports(id));
-        // 2026/08/07 장우철 — 댓글·대댓글 (읽기 전용)
+        // 댓글·대댓글 (읽기 전용)
         model.addAttribute("comments", adminCommunityService.getPostComments(id));
         return "admin/community/detail";
     }
 
-    //2026/08/06 장우철 — 대기 신고 기각 (게시글은 유지)
+    // 대기 신고 기각 (게시글은 유지)
     // ADMIN_NO는 TB_ADMIN.ADMIN_NO FK — 세션 adminNo 사용 (memberNo 아님)
     @PostMapping("/dismiss-reports")
     public String dismissReports(HttpSession session,
@@ -118,7 +118,7 @@ public class AdminCommunityController extends AdminBaseController {
         }
     }
 
-    // 2026-07-15 박유정 STEP 7 — 게시글 숨김
+    // 게시글 숨김
     @PostMapping("/hide")
     public String hidePost(HttpSession session,
                            @RequestParam long postId,
@@ -139,7 +139,7 @@ public class AdminCommunityController extends AdminBaseController {
         }
     }
 
-    // 2026-07-15 박유정 STEP 7 — 게시글 삭제
+    // 게시글 삭제
     @PostMapping("/delete")
     public String deletePost(HttpSession session,
                              @RequestParam long postId,
@@ -149,9 +149,8 @@ public class AdminCommunityController extends AdminBaseController {
             return redirectToLogin();
 
         try {
-            // adminCommunityService.deletePost(postId);
             
-            //HYJ 26.07.28 관리자 게시글 삭제 반영하기 위해 작성자정보 전달
+            // 관리자 게시글 삭제 반영하기 위해 작성자정보 전달
             adminCommunityService.deletePost(postId, memberNo);
             
             rttr.addFlashAttribute("successMsg", "게시글이 삭제되었습니다.");
@@ -165,7 +164,7 @@ public class AdminCommunityController extends AdminBaseController {
         }
     }
 
-    // 2026-07-15 박유정 — 복구 (숨김·삭제 → ACTIVE, POST /restore)
+    // 복구 (숨김·삭제 → ACTIVE, POST /restore)
     @PostMapping("/restore")
     public String restorePost(HttpSession session,
                               @RequestParam long postId,

@@ -1,7 +1,6 @@
 /**
  * 역할: 숙소 체크인 전 취소 시 위약금·환불액 계산 (1-6)
  * 기준: 캔버스 환불/취소 표 (입실일 기준 D-day)
- * 2026/07/31 장우철
  */
 package com.petcare.petcare.stay.service;
 
@@ -15,7 +14,7 @@ public final class StayCancelFeeCalculator {
     private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 
     /**
-     * 2026/08/11 장우철 — 플랫폼 고정 환불 정책 문구 (사업자 수정 불가, TB_STAY.REFUND_POLICY 저장용)
+     * 플랫폼 고정 환불 정책 문구 (사업자 수정 불가, TB_STAY.REFUND_POLICY 저장용)
      */
     public static final String FIXED_POLICY_TEXT =
             "입실일 기준 취소수수료\n"

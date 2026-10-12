@@ -1,7 +1,7 @@
 /**
  * 역할: PetHealthService 구현체
  *
- * 2026/07/14 장우철 — 건강수첩 = TB_MEDICAL_RECORD 회원 조회 + MEMO 태그 파싱
+ * 건강수첩 = TB_MEDICAL_RECORD 회원 조회 + MEMO 태그 파싱
  */
 
 package com.petcare.petcare.pet.health.service;
@@ -29,7 +29,7 @@ public class PetHealthServiceImpl implements PetHealthService {
             return List.of();
         }
         List<MedicalRecordVO> list = petHealthMapper.selectMedicalRecordsByMember(memberNo, petId);
-        // 2026-07-28 박유정 — MEMO 태그 파싱 공통 유틸(MedicalRecordMemoParser) 사용
+        // MEMO 태그 파싱 공통 유틸(MedicalRecordMemoParser) 사용
         for (MedicalRecordVO r : list) {
             MedicalRecordMemoParser.parse(r);
         }

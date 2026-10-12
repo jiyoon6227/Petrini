@@ -7,7 +7,7 @@
  * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
  * return 경로는 담당 JSP와 동일하게 맞출 것
  *
- * - 박유정 / 2026-07-06 — 재능나눔은 /give/talent 별도 (GiveTalentController)
+ * - 재능나눔은 /give/talent 별도 (GiveTalentController)
  */
 package com.petcare.petcare.give.controller;
 

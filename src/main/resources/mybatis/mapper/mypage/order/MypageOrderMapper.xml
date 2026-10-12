@@ -20,7 +20,7 @@
   테이블: TB_ORDER, TB_ORDER_ITEM, TB_FILE
 -->
 
-<!-- 지윤 26.07.30 수정: TB_PAYMENT.TOSS_ORDER_ID를 ORDER_GROUP_ID로 조회 -> 같은 결제로 쪼개진 여러 사업자 주문을 화면에서 하나로 묶기 위함 -->
+<!-- TB_PAYMENT.TOSS_ORDER_ID를 ORDER_GROUP_ID로 조회 (같은 결제의 사업자별 주문을 화면에서 묶기용) -->
 <select id="selectOrderList" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderVO">
     SELECT o.ORDER_ID, o.ORDER_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT, o.CONFIRM_YN,
            o.CLAIM_STATUS,
@@ -32,7 +32,7 @@
     LEFT JOIN TB_ORDER_DELIVERY d ON d.ORDER_ID = o.ORDER_ID
     LEFT JOIN TB_PAYMENT pay ON pay.ORDER_ID = o.ORDER_ID
     WHERE o.MEMBER_NO = #{memberNo}
-    <!-- 2026/08/13 장우철 — #7/#13: 취소/환불 탭은 주문취소+상품환불, 배송중/완료는 전부환불완료 제외 -->
+    <!-- 취소/환불 탭은 주문취소+상품환불, 배송중/완료는 전부환불완료 제외 -->
     <if test="statusCd != null and statusCd != ''">
         <choose>
             <when test="statusCd == 'CANCEL'">
@@ -70,13 +70,13 @@
     ORDER BY o.ORDER_ID DESC
 </select>
 
-<!-- 지윤 26.07.23 추가: 정책값 조회 (포인트 적립률/적립금 등, TB_POLICY.POLICY_TYPE='POINT' 고정) -->
+<!-- 정책값 조회 (포인트 적립률/적립금 등, TB_POLICY.POLICY_TYPE='POINT' 고정) -->
 <select id="selectPolicyValue" resultType="String">
     SELECT POLICY_VALUE FROM TB_POLICY WHERE POLICY_TYPE = 'POINT' AND POLICY_KEY = #{policyKey}
 </select>
 
-<!-- 지윤 26.07.23 추가: 구매확정 처리. DONE + 확정 가능한 ITEM이 있으면 대상 -->
-<!-- 2026/08/04 장우철 — 부분 확정: 환불중인 상품이 있어도 나머지 확정 가능 / 재확정(거절 후) 허용 -->
+<!-- 구매확정 처리. DONE + 확정 가능한 ITEM이 있으면 대상 -->
+<!-- 부분 확정: 환불중인 상품이 있어도 나머지 확정 가능 / 재확정(거절 후) 허용 -->
 <update id="confirmPurchaseOrder">
     UPDATE TB_ORDER
        SET CONFIRM_YN = 'Y',
@@ -92,24 +92,24 @@
        )
 </update>
 
-<!-- 지윤 26.07.23 추가: 포인트 적립 전 현재 잔액 조회 (새 잔액 계산용) -->
+<!-- 포인트 적립 전 현재 잔액 조회 (새 잔액 계산용) -->
 <select id="selectMemberPointBalance" resultType="int">
     SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
 </select>
 
-<!-- 지윤 26.07.23 추가: 포인트 잔액 적립 (새 잔액으로 덮어씀) -->
+<!-- 포인트 잔액 적립 (새 잔액으로 덮어씀) -->
 <update id="addMemberPoint">
     UPDATE TB_MEMBER SET POINT_BALANCE = #{newBalance} WHERE MEMBER_NO = #{memberNo}
 </update>
 
-<!-- 지윤 26.07.23 추가: 포인트 적립 이력 (MAX+1 채번, 프로젝트 컨벤션) -->
+<!-- 포인트 적립 이력 (MAX+1 채번, 프로젝트 컨벤션) -->
 <insert id="insertPointEarnHistory">
     INSERT INTO TB_POINT (POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT, BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE)
     VALUES ((SELECT NVL(MAX(POINT_ID),0)+1 FROM TB_POINT), #{memberNo}, 'EARN', #{pointAmount}, #{balanceAfter}, #{reasonCd}, #{refType}, #{refId}, SYSDATE)
 </insert>
 
-<!-- 지윤 26.07.29 수정: 배송조회(스마트택배 API) 버튼용 COURIER_CODE 추가 -->
-<!-- 지윤 26.07.30 수정: BIZ_NAME, ORDER_GROUP_ID(TOSS_ORDER_ID) 추가 - 상세보기를 결제그룹 단위로 묶어 보여주기 위함 -->
+<!-- 배송조회(스마트택배 API) 버튼용 COURIER_CODE -->
+<!-- BIZ_NAME, ORDER_GROUP_ID(TOSS_ORDER_ID): 상세보기 결제그룹 단위 표시용 -->
 <select id="selectOrderDetail" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderVO">
     SELECT o.ORDER_ID, o.ORDER_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT,
            o.TOTAL_AMOUNT, o.DELIVERY_FEE, o.DISCOUNT_AMOUNT, o.POINT_USED,
@@ -129,7 +129,7 @@
     WHERE o.ORDER_ID = #{orderId} AND o.MEMBER_NO = #{memberNo}
 </select>
 
-<!-- 지윤 26.07.30 추가: 같은 결제(TOSS_ORDER_ID)로 묶인 사업자별 주문을 전부 조회 (주문상세보기를 결제그룹 단위로 합쳐서 보여주기 위함) -->
+<!-- 같은 결제(TOSS_ORDER_ID)로 묶인 사업자별 주문 전체 조회 (주문상세보기 결제그룹 단위 표시용) -->
 <select id="selectOrdersByGroupId" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderVO">
     SELECT o.ORDER_ID, o.ORDER_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT,
            o.TOTAL_AMOUNT, o.DELIVERY_FEE, o.DISCOUNT_AMOUNT, o.POINT_USED,
@@ -150,7 +150,7 @@
     ORDER BY o.ORDER_ID ASC
 </select>
 
-<!-- 지윤 26.07.23 추가: 취소신청 알림 보낼 대상(사업자 회원번호) 조회 -->
+<!-- 취소신청 알림 보낼 대상(사업자 회원번호) 조회 -->
 <select id="selectBizMemberNoByOrderId" resultType="Long">
     SELECT M.MEMBER_NO
     FROM TB_ORDER O
@@ -159,8 +159,8 @@
     WHERE O.ORDER_ID = #{orderId}
 </select>
 
-<!-- 지윤 26.07.22 추가: 주문취소 신청. PAID 상태 + 아직 신청 안 한 주문만 대상 (조건 안 맞으면 0건 UPDATE) -->
-<!-- 2026/08/04 장우철 — 배송준비(READY)도 송장 전·배송중 전이므로 주문취소 허용 (환불 아님) -->
+<!-- 주문취소 신청. PAID 상태 + 아직 신청 안 한 주문만 대상 (조건 안 맞으면 0건 UPDATE) -->
+<!-- 배송준비(READY)도 송장 전·배송중 전이므로 주문취소 허용 (환불 아님) -->
 <update id="requestCancel">
     UPDATE TB_ORDER
        SET CLAIM_TYPE = 'CANCEL',
@@ -173,8 +173,8 @@
        AND CLAIM_STATUS IS NULL
 </update>
 
-<!-- 지윤 26.07.20 추가: 주문 하나의 상품 목록 (썸네일은 상품 대표이미지, store 모듈과 동일 패턴) -->
-<!-- 지윤 26.07.20 수정: ORDER_ITEM_ID(리뷰작성 시 식별용), REVIEWED(이미 리뷰 썼는지) 추가 -->
+<!-- 주문 하나의 상품 목록 (썸네일은 상품 대표이미지, store 모듈과 동일 패턴) -->
+<!-- ORDER_ITEM_ID(리뷰작성 시 식별용), REVIEWED(리뷰 작성 여부) -->
 <select id="selectOrderItems" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderItemVO">
     SELECT
         oi.ORDER_ITEM_ID, oi.PRODUCT_ID, oi.PRODUCT_NAME, oi.OPTION_COLOR, oi.OPTION_SIZE,
@@ -196,15 +196,15 @@
     ORDER BY oi.ORDER_ITEM_ID
 </select>
 
-<!-- 지윤 26.07.20 추가: 방금 등록한 리뷰의 REVIEW_ID 재조회 (사진 첨부 시 TB_FILE.REF_ID로 필요) -->
+<!-- 방금 등록한 리뷰의 REVIEW_ID 재조회 (사진 첨부 시 TB_FILE.REF_ID로 필요) -->
 <select id="selectReviewIdByOrderItem" resultType="Long">
     SELECT REVIEW_ID FROM TB_REVIEW WHERE ORDER_ITEM_ID = #{orderItemId} AND ROWNUM = 1
 </select>
 
-<!-- 지윤 26.07.20 추가: 상품 리뷰 작성 (병원 리뷰와 동일하게 시퀀스 없이 MAX+1)
+<!-- 상품 리뷰 작성 (병원 리뷰와 동일하게 시퀀스 없이 MAX+1)
      본인 주문(o.MEMBER_NO=#{memberNo})인지, 이미 리뷰 쓴 상품(NOT EXISTS)인지 SQL에서 같이 검증함
      -> 조건 안 맞으면 0건 INSERT되고 조용히 끝남 (Service에서 영향받은 행수로 성공/실패 판단) -->
-<!-- 2026/08/13 장우철 — 구매확정된 상품만. 환불신청/진행/완료는 확정 불가라 리뷰도 불가. 거절 후 확정하면 가능 -->
+<!-- 구매확정된 상품만. 환불신청/진행/완료는 확정 불가라 리뷰도 불가. 거절 후 확정하면 가능 -->
 <insert id="insertProductReview">
     <selectKey keyProperty="reviewId" resultType="long" order="BEFORE">
         SELECT NVL(MAX(REVIEW_ID), 0) + 1 FROM TB_REVIEW
@@ -221,7 +221,7 @@
 </insert>
 
 <!-- 7일 후 구매확정 자동) -->
-<!-- 2026/08/04 장우철 — 부분 확정: 확정 가능 ITEM이 1건이라도 있으면 대상 (환불중 상품은 confirmPurchaseItems에서 제외) -->
+<!-- 부분 확정: 확정 가능 ITEM이 1건이라도 있으면 대상 (환불중 상품은 confirmPurchaseItems에서 제외) -->
 <select id="selectOrdersNeedingAutoConfirm" resultType="map">
     SELECT o.ORDER_ID AS ORDER_ID, o.MEMBER_NO AS MEMBER_NO
     FROM TB_ORDER o
@@ -237,7 +237,7 @@
       )
 </select>
 
-<!-- 2026/08/04 장우철 — 환불 신청 대상 상품 1건 (본인 + 송장 이후 + 상품 미확정 + 진행중 환불 없음) -->
+<!-- 환불 신청 대상 상품 1건 (본인 + 송장 이후 + 상품 미확정 + 진행중 환불 없음) -->
 <select id="selectRefundableItem" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderItemVO">
     SELECT oi.ORDER_ITEM_ID, oi.PRODUCT_ID, oi.PRODUCT_NAME, oi.OPTION_COLOR, oi.OPTION_SIZE,
            oi.QTY, oi.TOTAL_PRICE, oi.CONFIRMED_AT,
@@ -261,7 +261,7 @@
        AND NVL(oi.RETURN_STATUS_CD, 'NONE') NOT IN ('REQUESTED', 'RETURNING', 'DONE')
 </select>
 
-<!-- 2026/08/04 장우철 — 이번 확정으로 적립할 대상 상품 금액 합계 -->
+<!-- 이번 확정으로 적립할 대상 상품 금액 합계 -->
 <select id="selectConfirmableItemsAmount" resultType="int">
     SELECT NVL(SUM(oi.TOTAL_PRICE), 0)
       FROM TB_ORDER_ITEM oi
@@ -270,7 +270,7 @@
        AND NVL(oi.RETURN_STATUS_CD, 'NONE') NOT IN ('REQUESTED', 'RETURNING', 'DONE')
 </select>
 
-<!-- 2026/08/04 장우철 — 상품단위 환불 신청 -->
+<!-- 상품단위 환불 신청 -->
 <update id="requestItemRefund">
     UPDATE TB_ORDER_ITEM
        SET RETURN_STATUS_CD    = 'REQUESTED',
@@ -306,7 +306,7 @@
      WHERE OI.ORDER_ITEM_ID = #{orderItemId}
 </select>
 
-<!-- 2026/08/04 장우철 — 구매확정 시 ITEM에도 CONFIRMED_AT 기록 (정산 집계용) -->
+<!-- 구매확정 시 ITEM에도 CONFIRMED_AT 기록 (정산 집계용) -->
 <!-- 환불신청/진행/완료 상품은 확정·정산 대상에서 제외 -->
 <update id="confirmPurchaseItems">
     UPDATE TB_ORDER_ITEM
@@ -318,7 +318,7 @@
 </update>
 
 <!--
-  2026/08/04 장우철 — STORE 정산 대상 후보 (5단계 엔진에서 재사용)
+  STORE 정산 대상 후보 (정산 엔진에서 재사용)
   조건: 구매확정됨 + 환불신청/진행/완료 아님 + (추후) 미정산은 SETTLEMENT_ITEM NOT EXISTS 로 추가
 -->
 <select id="selectSettlementEligibleItems" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderItemVO">

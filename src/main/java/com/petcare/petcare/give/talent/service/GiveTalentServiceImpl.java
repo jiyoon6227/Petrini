@@ -1,8 +1,7 @@
 /**
  * 역할: GiveTalentService 구현체 (@Service)
  *
- * - 박유정 / 2026-07-13~14
- * - 2026-08-10 박유정 — STEP 3: 일반 회원 참여 신청·모집마감·병원 확인·취소·이미지
+ * - 일반 회원 참여 신청·모집마감·병원 확인·취소·이미지
  *
  * 연결
  * - DB: GiveTalentMapper, GiveTalentApplyMapper
@@ -45,7 +44,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         this.fileService = fileService;
     }
 
-    // ── 사용자 목록·상세 (2026-07-13) ─────────────────────────────
+    // ── 사용자 목록·상세 ─────────────────────────────
 
     @Override
         public List<GiveTalentVO> getApprovedTalentList(String talentType) {
@@ -62,7 +61,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return giveTalentMapper.selectTalentDetail(talentId);
     }
 
-    // ── 관리자 승인 화면 (2026-07-13) ─────────────────────────────
+    // ── 관리자 승인 화면 ─────────────────────────────
 
     @Override
     public List<GiveTalentVO> getTalentListByStatus(String statusCd) {
@@ -103,7 +102,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         giveTalentMapper.updateTalentStatus(vo);
     }
 
-    // ── 사업자 신청 (2026-07-14 STEP 4 — 병원) ───────────────────
+    // ── 사업자 신청 ( — 병원) ───────────────────
 
     @Override
     public List<GiveTalentVO> getTalentListByBizId(String bizId) {
@@ -112,7 +111,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
 
     @Override
     @Transactional
-    // 2026-08-10 박유정 — 사업자 재능나눔 등록 + 대표 이미지 업로드(선택)
+    // 사업자 재능나눔 등록 + 대표 이미지 업로드(선택)
     public void applyTalent(String bizId, GiveTalentVO vo, MultipartFile thumbImage) {
         if (!"APPROVED".equals(giveTalentMapper.selectBusinessStatusByBizId(bizId))) {
             throw new IllegalStateException("BIZ_NOT_APPROVED");
@@ -142,7 +141,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         }
     }
 
-    // 2026-08-10 박유정 — 대표 이미지 형식·용량 검증
+    // 대표 이미지 형식·용량 검증
     private void validateTalentImageFile(MultipartFile image) {
         if (image.getSize() > 10L * 1024 * 1024) {
             throw new IllegalArgumentException("대표 이미지는 10MB 이하만 등록할 수 있습니다.");
@@ -161,9 +160,9 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         }
     }
 
-    // ── 일반 회원 참여 신청 (2026-08-10 STEP 3) ───────────────────
+    // ── 일반 회원 참여 신청  ───────────────────
 
-    // 2026-08-10 박유정 — 모집 중 조건: 관리자 승인(APPROVED) + 인원 여유 + DONE 아님
+    // 모집 중 조건: 관리자 승인(APPROVED) + 인원 여유 + DONE 아님
     @Override
     public boolean isRecruitmentOpen(GiveTalentVO talent) {
         if (talent == null || talent.getStatusCd() == null) {
@@ -182,7 +181,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return isRecruitmentOpen(talent) ? "모집중" : "모집마감";
     }
 
-    // 2026-08-10 박유정 — 일반 회원 [신청]: INSERT + CURRENT_CNT+1 + 정원 차면 DONE
+    // 일반 회원 [신청]: INSERT + CURRENT_CNT+1 + 정원 차면 DONE
     @Override
     @Transactional
     public void applyForTalent(long memberNo, long talentId, String message) {
@@ -211,7 +210,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         if (capacity > 0 && currentAfter >= capacity) {
             updateStatus(talentId, "DONE", null, null);
         }
-        // 2026-08-10 박유정 — 병원 사업자 알림
+        // 병원 사업자 알림
         Long bizMemberNo = giveTalentMapper.selectMemberNoByBizId(talent.getBizId());
         GiveTalentApplyVO saved = giveTalentApplyMapper.selectApplyById(apply.getApplyId());
         mypageNotifyService.sendTalentApplyToBizNotification(
@@ -229,7 +228,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return giveTalentApplyMapper.selectByTalentAndMember(talentId, memberNo);
     }
 
-    // ── 병원 사업자 신청자 확인 (2026-08-10 STEP 3) ─────────────
+    // ── 병원 사업자 신청자 확인  ─────────────
 
     @Override
     public List<GiveTalentApplyVO> getAppliesByBizId(String bizId) {
@@ -241,7 +240,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return giveTalentApplyMapper.selectAppliesByTalentId(talentId);
     }
 
-    // 2026-08-10 박유정 — 병원 [확인]: 내 글인지 검사 후 PENDING → CONFIRMED
+    // 병원 [확인]: 내 글인지 검사 후 PENDING → CONFIRMED
     @Override
     @Transactional
     public void confirmApply(long applyId, String bizId) {
@@ -271,7 +270,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
-    // 2026-08-10 박유정 — 사업자 사이드바 확인 대기 건수
+    // 사업자 사이드바 확인 대기 건수
     @Override
     public int countPendingAppliesByBizId(String bizId) {
         if (bizId == null || bizId.isBlank()) {
@@ -280,7 +279,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         return giveTalentApplyMapper.countPendingAppliesByBizId(bizId);
     }
 
-    // 2026-08-10 박유정 — 회원 참여 신청 취소 (PENDING → CANCELLED, 인원 복구)
+    // 회원 참여 신청 취소 (PENDING → CANCELLED, 인원 복구)
     @Override
     @Transactional
     public void cancelMyApply(long applyId, long memberNo) {
@@ -309,7 +308,7 @@ public class GiveTalentServiceImpl implements GiveTalentService {
         }
     }
 
-    // 2026-08-10 박유정 — 병원 수동 모집 마감
+    // 병원 수동 모집 마감
     @Override
     @Transactional
     public void closeRecruitment(long talentId, String bizId) {

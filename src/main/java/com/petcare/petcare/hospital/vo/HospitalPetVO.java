@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class HospitalPetVO {
 
-    // 2026-07-10 장우철 — 유저 예약 폼 펫 선택 목록 (F2)
+    // 유저 예약 폼 펫 선택 목록
     private Long    petId;
     private String  petName;
     private String  species;

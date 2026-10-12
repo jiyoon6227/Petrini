@@ -5,7 +5,7 @@
   [model]
   - availableCoupons : 받을 수 있는 쿠폰 (APPROVED + ACTIVE + 기간 내)
     └ alreadyClaimed : 로그인 사용자가 이미 받았으면 true
-  2026-08-13 박유정 — 소진(EXHAUSTED) 쿠폰 「쿠폰 소진」 표시, 다운 버튼 제거
+  소진(EXHAUSTED) 쿠폰은 「쿠폰 소진」 표시, 다운 버튼 없음
 --%>
 <%@ taglib prefix="c"   uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -24,7 +24,7 @@
   .ev-count{font-size:14px;color:var(--text-muted);margin-bottom:18px}
   .ev-count strong{color:#D97706;font-weight:800}
 
-  /* 지윤 26.08.07: 업종별 필터 탭 */
+  /* 업종별 필터 탭 */
   .cp-tabs{display:flex;gap:8px;margin-bottom:18px}
   .cp-tab{padding:8px 18px;border:1px solid var(--border);border-radius:50px;background:var(--bg-card);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer}
   .cp-tab:hover{border-color:#F59E0B}
@@ -45,7 +45,7 @@
   .cp-ticket-cond{font-size:12px;color:var(--text-muted);margin-bottom:2px}
   .cp-ticket-date{font-size:12px;color:var(--text-muted)}
 
-/* 지윤 26.08.06: 적용 상품·병원·숙소 이동 링크 */
+/* 적용 상품·병원·숙소 이동 링크 */
 .cp-ticket-target{
   display:inline-block;
   margin-top:7px;
@@ -94,7 +94,7 @@
       <div class="ev-empty">현재 받을 수 있는 쿠폰이 없습니다.</div>
     </c:when>
     <c:otherwise>
-      <%-- 지윤 26.08.07: 업종별 필터 탭 (클라이언트 필터, 재조회 없음) --%>
+      <%-- 업종별 필터 탭 (클라이언트 필터, 재조회 없음) --%>
       <div class="cp-tabs">
         <button type="button" class="cp-tab active" data-filter="ALL">전체</button>
         <button type="button" class="cp-tab" data-filter="HOSPITAL">병원</button>
@@ -109,15 +109,14 @@
       </c:forEach>
       <div class="ev-count">총 <strong id="evCountNum">${availableCoupons.size()}장</strong>의 쿠폰이 있습니다.</div>
 
-      <%-- 지윤 26.08.07: 필터 결과 0건일 때 표시 --%>
+      <%-- 필터 결과 0건일 때 표시 --%>
       <div class="ev-empty" id="evFilterEmpty" style="display:none">해당 카테고리에 쿠폰이 없습니다.</div>
 
       <c:forEach var="cpn" items="${availableCoupons}">
         <%--
-          지윤 26.08.10 수정
           - 조기마감(INACTIVE), 기간만료는 쿼리 단계에서 이미 제외되어 여기 안 옴
-          2026/08/12 장우철 — 소진 쿠폰은 받기 불가
-          2026-08-13 박유정 — isExhausted 시 「쿠폰 소진」 표시, 받기 버튼 제거
+          소진 쿠폰은 받기 불가
+          isExhausted 시 「쿠폰 소진」 표시, 받기 버튼 없음
         --%>
         <c:set var="isExhausted" value="${cpn.statusCd eq 'EXHAUSTED'
                                           || cpn.issuedQty >= cpn.totalQty
@@ -151,7 +150,6 @@
 </div>
 
 <%--
-  지윤 26.08.06
   쿠폰 발급 사업자 업종에 따라 적용 대상 이동
 --%>
 <c:choose>
@@ -188,7 +186,7 @@
               <c:when test="${cpn.alreadyClaimed}">
                 <button class="cp-ticket-btn claimed" disabled>받기 완료</button>
               </c:when>
-              <%-- 2026-08-13 박유정 — 소진 쿠폰: 받기 버튼 없음 · 문구는 기존 「받기」 유지 --%>
+              <%-- 소진 쿠폰: 받기 버튼 없음 · 문구는 기존 「받기」 유지 --%>
               <c:when test="${isExhausted}">
                 <span class="cp-ticket-btn claimed">쿠폰 소진</span>
               </c:when>
@@ -205,7 +203,7 @@
 </div>
 
 <script>
-// 지윤 26.08.07: 업종별 쿠폰 필터 (전체/병원/숙소/쇼핑몰)
+// 업종별 쿠폰 필터 (전체/병원/숙소/쇼핑몰)
 document.querySelectorAll('.cp-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
         document.querySelectorAll('.cp-tab').forEach(function(t) { t.classList.remove('active'); });
@@ -235,7 +233,6 @@ function claimCoupon(btn, couponId) {
     xhr.open('POST', '${contextPath}/coupon/claim');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     
-    //HYJ 26.08.05
     xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="_csrf"]').getAttribute('content'));									
 	
     xhr.onload = function() {
@@ -252,7 +249,7 @@ function claimCoupon(btn, couponId) {
                         location.href = '${contextPath}/login';
                     }
                 } else {
-                    // 2026/08/12 장우철 — 소진 응답 시 버튼도 즉시 비활성화
+                    // 소진 응답 시 버튼도 즉시 비활성화
                     if (res.message && res.message.indexOf('소진') >= 0) {
                         btn.textContent = '소진됨';
                         btn.disabled = true;

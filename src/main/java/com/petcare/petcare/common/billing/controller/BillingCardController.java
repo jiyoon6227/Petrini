@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — 토스 빌링 카드등록 Controller
+ * 토스 빌링 카드등록 Controller
  *
  * URL
  * - GET  /billing/card/prepare  : Ajax — clientKey·customerKey·콜백 URL 발급
@@ -44,7 +44,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/billing/card")
 public class BillingCardController {
 
-    /** 2026/07/27 장우철 — 세션 키 */
+    /** 세션 키 */
     public static final String SESSION_RETURN_PATH = "billingReturnPath";
     public static final String SESSION_OWNER_TYPE = "billingOwnerType";
     public static final String SESSION_CUSTOMER_KEY = "billingCustomerKey";
@@ -64,7 +64,7 @@ public class BillingCardController {
     }
 
     /**
-     * 2026/07/27 장우철 — Ajax: 카드등록 창 열기 전 준비
+     * Ajax: 카드등록 창 열기 전 준비
      * 응답: { ok, clientKey, customerKey, successUrl, failUrl }
      */
     @GetMapping("/prepare")
@@ -109,7 +109,7 @@ public class BillingCardController {
     }
 
     /**
-     * 2026/07/27 장우철 — 토스 성공 콜백
+     * 토스 성공 콜백
      * 쿼리: authKey, customerKey → 빌링키 발급 API → DB/세션 저장 → returnPath 복귀
      */
     @GetMapping("/success")
@@ -169,7 +169,7 @@ public class BillingCardController {
     }
 
     /**
-     * 2026/07/27 장우철 — 토스 실패 콜백
+     * 토스 실패 콜백
      */
     @GetMapping("/fail")
     public String fail(
@@ -191,7 +191,7 @@ public class BillingCardController {
     }
 
     /**
-     * 2026/07/27 장우철 — Ajax: 활성 카드 목록 (billingKey 미포함)
+     * Ajax: 활성 카드 목록 (billingKey 미포함)
      */
     @GetMapping("/list")
     @ResponseBody
@@ -199,7 +199,7 @@ public class BillingCardController {
         Map<String, Object> res = new HashMap<>();
         OwnerContext owner = resolveLoggedInOwner(session);
 
-        // 2026/07/27 장우철 — 가입 중 pending 카드는 로그인 여부와 무관하게 우선 노출
+        // 가입 중 pending 카드는 로그인 여부와 무관하게 우선 노출
         BillingIssueResultVO pending = (BillingIssueResultVO) session.getAttribute(SESSION_PENDING_CARD);
         if (pending != null) {
             res.put("ok", true);
@@ -229,7 +229,7 @@ public class BillingCardController {
     }
 
     /**
-     * 2026/07/27 장우철 — Ajax: 카드 논리삭제
+     * Ajax: 카드 논리삭제
      */
     @PostMapping("/delete")
     @ResponseBody

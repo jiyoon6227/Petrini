@@ -6,8 +6,6 @@
  *
  * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
  * return 경로는 담당 JSP와 동일하게 맞출 것
- *
- * 2026/08/01 장우철 — yeju 머지: 포인트 실데이터(HEAD/jiyoon) + 쿠폰함 목록(yeju) 동시 유지
  */
 
 package com.petcare.petcare.mypage.point.controller;
@@ -46,12 +44,12 @@ public class MypagePointController {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
         if (member == null) return "redirect:/login";
 
-        // HEAD(jiyoon): 포인트 잔액·이번달 적립·이력
+        // 포인트 잔액·이번달 적립·이력
         model.addAttribute("pointBalance", mypagePointService.getPointBalance(member.getMemberNo()));
         model.addAttribute("thisMonthEarned", mypagePointService.getThisMonthEarnedPoint(member.getMemberNo()));
         model.addAttribute("pointHistory", mypagePointService.getPointHistory(member.getMemberNo()));
 
-        // yeju: 쿠폰함 목록 + 사용가능 개수
+        // 쿠폰함 목록 + 사용가능 개수
         List<CouponVO> myCoupons = couponService.getMyCoupons(member.getMemberNo());
         model.addAttribute("myCoupons", myCoupons);
         int usableCouponCount = couponService.countUsableCoupons(member.getMemberNo());

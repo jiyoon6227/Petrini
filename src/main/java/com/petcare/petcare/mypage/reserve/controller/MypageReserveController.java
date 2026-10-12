@@ -1,7 +1,7 @@
 /**
  * 역할: 마이페이지 예약 URL 처리 → Service 호출 → JSP 반환
  *
- * 2026/07/11 장우철 — 예약 내역·상세 DB 연동 (2차)
+ * 예약 내역·상세
  */
 
 package com.petcare.petcare.mypage.reserve.controller;
@@ -35,7 +35,7 @@ public class MypageReserveController {
     @Autowired
     private MypageReserveService mypageReserveService;
 
-    // 2026/07/21 장우철 — type(전체/병원/숙소) + status(상태) 2단 필터
+    // type(전체/병원/숙소) + status(상태) 2단 필터
     @GetMapping("/reserve")
     public String reserve(@RequestParam(value = "status", required = false, defaultValue = "all") String status,
                           @RequestParam(value = "type", required = false, defaultValue = "all") String type,
@@ -53,8 +53,8 @@ public class MypageReserveController {
         return "mypage/reserve";
     }
 
-    // 2026/07/11 장우철 — 예약 상세 (/mypage/reserve/detail?resvId=)
-    // 2026-08-10 박유정 — resvType=TALENT 재능나눔 신청 상세 분기
+    // 예약 상세 (/mypage/reserve/detail?resvId=)
+    // resvType=TALENT 재능나눔 신청 상세 분기
     @GetMapping("/reserve/detail")
     public String reserveDetail(@RequestParam("resvId") Long resvId,
                                 @RequestParam(value = "resvType", required = false) String resvType,
@@ -78,7 +78,7 @@ public class MypageReserveController {
         return "mypage/reserve-detail";
     }
 
-    // 2026-08-10 박유정 — 재능나눔 참여 신청 취소
+    // 재능나눔 참여 신청 취소
     @PostMapping("/reserve/talent-cancel")
     public String cancelTalentApply(@RequestParam("resvId") Long resvId,
                                     HttpSession session,
@@ -96,7 +96,7 @@ public class MypageReserveController {
         return "redirect:/mypage/reserve/detail?resvId=" + resvId + "&resvType=TALENT";
     }
 
-    // 2026/07/13 장우철 — 진료완료 예약 병원 리뷰·별점 등록
+    // 진료완료 예약 병원 리뷰·별점 등록
     @PostMapping("/reserve/review")
     public String addHospitalReview(@RequestParam("resvId") Long resvId,
                                     @RequestParam("rating") Double rating,
@@ -117,7 +117,7 @@ public class MypageReserveController {
         return "redirect:/mypage/reserve/detail?resvId=" + resvId;
     }
 
-    // HYJ 26.07.20 — 숙박완료 예약 숙소 리뷰·별점 등록
+    // 숙박완료 예약 숙소 리뷰·별점 등록
     @PostMapping("/reserve/stay-review")
     public String addStayReview(@RequestParam("resvId") Long resvId,
                                 @RequestParam("rating") Double rating,
@@ -135,7 +135,7 @@ public class MypageReserveController {
             StayReviewRegisterResult result = mypageReserveService.addStayReview(
                     member.getMemberNo(), resvId, rating, content, member.getPointBalance());
 
-            // 2026-07-28 박유정 — 리뷰 포인트 적립 후 세션 잔액 갱신
+            // 리뷰 포인트 적립 후 세션 잔액 갱신
             if (result.isPointEarned()) {
                 long currentBalance = (member.getPointBalance() != null) ? member.getPointBalance() : 0;
                 member.setPointBalance(currentBalance + result.getEarnedPoint());
@@ -143,7 +143,7 @@ public class MypageReserveController {
             }
 
             String msg = "리뷰가 등록되었습니다.";
-            // 2026-07-28 박유정 — 포인트 적립 시 안내 메시지
+            // 포인트 적립 시 안내 메시지
             if (result.isPointEarned()) {
                 msg += " " + String.format("%,d", result.getEarnedPoint()) + "P가 적립되었습니다!";
             }
@@ -163,7 +163,7 @@ public class MypageReserveController {
         return "redirect:/mypage/reserve/detail?resvId=" + resvId;
     }
 
-    // 2026/07/31 장우철 — 유저 숙소 예약 취소 (1-4·1-6)
+    // 유저 숙소 예약 취소
     @PostMapping("/reserve/stay-cancel")
     public String cancelStayReservation(@RequestParam("resvId") Long resvId,
                                         @RequestParam("cancelReason") String cancelReason,

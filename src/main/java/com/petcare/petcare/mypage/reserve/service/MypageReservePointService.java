@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.petcare.petcare.mypage.reserve.mapper.MypageReserveMapper;
 
 /**
- * 2026-07-28 박유정 — 리뷰 포인트 적립 (별도 트랜잭션)
+ * 리뷰 포인트 적립 (별도 트랜잭션)
  * 리뷰 INSERT와 분리해 TB_POINT 락이 리뷰 등록을 막지 않게 함
  */
 @Service

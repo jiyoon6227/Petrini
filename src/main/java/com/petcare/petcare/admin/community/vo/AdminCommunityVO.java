@@ -1,7 +1,7 @@
 /**
  * 역할: 관리자 커뮤니티 VO (레거시 placeholder)
  *
- * - 박유정 / 2026-07-10 — 실제 구현은 CommunityPostVO 사용
+ * - 실제 구현은 CommunityPostVO 사용
  *
  * 참고 테이블
  * - TB_POST (BOARD_TYPE = TOWN/SHARE/LIFE)

@@ -1,5 +1,5 @@
 /**
- * 2026/08/11 장우철 — 관리자 상품 목록 (전 사업자)
+ * 관리자 상품 목록 (전 사업자)
  * 참고: TB_PRODUCT + TB_BUSINESS + TB_PRODUCT_CATEGORY
  */
 package com.petcare.petcare.admin.store.vo;

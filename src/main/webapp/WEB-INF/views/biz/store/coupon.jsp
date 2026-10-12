@@ -7,7 +7,7 @@
   2. 신규 신청 모달 → POST /biz/store/coupon/apply (PENDING)
   3. PENDING 쿠폰 수정/삭제 가능
   4. 관리자 승인 후 사용자 이벤트/쿠폰 게시판 노출
-  2026-08-13 박유정 — validateForm 빈 숫자칸 제거 + Controller @InitBinder (Integer 바인딩 오류 방지)
+  validateForm 빈 숫자칸 제거 + Controller @InitBinder (Integer 바인딩 오류 방지)
 
   [model]
   - couponList, msg, errorMsg
@@ -46,13 +46,13 @@
     .cpn-badge.rejected { background:#FEE2E2; color:#DC2626; }
     .cpn-badge.exhausted { background:#F1F3F7; color:#999; }
 
-/* 지윤 26.08.06: 조기 마감 상태 */
+/* 조기 마감 상태 */
 .cpn-badge.closed {
     background:#F1F3F7;
     color:#666;
 }
 
-/* 지윤 26.08.10 추가: 기간 만료 상태 */
+/* 기간 만료 상태 */
 .cpn-badge.expired {
     background:#F1F3F7;
     color:#666;
@@ -301,7 +301,7 @@
                                 <div style="display:flex;gap:6px">
                                     <form method="post" action="${contextPath}/biz/store/coupon/delete"
                                           onsubmit="return confirm('삭제하시겠습니까?')">
-                                        <%-- 2026/08/07 장우철 — CSRF --%>
+                                        <%-- CSRF --%>
                                         <input type="hidden" name="_csrf" value="${_csrf}">
                                         <input type="hidden" name="couponId" value="${cpn.couponId}">
                                         <button type="submit" class="cpn-btn red">삭제</button>
@@ -310,7 +310,6 @@
                             </c:if>
 
                             <%--
-  지윤 26.08.06 / 26.08.10 수정
   승인되어 게시 중이고, 아직 기간 만료 안 된 쿠폰에만 조기 마감 버튼 표시
 --%>
 <c:if test="${cpn.approvalStatus eq 'APPROVED'
@@ -322,7 +321,7 @@
     <form method="post"
           action="${contextPath}/biz/store/coupon/close"
           onsubmit="return confirm('쿠폰을 조기 마감하시겠습니까?\n마감 후 이벤트 화면에서 사라집니다.')">
-        <%-- 2026/08/07 장우철 — CSRF --%>
+        <%-- CSRF --%>
         <input type="hidden" name="_csrf" value="${_csrf}">
         <input type="hidden"
                name="couponId"
@@ -353,7 +352,7 @@
             <button class="cpn-modal-close" onclick="closeApplyModal()">&times;</button>
         </div>
         <form method="post" action="${contextPath}/biz/store/coupon/apply" onsubmit="return validateForm()">
-            <%-- 2026/08/07 장우철 — CSRF --%>
+            <%-- CSRF --%>
             <input type="hidden" name="_csrf" value="${_csrf}">
             <div class="cpn-modal-body">
                 <div class="cpn-form-group">
@@ -374,7 +373,7 @@
            placeholder="0" min="1" required oninput="calcTotalBudget()">
 </div>
 </div>
-<%-- 지윤 26.08.11 추가: 정률(RATE) 쿠폰 전용, 기본 숨김 --%>
+<%-- 정률(RATE) 쿠폰 전용, 기본 숨김 --%>
 <div class="cpn-form-row" id="maxDiscountRow" style="display:none">
     <div class="cpn-form-group">
         <label>최대 할인 금액 (원) <span style="color:#DC2626">*</span></label>
@@ -466,7 +465,7 @@ function toggleDiscountLabel() {
     calcTotalBudget();
 }
 
-// 지윤 26.08.11 추가: 총예산 자동계산
+// 총예산 자동계산
 // 정액(FIXED) = 할인금액 × 발급수량 / 정률(RATE) = 최대할인금액 × 발급수량
 function calcTotalBudget() {
     var type = document.getElementById('couponType').value;
@@ -493,7 +492,7 @@ function validateForm() {
         alert('최대 할인 금액을 입력해주세요.');
         return false;
     }
-    // 2026-08-13 박유정 — 빈 숫자칸 "" 전송 방지 (Integer 바인딩 오류)
+    // 빈 숫자칸 "" 전송 방지 (Integer 바인딩 오류)
     var minOrder = document.getElementById('minOrderAmt');
     if (!minOrder.value) {
         minOrder.removeAttribute('name');

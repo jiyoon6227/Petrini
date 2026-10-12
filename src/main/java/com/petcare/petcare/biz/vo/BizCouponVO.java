@@ -20,7 +20,7 @@ public class BizCouponVO {
     private String couponName;       // 쿠폰명
     private String couponType;       // 할인 유형 (FIXED / RATE)
     private Integer discountValue;   // 할인값 (정액=원, 정률=%)
-    private Integer maxDiscountAmt;  // 정률(RATE) 쿠폰 최대 할인금액 (FIXED는 NULL) // 지윤 26.08.11 추가
+    private Integer maxDiscountAmt;  // 정률(RATE) 쿠폰 최대 할인금액 (FIXED는 NULL)
     private Integer minOrderAmt;     // 최소 주문 금액
 
     private Integer totalBudget;     // 총 예산
@@ -31,7 +31,7 @@ public class BizCouponVO {
     private String useStartDate;     // 사용 시작일 (YYYYMMDD)
     private String useEndDate;       // 사용 종료일 (YYYYMMDD)
 
-    // 2026/08/01 장우철 — DDL BIZ_MEMBER_NO NUMBER (구 BIZ_MEMBER_ID 문자열 → TB_BUSINESS.BIZ_NO)
+    // DDL BIZ_MEMBER_NO NUMBER (구 BIZ_MEMBER_ID 문자열 → TB_BUSINESS.BIZ_NO)
     private Long   bizMemberNo;      // 신청 사업자번호 (TB_BUSINESS.BIZ_NO)
     private String approvalStatus;   // 승인 상태 (PENDING / APPROVED / REJECTED)
     private String rejectReason;     // 반려 사유

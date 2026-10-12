@@ -16,7 +16,7 @@
 <div class="mp-section active">
     <h2 class="mp-title">포인트 / 쿠폰</h2>
     <p class="mp-desc">포인트 적립·사용 내역과 보유 쿠폰을 관리하세요.</p>
-    <%-- 2026/08/01 장우철 — 포인트 실데이터(HEAD) + 쿠폰 개수(yeju usableCouponCount) --%>
+    <%-- 포인트 + 쿠폰 개수(usableCouponCount) --%>
     <div class="point-summary">
         <div class="point-summary-item">
             <span class="ps-label">보유 포인트</span>
@@ -38,7 +38,7 @@
         <button class="mp-tab on">포인트 내역</button>
         <button class="mp-tab">쿠폰함</button>
     </div>
-    <%-- 지윤 26.07.29 수정: 하드코딩 4줄 -> Controller가 넘긴 pointHistory(실데이터) JSTL 렌더링으로 교체 --%>
+    <%-- Controller가 넘긴 pointHistory JSTL 렌더링 --%>
     <div id="tab-points">
         <table class="mp-table">
             <thead><tr><th>날짜</th><th>내용</th><th>구분</th><th style="text-align:right">포인트</th></tr></thead>

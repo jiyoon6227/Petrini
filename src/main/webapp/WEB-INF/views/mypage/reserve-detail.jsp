@@ -15,7 +15,7 @@
   .rd-row span:first-child{color:#888;flex-shrink:0;min-width:90px}
   .rd-row span:last-child{color:#1A1A2E;font-weight:600;text-align:right}
   .rd-reason{background:#FEF2F2;border-radius:8px;padding:14px 16px;margin-top:8px;font-size:13px;color:#991B1B;line-height:1.6}
-  /* 2026/07/13 장우철 — 리뷰 작성 폼 */
+  /* 리뷰 작성 폼 */
   .rd-review{background:#F8FFFC;border:1px solid #C6EDE0;border-radius:12px;padding:20px;margin-bottom:16px}
   .rd-review h3{font-size:16px;font-weight:800;margin:0 0 12px;color:#1A1A2E}
   .rd-stars{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
@@ -23,7 +23,7 @@
   .rd-stars input{margin-right:4px}
   .rd-review textarea{width:100%;min-height:90px;border:1px solid #E2E8E4;border-radius:8px;padding:10px 12px;font-size:14px;resize:vertical;box-sizing:border-box}
   .rd-review .btn-review{margin-top:12px;background:#2BAB82;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer}
-  /* 2026/07/31 장우철 — 숙소 유저 취소 */
+  /* 숙소 유저 취소 */
   .rd-cancel{background:#FFF8F8;border:1px solid #FECACA;border-radius:12px;padding:20px;margin-bottom:16px}
   .rd-cancel h3{font-size:16px;font-weight:800;margin:0 0 8px;color:#1A1A2E}
   .rd-cancel .fee-row{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;color:#444}
@@ -36,7 +36,7 @@
 <%@ include file="/WEB-INF/views/mypage/sidebar.jsp" %>
 <div class="mypage-content">
 
-<%-- 2026/07/11 장우철 — 마이페이지 예약 상세 (2차) --%>
+<%-- 마이페이지 예약 상세 --%>
 <div class="mp-section active">
   <h2 class="mp-title">
     <c:choose>
@@ -60,7 +60,7 @@
   </c:if>
 
   <c:choose>
-    <%-- 2026-08-10 박유정 — 재능나눔 참여 신청 상세 (예약내역 통합) --%>
+    <%-- 재능나눔 참여 신청 상세 (예약내역 통합) --%>
     <c:when test="${reservation.resvType eq 'TALENT'}">
       <div class="rd-card">
         <div class="rd-row">
@@ -118,7 +118,7 @@
         <c:choose>
           <c:when test="${reservation.statusCd eq 'PENDING'}"><span class="badge-status badge-wait">예약신청</span></c:when>
           <c:when test="${reservation.statusCd eq 'CONFIRMED'}"><span class="badge-status badge-ready">예약확정</span></c:when>
-          <%-- 2026/08/06 장우철 — 운영 상태만 표시 (환불 신청/거절은 아래 환불 영역) --%>
+          <%-- 운영 상태만 표시 (환불 신청/거절은 아래 환불 영역) --%>
           <c:when test="${reservation.statusCd eq 'CHECKIN'}">
             <span class="badge-status badge-ready">체크인</span>
           </c:when>
@@ -150,7 +150,7 @@
     <div class="rd-row">
       <span>예약일시</span>
       <span>
-        <!--HYJ 26.07.28 사업장에 따라 처리-->
+        <!-- 사업장에 따라 처리-->
         <fmt:formatDate value="${reservation.resvDate}" pattern="yyyy-MM-dd"/>
         <c:if test="${not empty reservation.resvTime}"> ${reservation.resvTime}</c:if>
         <c:if test="${not empty reservation.endTime}"> ~ ${reservation.endTime}</c:if>
@@ -211,7 +211,7 @@
     </c:if>
   </div>
 
-  <%-- 2026/08/01 장우철 — PENDING(결제 미완료) 숙소 예약 재결제 --%>
+  <%-- PENDING(결제 미완료) 숙소 예약 재결제 --%>
   <c:if test="${reservation.resvType eq 'STAY' and reservation.statusCd eq 'PENDING'}">
     <div class="rd-cancel" style="background:#FFF8EE;border-color:#F5C26B">
       <h3 style="margin:0 0 8px">결제 대기</h3>
@@ -224,7 +224,7 @@
     </div>
   </c:if>
 
-  <%-- 2026/07/31 장우철 — 숙소 CONFIRMED + 체크인 전 유저 취소 (1-4·1-6) --%>
+  <%-- 숙소 CONFIRMED + 체크인 전 유저 취소 --%>
   <c:if test="${reservation.resvType eq 'STAY' and reservation.cancelable eq true}">
     <div class="rd-cancel">
       <h3>예약 취소</h3>
@@ -246,7 +246,6 @@
       <div class="fee-row"><span>예상 카드환불액</span><span><fmt:formatNumber value="${reservation.refundAmt}" pattern="#,###"/>원</span></div>
       <form method="post" action="${contextPath}/mypage/reserve/stay-cancel"
             onsubmit="return confirm('예약을 취소하시겠습니까? 취소수수료가 적용됩니다.');">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="resvId" value="${reservation.resvId}">
@@ -256,7 +255,7 @@
     </div>
   </c:if>
 
-  <%-- 2026/08/06 장우철 — 숙소 환불: 상세 전용 (B: APPROVED/REJECTED, 예약 운영상태 유지) --%>
+  <%-- 숙소 환불: 상세 전용 (APPROVED/REJECTED, 예약 운영상태 유지) --%>
   <c:if test="${reservation.resvType eq 'STAY'
       and (reservation.statusCd eq 'CHECKIN'
         or reservation.stayRefundStatus eq 'PENDING'
@@ -313,7 +312,7 @@
     </div>
   </c:if>
 
-  <%-- 2026/07/13 장우철 — 완료 안내 / HYJ 26.07.20 숙소 분기 추가 --%>
+  <%-- 완료 안내 (병원/숙소 분기) --%>
   <c:if test="${reservation.statusCd eq 'DONE'}">
     <p style="font-size:14px;color:#1F8464;background:#E8F8F1;border-radius:8px;padding:12px 14px;margin-bottom:16px;line-height:1.5">
       <c:choose>
@@ -336,7 +335,6 @@
       <h3>병원 리뷰 작성</h3>
       <p style="font-size:13px;color:#666;margin:0 0 12px">진료받으신 병원에 별점과 후기를 남겨 주세요.</p>
       <form method="post" action="${contextPath}/mypage/reserve/review">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="resvId" value="${reservation.resvId}">
@@ -356,7 +354,7 @@
     <p style="font-size:14px;color:#166534;margin-bottom:16px">이 예약에 대한 리뷰를 작성하셨습니다.</p>
   </c:if>
 
-  <%-- HYJ 26.07.20 — 숙박완료 + 미작성 시 숙소 리뷰·별점 작성 --%>
+  <%-- 숙박완료 + 미작성 시 숙소 리뷰·별점 작성 --%>
   <c:if test="${reservation.resvType eq 'STAY' and reservation.statusCd eq 'DONE' and reservation.reviewedYn ne 'Y'}">
     <div class="rd-review">
       <h3>숙소 리뷰 작성</h3>
@@ -368,7 +366,6 @@
       </c:if>
       <form method="post" action="${contextPath}/mypage/reserve/stay-review"
             onsubmit="var b=this.querySelector('.btn-review'); if(b.disabled)return false; b.disabled=true; b.textContent='등록 중...'; return true;">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="resvId" value="${reservation.resvId}">
@@ -385,7 +382,7 @@
     </div>
   </c:if>
   <c:if test="${reservation.resvType eq 'STAY' and reservation.statusCd eq 'DONE' and reservation.reviewedYn eq 'Y'}">
-    <%-- 2026-07-28 박유정 — 숙소 리뷰 포인트 적립 완료 안내 --%>
+    <%-- 숙소 리뷰 포인트 적립 완료 안내 --%>
     <p style="font-size:14px;color:#166534;margin-bottom:16px">이 예약에 대한 리뷰를 작성하셨습니다. (포인트 적립 완료)</p>
   </c:if>
 

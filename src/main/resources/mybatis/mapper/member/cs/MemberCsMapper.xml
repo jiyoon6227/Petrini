@@ -16,7 +16,7 @@
   - TB_FAQ
 -->
 
-    <!-- 2026-08-11 박유정 — 고객센터 노출 FAQ (VISIBLE_YN = Y) -->
+    <!-- 고객센터 노출 FAQ (VISIBLE_YN = Y) -->
     <select id="selectVisibleFaqList" resultType="com.petcare.petcare.admin.cms.vo.FaqVO">
         SELECT F.FAQ_ID      AS faqId,
                F.CATEGORY_CD AS categoryCd,
@@ -31,7 +31,7 @@
          ORDER BY F.SORT_ORDER ASC, F.FAQ_ID DESC
     </select>
 
-    <!-- 2026-08-11 박유정 — 고객센터 노출 공지 (VISIBLE_YN = Y) -->
+    <!-- 고객센터 노출 공지 (VISIBLE_YN = Y) -->
     <select id="selectVisibleNoticeList" resultType="com.petcare.petcare.admin.cms.vo.NoticeVO">
         SELECT N.NOTICE_ID      AS noticeId,
                N.NOTICE_TYPE_CD AS noticeTypeCd,

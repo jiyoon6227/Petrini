@@ -32,20 +32,20 @@ public class MemberCsServiceImpl implements MemberCsService {
     @Autowired
     private MemberCsMapper memberCsMapper;
 
-    // 2026-08-11 박유정 — 고객센터 노출 FAQ
+    // 고객센터 노출 FAQ
     @Override
     @Transactional(readOnly = true)
     public List<FaqVO> getVisibleFaqList() {
         return memberCsMapper.selectVisibleFaqList();
     }
 
-    // 2026-08-11 박유정 — 고객센터 노출 공지 목록
+    // 고객센터 노출 공지 목록
     @Override
     @Transactional(readOnly = true)
     public List<NoticeVO> getVisibleNoticeList() {
         return memberCsMapper.selectVisibleNoticeList();
     }
-    // 2026-08-11 박유정 — 공지 상세 조회 + 조회수 증가
+    // 공지 상세 조회 + 조회수 증가
     @Override
     @Transactional
     public NoticeVO getVisibleNoticeDetail(Long noticeId) {

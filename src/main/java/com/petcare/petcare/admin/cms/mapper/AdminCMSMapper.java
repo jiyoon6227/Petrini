@@ -54,13 +54,13 @@ public interface AdminCMSMapper {
     MainBannerVO selectBannerById(Long bannerId);
 
     // ── 관리자: 배너 상세 (FILE_ID 포함) ──
-    // 2026-08-07 박유정 — fileId 조회 (이미지 교체 시 구 FILE 삭제용)
+    // fileId 조회 (이미지 교체 시 구 FILE 삭제용)
     MainBannerVO selectBannerDetail(Long bannerId);
 
     // ── 관리자: 노출 기간 변경 ──
     void updateBannerPeriod(MainBannerVO banner);
 
-    // 2026-08-07 박유정 — 관리자 배너 정보 변경 (제목·링크·이미지 FILE_ID)
+    // 관리자 배너 정보 변경 (제목·링크·이미지 FILE_ID)
     void updateBannerInfo(MainBannerVO banner);
 
     // ── 관리자: 배너 삭제 ──
@@ -71,7 +71,7 @@ public interface AdminCMSMapper {
 
     Long selectMemberNoByBizNo(Long bizNo);
 
-    // 2026-08-11 박유정 — FAQ CMS
+    // FAQ CMS
     List<FaqVO> selectFaqList();
 
     FaqVO selectFaqById(Long faqId);
@@ -82,7 +82,7 @@ public interface AdminCMSMapper {
 
     void deleteFaq(Long faqId);
 
-    // 2026-08-11 박유정 — 공지사항 CMS
+    // 공지사항 CMS
     List<NoticeVO> selectNoticeList();
     NoticeVO selectNoticeById(Long noticeId);
     void insertNotice(NoticeVO notice);

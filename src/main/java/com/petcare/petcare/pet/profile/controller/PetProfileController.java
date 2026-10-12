@@ -1,5 +1,5 @@
 /**
- * 2026/07/11 장우철 — 마이페이지 반려동물 관리
+ * 마이페이지 반려동물 관리
  *
  * URL: /mypage/pets
  * 화면: mypage/pets.jsp
@@ -49,13 +49,13 @@ public class PetProfileController {
         }
         List<PetProfileVO> petList = petProfileService.getPetList(member.getMemberNo());
         model.addAttribute("petList", petList);
-        // 2026/07/11 장우철 — 수정 모달용 JSON (이름 특수문자 안전)
+        // 수정 모달용 JSON (이름 특수문자 안전)
         model.addAttribute("petListJson", objectMapper.writeValueAsString(petList));
         return "mypage/pets";
     }
 
-    // 2026/07/11 장우철 — 등록·수정 (모달 Ajax)
-    // 2026/08/11 장우철 — petPhoto(대표사진) Multipart 연동
+    // 등록·수정 (모달 Ajax)
+    // petPhoto(대표사진) Multipart 연동
     @PostMapping("/pets/save")
     @ResponseBody
     public Map<String, Object> savePet(PetProfileVO vo,
@@ -81,7 +81,7 @@ public class PetProfileController {
         return result;
     }
 
-    // 2026/07/11 장우철 — 삭제 (모달/카드 Ajax)
+    // 삭제 (모달/카드 Ajax)
     @PostMapping("/pets/delete")
     @ResponseBody
     public Map<String, Object> deletePet(@RequestParam("petId") Long petId, HttpSession session) {

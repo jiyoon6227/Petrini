@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%--
-  - HYJ / 2026-07-23
   - 커뮤니티 게시글 수정 화면
 
   [수정 화면 흐름]
@@ -8,7 +7,7 @@
   2. 본인 글 확인 후 ${post} 로 기존 데이터 표시
   3. POST /community/edit → updatePost() → 상세 redirect + successMessage
   4. 실패 → ?error=save / ?error=forbidden
-  2026-08-13 박유정 — 기존 사진 X 삭제 + 새 사진 추가 (전체 5장上限)
+  기존 사진 X 삭제 + 새 사진 추가 (전체 5장上限)
 
   [model]
   - post (기존 게시글 데이터), post.photoUrls
@@ -50,7 +49,6 @@
 <form method="post"
       action="${contextPath}/community/edit"
       enctype="multipart/form-data">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
   
   <input type="hidden" name="postId" value="${post.postId}">
@@ -96,7 +94,7 @@
     <label>이미지 (최대 5장)</label>
     <p class="edit-photo-count" id="edit-photo-count"></p>
 
-    <%-- 2026-08-13 박유정 — 기존 사진: X 클릭 시 삭제 --%>
+    <%-- 기존 사진: X 클릭 시 삭제 --%>
     <div class="edit-photo-list" id="existing-photo-list">
       <c:forEach var="url" items="${post.photoUrls}">
         <div class="edit-photo-item" data-url="<c:out value='${url}'/>">
@@ -126,7 +124,7 @@
 
 <script>
 (function () {
-  // 2026-08-13 박유정 — 기존 X 삭제 + 새 이미지 미리보기
+  // 기존 X 삭제 + 새 이미지 미리보기
   var MAX = 5;
   var section = document.getElementById('edit-photo-section');
   if (!section) return;
@@ -245,7 +243,7 @@
       alert('사진은 최대 ' + MAX + '장까지입니다. (' + allowed + '장만 추가됩니다)');
     }
 
-    // 2026/08/14 장우철 — value='' 를 sync 뒤에 두면 DataTransfer로 넣은 files가 비워져 서버에 사진이 안 감
+    // value='' 를 sync 뒤에 두면 DataTransfer로 넣은 files가 비워져 서버에 사진이 안 감
     this.value = '';
     syncInputFiles();
     renderNewPreviews();

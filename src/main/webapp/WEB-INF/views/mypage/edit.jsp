@@ -12,7 +12,6 @@
 <div class="mypage-content">
 
 <%-- ── 회원정보 수정 ── --%>
-<%-- 2026/08/06 장우철 — yeju(정보·비번 AJAX) + 유정(프로필 사진) merge 합본 --%>
 <div class="mp-section active">
     <h2 class="mp-title">회원정보 수정</h2>
     <c:if test="${not empty msg}">
@@ -23,7 +22,7 @@
     </c:if>
     <p class="mp-desc">개인정보를 수정하고 저장하세요.</p>
 
-    <%-- 2026-08-04 박유정 — 프로필 사진 (별도 POST /mypage/edit/profile-image) --%>
+    <%-- 프로필 사진 (별도 POST /mypage/edit/profile-image) --%>
     <form id="profileImageForm"
           method="post"
           action="${contextPath}/mypage/edit/profile-image"
@@ -136,7 +135,7 @@
         </div>
     </div>
 
-    <%-- 2026/07/27 장우철 — 카드등록 (토스 빌링 + Ajax) --%>
+    <%-- 카드등록 (토스 빌링 + Ajax) --%>
     <div class="edit-section" id="editCardSection">
         <div class="edit-section-title">
             <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -146,7 +145,7 @@
             <p class="edit-card-desc">등록된 카드가 없습니다. 간편결제를 위해 카드를 등록해 주세요.</p>
             <button type="button" class="btn-verify" id="btnEditCardRegister">카드 등록하기</button>
         </div>
-        <%-- 2026/08/11 장우철 — 등록 카드 여러 장 전부 --%>
+        <%-- 등록 카드 여러 장 전부 --%>
         <div id="editCardRegistered" class="edit-card-list-wrap" style="display:none;">
             <div id="editCardList" class="edit-card-list"></div>
             <div class="edit-card-actions" style="margin-top:12px;">
@@ -159,7 +158,7 @@
         <button type="button" class="btn-primary" id="btnSaveProfile" style="padding:13px 52px; font-size:15px;">저장하기</button>
     </div>
 
-    <%-- HYJ 26.07.29 회원 탈퇴 --%>
+    <%-- 회원 탈퇴 --%>
     <div style="text-align:center; margin-top:48px; padding-top:24px; border-top:1px solid #eee;">
         <a href="${contextPath}/mypage/withdraw"
            style="color:#999; font-size:13px; text-decoration:underline;">회원 탈퇴</a>
@@ -171,7 +170,7 @@
 </div><%-- /mypage-content --%>
 </div><%-- /mypage-wrap --%>
 
-<%-- 2026-08-04 박유정 — 사진 선택 즉시 미리보기 --%>
+<%-- 사진 선택 즉시 미리보기 --%>
 <script>
 (function () {
   var input = document.getElementById('profileImageInput');
@@ -194,14 +193,14 @@
 })();
 </script>
 
-<%-- HYJ 26.08.06 주소찾기 --%>
+<%-- 주소찾기 --%>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<%-- 2026/07/27 장우철 — 토스 빌링 SDK + 카드등록 Ajax --%>
+<%-- 토스 빌링 SDK + 카드등록 Ajax --%>
 <script src="https://js.tosspayments.com/v2/standard"></script>
 <script src="${contextPath}/resources/js/billing-card.js"></script>
 <script>
-/* 2026/07/27 장우철 — 회원정보 카드등록 (목록 Ajax + requestBillingAuth) */
-/* 2026/08/11 장우철 — 등록 카드 전부 표시 */
+/* 회원정보 카드등록 (목록 Ajax + requestBillingAuth) */
+/* 등록 카드 전부 표시 */
 (function () {
   var empty = document.getElementById('editCardEmpty');
   var registered = document.getElementById('editCardRegistered');
@@ -268,7 +267,7 @@
   refreshCards();
 })();
 
-/* HYJ 26.08.06 주소 찾기 (카카오 주소 API 연동) */
+/* 주소 찾기 (카카오 주소 API 연동) */
 $("#btnSearchAddr").click(function(){
     new daum.Postcode({
         oncomplete:function(data){
@@ -296,7 +295,7 @@ $("#btnSearchAddr").click(function(){
     }).open();
 });
 
-/* ── HYJ 26.08.06 회원정보 저장 (닉네임·전화번호·주소) ── */
+/* ── 회원정보 저장 (닉네임·전화번호·주소) ── */
 $("#btnSaveProfile").click(function(){
     var nickname = $.trim($("#nickname").val());
     var phone    = $.trim($("#phone").val());
@@ -338,7 +337,7 @@ $("#btnSaveProfile").click(function(){
         });
 });
 
-/* ── HYJ 26.08.06 비밀번호 변경 ── */
+/* ── 비밀번호 변경 ── */
 $("#btnChangePw").click(function(){
     var cur     = $.trim($("#currentPassword").val());
     var newPw   = $.trim($("#newPassword").val());
@@ -386,7 +385,7 @@ $("#btnChangePw").click(function(){
         });
 });
 
-/* ── HYJ 26.08.06 비밀번호 보기/숨기기 토글 ── */
+/* ── 비밀번호 보기/숨기기 토글 ── */
 $(".edit-pw-eye").click(function(){
     var input = $(this).siblings("input");
     if (input.attr("type") === "password") {

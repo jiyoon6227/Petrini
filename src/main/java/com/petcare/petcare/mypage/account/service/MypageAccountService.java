@@ -25,10 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MypageAccountService {
 
-    // 2026-07-28 박유정 — 회원정보 수정 화면용 프로필 조회
+    // 회원정보 수정 화면용 프로필 조회
     MypageAccountVO getMemberProfile(Long memberNo);
 
-    // 2026-08-04 박유정 — 프로필 사진 로컬 저장 + TB_MEMBER.PROFILE_IMG_URL UPDATE, 저장 URL 반환
+    // 프로필 사진 로컬 저장 + TB_MEMBER.PROFILE_IMG_URL UPDATE, 저장 URL 반환
     String updateProfileImage(Long memberNo, MultipartFile file);
 
     /**
@@ -44,13 +44,13 @@ public interface MypageAccountService {
     String changePassword(Long memberNo, String currentPassword, String newPassword);
 
     /**
-     * HYJ 26.07.29 회원 탈퇴 — 비밀번호 확인 후 STATUS_CD = 'WITHDRAWN'
+     * 회원 탈퇴 — 비밀번호 확인 후 STATUS_CD = 'WITHDRAWN'
      * @return null 이면 성공, 문자열이면 오류 메시지
      */
     String withdraw(Long memberNo, String password);
 
     /**
-     * HYJ 26.07.29 7일 경과 탈퇴 회원 개인정보 삭제 (스케줄러에서 호출)
+     * 7일 경과 탈퇴 회원 개인정보 삭제 (스케줄러에서 호출)
      * @return 처리된 회원 수
      */
     int purgeExpiredWithdrawnMembers();

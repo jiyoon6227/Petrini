@@ -64,12 +64,12 @@ public class MypageBizController extends CommonConfigController {
     @Autowired
     private MypageBizService mypageBizService;
 
-    // 2026-07-09 장우철 — 승인 완료 사업자 세션(role=BIZ) 동기화
+    // 승인 완료 사업자 세션(role=BIZ) 동기화
     // 이유: 관리자 승인 후 재로그인 없이 /mypage/biz ↔ /apply 무한 리다이렉트 방지
     @Autowired
     private MemberAuthService memberAuthService;
 
-    // 2026/07/28 장우철 — 정산 계좌 실명조회 (mock/실연동)
+    // 정산 계좌 실명조회 (mock/실연동)
     @Autowired
     private KftcOpenBankingService kftcOpenBankingService;
     
@@ -79,15 +79,9 @@ public class MypageBizController extends CommonConfigController {
         if (memberInfo == null)
             return "redirect:/login";
 
-        // 2026-07-09 장우철 — [변경 후] DB 승인 상태를 세션에 반영 후 업종별 사업자 화면으로 이동
+        // DB 승인 상태를 세션에 반영 후 업종별 사업자 화면으로 이동
         memberAuthService.enrichSessionWithApprovedBiz(memberInfo);
         session.setAttribute("memberInfo", memberInfo);
-
-        /* [변경 전] 2026-07-09 장우철 — 세션 role 만 확인, APPROVED 인데 USER 이면 /apply 로 루프
-        if (!"BIZ".equals(memberInfo.getRole())) {
-            return "redirect:/mypage/biz/apply";
-        }
-        */
 
         if (!"BIZ".equals(memberInfo.getRole())) {
             return "redirect:/mypage/biz/apply";
@@ -119,12 +113,12 @@ public class MypageBizController extends CommonConfigController {
         BusinessVO apply = mypageBizService.getBizAuthStatus(member.getMemberId());
         if (apply != null) {
         if ("APPROVED".equals(apply.getStatusCd())) {
-            // 2026-07-09 장우철 — [변경 후] 승인 완료 시 세션에 BIZ 권한 반영 후 이동
+            // 승인 완료 시 세션에 BIZ 권한 반영 후 이동
             memberAuthService.enrichSessionWithApprovedBiz(member);
             session.setAttribute("memberInfo", member);
             return "redirect:/mypage/biz";
         }
-        // 2026-07-09 장우철 — [변경 후] 반려 → 반려 안내 화면, reapply=Y 일 때만 신청 폼
+        // 반려 → 반려 안내 화면, reapply=Y 일 때만 신청 폼
         // 이유: PENDING 과 동일하게 complete 로내면 「심사중」으로만 보이는 문제 해결
         if ("REJECTED".equals(apply.getStatusCd())) {
             if ("Y".equalsIgnoreCase(reapply)) {
@@ -139,17 +133,12 @@ public class MypageBizController extends CommonConfigController {
         redirectAttr.addFlashAttribute("bizType", apply.getBizType());
         redirectAttr.addFlashAttribute("bizRegNo", apply.getBizRegNo());
         return "redirect:/mypage/biz/complete";
-
-        /* [변경 전] 2026-07-09 장우철 — REJECTED 도 PENDING 과 같이 complete(심사중) 로 이동
-        redirectAttr.addFlashAttribute("bizName", apply.getBizName());
-        return "redirect:/mypage/biz/complete";
-        */
     }
 
         return "mypage/biz/apply";
     }
 
-    // 2026-07-09 장우철 — 반려 안내 화면 (재신청 버튼 → /apply?reapply=Y)
+    // 반려 안내 화면 (재신청 버튼 → /apply?reapply=Y)
     @GetMapping("/rejected")
     public String bizRejected(HttpSession session, Model model) throws Exception {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
@@ -173,7 +162,6 @@ public class MypageBizController extends CommonConfigController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            //HYJ 26.08.04
             if (!mypageBizService.checkBizRegNo(bizRegNo)) {
                 result.put("success", false);
                 result.put("message", "이미 등록된 사업자 번호 입니다.");
@@ -182,36 +170,6 @@ public class MypageBizController extends CommonConfigController {
 
             result.put("success", true);
             result.put("message", "이미 등록된 사업자 번호 입니다.");
-
-            // String baseUrl = "https://api.odcloud.kr/api/nts-businessman/v1/status";
-            // StringBuilder sb = new StringBuilder(baseUrl);
-            // sb.append("?serviceKey=").append(URLEncoder.encode(apiService.publicServiceApiKey, "UTF-8"));
-            
-            // String body = "{\"b_no\":[\"" + bizRegNo.replace("-", "") + "\"]}";
-            // String json = apiService.callApi(sb.toString(), body);
-
-            // ObjectMapper mapper = new ObjectMapper();
-            // JsonNode root = mapper.readTree(json);
-            // JsonNode data = root.path("data");
-
-            // if (data.isArray() && data.size() > 0) {
-            //     String status = data.get(0).path("b_stt").asText("");
-            //     // "계속사업자" = 정상 / "휴업자" = 휴업 / "폐업자" = 폐업
-            //     if ("계속사업자".equals(status)) {
-            //         result.put("success", true);
-            //         result.put("message", "인증 완료 (계속사업자)");
-            //     } else if (status.isEmpty()) {
-            //         result.put("success", false);
-            //         result.put("message", "등록되지 않은 사업자등록번호입니다.");
-            //     } else {
-            //         result.put("success", false);
-            //         result.put("message", "사업 상태: " + status);
-            //     }
-            // } 
-            // else {
-            //     result.put("success", false);
-            //     result.put("message", "조회 결과가 없습니다.");
-            // }
         } 
         catch (Exception e) {
             result.put("success", false);
@@ -221,7 +179,7 @@ public class MypageBizController extends CommonConfigController {
     }
 
     /**
-     * 2026/07/28 장우철 — Ajax: 정산 계좌 실명조회 (mock / 금결원)
+     * Ajax: 정산 계좌 실명조회 (mock / 금결원)
      * 요청: bankCodeStd, bankName, accountNum, accountHolder, bizRegNo
      */
     @PostMapping("/account/verify")
@@ -274,7 +232,7 @@ public class MypageBizController extends CommonConfigController {
         vo.setBizId(member.getMemberId());
         vo.setStatusCd("PENDING");
 
-        // 2026/07/28 장우철 — 숙소·쇼핑은 정산 계좌 인증값 필수
+        // 숙소·쇼핑은 정산 계좌 인증값 필수
         if ("STAY".equals(vo.getBizType()) || "STORE".equals(vo.getBizType())) {
             if (!"Y".equalsIgnoreCase(vo.getSettleVerifyYn())
                     || vo.getSettleAccount() == null || vo.getSettleAccount().isBlank()
@@ -292,7 +250,7 @@ public class MypageBizController extends CommonConfigController {
         }
 
         try {
-            // 1) 파일을 로컬 또는 GCS에 저장 + FileVO 목록 준비 — 2026/07/22 장우철
+            // 1) 파일을 로컬 또는 GCS에 저장 + FileVO 목록 준비
             String subDir = "biz/" + vo.getBizId();
             List<FileVO> fileList = new ArrayList<>();
 
@@ -358,7 +316,7 @@ public class MypageBizController extends CommonConfigController {
         if (member == null)
             return "redirect:/login";
 
-        // 2026-07-09 장우철 — [변경 후] DB 상태로 분기 (flash 만 믿지 않음)
+        // DB 상태로 분기 (flash 만 믿지 않음)
         // 이유: 반려 후에도 complete 북마크 시 심사중으로 보이던 문제 방지
         BusinessVO apply = mypageBizService.getBizAuthStatus(member.getMemberId());
         if (apply == null) {
@@ -374,19 +332,14 @@ public class MypageBizController extends CommonConfigController {
         }
         model.addAttribute("biz", apply);
         return "mypage/biz/complete";
-
-        /* [변경 전] 2026-07-09 장우철 — 상태 확인 없이 complete.jsp 만 반환
-        return "mypage/biz/complete";
-        */
     }
 
     /**
      * 사업자 신청 서류 저장 — gcs.enabled 분기
-     * 2026/07/22 장우철
      */
     private void storeBizUploadFile(MultipartFile file, String objectPath) throws Exception {
         if (gcsEnabled) {
-            // [GCS 업로드 — gcs.enabled=true] 2026/07/22 장우철
+            // [GCS 업로드 — gcs.enabled=true]
             //#region구글 스토리지 GCS 전환코드 START
             if (storage == null) {
                 throw new IllegalStateException("GCS enabled but Storage bean is missing");
@@ -401,7 +354,7 @@ public class MypageBizController extends CommonConfigController {
             storage.create(blobInfo, file.getBytes());
             //#endregion GCS 전환코드 END
         } else {
-            // [로컬 저장 — gcs.enabled=false] 2026/07/22 장우철
+            // [로컬 저장 — gcs.enabled=false]
             //#region로컬 파일관리
             File dest = new File(uploadDir + objectPath);
             File parent = dest.getParentFile();

@@ -8,7 +8,7 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_hospital.jsp" %>
 
-<%-- 7/3, 사업자(병원) 예약 캘린더 — FullCalendar 라이브러리 적용 버전 --%>
+<%-- 사업자(병원) 예약 캘린더 — FullCalendar 라이브러리 적용 버전 --%>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
@@ -54,8 +54,8 @@
 </main>
 
 <script>
-  // 2026-07-10 장우철 — 서버 예약 데이터 → FullCalendar (F7)
-  // 2026/07/11 장우철 — 상태 분리 / 날짜 칸 숫자 제거(사이드바 배지로 이동)
+  // 서버 예약 데이터 → FullCalendar
+  // 상태 분리 (날짜 칸 숫자 대신 사이드바 배지)
   function toKey(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }

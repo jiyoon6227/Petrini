@@ -1,6 +1,6 @@
 /**
  * 역할: 관리자 숙소 중간정산 요청 목록용 VO
- * 2026/07/30 장우철 — 숙소 정산 구현순서 4-3
+ * 숙소 정산
  *
  * TB_SETTLEMENT_REQUEST + TB_BUSINESS(+객실명) JOIN
  */

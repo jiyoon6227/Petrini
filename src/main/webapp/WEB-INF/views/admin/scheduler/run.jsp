@@ -1,6 +1,6 @@
 <%--
   역할: 관리자 스케줄러 수동 실행 (QA)
-  2026/08/12 장우철 — ADMIN + csrfFetch
+  ADMIN + csrfFetch
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>

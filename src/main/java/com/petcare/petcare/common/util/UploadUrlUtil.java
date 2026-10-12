@@ -7,14 +7,14 @@ package com.petcare.petcare.common.util;
  * - banner/12/uuid.jpg           (FileService)
  * - /upload/give/report/...      (분실신고·커뮤니티 등)
  *
- * 2026-08-07 박유정 — 배너 API·목록 이미지 URL 통일
+ * 배너 API·목록 이미지 URL 통일
  */
 public final class UploadUrlUtil {
 
     private UploadUrlUtil() {
     }
 
-    /** 2026-08-07 박유정 — FILE_URL → contextPath 포함 브라우저 접근 URL */
+    /** FILE_URL → contextPath 포함 브라우저 접근 URL */
     public static String toPublicUrl(String fileUrl, String contextPath) {
         if (fileUrl == null || fileUrl.isBlank()) {
             return "";
@@ -41,7 +41,7 @@ public final class UploadUrlUtil {
             return ctx + path.substring(uploadIdx);
         }
 
-        // Windows 절대경로가 DB에 들어간 경우 (C:/upload/banner/...) — 2026-08-07 박유정
+        // Windows 절대경로가 DB에 들어간 경우 (C:/upload/banner/...)
         int bannerIdx = path.indexOf("banner/");
         if (bannerIdx > 0 && path.contains(":")) {
             return ctx + "/upload/" + path.substring(bannerIdx);

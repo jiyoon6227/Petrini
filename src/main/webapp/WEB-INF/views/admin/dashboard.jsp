@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <%-- 2026-07-30 박유정 — Phase 2: 상단 통계 카드 4종 (summary.todayXxx 실데이터) --%>
+    <%-- 상단 통계 카드 4종 (summary.todayXxx) --%>
     <div class="adm-stats">
         <div class="adm-stat-card">
             <div class="adm-stat-icon blue">
@@ -25,7 +25,7 @@
             </div>
             <div class="adm-stat-body">
                 <div class="adm-stat-label">오늘 신규 가입자</div>
-                <%-- 2026-07-30 박유정 — TB_MEMBER.JOIN_DATE = 오늘 --%>
+                <%-- TB_MEMBER.JOIN_DATE = 오늘 --%>
                 <div class="adm-stat-val">${summary.todayNewMemberCount}<span class="adm-stat-unit">명</span></div>
                 <div class="adm-stat-diff up">오늘 기준 실시간 집계</div>
             </div>
@@ -36,7 +36,7 @@
             </div>
             <div class="adm-stat-body">
                 <div class="adm-stat-label">오늘 주문 수</div>
-                <%-- 2026-07-30 박유정 — TB_ORDER.ORDER_DATE = 오늘 --%>
+                <%-- TB_ORDER.ORDER_DATE = 오늘 --%>
                 <div class="adm-stat-val">${summary.todayOrderCount}<span class="adm-stat-unit">건</span></div>
                 <div class="adm-stat-diff up">오늘 기준 실시간 집계</div>
             </div>
@@ -47,7 +47,7 @@
             </div>
             <div class="adm-stat-body">
                 <div class="adm-stat-label">오늘 매출</div>
-                <%-- 2026-07-30 박유정 — 오늘 매출 원 → 백만원 (÷1000000) --%>
+                <%-- 오늘 매출 원 → 백만원 (÷1000000) --%>
                 <div class="adm-stat-val">
                     <fmt:formatNumber value="${summary.todaySalesAmount / 1000000}"
                                       maxFractionDigits="1" minFractionDigits="0" />
@@ -62,7 +62,7 @@
             </div>
             <div class="adm-stat-body">
                 <div class="adm-stat-label">미처리 예약</div>
-                <%-- 2026-07-30 박유정 — TB_RESERVATION PENDING + CONFIRMED --%>
+                <%-- TB_RESERVATION PENDING + CONFIRMED --%>
                 <div class="adm-stat-val">${summary.pendingReservationCount}<span class="adm-stat-unit">건</span></div>
                 <c:if test="${summary.pendingReservationCount > 0}">
                     <div class="adm-stat-diff down">▼ 처리 필요</div>
@@ -74,7 +74,7 @@
         </div>
     </div>
     <div class="adm-grid-2">
-        <%-- 2026-07-30 박유정 — Phase 3-C: 매출 차트 (주간 7일 / 월간 이번달 일별, switchSalesChart) --%>
+        <%-- 매출 차트 (주간 7일 / 월간 이번달 일별, switchSalesChart) --%>
         <div class="adm-card">
             <div class="adm-card-head">
                 <span class="adm-card-head-title">매출 현황</span>
@@ -89,7 +89,7 @@
         </div>
 
         <%-- 회원 현황 도넛 차트 --%>
-        <%-- 2026-07-30 박유정 — Phase 3-B: 회원 합계 (도넛·% 계산용) --%>
+        <%-- 회원 합계 (도넛·% 계산용) --%>
         <c:set var="memberTotal"
                value="${summary.memberGeneralCount + summary.memberBizCount + summary.memberWithdrawnCount}" />
         <div class="adm-card">
@@ -149,7 +149,7 @@
                 <table class="adm-table">
                     <thead><tr><th>주문번호</th><th>회원</th><th>금액</th><th>상태</th></tr></thead>
                     <tbody>
-                        <%-- 2026-07-30 박유정 — Phase 3-A: summary.recentOrderList 실데이터 --%>
+                        <%-- summary.recentOrderList --%>
                         <c:choose>
                             <c:when test="${empty summary.recentOrderList}">
                                 <tr>
@@ -199,7 +199,7 @@
         <div class="adm-card">
             <div class="adm-card-head">
                 <span class="adm-card-head-title">사업자 승인 대기
-                    <%-- 2026/07/11 장우철 — PENDING 실건수 (더미 3건 제거) --%>
+                    <%-- PENDING 실건수 --%>
                     <span style="margin-left:8px;background:#EEF2FF;color:#3B5BDB;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">${pendingBizApproveCount}건</span>
                 </span>
                 <a href="${contextPath}/admin/biz/list?status=PENDING" class="adm-btn blue" style="font-size:12px">승인 관리</a>
@@ -208,7 +208,7 @@
                 <table class="adm-table">
                     <thead><tr><th>업체명</th><th>업종</th><th>신청일</th><th>처리</th></tr></thead>
                     <tbody>
-                        <%-- 2026-07-30 박유정 — Phase 1: summary.pendingBizList 실데이터 (더미 3행 제거) --%>
+                        <%-- summary.pendingBizList --%>
                         <c:choose>
                             <c:when test="${empty summary.pendingBizList}">
                                 <tr>
@@ -240,7 +240,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-/* 2026-07-30 박유정 — Phase 3-C: 매출 차트 데이터 (원 → 만원 ÷10000) */
+/* 매출 차트 데이터 (원 → 만원 ÷10000) */
 const weeklyLabels = [
     <c:forEach var="day" items="${summary.weeklySalesList}" varStatus="st">
         '${day.dayLabel}'<c:if test="${!st.last}">,</c:if>
@@ -285,7 +285,7 @@ let salesChart = new Chart(document.getElementById('salesChart'), {
     }
 });
 
-/* 2026-07-30 박유정 — 주간/월간 버튼 전환 */
+/* 주간/월간 버튼 전환 */
 function switchSalesChart(mode) {
     const btnWeekly = document.getElementById('btnSalesWeekly');
     const btnMonthly = document.getElementById('btnSalesMonthly');
@@ -315,7 +315,7 @@ document.getElementById('btnSalesMonthly').addEventListener('click', function() 
     switchSalesChart('monthly');
 });
 
-/* 2026-07-30 박유정 — Phase 3-B: 회원 도넛 차트 (일반/사업자/탈퇴) */
+/* 회원 도넛 차트 (일반/사업자/탈퇴) */
 new Chart(document.getElementById('memberChart'), {
     type: 'doughnut',
     data: {

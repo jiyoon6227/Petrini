@@ -1,7 +1,7 @@
 /**
  * 역할: 쇼핑 정산 조회·저장 (MyBatis)
- * 2026/08/04 장우철 — 쇼핑 정산 S8 (1-2~1-6)
- * 2026/08/05 장우철 — S9 사업자 화면 · S10 중간요청
+ * 쇼핑 정산
+ * 사업자 화면 · 중간요청
  *
  * 참고 테이블
  * - TB_ORDER, TB_ORDER_ITEM, TB_PRODUCT, TB_BUSINESS
@@ -79,9 +79,9 @@ public interface StoreSettlementMapper {
 
     String selectBizNameByBizNo(@Param("bizNo") Long bizNo);
 
-    /** 2026/08/05 장우철 — S12: 승인된 쇼핑 사업자 목록 (월정산 배치) */
+    /** 승인된 쇼핑 사업자 목록 (월정산 배치) */
     List<Long> selectApprovedStoreBizNos();
 
-    /** 2026/08/05 장우철 — S12: 동일 월 REGULAR 존재 여부 */
+    /** 동일 월 REGULAR 존재 여부 */
     int countRegularByBizAndMonth(@Param("bizNo") Long bizNo, @Param("settleMonth") String settleMonth);
 }

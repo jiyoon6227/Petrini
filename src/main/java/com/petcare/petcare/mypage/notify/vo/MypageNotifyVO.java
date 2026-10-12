@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class MypageNotifyVO {
 
-    // 2026-07-09 장우철 — TB_NOTIFICATION 컬럼 (DATABASE_TABLE.sql 기준)
+    // TB_NOTIFICATION 컬럼 (DATABASE_TABLE.sql 기준)
     private Long   notiId;
     private Long   memberNo;
     private String notiType;   // ORDER / RESERVE / COMMUNITY / SYSTEM

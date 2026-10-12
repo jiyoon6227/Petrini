@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/biz/common/sidebar_stay.jsp" %>
 
 <%--
-  2026/07/30 장우철 — 숙소 정산 내역
+  숙소 정산 내역
   - 2-1 상단 요약 / 2-2 목록 / 2-4 상세(아코디언 + AJAX ITEM)
   - 4-1/4-2 중간정산 요청 버튼·폼 + REQUEST 저장
 --%>
@@ -113,7 +113,7 @@
         <option value="pending" <c:if test="${filterStatus eq 'pending'}">selected</c:if>>지급대기</option>
         <option value="done" <c:if test="${filterStatus eq 'done'}">selected</c:if>>지급완료</option>
       </select>
-      <%-- 2026/08/06 장우철 — 필터 줄 오른쪽 정산계좌 버튼 (숙소·쇼핑 공통) --%>
+      <%-- 필터 줄 오른쪽 정산계좌 버튼 (숙소·쇼핑 공통) --%>
       <button type="button" class="biz-btn btn-settle-account" onclick="openSettleAccountModal()">정산계좌</button>
     </form>
   </div>
@@ -208,7 +208,7 @@
   </div>
 </main>
 
-<%-- 2026/08/06 장우철 — 정산계좌 조회/변경 모달 (숙소) --%>
+<%-- 정산계좌 조회/변경 모달 (숙소) --%>
 <div class="adhoc-modal-bg" id="settleAccountModalBg" onclick="if(event.target===this) closeSettleAccountModal()">
   <div class="adhoc-modal" role="dialog" aria-labelledby="settleAccountModalTitle">
     <div class="adhoc-modal-head">

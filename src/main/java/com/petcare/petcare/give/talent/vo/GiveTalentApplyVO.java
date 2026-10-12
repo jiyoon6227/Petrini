@@ -1,7 +1,7 @@
 /**
  * 역할: 재능나눔 참여 신청 데이터 객체
  *
- * - 박유정 / 2026-08-10 — STEP 2 (일반 회원 → TB_TALENT_APPLY)
+ * - 일반 회원 → TB_TALENT_APPLY
  *
  * 참고 테이블
  * - TB_TALENT_APPLY

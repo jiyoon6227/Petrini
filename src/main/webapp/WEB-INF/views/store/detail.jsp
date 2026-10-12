@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%-- 지윤 26.07.07 추가: 가격 콤마 표시용 fmt 태그 --%>
+<%-- 가격 콤마 표시용 fmt 태그 --%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 지윤 26.07.15 추가: 이미지 URL이 http로 시작하는지 검사용 (외부 URL vs 로컬 업로드 구분) --%>
+<%-- 이미지 URL이 http로 시작하는지 검사용 (외부 URL vs 로컬 업로드 구분) --%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId" value="store" />
-<%-- 지윤 26.07.07 수정: URL param.id 그대로 쓰던 것 -> Controller가 넘겨준 product 객체의 productId로 변경 (실데이터 연동) --%>
+<%-- productId는 Controller가 넘긴 product 객체 값 사용 --%>
 <c:set var="productId" value="${product.productId}" />
 
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -50,7 +50,7 @@
 .btn-wish-detail { flex:1; padding:14px; border:2px solid var(--primary); border-radius:var(--radius-sm); background:#fff; color:var(--primary); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
 .btn-wish-detail svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
 .btn-cart-detail { flex:2; padding:14px; border:none; border-radius:var(--radius-sm); background:var(--primary); color:#fff; font-size:15px; font-weight:700; cursor:pointer; }
-/* 지윤 26.07.08 추가: 바로구매 버튼 스타일 (기존엔 스타일 정의 자체가 없어서 브라우저 기본 버튼으로 보였음) */
+/* 바로구매 버튼 스타일 */
 .btn-buy-now { flex:1; padding:14px; border:1px solid var(--primary); border-radius:var(--radius-sm); background:#fff; color:var(--primary); font-size:15px; font-weight:700; cursor:pointer; transition:var(--transition); }
 .btn-buy-now:hover { background:var(--primary-light); }
 .btn-buy-detail { flex:2; padding:14px; border:none; border-radius:var(--radius-sm); background:var(--text-main); color:#fff; font-size:15px; font-weight:700; cursor:pointer; }
@@ -75,7 +75,7 @@
 .reviewer { font-size:14px; font-weight:700; color:var(--text-main); }
 .review-date { font-size:12px; color:var(--text-muted); }
 .review-text { font-size:14px; color:var(--text-sub); line-height:1.6; word-break:break-word; overflow-wrap:anywhere; }
-/* 2026/08/12 장우철 — 사장님 답글 긴 문자열 줄바꿈 */
+/* 사장님 답글 긴 문자열 줄바꿈 */
 .review-biz-reply { margin-top:10px; padding:12px 14px; background:#EAF7F2; border-left:3px solid #2BAB82; border-radius:8px; max-width:100%; box-sizing:border-box; overflow-wrap:anywhere; word-break:break-word; }
 .review-biz-reply-text { margin-top:4px; font-size:14px; color:var(--text-sub); line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
 .review-report-btn { margin-top:10px; background:none; border:none; color:var(--text-muted); font-size:12px; text-decoration:underline; cursor:pointer; padding:0; }
@@ -86,7 +86,7 @@
   <div class="breadcrumb">
     <a href="${contextPath}/">홈</a><span>›</span>
     <a href="${contextPath}/store">상품</a><span>›</span>
-    <%-- 지윤 26.07.07 수정: 하드코딩된 카테고리명/상품명 -> product 실데이터로 변경 --%>
+    <%-- 카테고리명/상품명 (product) --%>
     <a href="${contextPath}/store">${product.categoryName}</a><span>›</span>
     ${product.productName}
   </div>
@@ -95,13 +95,13 @@
     <%-- 이미지 갤러리 --%>
     <div class="detail-gallery">
 
-      <%-- 지윤 26.07.07 수정: 메인 상품 고정 이미지 URL -> DB에서 가져온 product.thumbnailUrl로 변경 --%>
-     <%-- 지윤 26.07.15 수정: 로컬 업로드 이미지는 /upload/ 접두사 필요, 외부(목업) URL은 그대로 --%>
+      <%-- 메인 상품 이미지 (product.thumbnailUrl) --%>
+     <%-- 로컬 업로드 이미지는 /upload/ 접두사 필요, 외부(목업) URL은 그대로 --%>
      <img class="detail-main-img" id="mainImg"
      src="${fn:startsWith(product.thumbnailUrl,'http') ? product.thumbnailUrl : contextPath.concat('/upload/').concat(product.thumbnailUrl)}"
      alt="${product.productName}" onerror="this.src='https://placehold.co/600x600/EAF7F2/2BAB82?text=상품'">
 
-      <%-- 지윤 26.07.07 수정: 썸네일 3개 하드코딩 -> TB_FILE 실데이터로 개수 상관없이 자동 반복
+      <%-- 썸네일 목록 (TB_FILE, 개수만큼 반복)
      이미지 없는 상품은 imageList가 빈 리스트라 자동으로 썸네일 줄 자체가 안 보임 --%>
    <div class="detail-thumbs">
     <c:forEach var="img" items="${product.imageList}" varStatus="loop">
@@ -113,7 +113,7 @@
 
     <%-- 상품 정보 --%>
     <div class="detail-info">
-      <%-- 지윤 26.07.07 수정: 브랜드/상품명/평점/가격 하드코딩 -> product 실데이터로 변경
+      <%-- 브랜드/상품명/평점/가격 (product)
      별 아이콘 5개 고정 -> 1개만 남기고 텍스트로 대체 (진짜 별점 렌더링은 리뷰 단계에서 처리 예정) --%>
     <div class="detail-brand">${product.brandName}</div>
     <div class="detail-name">${product.productName}</div>
@@ -131,7 +131,7 @@
      </c:if>
     </div>
 
-      <%-- 지윤 26.07.21 수정: 하드코딩된 뱃지 4개 -> TB_PRODUCT.TAGS(쉼표 구분)를 split해서 실제 태그로 렌더링. 태그 없으면 영역 자체 숨김 --%>
+      <%-- TB_PRODUCT.TAGS(쉼표 구분) split 태그 렌더링, 태그 없으면 영역 숨김 --%>
       <c:if test="${not empty product.tags}">
         <div class="detail-tags">
           <c:forEach var="tag" items="${fn:split(product.tags, ',')}">
@@ -142,17 +142,17 @@
         </div>
       </c:if>
 
-      <%-- 지윤 26.07.07 수정: 용량 하드코딩 -> TB_PRODUCT_OPTION 실데이터로 변경
+      <%-- 옵션 목록 (TB_PRODUCT_OPTION)
      색상이 없거나 '기본'이면 색상 표시 생략, 사이즈만 표시 --%>
 <div class="detail-option">
   <label>옵션 선택</label>
   <select id="optionSelect" onchange="onOptionChange()">
-    <%-- 지윤 26.07.15 수정: 옵션 있든 없든(단일옵션 포함) 무조건 안내문구부터 먼저 보여주기 --%>
+    <%-- 옵션 유무와 관계없이(단일옵션 포함) 안내문구를 첫 항목으로 표시 --%>
     <option value="" data-stock="0" data-option-id="" disabled selected>옵션을 선택해 주세요</option>
     <c:forEach var="opt" items="${product.optionList}">
 
-      <%-- 지윤 26.07.08 수정: data-option-id 추가 (장바구니 담을 때 어느 옵션인지 알아야 해서) --%>
-<%-- 지윤 26.07.15 추가: 재고 0인 옵션은 선택 자체를 막음(disabled) + "품절" 표시 --%>
+      <%-- data-option-id: 장바구니 담기 시 옵션 식별용 --%>
+<%-- 재고 0인 옵션은 선택 자체를 막음(disabled) + "품절" 표시 --%>
 <option value="${opt.addPrice}" data-stock="${opt.stockQty}" data-option-id="${opt.optionId}" ${opt.stockQty <= 0 ? 'disabled' : ''}>
 <c:if test="${not empty opt.optionColor && opt.optionColor != '기본'}">${opt.optionColor} / </c:if>${opt.optionSize}
 <c:if test="${opt.addPrice > 0}"> (+<fmt:formatNumber value="${opt.addPrice}" pattern="#,###"/>원)</c:if>
@@ -160,7 +160,7 @@
 </option>
 
     </c:forEach>
-    <%-- 지윤 26.07.08 추가: 옵션 없는 상품은 빈 박스로 보이던 것 -> cart.jsp와 동일하게 "단일 옵션" 표시. data-option-id 빈 값 -> 장바구니 담을 때 null 처리됨 --%>
+    <%-- 옵션 없는 상품은 "단일 옵션" 표시 (cart.jsp와 동일), data-option-id 빈 값은 장바구니 담기 시 null --%>
     <c:if test="${empty product.optionList}">
       <option value="0" data-stock="${product.stockQty}" data-option-id="">단일 옵션</option>
     </c:if>
@@ -174,13 +174,13 @@
     <input type="number" id="qty" value="1" min="1">
     <button onclick="changeQty(1)">+</button>
   </div>
-  <%-- 지윤 26.07.07 추가: 재고 초과 경고 --%>
+  <%-- 재고 초과 경고 --%>
   <div id="stockWarning" style="display:none; color:var(--accent); font-size:12px; margin-top:6px;">재고가 부족합니다.</div>
-<!-- 지윤 26.07.14 추가: 0개 이하 입력 시 안내문구용 -->
+<!-- 0개 이하 입력 시 안내문구용 -->
 <div id="qtyLimitMsg" style="display:none; color:var(--accent); font-size:12px; margin-top:6px;"></div>
   </div>
 
-  <%-- 지윤 26.07.07 수정: 하드코딩 48,900원 -> 실제 판매가로 변경 --%>
+  <%-- 판매가 표시 --%>
   <div class="detail-total">
   <span>총 결제금액</span>
   <strong id="totalPrice"><fmt:formatNumber value="${product.salePrice}" pattern="#,###"/>원</strong>
@@ -188,7 +188,7 @@
 
 <div class="detail-btn-row">
 <button type="button" class="btn-wish-detail wish-btn" data-wish-id="store:${productId}" aria-label="찜하기">찜</button>
-<%-- 지윤 26.07.08 수정: alert만 뜨던 가짜 버튼 -> 실제 TB_CART_ITEM에 저장하는 폼으로 변경 --%>
+<%-- TB_CART_ITEM 저장 폼 --%>
 <form id="cartForm" style="display:contents">
   <input type="hidden" name="productId" value="${product.productId}">
   <input type="hidden" name="optionId" id="cartOptionId">
@@ -208,7 +208,7 @@
     <button class="detail-tab" onclick="showTab('qna',this)">Q&A (${product.qnaList.size()})</button>
   </div>
 
-  <%-- 지윤 26.07.12 수정: 하드코딩 이미지/주요특징 -> product.imageList(실제 상품이미지)/product.description(실제 설명) 실데이터로 교체 --%>
+  <%-- 상품 이미지(product.imageList)/설명(product.description) --%>
   <div class="tab-section on" id="tab-info">
     <c:choose>
       <c:when test="${not empty product.imageList}">
@@ -249,7 +249,7 @@
     </div>
   </div>
 
-  <%-- 지윤 26.07.07 수정: 평점/막대그래프/리뷰카드 하드코딩 -> TB_REVIEW 실데이터로 변경 --%>
+  <%-- 평점/막대그래프/리뷰카드 (TB_REVIEW) --%>
 <div class="tab-section" id="tab-review">
     <div class="review-summary">
       <div class="review-avg">
@@ -278,7 +278,7 @@
           <span class="reviewer">${rv.nickname} <c:forEach begin="1" end="${rv.rating}">⭐</c:forEach></span>
           <span style="display:flex; align-items:center; gap:10px;">
             <span class="review-date"><fmt:formatDate value="${rv.regDate}" pattern="yyyy.MM.dd"/></span>
-            <%-- 지윤 26.07.21 추가: 본인 리뷰 삭제 --%>
+            <%-- 본인 리뷰 삭제 --%>
             <c:if test="${not empty sessionScope.memberInfo && sessionScope.memberInfo.memberNo == rv.memberNo}">
               <button type="button" class="btnDeleteReview" data-review-id="${rv.reviewId}" style="border:none; background:none; color:var(--text-muted); font-size:12px; cursor:pointer; text-decoration:underline;">삭제</button>
             </c:if>
@@ -290,7 +290,7 @@
           </c:when>
           <c:otherwise>
             <div class="review-text">${rv.content}</div>
-            <%-- 지윤 26.07.23 추가: 리뷰 첨부 이미지 --%>
+            <%-- 리뷰 첨부 이미지 --%>
             <c:if test="${not empty rv.imageUrls}">
               <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
                 <c:forEach var="imgUrl" items="${rv.imageUrls}">
@@ -304,7 +304,7 @@
                 <div class="review-biz-reply-text"><c:out value="${rv.bizReply}"/></div>
               </div>
             </c:if>
-            <%-- 지윤 26.07.21 추가: 리뷰 신고 - 로그인했고 본인 리뷰가 아닐 때만 노출 --%>
+            <%-- 리뷰 신고 - 로그인했고 본인 리뷰가 아닐 때만 노출 --%>
             <c:if test="${not empty sessionScope.memberInfo && sessionScope.memberInfo.memberNo != rv.memberNo}">
               <button type="button" class="review-report-btn" onclick="reportReview(${rv.reviewId})">신고</button>
             </c:if>
@@ -316,7 +316,7 @@
     
   </div>
 
- <%-- 지윤 26.07.10 수정: 문의 등록(AJAX) 기능 추가 --%>
+ <%-- 문의 등록 (AJAX) --%>
 <div class="tab-section" id="tab-qna">
     <div style="display:flex; gap:8px; margin-bottom:20px;">
       <c:if test="${not empty product.optionList}">
@@ -336,7 +336,7 @@
     <c:forEach var="qna" items="${product.qnaList}">
 
     
-      <%-- 지윤 26.07.12 수정: data-qna-id 부여, 본인 글 + 답변 미완료 건에만 삭제 버튼 노출 --%>
+      <%-- data-qna-id 부여, 본인 글 + 답변 미완료 건에만 삭제 버튼 노출 --%>
       <div class="review-card" data-qna-id="${qna.qnaId}">
         <div class="review-card-head">
           <span class="reviewer">Q. ${qna.nickname}</span>
@@ -370,20 +370,20 @@ function switchImg(el, src) {
   document.querySelectorAll('.detail-thumb').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
 }
-// 지윤 26.07.07 수정: 판매가 하드코딩 -> product.salePrice 실데이터로 변경
+// 판매가 (product.salePrice)
 // 99개 고정 제한 -> 선택된 옵션의 실제 재고(data-stock) 기준으로 변경 
 function getSelectedStock() {
   const sel = document.getElementById('optionSelect');
   if (!sel || sel.options.length === 0) return 99;
   return parseInt(sel.options[sel.selectedIndex].dataset.stock) || 0;
 }
-//지윤 26.07.15 추가: 옵션 안 고른 상태에서 장바구니/바로구매 누르면 막기
+// 옵션 안 고른 상태에서 장바구니/바로구매 누르면 막기
 function isOptionSelected() {
   const sel = document.getElementById('optionSelect');
   if (!sel || sel.options.length === 0) return true;
   return sel.options[sel.selectedIndex].value !== '';
 }
-//지윤 26.07.14 추가: 경고문구 초기화 헬퍼
+// 경고문구 초기화 헬퍼
 function hideQtyMessages() {
   document.getElementById('stockWarning').style.display = 'none';
   document.getElementById('qtyLimitMsg').style.display = 'none';
@@ -395,7 +395,7 @@ function changeQty(d) {
   inp.value = v;
   updateTotal();
 }
-//지윤 26.07.14 추가: 직접 타이핑 가능하게 바뀌면서, 입력값 검증하는 함수 분리
+// 직접 입력값 검증 함수
 function validateQty() {
   const inp = document.getElementById('qty');
   let v = parseInt(inp.value);
@@ -405,7 +405,7 @@ function validateQty() {
   updateTotal();
 
 }
-//지윤 26.07.14 수정: 999 상한 로직 제거, 재고 초과 시 "재고 OO개까지만 구매 가능"으로 안내
+// 재고 초과 시 "재고 OO개까지만 구매 가능" 안내 (999 상한 없음)
 function applyQtyLimit(v) {
   hideQtyMessages();
   const stock = getSelectedStock();
@@ -426,16 +426,16 @@ function onOptionChange() {
   hideQtyMessages();
   updateTotal();
 }
-//지윤 26.07.14 추가: 직접 입력 후 포커스를 벗어나는 순간(blur) 검증 실행
+// 직접 입력 후 포커스를 벗어나는 순간(blur) 검증 실행
 document.getElementById('qty').addEventListener('blur', validateQty);
-//지윤 26.07.14 추가: 타이핑하는 즉시 숫자 외 문자(글자, 음수기호, 소수점 등) 제거
+// 타이핑하는 즉시 숫자 외 문자(글자, 음수기호, 소수점 등) 제거
 document.getElementById('qty').addEventListener('input', function () {
   this.value = this.value.replace(/[^0-9]/g, '');
 });
 function updateTotal() {
   const sel = document.getElementById('optionSelect');
   const selected = sel && sel.options.length > 0 ? sel.options[sel.selectedIndex] : null;
-  //지윤 26.07.15 추가: 옵션 안 고른 상태(안내문구가 선택된 상태)면 0원으로 표시
+  // 옵션 안 고른 상태(안내문구가 선택된 상태)면 0원으로 표시
   if (selected && selected.value === '') {
     document.getElementById('totalPrice').textContent = '0원';
     return;
@@ -445,7 +445,7 @@ function updateTotal() {
   const total = (${product.salePrice} + addPrice) * qty;
   document.getElementById('totalPrice').textContent = total.toLocaleString() + '원';
 }
-//지윤 26.07.07 추가: 페이지 로드 시 총 결제금액 한 번 계산
+// 페이지 로드 시 총 결제금액 한 번 계산
 updateTotal();
 
 function showTab(id, btn) {
@@ -455,11 +455,10 @@ function showTab(id, btn) {
   btn.classList.add('on');
 }
 
-//지윤 26.07.21 추가: 리뷰 신고 (AJAX) - 신고 사유는 선택 입력, 이미 신고했으면 안내만
+// 리뷰 신고 (AJAX) - 신고 사유는 선택 입력, 이미 신고했으면 안내만
 function reportReview(reviewId) {
   if (!confirm('이 리뷰를 신고하시겠습니까?')) return;
   var reason = prompt('신고 사유를 입력해주세요 (선택)') || '';
-  //HYJ 26.08.05
   csrfFetch('${contextPath}/store/review/report', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -479,13 +478,12 @@ function reportReview(reviewId) {
     });
 }
 
-//지윤 26.07.21 추가: 본인 리뷰 삭제 (평점 요약 갱신을 위해 성공 시 새로고침)
+// 본인 리뷰 삭제 (평점 요약 갱신을 위해 성공 시 새로고침)
 document.getElementById('reviewList').addEventListener('click', function (e) {
   var btn = e.target.closest('.btnDeleteReview');
   if (!btn) return;
   if (!confirm('작성한 리뷰를 삭제하시겠습니까?')) return;
   var reviewId = btn.dataset.reviewId;
-  //HYJ 26.08.05
   csrfFetch('${contextPath}/store/review/delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -504,7 +502,7 @@ document.getElementById('reviewList').addEventListener('click', function (e) {
     });
 });
 
-//지윤 26.07.09 수정: 로그인 안 했으면 AJAX 요청 전에 confirm으로 로그인페이지 이동 여부부터 물어봄
+// 비로그인 시 AJAX 요청 전 confirm으로 로그인페이지 이동 확인
 document.getElementById('btnAddCart').addEventListener('click', function () {
   var isLoggedIn = ${not empty sessionScope.memberInfo};
   if (!isLoggedIn) {
@@ -513,7 +511,7 @@ document.getElementById('btnAddCart').addEventListener('click', function () {
     }
     return;
   }
-   //지윤 26.07.15 추가: 옵션 안 고르면 담기 막음
+   // 옵션 안 고르면 담기 막음
   if (!isOptionSelected()) {
     alert('옵션을 선택해주세요.');
     return;
@@ -525,7 +523,6 @@ document.getElementById('btnAddCart').addEventListener('click', function () {
   var qty = parseInt(document.getElementById('qty').value);
   var price = ${product.salePrice} + addPrice;
 
-  //HYJ 26.08.05
   csrfFetch('${contextPath}/store/cart/add', {
     method: 'POST',
     headers: {'Content-Type':'application/x-www-form-urlencoded'},
@@ -542,9 +539,9 @@ document.getElementById('btnAddCart').addEventListener('click', function () {
   });
 });
 
-//지윤 26.07.08 추가: 바로구매 -> 주문서 페이지로 바로 이동 (장바구니 거치지 않음)
+// 바로구매 -> 주문서 페이지로 바로 이동 (장바구니 거치지 않음)
 document.getElementById('btnBuyNow').addEventListener('click', function () {
- //지윤 26.07.15 추가: 옵션 안 고르면 이동 막음
+ // 옵션 안 고르면 이동 막음
   if (!isOptionSelected()) {
     alert('옵션을 선택해주세요.');
     return;
@@ -559,8 +556,8 @@ document.getElementById('btnBuyNow').addEventListener('click', function () {
     + '&qty=' + qty;
 });
 
-//지윤 26.07.10 수정: 등록 성공 시 새로고침 없이 화면에 바로 질문 추가
-//지윤 26.07.12 수정: 응답이 "OK:qnaId" 형식으로 바뀜에 따라 파싱 로직 추가, 새 카드에도 삭제버튼 부여
+// 등록 성공 시 새로고침 없이 화면에 바로 질문 추가
+// 응답 "OK:qnaId" 파싱, 새 카드에도 삭제버튼 부여
 document.getElementById('btnAddQna').addEventListener('click', function () {
   var isLoggedIn = ${not empty sessionScope.memberInfo};
   if (!isLoggedIn) {
@@ -577,7 +574,6 @@ document.getElementById('btnAddQna').addEventListener('click', function () {
   }
   var optionSelectEl = document.getElementById('qnaOptionSelect');
   var qnaOptionId = optionSelectEl ? optionSelectEl.value : '';
-  //HYJ 26.08.05
   csrfFetch('${contextPath}/store/qna/add', {
     method: 'POST',
     headers: {'Content-Type':'application/x-www-form-urlencoded'},
@@ -618,13 +614,12 @@ document.getElementById('btnAddQna').addEventListener('click', function () {
     });
 });
 
-//지윤 26.07.12 상품 Q&A 삭제: 기존 글/새로 추가된 글 모두 처리되도록 qnaList에 이벤트 위임
+// 상품 Q&A 삭제: 기존 글/새로 추가된 글 모두 처리되도록 qnaList에 이벤트 위임
 document.getElementById('qnaList').addEventListener('click', function (e) {
   var btn = e.target.closest('.btnDeleteQna');
   if (!btn) return;
   if (!confirm('문의를 삭제하시겠습니까?')) return;
   var qnaId = btn.dataset.qnaId;
-  //HYJ 26.08.05
   csrfFetch('${contextPath}/store/qna/delete', {
     method: 'POST',
     headers: {'Content-Type':'application/x-www-form-urlencoded'},

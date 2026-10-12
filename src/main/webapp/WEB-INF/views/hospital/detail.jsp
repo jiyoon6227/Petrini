@@ -40,7 +40,7 @@
   .review-item-stars svg{width:13px;height:13px;fill:var(--yellow)}
   .review-item-date{font-size:12px;color:var(--text-muted)}
   .review-item-text{font-size:14px;color:var(--text-sub);line-height:1.6;word-break:break-word;overflow-wrap:anywhere}
-  /* 2026/08/12 장우철 — 사업자 답글 긴 문자열 줄바꿈 */
+  /* 사업자 답글 긴 문자열 줄바꿈 */
   .review-biz-reply{margin-top:10px;padding:10px 12px;background:var(--bg-page);border-radius:8px;font-size:13px;color:var(--text-sub);max-width:100%;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word}
   .review-biz-reply-text{margin-top:4px;white-space:pre-wrap;line-height:1.6;overflow-wrap:anywhere;word-break:break-word}
   /* 사이드 예약 카드 */
@@ -57,9 +57,6 @@
 <div class="hdetail-wrap">
   <div class="hdetail-main">
     <div class="hdetail-photos">
-      <%-- <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=600&q=70&auto=format&fit=crop" alt="병원메인" onerror="this.src='https://placehold.co/600x400/E0F2FE/0284C7?text=병원'">
-      <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=300&q=70&auto=format&fit=crop" alt="병원2" onerror="this.src='https://placehold.co/300x200/E0F2FE/0284C7?text=병원'">
-      <img src="https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=300&q=70&auto=format&fit=crop" alt="병원3" onerror="this.src='https://placehold.co/300x200/E0F2FE/0284C7?text=병원'"> --%>
       <c:forEach var="img" items="${imgList}">
         <div class="swiper-slide">
             <img src="${contextPath}/upload/${img.fileUrl}" alt="${hospital.name}">
@@ -72,7 +69,7 @@
         <div class="hdetail-name">${hospital.name}</div>
         <div class="hdetail-rating">
           <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <%-- 2026/07/13 장우철 — TB_HOSPITAL.AVG_RATING / REVIEW_CNT --%>
+          <%-- TB_HOSPITAL.AVG_RATING / REVIEW_CNT --%>
           <c:choose>
             <c:when test="${not empty hospital.avgRating}">
               <fmt:formatNumber value="${hospital.avgRating}" pattern="0.0"/>
@@ -89,7 +86,6 @@
       <div class="hdinfo-card">
         <div class="hdinfo-label"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>주소</div>
         <div class="hdinfo-val">${hospital.addr}
-          <%-- <br><small style="color:var(--text-muted)">현재 위치에서 0.8km</small> --%>
         </div>
       </div>
       <div class="hdinfo-card">
@@ -123,12 +119,9 @@
         </div>
       </div>
     </div>
-    <%-- <div style="background:var(--bg-page);border-radius:var(--radius-md);overflow:hidden;height:200px;margin-bottom:28px" id="map">
-      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=70&auto=format&fit=crop" style="width:100%;height:100%;object-fit:cover" alt="지도" onerror="this.src='https://placehold.co/900x200/EAF7F2/2BAB82?text=카카오맵+위치'">
-    </div> --%>
     <div id="kakao-map" style="width:100%;height:280px;border-radius:12px;overflow:hidden;margin-bottom:28px"></div>
     <%@ include file="/WEB-INF/views/common/kakaomap.jsp" %>
-    <%-- 2026/07/13 장우철 — 더미 리뷰 제거, TB_REVIEW 실데이터 --%>
+    <%-- TB_REVIEW 리뷰 목록 --%>
     <h3 style="font-size:18px;font-weight:800;margin-bottom:16px">
       진료 리뷰 (<c:out value="${empty hospital.reviewCnt ? 0 : hospital.reviewCnt}"/>)
     </h3>

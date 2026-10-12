@@ -1,15 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%-- 지윤 26.07.08 가격 콤마 표시용 fmt 태그 --%>
+<%-- 가격 콤마 표시용 fmt 태그 --%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 지윤 26.07.30 추가: 이미지 URL이 http로 시작하는지 검사용 (fn:startsWith 쓰려고 필요) --%>
+<%-- 이미지 URL http 시작 여부 검사용 (fn:startsWith) --%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
 <c:set var="pageId" value="store" />
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
-<%-- 지윤 26.07.08 추가: 상세페이지에서 장바구니 담기 성공 시 이 페이지로 리다이렉트되면서 뜨는 팝업 --%>
+<%-- 상세페이지에서 장바구니 담기 성공 시 이 페이지로 리다이렉트되면서 뜨는 팝업 --%>
 <c:if test="${cartAddSuccess}">
 <script>alert('장바구니에 상품을 담았습니다.');</script>
 </c:if>
@@ -39,7 +39,7 @@
   .cart-price{font-size:16px;font-weight:800;color:var(--text-main);text-align:right;flex-shrink:0;min-width:90px}
   .cart-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;line-height:1;padding:4px;flex-shrink:0}
   .cart-del:hover{color:var(--accent)}
-  /* 지윤 26.07.30 추가: 사업자별 그룹 헤더/미니요약 (화해 앱 스타일) */
+  /* 사업자별 그룹 헤더/미니요약 (화해 앱 스타일) */
   .cart-seller-head{display:flex;align-items:center;gap:8px;padding:14px 20px;background:var(--bg-page);border-bottom:1px solid var(--border);font-size:14px;font-weight:800;color:var(--text-main)}
   .cart-seller-summary{display:flex;flex-direction:column;gap:6px;padding:14px 20px;background:var(--bg-page);border-bottom:1px solid var(--border);font-size:13px;color:var(--text-sub)}
   .cart-seller-summary .row{display:flex;justify-content:space-between}
@@ -64,7 +64,7 @@
   <input type="checkbox" class="cart-cb" id="checkAll" checked>
   <h2>전체 선택</h2>
   <span class="cart-count">${cartItems.size()}</span>
-  <%-- 지윤 26.07.08 추가: 선택삭제(체크된 것만) / 전체삭제(장바구니 통째로) 버튼 --%>
+  <%-- 선택삭제(체크된 것만) / 전체삭제(장바구니 통째로) 버튼 --%>
   <div style="margin-left:auto;display:flex;gap:8px;">
     <button type="button" id="btnDeleteSelected" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:13px;color:var(--text-sub);cursor:pointer;">선택 삭제</button>
     <button type="button" id="btnDeleteAll" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:13px;color:var(--text-sub);cursor:pointer;">전체 삭제</button>
@@ -74,14 +74,14 @@
       <c:if test="${empty cartItems}">
         <div style="text-align:center;padding:60px 20px;color:var(--text-muted)">장바구니가 비어있습니다.</div>
       </c:if>
-      <%-- 지윤 26.07.30 수정: 사업자(BIZ_NO)별로 묶어서 렌더링. 쿼리가 BIZ_NO 순으로 정렬해서 주므로 같은 사업자 상품끼리 붙어있음을 전제로,
+      <%-- 사업자(BIZ_NO)별로 묶어서 렌더링. 쿼리가 BIZ_NO 순으로 정렬해서 주므로 같은 사업자 상품끼리 붙어있음을 전제로,
            이전/다음 상품의 bizNo와 비교해서 그룹의 시작/끝을 판단함 --%>
       <c:forEach var="item" items="${cartItems}" varStatus="vs">
         <c:if test="${vs.first || item.bizNo != cartItems[vs.index-1].bizNo}">
           <div class="cart-seller-head" data-biz-no="${item.bizNo}"> ${item.bizName}</div>
         </c:if>
 
-        <%-- 지윤 26.07.30 추가: 로컬 업로드 이미지는 /upload/ 접두사 필요, 외부(목업) URL은 그대로 (list.jsp와 동일 패턴) --%>
+        <%-- 로컬 업로드 이미지는 /upload/ 접두사 필요, 외부(목업) URL은 그대로 (list.jsp와 동일 패턴) --%>
         <c:set var="cartThumbSrc" value="${fn:startsWith(item.thumbnailUrl,'http') ? item.thumbnailUrl : contextPath.concat('/upload/').concat(item.thumbnailUrl)}"/>
         <div class="cart-item" data-price="${item.price}" data-cart-item-id="${item.cartItemId}" data-biz-no="${item.bizNo}">
           <input type="checkbox" class="cart-cb" checked>
@@ -100,7 +100,7 @@
           <div style="flex-shrink:0">
             <div class="cart-qty-wrap">
               <button >−</button>
-              <!--HYJ 26.08.16 · 2026/08/13 장우철 — id 중복 제거, 항목별 data-stock 사용-->
+              <!-- 항목별 data-stock 사용 (id 중복 없음) -->
               <input type="number" class="cart-qty-input" min="1" value="${item.qty}" data-stock="${item.stockQty}" data-option-id="${item.optionId}" readonly>
               <button >+</button>
             </div>
@@ -124,7 +124,7 @@
   <div class="cart-summary">
     <h3>주문 요약</h3>
     <div class="summary-row"><span>상품 금액</span><span id="sumProduct">98,900원</span></div>
-    <%-- 지윤 26.07.09 배송비 무료 고정 텍스트 -> 5만원 기준 실시간 계산으로 변경 --%>
+    <%-- 배송비 5만원 기준 실시간 계산 --%>
     <div class="summary-row"><span>배송비</span><span id="sumDelivery" style="color:var(--primary);font-weight:700">무료</span></div>
     <div class="summary-row total"><span>총 결제금액</span><span id="sumTotal">98,900원</span></div>
     <button class="btn-order" id="btnOrder">주문하기 (3개)</button>
@@ -133,7 +133,7 @@
 <script>
   function won(n){ return n.toLocaleString('ko-KR') + '원'; }
 
-  //지윤 26.07.30 추가: 삭제 후 남은 상품 없는 사업자 그룹의 헤더/미니요약을 정리
+  // 삭제 후 남은 상품 없는 사업자 그룹의 헤더/미니요약을 정리
   function cleanupEmptyGroups(){
     var remainingBizNos = new Set(
       Array.from(document.querySelectorAll('.cart-item')).map(function(item){ return item.dataset.bizNo; })
@@ -145,8 +145,8 @@
     });
   }
 
-  //지윤 26.07.09 배송비 계산 추가 (5만원 이상 무료, 미만은 3,000원)
-  //지윤 26.07.30 수정: 전체 합산 -> 사업자(bizNo)별로 따로 계산 후 합산. 그룹별 소계 DOM도 같이 갱신
+  // 배송비 계산 (5만원 이상 무료, 미만은 3,000원)
+  // 사업자(bizNo)별 계산 후 합산, 그룹별 소계 DOM도 갱신
   function recalc(){
     var groups = {}; // bizNo -> { total, count }
     var total = 0, count = 0;
@@ -195,11 +195,10 @@
       var val = parseInt(input.value, 10);
       var isPlus = this.textContent.trim() === '+';
       val = isPlus ? val + 1 : Math.max(1, val - 1);
-      //HYJ 26.08.16 재고확인 추가 · 2026/08/13 장우철 — 해당 줄 input 기준으로 재고 제한
+      // 재고확인: 해당 줄 input 기준으로 재고 제한
       val = applyQtyLimit(val, input);
       input.value = val;
       recalc();
-      //HYJ 26.08.05
       csrfFetch('${contextPath}/store/cart/updateQty', {
         method: 'POST',
         headers: {'Content-Type':'application/x-www-form-urlencoded'},
@@ -225,7 +224,6 @@
       item.remove();
       cleanupEmptyGroups();
       recalc();
-      //HYJ 26.08.05
       csrfFetch('${contextPath}/store/cart/delete', {
         method: 'POST',
         headers: {'Content-Type':'application/x-www-form-urlencoded'},
@@ -234,7 +232,7 @@
     });
   });
 
-  //지윤 26.07.08 추가: 선택삭제(체크된 것만) / 전체삭제(장바구니 통째로) 버튼
+  // 선택삭제(체크된 것만) / 전체삭제(장바구니 통째로) 버튼
   document.getElementById('btnDeleteSelected').addEventListener('click', function(){
     var checkedItems = Array.from(document.querySelectorAll('.cart-item')).filter(function(item){
       return item.querySelector('.cart-cb').checked;
@@ -250,7 +248,6 @@
       params.append('cartItemIds', item.dataset.cartItemId);
     });
 
-    //HYJ 26.08.05
    csrfFetch('${contextPath}/store/cart/deleteAll', {
       method: 'POST',
       headers: {'Content-Type':'application/x-www-form-urlencoded'},
@@ -266,7 +263,7 @@
     });
   });
 
-  //지윤 26.07.08 추가: 전체삭제 (체크 여부 상관없이 장바구니에 있는 항목 전부 삭제)
+  // 전체삭제 (체크 여부 상관없이 장바구니에 있는 항목 전부 삭제)
   document.getElementById('btnDeleteAll').addEventListener('click', function(){
     var allItems = Array.from(document.querySelectorAll('.cart-item'));
     if (allItems.length === 0) {
@@ -280,7 +277,7 @@
       params.append('cartItemIds', item.dataset.cartItemId);
     });
     
-    //HYJ 26.08.05 · 2026/08/07 장우철 CSRF (csrfFetch)
+    // CSRF (csrfFetch)
     csrfFetch('${contextPath}/store/cart/deleteAll', {
       method: 'POST',
       headers: {'Content-Type':'application/x-www-form-urlencoded'},
@@ -296,7 +293,7 @@
     });
   });
 
-  //지윤 26.07.09 추가: 주문하기 클릭 시 체크된 장바구니 항목ID들을 파라미터로 넘김
+  // 주문하기 클릭 시 체크된 장바구니 항목ID들을 파라미터로 넘김
   document.getElementById('btnOrder').addEventListener('click', function () {
     var checkedIds = Array.from(document.querySelectorAll('.cart-item'))
       .filter(function(item){ return item.querySelector('.cart-cb').checked; })
@@ -309,10 +306,10 @@
   });
 
   recalc();
-  //HYJ 26.08.13 재고확인 메시지 초기화
+  // 재고확인 메시지 초기화
   hideQtyMessages();
 
-  //HYJ 26.08.16 재고확인 · 2026/08/13 장우철 — getElementById('qty')가 첫 상품만 보던 문제 수정
+  // 재고확인: 줄별 qty input 기준 (getElementById('qty')는 첫 상품만 조회)
   function applyQtyLimit(v, input) {
     var item = input.closest('.cart-item');
     var warn = item.querySelector('.stockWarning');

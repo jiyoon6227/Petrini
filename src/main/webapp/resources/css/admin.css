@@ -59,7 +59,7 @@
     border-radius: 50%; margin-left: 2px;
 }
 
-/* 2026/07/27 장우철 — 관리자 카드등록 헤더 버튼·모달 */
+/* 관리자 카드등록 헤더 버튼·모달 */
 .adm-header-card-btn {
     font-size: 13px; color: rgba(255,255,255,.55);
     background: transparent; border: none; cursor: pointer;

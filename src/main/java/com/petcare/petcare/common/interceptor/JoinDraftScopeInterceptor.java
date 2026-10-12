@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — 가입 임시저장(세션) 범위 제한
+ * 가입 임시저장(세션) 범위 제한
  *
  * 정책
  * - joinDraft / 가입 pending 카드는 「가입·토스 카드등록 왕복」에서만 유지
@@ -31,7 +31,7 @@ public class JoinDraftScopeInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // 2026/07/27 장우철 — Ajax/이미지 등은 유지, 실제 페이지 이동만 폐기
+        // Ajax/이미지 등은 유지, 실제 페이지 이동만 폐기
         if (!isDocumentNavigation(request)) {
             return true;
         }

@@ -2,10 +2,9 @@
 <%--
   역할: 유기동물 목록 화면 (give/animal/list)
 
-  - 박유정 / 2026-07-06
   - 파일 안에서 API 를 직접 호출했는데, Service 로 옮김
 
-  [목록 화면 흐름] (2026-07-06 조건 후 조회 추가)
+  [목록 화면 흐름] (조건 선택 후 조회)
   1. 사용자가 /give/animal/list 주소로 들어옴 → API 안 부름, 안내만 표시 (searched=false)
   2. 조건 고르고 [조회] 클릭 → hidden search=true 와 함께 Controller 호출
   3. giveAnimalService.getAnimalList() (캐시 적용)
@@ -266,7 +265,7 @@
           </a>
         </c:if>
 
-        <%-- 페이지 버튼 5개씩 묶음 (1~5, 6~10, 11~15 ...) / 박유정 2026-07-06 --%>
+        <%-- 페이지 버튼 5개씩 묶음 (1~5, 6~10, 11~15 ...) --%>
         <c:set var="startPage" value="${pageNo - ((pageNo - 1) % 5)}" />
         <c:set var="endPage" value="${startPage + 4 > totalPages ? totalPages : startPage + 4}" />
         <c:forEach begin="${startPage}" end="${endPage}" var="p">

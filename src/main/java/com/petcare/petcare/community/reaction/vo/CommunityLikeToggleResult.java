@@ -1,8 +1,6 @@
 /**
  * 역할: 좋아요 Ajax 토글 응답 DTO
  *
- * - 박유정 / 2026-07-09
- *
  * [응답 흐름]
  * 1. POST /community/like/toggle 처리 후 JSON 반환
  * 2. detail.jsp 가 liked, likeCnt 로 버튼·숫자 갱신

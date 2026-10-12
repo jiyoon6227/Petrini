@@ -18,7 +18,7 @@
   <c:if test="${not empty msg}"><div class="biz-card" style="padding:14px 20px;margin-bottom:16px;color:#2BAB82;font-weight:700">${msg}</div></c:if>
   <c:if test="${not empty errorMsg}"><div class="biz-card" style="padding:14px 20px;margin-bottom:16px;color:#E24B4A;font-weight:700">${errorMsg}</div></c:if>
 
-  <%-- 지윤 26.07.22 추가: 리뷰관리와 동일한 전체/미답변 탭 (서버사이드 렌더링이라 JS로 행 숨김/카운트 처리) --%>
+  <%-- 리뷰관리와 동일한 전체/미답변 탭 (서버사이드 렌더링이라 JS로 행 숨김/카운트 처리) --%>
   <c:set var="unansweredCount" value="0" />
   <c:forEach var="q" items="${qnaList}"><c:if test="${empty q.answer}"><c:set var="unansweredCount" value="${unansweredCount + 1}" /></c:if></c:forEach>
 
@@ -40,7 +40,7 @@
 
            <div class="biz-review-item" data-answered="${not empty q.answer}">
               <div class="biz-review-main">
-                <%-- 지윤 26.07.22 수정: 리뷰관리와 동일한 상품 썸네일+상품명 상단 블록 (옵션은 Q&A 특성상 없음 - 구매내역과 무관한 일반 문의라 특정 옵션이 없음) --%>
+                <%-- 리뷰관리와 동일한 상품 썸네일+상품명 상단 블록 (Q&A는 구매와 무관한 일반 문의라 옵션 없음) --%>
                 <div class="biz-review-product-row">
                   <c:choose>
                     <c:when test="${not empty q.thumbnailUrl}"><img class="biz-review-thumb" src="${fn:startsWith(q.thumbnailUrl,'http') ? q.thumbnailUrl : contextPath.concat('/upload/').concat(q.thumbnailUrl)}"></c:when>
@@ -60,14 +60,13 @@
                 </div>
                 <div class="biz-review-content">${q.question}</div>
 
-                <%-- 지윤 26.07.22 수정: 답변에도 날짜 표시 (단, 실제 "답변한 시각"을 저장하는 컬럼이 없어서 REG_DATE(질문 등록일)를 그대로 씀 - 나중에 ANSWER_DATE 컬럼 추가하면 정확해짐) --%>
+                <%-- 답변 날짜 표시 (답변 시각 컬럼이 없어 REG_DATE(질문 등록일) 사용, ANSWER_DATE 컬럼 추가 시 교체) --%>
                 <c:if test="${not empty q.answer}">
                   <div class="biz-review-reply"><span class="biz-review-reply-label">답변</span><span class="biz-review-reply-date">${q.answerDate}</span><div class="biz-review-reply-text">${q.answer}</div></div>
                 </c:if>
 
-                <%-- 지윤 26.07.22 수정: 리뷰관리와 동일하게 기본 접힘, "답변쓰기/답변수정" 눌러야 폼 펼쳐지게 변경 --%>
+                <%-- 리뷰관리와 동일하게 기본 접힘 ("답변쓰기/답변수정" 클릭 시 폼 펼침) --%>
                 <form method="post" action="${contextPath}/biz/store/qna/answer" class="biz-reply-box" id="answer-box-${q.qnaId}" style="display:none">
-                  <!--HYJ 26.08.05-->
                   <input type="hidden" name="_csrf" value="${_csrf}">
                   
                   <input type="hidden" name="qnaId" value="${q.qnaId}">
@@ -91,7 +90,7 @@
 </main>
 
 <script>
-  //지윤 26.07.22 추가: Q&A 전체/미답변 탭 전환 (서버사이드 렌더링된 행을 data-answered 기준으로 숨김/표시)
+  // Q&A 전체/미답변 탭 전환 (서버사이드 렌더링된 행을 data-answered 기준으로 숨김/표시)
   function qnaSwitchTab(tab, btn) {
     document.querySelectorAll('.biz-tab').forEach(function (b) { b.classList.remove('active'); });
     btn.classList.add('active');

@@ -8,7 +8,7 @@
     TB_PRODUCT — 판매중(NORMAL) 상품 중 주문 수량 합계 많은 순 TOP N
     (주문 없으면 PRODUCT_ID 내림차순으로 최신 상품 우선)
 -->
-    <!-- 지윤 26.07.09: DESCRIPTION -> TB_FILE로 이미지 저장방식 변경됨 -->
+    <!-- 이미지는 TB_FILE에 저장 (DESCRIPTION 아님) -->
 <select id="selectPopularProducts" resultType="com.petcare.petcare.main.section.vo.MainPopularProductVO">
     SELECT *
     FROM (

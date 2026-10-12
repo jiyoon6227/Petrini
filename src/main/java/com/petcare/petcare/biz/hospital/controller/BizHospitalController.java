@@ -1,8 +1,6 @@
 /**
  * 역할: 사업자 동물병원 URL 처리 → Service 호출 → JSP 반환
  *
- * - 박유정 / 2026-07-14 (재능나눔 신청 — 병원만 DB 연동)
- *
  * 연결
  * - Service: BizHospitalService, GiveTalentService
  * - 상속: BizBaseController (사업자 로그인 체크)
@@ -63,18 +61,18 @@ public class BizHospitalController extends BizBaseController {
 
     @Autowired
     private BizHospitalService bizHospitalService;
-    // 2026-07-14 박유정 — STEP 4 재능나눔 신청·이력 (biz/hospital/talent.jsp)
+    // 재능나눔 신청·이력 (biz/hospital/talent.jsp)
     @Autowired
     private GiveTalentService giveTalentService;
     @Autowired
     private FileService fileService;
     @Autowired
     private ObjectMapper objectMapper;
-    // 2026/08/01 장우철 — 병원 쿠폰 (BizStayService 공용)
+    // 병원 쿠폰 (BizStayService 공용)
     @Autowired
     private com.petcare.petcare.biz.stay.service.BizStayService bizStayService;
 
-    // 2026/07/11 장우철 — 모든 병원 사업자 화면에 PENDING 배지 건수 전달
+    // 모든 병원 사업자 화면에 PENDING 배지 건수 전달
     // [변경] sidebar_hospital.jsp 뱃지 5 고정
     @ModelAttribute("pendingReserveCount")
     public int pendingReserveCount(HttpSession session) {
@@ -93,7 +91,7 @@ public class BizHospitalController extends BizBaseController {
         }
     }
 
-    // 2026-08-10 박유정 — 재능나눔 참여 신청 확인 대기 건수 (사이드바 뱃지)
+    // 재능나눔 참여 신청 확인 대기 건수 (사이드바 뱃지)
     @ModelAttribute("pendingTalentApplyCount")
     public int pendingTalentApplyCount(HttpSession session) {
         try {
@@ -107,7 +105,7 @@ public class BizHospitalController extends BizBaseController {
         }
     }
 
-    // 2026/07/11 장우철 — 캘린더 메뉴: 오늘 예약확정(CONFIRMED) 건수
+    // 캘린더 메뉴: 오늘 예약확정(CONFIRMED) 건수
     @ModelAttribute("todayConfirmedCount")
     public int todayConfirmedCount(HttpSession session) {
         try {
@@ -135,7 +133,7 @@ public class BizHospitalController extends BizBaseController {
 
         HospitalVO hospital = bizHospitalService.resolveHospitalByBizId(member.getMemberId());
         model.addAttribute("hospital", hospital);
-        //HYJ 26.08.06 대시보드
+        // 대시보드
         model.addAttribute("dash", bizHospitalService.getDashboardData(hospital.getHospitalId(), 7));
         model.addAttribute("todayList", bizHospitalService.getTodayResvList(hospital.getHospitalId()));
         model.addAttribute("recentReviews", bizHospitalService.getRecentReviews(hospital.getHospitalId()));
@@ -143,7 +141,7 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/dashboard";
     }
 
-    // 지윤 26.08.13 추가: 일간/월간 버튼 전환용 - 차트 데이터만 JSON으로 반환
+    // 일간/월간 버튼 전환용 - 차트 데이터만 JSON으로 반환
     @GetMapping("/dashboard/chart")
     @ResponseBody
     public List<com.petcare.petcare.biz.vo.DailyStatVO> hospitalDashboardChart(
@@ -158,7 +156,7 @@ public class BizHospitalController extends BizBaseController {
         return bizHospitalService.getChartData(hospital.getHospitalId(), period);
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 관리 (F4)
+    // 사업자 예약 관리
     @GetMapping("/reserve")
     public String hospitalReserve(HttpSession session, Model model) throws Exception {
         MemberVO member = getBizMember(session);
@@ -177,8 +175,8 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/reserve";
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 상태 변경 (F5)
-    // 2026/07/11 장우철 — cancelReason: CANCEL 시 필수
+    // 사업자 예약 상태 변경
+    // cancelReason: CANCEL 시 필수
     @PostMapping("/reserve/status")
     public String updateReservationStatus(@RequestParam("resvId") Long resvId,
                                           @RequestParam("statusCd") String statusCd,
@@ -205,7 +203,7 @@ public class BizHospitalController extends BizBaseController {
         return "redirect:/biz/hospital/reserve";
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 상세 모달 API (F6)
+    // 사업자 예약 상세 모달 API
     @GetMapping("/reserve/detail")
     @ResponseBody
     public ReservationVO reservationDetail(@RequestParam("resvId") Long resvId,
@@ -223,7 +221,7 @@ public class BizHospitalController extends BizBaseController {
         return bizHospitalService.getReservationDetail(hospital.getHospitalId(), resvId);
     }
 
-    // 2026-07-10 장우철 — 사업자 예약 캘린더 (F7)
+    // 사업자 예약 캘린더
     @GetMapping("/calendar")
     public String hospitalCalendar(@RequestParam(value = "from", required = false) String fromDate,
                                    @RequestParam(value = "to", required = false) String toDate,
@@ -252,7 +250,7 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/calendar";
     }
 
-    // 2026/07/16 장우철 고도화작업 — 병원 스케줄 화면
+    // 병원 스케줄 화면
     @GetMapping("/schedule")
     public String hospitalSchedule(HttpSession session) {
         if (getBizMember(session) == null)
@@ -260,7 +258,7 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/schedule";
     }
 
-    // 2026/07/16 장우철 고도화작업 — 스케줄 API 공통: 로그인·병원 해석
+    // 스케줄 API 공통: 로그인·병원 해석
     private HospitalVO requireScheduleHospital(HttpSession session) throws Exception {
         MemberVO member = getBizMember(session);
         if (member == null || member.getMemberId() == null) {
@@ -367,7 +365,7 @@ public class BizHospitalController extends BizBaseController {
         }
     }
 
-    // 2026/07/16 장우철 고도화작업 — RESV_RULE 제거, 예약 시작 간격만 병원 컬럼으로
+    // RESV_RULE 제거, 예약 시작 간격만 병원 컬럼으로
     @GetMapping("/schedule/interval")
     @ResponseBody
     public Map<String, Object> getInterval(HttpSession session) throws Exception {
@@ -472,7 +470,7 @@ public class BizHospitalController extends BizBaseController {
                                   @RequestParam(value = "period", required = false) Integer period,
                                   HttpSession session,
                                   Model model) throws Exception {
-        // 2026/07/13 장우철 — 진료기록 목록 DB 연동
+        // 진료기록 목록 DB 연동
         MemberVO member = getBizMember(session);
         if (member == null) {
             return "redirect:/login";
@@ -486,13 +484,13 @@ public class BizHospitalController extends BizBaseController {
         model.addAttribute("period", period);
         model.addAttribute("recordList",
                 bizHospitalService.getMedicalRecords(hospital.getHospitalId(), keyword, period));
-        // 2026/07/13 장우철 — 작성 모달: 확정·미기록 예약 선택
+        // 작성 모달: 확정·미기록 예약 선택
         model.addAttribute("writableReserves",
                 bizHospitalService.getConfirmedWithoutRecord(hospital.getHospitalId()));
         return "biz/hospital/records";
     }
 
-    // 2026/07/13 장우철 — 예약확정 → 진료기록 저장 + DONE
+    // 예약확정 → 진료기록 저장 + DONE
     @PostMapping("/records/complete")
     public String completeWithRecord(@RequestParam("resvId") Long resvId,
                                      @RequestParam("symptoms") String symptoms,
@@ -540,14 +538,14 @@ public class BizHospitalController extends BizBaseController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             rttr.addFlashAttribute("errorMsg", e.getMessage());
         }
-        // 2026/07/13 장우철 — 기록관리에서 작성 시 기록 목록으로, 아니면 예약관리로
+        // 기록관리에서 작성 시 기록 목록으로, 아니면 예약관리로
         if ("records".equals(redirect)) {
             return "redirect:/biz/hospital/records";
         }
         return "redirect:/biz/hospital/reserve";
     }
 
-    // 2026-07-14 박유정 — STEP 4 재능나눔 신청 (병원만 실제 DB 연동)
+    // 재능나눔 신청 (병원만 실제 DB 연동)
     // 이유: 타 방향(미용 등) 다른 사업자는 더미 화면 유지, 병원만 TB_TALENT INSERT
     @GetMapping("/talent")
     public String hospitalTalent(HttpSession session, Model model) {
@@ -556,13 +554,13 @@ public class BizHospitalController extends BizBaseController {
             return "redirect:/login";
         String bizId = member.getMemberId();
         model.addAttribute("talentList", giveTalentService.getTalentListByBizId(bizId));
-        // 2026-08-10 박유정 — 참여 신청자 목록 (STEP 6)
+        // 참여 신청자 목록
         model.addAttribute("applyList", giveTalentService.getAppliesByBizId(bizId));
         return "biz/hospital/talent";
     }
 
-    // 2026-07-14 박유정 — STEP 4 재능나눔 신청 POST → GiveTalentService.applyTalent (PENDING)
-    // 2026-08-10 박유정 — thumbImage 대표 이미지 multipart 추가
+    // 재능나눔 신청 POST → GiveTalentService.applyTalent (PENDING)
+    // thumbImage 대표 이미지 multipart 추가
     @PostMapping("/talent")
     public String hospitalTalentSubmit(@RequestParam String title,
                                        @RequestParam int capacity,
@@ -605,7 +603,7 @@ public class BizHospitalController extends BizBaseController {
         return "redirect:/biz/hospital/talent";
     }
 
-    // 2026/07/14 장우철 — 사업자 리뷰관리 (DB 목록)
+    // 사업자 리뷰관리 (DB 목록)
     @GetMapping("/reviews")
     public String hospitalReviews(HttpSession session, Model model) throws Exception {
         MemberVO member = getBizMember(session);
@@ -620,7 +618,7 @@ public class BizHospitalController extends BizBaseController {
         List<HospitalReviewVO> reviewList =
                 bizHospitalService.getBizHospitalReviews(hospital.getHospitalId());
 
-        // 2026-07-24 박유정 — 삭제요청 탭 + PENDING 뱃지용
+        // 삭제요청 탭 + PENDING 뱃지용
         List<ReviewDeleteRequestVO> deleteRequests = List.of();
         if (hospital.getBizNo() != null) {
             deleteRequests = bizHospitalService.getBizReviewDeleteRequests(
@@ -671,7 +669,7 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/reviews";
     }
 
-    // 2026/07/14 장우철 — 리뷰 답글 작성/수정
+    // 리뷰 답글 작성/수정
     @PostMapping("/reviews/reply")
     public String saveReviewReply(@RequestParam("reviewId") Long reviewId,
                                   @RequestParam("bizReply") String bizReply,
@@ -695,7 +693,7 @@ public class BizHospitalController extends BizBaseController {
     }
     
 
-    // 2026-07-24 박유정 — 리뷰 삭제 요청 (사유 입력 → TB_REVIEW_DELETE_REQUEST)
+    // 리뷰 삭제 요청 (사유 입력 → TB_REVIEW_DELETE_REQUEST)
     @PostMapping("/reviews/delete-request")
     public String requestReviewDelete(@RequestParam("reviewId") Long reviewId,
                                       @RequestParam("requestReason") String requestReason,
@@ -729,7 +727,7 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/contract";
     }
 
-    // 2026-07-10 장우철 yeju merge — 사업자 정보 조회 (info.jsp, yeju 간소 화면)
+    // 사업자 정보 조회 (info.jsp 간소 화면)
     @GetMapping("/info")
     public String hospitalInfo(HttpSession session, Model model) throws Exception {
         MemberVO member = getBizMember(session);
@@ -745,7 +743,7 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/info";
     }
 
-    // 2026-07-10 장우철 yeju merge — 병원 정보 등록/수정 (profile.jsp, yeju DB)
+    // 병원 정보 등록/수정 (profile.jsp)
     @GetMapping("/profile")
     public String hospitalProfile(HttpSession session, Model model) throws Exception {
         MemberVO member = getBizMember(session);
@@ -764,7 +762,7 @@ public class BizHospitalController extends BizBaseController {
         return "biz/hospital/profile";
     }
 
-    // 2026-07-10 장우철 yeju merge — yeju profile.jsp → POST /profile + resolveHospital
+    // profile.jsp → POST /profile + resolveHospital
     @PostMapping("/profile")
     public String saveProfile(HospitalVO vo,
                               @RequestParam(value = "tagList", required = false) String[] tagList,
@@ -785,7 +783,7 @@ public class BizHospitalController extends BizBaseController {
         }
         vo.setHospitalId(hospital.getHospitalId());
 
-        // 2026-07-10 장우철 — 미전달 필드만 기존값 유지 (주소 있으면 Service에서 지오코딩)
+        // 미전달 필드만 기존값 유지 (주소 있으면 Service에서 지오코딩)
         if (vo.getName() == null || vo.getName().isBlank()) {
             vo.setName(hospital.getName());
         }
@@ -830,7 +828,7 @@ public class BizHospitalController extends BizBaseController {
     }
 
     // ─────────────────────────────────────────────
-    // HYJ 쿠폰 — 2026/08/01 장우철
+    // 쿠폰
     // 사이드바 /biz/hospital/coupon 진입용 (로직은 BizStayService 공용)
     // ─────────────────────────────────────────────
     @GetMapping({"/coupon", "/coupon/"})
@@ -923,7 +921,6 @@ public class BizHospitalController extends BizBaseController {
     }
 
     /**
-     * 지윤 26.08.07
      * 병원 쿠폰 조기 마감 (로직은 BizStayService 공용, store closeCoupon과 동일 패턴)
      */
     @PostMapping("/coupon/close")
@@ -959,7 +956,7 @@ public class BizHospitalController extends BizBaseController {
     // ─────────────────────────────────────────────
 
     // ─────────────────────────────────────────────
-    // 2026/08/03 장우철 — 병원 배너 (yeju JSP·사이드바 추가, stay 공용 BizStayService)
+    // 병원 배너 (JSP·사이드바, stay 공용 BizStayService)
     // ─────────────────────────────────────────────
     @GetMapping({"/banner", "/banner/"})
     public String bannerList(HttpSession session, Model model) {
@@ -1024,7 +1021,6 @@ public class BizHospitalController extends BizBaseController {
     /**
  * 재능나눔 참여 신청 확인
  * POST /biz/hospital/talent/confirm
- * 2026-08-10 박유정 — STEP 6
  */
 @PostMapping("/talent/confirm")
 public String hospitalTalentConfirm(@RequestParam long applyId,
@@ -1046,7 +1042,6 @@ public String hospitalTalentConfirm(@RequestParam long applyId,
 /**
  * 재능나눔 모집 수동 마감
  * POST /biz/hospital/talent/close
- * 2026-08-10 박유정 — STEP 7-B
  */
 @PostMapping("/talent/close")
 public String hospitalTalentClose(@RequestParam long talentId,
@@ -1065,7 +1060,7 @@ public String hospitalTalentClose(@RequestParam long talentId,
     return "redirect:/biz/hospital/talent";
 }
 
-// 2026-08-13 박유정 — 빈 숫자칸("") → null (Integer 바인딩 오류 방지)
+// 빈 숫자칸("") → null (Integer 바인딩 오류 방지)
 @InitBinder
 public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(Integer.class, new CustomNumberEditor(Integer.class, true));

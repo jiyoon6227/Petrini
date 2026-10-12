@@ -2,7 +2,6 @@
 <%--
   역할: 분실/보호 신고 상세 (give/report/detail)
 
-  - 박유정 / 2026-07-06~07
 
   [상세 화면 흐름]
   1. GET /give/report/detail?id=번호
@@ -12,7 +11,7 @@
   6. POST /give/report/comment/delete — 본인 댓글 삭제
   7. POST /give/report/comment/update — 본인 댓글 수정
 
-  - 박유정 / 2026-07-29 — 발견 위치 카카오맵 (TB_POST LOST_LAT/LNG, kakaomap.jsp)
+  - 발견 위치 카카오맵 (TB_POST LOST_LAT/LNG, kakaomap.jsp)
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
@@ -54,7 +53,7 @@
   .rd-section h3{font-size:14px;font-weight:800;color:var(--text-main);margin:0 0 12px}
   .rd-desc{font-size:14px;color:var(--text-sub);line-height:1.8;margin:0;border-left:3px solid var(--primary);padding-left:14px;white-space:pre-line}
   .rd-map{border-radius:var(--radius-sm);overflow:hidden;height:180px}
-  /* 2026-07-29 박유정 — 상세 발견 위치 카카오맵 영역 */
+  /* 상세 발견 위치 카카오맵 영역 */
   #kakao-map{width:100%;height:180px}
   .comment-input-wrap{display:flex;gap:10px;margin-bottom:18px}
   .comment-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--primary-light)}
@@ -182,7 +181,7 @@
 
     <div class="rd-section">
       <h3>발견 위치</h3>
-      <%-- 2026-07-29 박유정 — 저장된 LOST_LAT/LNG 카카오맵 마커 --%>
+      <%-- 저장된 LOST_LAT/LNG 카카오맵 마커 --%>
       <div class="rd-map">
         <div id="kakao-map"></div>
         <%@ include file="/WEB-INF/views/common/kakaomap.jsp" %>
@@ -209,12 +208,11 @@
       </c:if>
 
       <form method="post" action="${contextPath}/give/report/comment">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="postId" value="${report.postId}">
         <div class="comment-input-wrap">
-          <%-- 2026/08/06 장우철 — 로그인 회원 프로필 아바타 --%>
+          <%-- 로그인 회원 프로필 아바타 --%>
           <img class="comment-avatar"
                src="${not empty memberInfo.profileImgUrl ? contextPath.concat(memberInfo.profileImgUrl) : 'https://placehold.co/36x36/EAF7F2/2BAB82?text=ME'}"
                alt="me"
@@ -228,7 +226,7 @@
 
       <c:forEach var="cmt" items="${comments}">
         <div class="comment-item">
-          <%-- 2026/08/06 장우철 — 댓글 작성자 프로필 아바타 --%>
+          <%-- 댓글 작성자 프로필 아바타 --%>
           <img class="comment-avatar"
                src="${not empty cmt.profileImgUrl ? contextPath.concat(cmt.profileImgUrl) : 'https://placehold.co/36x36/EAF7F2/2BAB82?text=U'}"
                alt="댓글러"
@@ -250,14 +248,13 @@
                     <c:otherwise>-</c:otherwise>
                   </c:choose>
                 </span>
-                <%-- 2026/08/03 장우철 — 삭제된 댓글은 수정/삭제 숨김 --%>
+                <%-- 삭제된 댓글은 수정/삭제 숨김 --%>
                 <c:if test="${cmt.isDeleted ne 'Y' && loginMemberNo != null && loginMemberNo == cmt.memberNo}">
                   <span class="comment-meta-sep">·</span>
                   <button type="button" class="comment-edit-btn"
                           onclick="toggleEditForm(${cmt.commentId})">수정</button>
                   <span class="comment-meta-sep">·</span>
                   <form method="post" action="${contextPath}/give/report/comment/delete" style="display:inline;margin:0;padding:0">
-                    <!--HYJ 26.08.05-->
                     <input type="hidden" name="_csrf" value="${_csrf}">
                     
                     <input type="hidden" name="commentId" value="${cmt.commentId}">
@@ -276,7 +273,6 @@
                 <div class="comment-text" id="commentText-${cmt.commentId}"><c:out value="${cmt.body}"/></div>
                 <div id="editForm-${cmt.commentId}" class="edit-form">
                   <form method="post" action="${contextPath}/give/report/comment/update">
-                  <!--HYJ 26.08.05-->
                 <input type="hidden" name="_csrf" value="${_csrf}">
                     <input type="hidden" name="commentId" value="${cmt.commentId}">
                     <input type="hidden" name="postId" value="${report.postId}">
@@ -294,7 +290,6 @@
             </div>
             <div id="replyForm-${cmt.commentId}" class="reply-form">
               <form method="post" action="${contextPath}/give/report/comment">
-                <!--HYJ 26.08.05-->
                 <input type="hidden" name="_csrf" value="${_csrf}">
                 
                 <input type="hidden" name="postId" value="${report.postId}">
@@ -308,7 +303,7 @@
 
         <c:forEach var="reply" items="${cmt.replies}">
           <div class="comment-item reply-item">
-            <%-- 2026/08/06 장우철 — 답글 작성자 프로필 아바타 --%>
+            <%-- 답글 작성자 프로필 아바타 --%>
             <img class="comment-avatar"
                  src="${not empty reply.profileImgUrl ? contextPath.concat(reply.profileImgUrl) : 'https://placehold.co/36x36/EAF7F2/2BAB82?text=R'}"
                  alt="답글러"
@@ -336,7 +331,6 @@
                             onclick="toggleEditForm(${reply.commentId})">수정</button>
                     <span class="comment-meta-sep">·</span>
                     <form method="post" action="${contextPath}/give/report/comment/delete" style="display:inline;margin:0;padding:0">
-                      <!--HYJ 26.08.05-->
                       <input type="hidden" name="_csrf" value="${_csrf}">
                       
                       <input type="hidden" name="commentId" value="${reply.commentId}">
@@ -355,7 +349,6 @@
                   <div class="comment-text" id="commentText-${reply.commentId}"><c:out value="${reply.body}"/></div>
                   <div id="editForm-${reply.commentId}" class="edit-form">
                     <form method="post" action="${contextPath}/give/report/comment/update">
-                    <!--HYJ 26.08.05-->
                 <input type="hidden" name="_csrf" value="${_csrf}">
                       <input type="hidden" name="commentId" value="${reply.commentId}">
                       <input type="hidden" name="postId" value="${report.postId}">
@@ -417,7 +410,6 @@
 
       <c:if test="${loginMemberNo != null && loginMemberNo == report.memberNo}">
       <form method="post" action="${contextPath}/give/report/status">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">
         
         <input type="hidden" name="postId" value="${report.postId}">

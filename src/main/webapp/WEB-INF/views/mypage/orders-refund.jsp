@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
-<%-- 2026/08/04 장우철 — 쇼핑 상품단위 환불 신청 (1:1문의 폼 유사) --%>
+<%-- 쇼핑 상품단위 환불 신청 (1:1문의 폼 유사) --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="pageId" value="mypage" />
 <c:set var="sec" value="orders" />
@@ -28,7 +28,7 @@
 
     <div style="background:#fff;border:1px solid #E2E8E4;border-radius:12px;padding:24px;max-width:640px;">
       <div style="display:flex;gap:14px;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #F1F5F4;">
-        <%-- 2026/08/18 장우철 — 환불 신청 상품 사진도 /upload 경로 맞춤 --%>
+        <%-- 환불 신청 상품 사진도 /upload 경로 맞춤 --%>
         <c:choose>
           <c:when test="${empty item.thumbnailUrl}">
             <c:set var="refundThumbSrc" value="https://placehold.co/72x72/EAF7F2/2BAB82?text=IMG" />
@@ -59,7 +59,7 @@
 
       <form method="post" action="${contextPath}/mypage/orders/refund" enctype="multipart/form-data"
             onsubmit="return validateRefundForm()">
-        <%-- 2026/08/07 장우철 CSRF --%>
+        <%-- CSRF --%>
         <input type="hidden" name="_csrf" value="${_csrf}">
         <input type="hidden" name="orderItemId" value="${item.orderItemId}">
 

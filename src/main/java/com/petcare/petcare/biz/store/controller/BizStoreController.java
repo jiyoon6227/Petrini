@@ -59,27 +59,27 @@ import org.springframework.web.bind.annotation.InitBinder;
 @RequestMapping("/biz/store")
 public class BizStoreController extends BizBaseController {
 
-    //지윤 26.07.14 상품관리(BIZ-04) 서비스 주입
+    // 상품관리(BIZ-04) 서비스 주입
     @Autowired
     private BizStoreService bizStoreService;
 
-    //지윤 26.07.20 추가: 리뷰관리 JSON 응답용
+    // 리뷰관리 JSON 응답용
     @Autowired
     private ObjectMapper objectMapper;
 
-    // 2026/08/05 장우철 — 쇼핑 정산 S9
+    // 쇼핑 정산
     @Autowired
     private StoreSettlementService storeSettlementService;
 
-    //지윤 26.07.24 추가: 택배사 API 연동용
+    // 택배사 API 연동용
     @Autowired
     private com.petcare.petcare.common.external.service.SmartTrackerService smartTrackerService;
 
-    // 2026-08-06 박유정 — 쇼핑 배너 (BizStayService 공용)
+    // 쇼핑 배너 (BizStayService 공용)
     @Autowired
     private BizStayService bizStayService;
 
-    //지윤 26.07.21 추가: 사이드바 "주문관리" 뱃지 하드코딩(12) 제거 - 이 컨트롤러가 처리하는 모든 페이지(상품관리/주문관리/배송관리/리뷰관리 등) 렌더링 전에
+    // 사이드바 "주문관리" 뱃지 카운트 - 이 컨트롤러가 처리하는 모든 페이지(상품관리/주문관리/배송관리/리뷰관리 등) 렌더링 전에
     //자동으로 실행돼서 model에 paidOrderCount를 채워줌. 로그인 안 됐으면 0으로 조용히 넘어감 (개별 핸들러가 알아서 redirect:/login 처리하므로 여기선 막지 않음)
     @ModelAttribute
     public void addPaidOrderCount(HttpSession session, Model model) {
@@ -91,11 +91,11 @@ public class BizStoreController extends BizBaseController {
         }
         Long bizNo = bizStoreService.getBizNo(biz.getMemberId());
         model.addAttribute("paidOrderCount", bizStoreService.getPaidOrderCount(bizNo));
-        // 2026/08/04 장우철 — 환불신청 대기 뱃지
+        // 환불신청 대기 뱃지
         model.addAttribute("returnRequestedCount", bizStoreService.getReturnRequestedCount(bizNo));
     }
 
-   //지윤 26.07.23 수정: 목업 -> 실데이터 연동 (매출 통계 라인차트/이번달매출은 패스, 나머지는 실데이터)
+   // 매출 통계 라인차트·이번달 매출은 목업 유지
    @GetMapping({"", "/"})
    public String storeDashboard(HttpSession session, Model model) {
        MemberVO biz = getBizMember(session);
@@ -114,8 +114,8 @@ public class BizStoreController extends BizBaseController {
        return "biz/store/dashboard";
    }
 
-    //지윤 26.07.14 수정: 상품목록 실데이터 연동 (검색/카테고리/상태 필터 + 페이지네이션, 페이지당 10개)
-    //2026/08/06 장우철: 카테고리 필터를 ID → 이름(동일명칭 통합)으로 변경
+    // 상품목록 (검색/카테고리/상태 필터 + 페이지네이션, 페이지당 10개)
+    // 카테고리 필터는 ID 대신 이름 기준 (동일명칭 통합)
     @GetMapping("/products")
     public String storeProducts(@RequestParam(required = false) String keyword,
                                  @RequestParam(required = false) String categoryName,
@@ -140,8 +140,8 @@ public class BizStoreController extends BizBaseController {
         return "biz/store/products";
     }
 
-        //지윤 26.07.20 수정: 목업 -> 실데이터 연동 (상태 탭 필터)
-    // 2026/08/13 장우철 — 환불·배송중·배송완료 탭 제거. 환불 완료는 /biz/store/refunds
+        // 상태 탭 필터
+    // 환불·배송중·배송완료 탭 없음 (환불 완료는 /biz/store/refunds)
     @GetMapping("/orders")
     public String storeOrders(@RequestParam(required = false) String statusCd, HttpSession session, Model model) {
         MemberVO biz = getBizMember(session);
@@ -158,8 +158,8 @@ public class BizStoreController extends BizBaseController {
         return "biz/store/orders";
     }
 
-    // 2026/08/04 장우철 — 환불신청 목록 (처리용: REQUESTED / RETURNING)
-    // 2026/08/11 장우철 — P8: DONE/REJECTED 탭 추가 (숙소 예약관리와 유사)
+    // 환불신청 목록 (처리용: REQUESTED / RETURNING)
+    // DONE/REJECTED 탭 (숙소 예약관리와 유사)
     @GetMapping("/refunds")
     public String storeRefunds(@RequestParam(required = false, defaultValue = "REQUESTED") String statusCd,
                                HttpSession session, Model model) {
@@ -235,7 +235,7 @@ public class BizStoreController extends BizBaseController {
                 : "redirect:/biz/store/refunds/detail?orderItemId=" + orderItemId;
     }
 
-    //지윤 26.07.20 추가: 주문 상세 조회 (모달/상세영역 프리필용 AJAX)
+    // 주문 상세 조회 (모달/상세영역 프리필용 AJAX)
     @GetMapping("/orders/{id}")
     @ResponseBody
     public com.petcare.petcare.biz.store.vo.BizOrderVO getOrderDetailJson(@PathVariable Long id, HttpSession session) {
@@ -245,7 +245,7 @@ public class BizStoreController extends BizBaseController {
         return bizStoreService.getOrderDetail(id, bizNo);
     }
 
-    //지윤 26.07.20 추가: 주문 상태 변경 (택배사/송장번호 같이 저장)
+    // 주문 상태 변경 (택배사/송장번호 같이 저장)
     @PostMapping("/orders/{id}/status")
     @ResponseBody
     public String updateOrderStatus(@PathVariable Long id,
@@ -261,7 +261,7 @@ public class BizStoreController extends BizBaseController {
         return ok ? "OK" : "FAILED";
     }
 
-    //지윤 26.07.22 추가: 취소신청 승인
+    // 취소신청 승인
     @PostMapping("/orders/{id}/cancel/approve")
     @ResponseBody
     public String approveOrderCancel(@PathVariable Long id, HttpSession session) {
@@ -272,7 +272,7 @@ public class BizStoreController extends BizBaseController {
         return error == null ? "OK" : error;
     }
 
-    //지윤 26.07.22 추가: 취소신청 반려
+    // 취소신청 반려
 @PostMapping("/orders/{id}/cancel/reject")
 @ResponseBody
 public String rejectOrderCancel(@PathVariable Long id, HttpSession session) {
@@ -283,7 +283,7 @@ public String rejectOrderCancel(@PathVariable Long id, HttpSession session) {
     return ok ? "OK" : "FAILED";
 }
 
-//지윤 26.07.27 추가: 배송완료 수동 강제처리
+// 배송완료 수동 강제처리
 //원칙적으로 "배송완료"는 스마트택배 API(level==6) 확인 시에만 자동으로 전환되고, 드롭다운에선 선택 불가하게 뺐음.
 //단, 스마트택배 미지원 특수배송(퀵서비스/직접전달 등) 예외 케이스 대비용으로 별도 버튼+확인창을 통해서만 가능하게 함
 //autoCompleteDeliveryIfDone 그대로 재사용: 이미 DONE이면 스킵되는 가드도 동일하게 적용됨
@@ -314,16 +314,16 @@ public String forceCompleteDelivery(@PathVariable Long id, HttpSession session) 
         return "biz/store/delivery";
     }
 
-    //지윤 26.07.24 추가: 택배사 전체목록 조회 (드롭다운 채우기용, AJAX)
-//지윤 26.07.27 수정: BIZ 세션 체크 제거 - 택배사 목록은 민감정보 아니고 admin 화면(order-detail.jsp)에서도 같이 씀
+    // 택배사 전체목록 조회 (드롭다운 채우기용, AJAX)
+// BIZ 세션 체크 없음 (택배사 목록은 민감정보 아님, admin 화면(order-detail.jsp)에서도 사용)
 @GetMapping("/delivery/companies")
 @ResponseBody
 public java.util.List<java.util.Map<String, String>> getCompanyList(HttpSession session) {
     return smartTrackerService.getCompanyList();
 }
 
-    //지윤 26.07.24 추가: 실시간 배송조회 (AJAX, 원본 JSON 그대로 화면에 넘김)
-//지윤 26.07.27 수정: orderId 추가 - 조회 결과 level==6(배송완료)이면 그 시점에 주문상태 자동 DONE 처리
+    // 실시간 배송조회 (AJAX, 원본 JSON 그대로 화면에 넘김)
+// orderId: 조회 결과 level==6(배송완료)이면 주문상태 자동 DONE 처리
 //(스마트택배 무료플랜 월 100건 제한이라 별도 스케줄러 폴링은 안 함, 사람이 조회 버튼 누르는 시점에만 동기화)
 @GetMapping("/delivery/track")
 @ResponseBody
@@ -337,7 +337,7 @@ try {
     Long bizNo = bizStoreService.getBizNo(biz.getMemberId());
     com.fasterxml.jackson.databind.JsonNode node = new ObjectMapper().readTree(json);
     int level = node.path("level").asInt(-1);
-    //지윤 26.07.28 수정: level==6(완료)일 때만 반응하던 것 -> level 2~5(이미 이동중)일 때도 반응하도록 확장
+    // level 2~5(이동중)·level 6(완료) 모두 반영
     //PAID/READY에 머물러있는 주문이면 SHIPPING으로 자동승격 (이미 SHIPPING 이상이면 내부에서 자동 스킵)
     if (level == 6) {
         bizStoreService.autoCompleteDeliveryIfDone(orderId, bizNo);
@@ -351,7 +351,7 @@ return json;
 }
     
 
-    //지윤 26.07.20 추가: 송장 일괄등록 (텍스트 여러 줄 파싱)
+    // 송장 일괄등록 (텍스트 여러 줄 파싱)
     @PostMapping("/delivery/bulk")
     @ResponseBody
     public java.util.Map<String, Object> bulkDelivery(@RequestParam String bulkText, HttpSession session) {
@@ -361,7 +361,7 @@ return json;
         return bizStoreService.bulkRegisterDelivery(bizNo, bulkText);
     }
 
-    //지윤 26.07.20 수정: 목업 -> 실데이터 연동. 리뷰 목록 조회해서 JS에서 쓸 JSON으로 변환
+    // 리뷰 목록 조회 후 JS용 JSON으로 변환
     @GetMapping("/reviews")
     public String storeReviews(HttpSession session, Model model) throws Exception {
         MemberVO biz = getBizMember(session);
@@ -378,8 +378,8 @@ return json;
             row.put("date", r.getRegDate() != null ? df.format(r.getRegDate()) : "");
             row.put("rating", r.getRating() != null ? r.getRating() : 0);
             row.put("product", r.getProductName());
-            row.put("thumbnail", r.getThumbnailUrl()); //지윤 26.07.22 추가: 상품 썸네일
-            //지윤 26.07.22 복원: 실제 구매 옵션 (색상/사이즈)
+            row.put("thumbnail", r.getThumbnailUrl()); // 상품 썸네일
+            // 실제 구매 옵션 (색상/사이즈)
             String optText = "";
             if (r.getOptionSize() != null && !r.getOptionSize().isBlank()) {
                 optText = (r.getOptionColor() != null && !r.getOptionColor().isBlank() && !"기본".equals(r.getOptionColor()))
@@ -388,18 +388,18 @@ return json;
             row.put("option", optText);
             row.put("content", r.getContent() != null ? r.getContent() : "");
             row.put("reply", r.getBizReply());
-            row.put("deleteRequested", "PENDING".equals(r.getReportStatus())); //지윤 26.07.20 추가: 삭제요청 대기중이면 true
-            //지윤 26.07.22 추가: 리뷰가 남아있는데 요청상태가 DONE이면 = 반려된 것 (승인됐으면 리뷰 자체가 삭제돼서 여기 조회조차 안 됨)
+            row.put("deleteRequested", "PENDING".equals(r.getReportStatus())); // 삭제요청 대기중이면 true
+            // 리뷰가 남아 있고 요청상태가 DONE이면 반려 (승인 시 리뷰 자체가 삭제되어 조회 안 됨)
             row.put("deleteRejected", "DONE".equals(r.getReportStatus()));
-            row.put("reportCount", r.getReportCount() != null ? r.getReportCount() : 0); //지윤 26.07.21 추가: 유저 신고 건수
-            row.put("reporterNames", r.getReporterNames());                              //지윤 26.07.21 추가: 신고자 닉네임 목록
+            row.put("reportCount", r.getReportCount() != null ? r.getReportCount() : 0); // 유저 신고 건수
+            row.put("reporterNames", r.getReporterNames());                              // 신고자 닉네임 목록
             rows.add(row);
         }
         model.addAttribute("reviewListJson", objectMapper.writeValueAsString(rows));
         return "biz/store/reviews";
     }
 
-    //지윤 26.07.20 추가: 리뷰 답글 작성/수정 (TB_REVIEW.BIZ_REPLY)
+    // 리뷰 답글 작성/수정 (TB_REVIEW.BIZ_REPLY)
     @PostMapping("/reviews/reply")
     public String saveReviewReply(@RequestParam("reviewId") Long reviewId,
                                    @RequestParam("bizReply") String bizReply,
@@ -412,7 +412,7 @@ return json;
         return "redirect:/biz/store/reviews";
     }
 
-    //지윤 26.07.20 추가: 리뷰 삭제요청 - 즉시 삭제 X, TB_REVIEW_REPORT에 PENDING 등록만 (관리자 승인 후 실제 삭제됨)
+    // 리뷰 삭제요청: 즉시 삭제 없이 TB_REVIEW_REPORT에 PENDING 등록 (관리자 승인 후 삭제)
     @PostMapping("/reviews/delete-request")
     public String requestReviewDelete(@RequestParam("reviewId") Long reviewId,
                                        @RequestParam(value = "reason", required = false) String reason,
@@ -429,7 +429,7 @@ return json;
         return "redirect:/biz/store/reviews";
     }
 
-    //지윤 26.07.21 추가: Q&A관리 목록 (미답변 우선 정렬)
+    // Q&A관리 목록 (미답변 우선 정렬)
     @GetMapping("/qna")
     public String storeQna(HttpSession session, Model model) {
         MemberVO biz = getBizMember(session);
@@ -440,7 +440,7 @@ return json;
         return "biz/store/qna";
     }
 
-    //지윤 26.07.21 추가: Q&A 답변 작성/수정
+    // Q&A 답변 작성/수정
     @PostMapping("/qna/answer")
     public String saveQnaAnswer(@RequestParam("qnaId") Long qnaId,
                                  @RequestParam("answer") String answer,
@@ -453,7 +453,7 @@ return json;
         return "redirect:/biz/store/qna";
     }
 
-    /* 사업자(쇼핑) 정산관리 — 2026/08/05 장우철 S9 2-1 요약 / 2-2 목록 / 2-3·2-4 상세 */
+    /* 사업자(쇼핑) 정산관리 — 요약 / 목록 / 상세 */
     @GetMapping("/settlement")
     public String storeSettlement(HttpSession session, Model model,
                                   @RequestParam(value = "month", required = false, defaultValue = "all") String month,
@@ -479,7 +479,7 @@ return json;
         model.addAttribute("filterMonth", month);
         model.addAttribute("filterStatus", status);
         model.addAttribute("productList", productList);
-        //2026/08/06 장우철 — 정산계좌 모달용
+        // 정산계좌 모달용
         com.petcare.petcare.biz.store.vo.BizInfoVO settleAcc = bizStoreService.getSettleAccount(bizNo);
         model.addAttribute("settleAccountInfo",
                 settleAcc != null ? settleAcc : new com.petcare.petcare.biz.store.vo.BizInfoVO());
@@ -487,7 +487,7 @@ return json;
     }
 
     /**
-     * 2026/08/05 장우철 — S9 2-3 정산 상세 ITEM JSON
+     * 정산 상세 ITEM JSON
      * GET /biz/store/settlement/items?settleId=
      */
     @GetMapping("/settlement/items")
@@ -517,7 +517,7 @@ return json;
     }
 
     /**
-     * 2026/08/06 장우철 — 정산 계좌 변경
+     * 정산 계좌 변경
      * POST /biz/store/settlement/account
      * (계좌인증은 /mypage/biz/account/verify 재사용 후 여기로 저장)
      */
@@ -554,7 +554,7 @@ return json;
     }
 
     /**
-     * 2026/08/05 장우철 — S10 중간정산 요청
+     * 중간정산 요청
      * POST /biz/store/settlement/request
      */
     @PostMapping("/settlement/request")
@@ -610,7 +610,6 @@ return json;
         return result;
     }
 
-    //지윤 26.07.23 수정: 목업 -> 실데이터 연동
     @GetMapping("/info")
     public String storeInfo(HttpSession session, Model model) {
         MemberVO biz = getBizMember(session);
@@ -621,7 +620,7 @@ return json;
         return "biz/store/info";
     }
 
-    //지윤 26.07.23 추가: 사업자 정보 저장
+    // 사업자 정보 저장
     @PostMapping("/info")
     public String saveInfo(@RequestParam String shopName, @RequestParam String ceoName, @RequestParam String bizRegNo,
                             @RequestParam String addr,
@@ -648,7 +647,7 @@ return json;
         return "redirect:/biz/store/info";
     }
     
-    //지윤 26.07.15 상품 등록 모달 제출 처리 (옵션 여러 개 + 이미지 1장)
+    // 상품 등록 모달 제출 처리 (옵션 여러 개 + 이미지 1장)
     @PostMapping("/products")
     public String registerProduct(@RequestParam String productName,
                                    @RequestParam Long categoryId,
@@ -683,7 +682,7 @@ return json;
         return "redirect:/biz/store/products";
     }
 
-    //지윤 26.07.15 수정 모달 프리필용 - 상품 1건 + 옵션 리스트 JSON 반환
+    // 수정 모달 프리필용 - 상품 1건 + 옵션 리스트 JSON 반환
     @GetMapping("/products/{id}")
     @ResponseBody
     public BizProductVO getProductJson(@PathVariable Long id, HttpSession session) {
@@ -693,7 +692,7 @@ return json;
         return bizStoreService.getProductDetail(id, bizNo);
     }
 
-    //지윤 26.07.15 상품 수정 모달 제출 처리
+    // 상품 수정 모달 제출 처리
     @PostMapping("/products/{id}")
     public String updateProductSubmit(@PathVariable Long id,
                                        @RequestParam String productName,
@@ -731,9 +730,9 @@ return json;
         return "redirect:/biz/store/products";
     }
 
-    //지윤 26.07.15 폼 배열(옵션당 1줄씩)을 OptionVO 리스트로 변환
-    //지윤 26.07.15 수정: 배열 길이가 서로 안 맞아도(브라우저 재전송 등) 에러 안 나게 방어 코드 추가
-    //지윤 26.07.24 수정: optionId 오버로드 추가 (수정화면에서 어느 옵션인지 정확히 구분하기 위함)
+    // 폼 배열(옵션당 1줄씩)을 OptionVO 리스트로 변환
+    // 배열 길이가 서로 달라도(브라우저 재전송 등) 에러 없도록 방어
+    // optionId 오버로드 (수정화면 옵션 구분용)
     private List<OptionVO> buildOptions(String[] optionColor, String[] optionSize, Integer[] addPrice, Integer[] stockQty) {
         return buildOptions(null, optionColor, optionSize, addPrice, stockQty);
     }
@@ -743,12 +742,12 @@ return json;
         if (optionSize == null) return options;
         for (int i = 0; i < optionSize.length; i++) {
             OptionVO opt = new OptionVO();
-            // 2026/08/13 장우철 — 수정 시 신규 옵션 hidden optionId="" 가 Long[] 바인딩에서 400 나던 것 방지
+            // 수정 시 신규 옵션의 hidden optionId=""로 인한 Long[] 바인딩 400 방지
             opt.setOptionId(parseLongOrNull(optionId, i));
             opt.setOptionColor(optionColor != null && optionColor.length > i ? optionColor[i] : null);
             opt.setOptionSize(optionSize[i]);
 
-            //HYJ 26.08.13 null 체크 추가
+            // null 체크
             opt.setAddPrice(addPrice != null && addPrice.length > i && addPrice[i] != null ? addPrice[i] : 0);
             opt.setStockQty(stockQty != null && stockQty.length > i && stockQty[i] != null ? stockQty[i] : 0);
             options.add(opt);
@@ -766,7 +765,7 @@ return json;
     }
 
     // ─────────────────────────────────────────────
-// 2026-08-06 박유정 — 쇼핑 배너 (stay/hospital 공용 BizStayService)
+// 쇼핑 배너 (stay/hospital 공용 BizStayService)
 // ─────────────────────────────────────────────
 @GetMapping({"/banner", "/banner/"})
 public String bannerList(HttpSession session, Model model) {
@@ -847,7 +846,7 @@ public String bannerSubmit(@RequestParam String title,
     }
 
     // ─────────────────────────────────────────────
-// 지윤 26.08.06: 쇼핑몰 사업자 쿠폰 관리
+// 쇼핑몰 사업자 쿠폰 관리
 // ─────────────────────────────────────────────
 
 /**
@@ -885,7 +884,7 @@ public String couponList(
             bizStoreService.getCouponList(bizNo)
     );
 
-    // 지윤 26.08.10 추가: 기간만료 배지 판단용
+    // 기간만료 배지 판단용
     model.addAttribute(
             "today",
             LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
@@ -1059,7 +1058,6 @@ public String deleteCoupon(
 }
 
 /**
- * 지윤 26.08.06
  * 쇼핑몰 사업자 쿠폰 조기 마감
  *
  * 관리자 재승인 없이 사업자가 직접 마감한다.
@@ -1133,7 +1131,7 @@ public String closeCoupon(
     return "redirect:/biz/store/coupon";
 }
 
-// 2026-08-13 박유정 — 빈 숫자칸("") → null (Integer 바인딩 오류 방지)
+// 빈 숫자칸("") → null (Integer 바인딩 오류 방지)
 @InitBinder
 public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(Integer.class, new CustomNumberEditor(Integer.class, true));

@@ -196,7 +196,7 @@
 
 <div class="mypage-content">
 <div class="mp-section active">
-    <%-- 2026/07/14 장우철 — 건강수첩: TB_MEDICAL_RECORD 연동 --%>
+    <%-- 건강수첩: TB_MEDICAL_RECORD 연동 --%>
     <h2 class="mp-title">건강수첩</h2>
     <p class="mp-desc">병원에서 작성한 진료 기록을 확인하세요.</p>
 

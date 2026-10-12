@@ -1,9 +1,8 @@
 <%--
-  - 박유정 / 2026-07-15
   - GET /admin/community/detail?id= → ${post}
   - POST 숨김·삭제·복구 (상태별 버튼 분기)
-  - 2026/08/06 장우철 — 신고 건수·내역확인 모달·신고 기각 연동
-  - 2026/08/07 장우철 — 댓글·대댓글 읽기 전용 표시
+  - 신고 건수·내역확인 모달·신고 기각 연동
+  - 댓글·대댓글 읽기 전용 표시
 --%>
 
 
@@ -15,7 +14,7 @@
 <%@ include file="/WEB-INF/views/admin/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/admin/common/sidebar.jsp" %>
 
-<%-- 2026-07-15 박유정 — 상세 레이아웃·처리 버튼 너비 통일 --%>
+<%-- 상세 레이아웃·처리 버튼 너비 통일 --%>
 <style>
     .comm-detail-breadcrumb{font-size:13px;color:#999;margin-bottom:20px;display:flex;align-items:center;gap:8px}
     .comm-detail-breadcrumb a{color:#999;text-decoration:none}
@@ -52,7 +51,7 @@
     .report-modal-row:last-child{border-bottom:none}
     .report-modal-reason{font-weight:700;color:#1A1A2E;font-size:14px;margin-bottom:6px}
     .report-modal-meta{font-size:12px;color:#888;line-height:1.5}
-    /* 2026/08/07 장우철 — 관리자 상세 댓글 영역 */
+    /* 관리자 상세 댓글 영역 */
     .comm-comments-card{background:#fff;border:1px solid #E4E6ED;border-radius:12px;overflow:hidden;margin-top:16px}
     .comm-comments-head{padding:16px 20px;border-bottom:1px solid #E4E6ED;display:flex;align-items:center;justify-content:space-between}
     .comm-comments-head h3{margin:0;font-size:15px;font-weight:800;color:#1A1A2E}
@@ -81,7 +80,7 @@
             <h1 class="adm-page-title">게시글 상세</h1>
             <p class="adm-page-desc">게시글·신고 내역을 확인하고 처리할 수 있습니다.</p>
         </div>
-        <%-- 2026-07-15 박유정 — 상단 처리 버튼 (상태별 분기) --%>
+        <%-- 상단 처리 버튼 (상태별 분기) --%>
         <div class="adm-page-actions">
             <c:choose>
                 <c:when test="${post.statusCd eq 'HIDDEN'}">
@@ -144,7 +143,7 @@
                         <c:when test="${post.boardType eq 'LIFE'}">수의사 상담</c:when>
                     </c:choose>
                 </span>
-                <%-- 2026/08/06 장우철 — 신고 대기 / 신고 기각 뱃지 --%>
+                <%-- 신고 대기 / 신고 기각 뱃지 --%>
                 <c:choose>
                     <c:when test="${post.pendingReportCount != null && post.pendingReportCount > 0}">
                         <span class="adm-badge wait" style="margin-left:8px">신고 대기</span>
@@ -171,7 +170,7 @@
             </div>
         </div>
 
-        <%-- 2026/08/07 장우철 — 게시글 아래 댓글·대댓글 (읽기 전용) --%>
+        <%-- 게시글 아래 댓글·대댓글 (읽기 전용) --%>
         <div class="comm-comments-card">
             <div class="comm-comments-head">
                 <h3>댓글</h3>
@@ -264,7 +263,7 @@
                 <div class="comm-report-item"><span>이메일</span><strong><c:out value="${post.authorEmail}"/></strong></div>
             </div>
 
-            <%-- 2026/08/06 장우철 — 신고 내역 요약 + 내역확인 모달 --%>
+            <%-- 신고 내역 요약 + 내역확인 모달 --%>
             <div class="comm-side-card">
                 <h3 class="comm-side-title">신고 내역</h3>
                 <div class="comm-report-item">
@@ -342,7 +341,7 @@
     </div>
 </main>
 
-<%-- 2026/08/06 장우철 — 신고 내역 모달 --%>
+<%-- 신고 내역 모달 --%>
 <div class="report-modal-bg" id="reportModalBg" onclick="if(event.target===this) closeReportModal()">
   <div class="report-modal" role="dialog" aria-labelledby="reportModalTitle">
     <div class="report-modal-head">

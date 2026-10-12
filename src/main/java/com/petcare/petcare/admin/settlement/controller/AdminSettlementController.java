@@ -1,8 +1,8 @@
 /**
  * 역할: 관리자 정산 관리 화면
- * 2026/07/24 장우철 — STORE 탭 UI 더미
- * 2026/07/30 장우철 — STAY 탭 실데이터
- * 2026/08/05 장우철 — STORE 탭 S11 실데이터
+ * STORE 탭 UI 더미
+ * STAY 탭 실데이터
+ * STORE 탭 실데이터
  *
  * - GET  /admin/settlement
  * - GET  /admin/settlement/stay/items | /store/items
@@ -299,7 +299,7 @@ public class AdminSettlementController extends AdminBaseController {
         return result;
     }
 
-    // ===== S12 배치 / FAIL (2026/08/05 장우철) =====
+    // ===== 배치 / FAIL =====
 
     /** 월정산 생성 — body: { settleMonth: "2026-07" } 없으면 전월 */
     @PostMapping("/batch/monthly-create")

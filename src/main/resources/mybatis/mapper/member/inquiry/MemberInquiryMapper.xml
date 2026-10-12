@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!-- 2026/07/31 장우철 — TB_INQUIRY 연동 -->
+<!-- TB_INQUIRY 연동 -->
 <mapper namespace="com.petcare.petcare.member.inquiry.mapper.MemberInquiryMapper">
 
   <select id="selectByMemberNo" resultType="com.petcare.petcare.member.inquiry.vo.MemberInquiryVO">
@@ -71,7 +71,7 @@
        AND TITLE LIKE '숙소 환불신청%'
   </select>
 
-  <!-- 2026/08/06 장우철 — 처리완료(승인·거절·레거시 DONE) 환불신청 → 재신청 불가 -->
+  <!-- 처리완료(승인·거절·레거시 DONE) 환불신청 → 재신청 불가 -->
   <select id="countRejectedStayRefund" resultType="int">
     SELECT COUNT(*)
       FROM TB_INQUIRY I
@@ -82,8 +82,8 @@
        AND I.STATUS_CD IN ('APPROVED', 'REJECTED', 'DONE')
   </select>
 
-  <!-- 2026-08-11 박유정 — 사업자 숙소 환불신청 대기 건수 -->
-  <!-- 2026/08/18 장우철 — STATUS_CD CHAR 패딩 대비 TRIM -->
+  <!-- 사업자 숙소 환불신청 대기 건수 -->
+  <!-- STATUS_CD CHAR 패딩 대비 TRIM -->
   <select id="countPendingStayRefundByStayId" resultType="int">
     SELECT COUNT(*)
       FROM TB_INQUIRY I
@@ -94,7 +94,7 @@
        AND TO_NUMBER(R.TARGET_ID) = #{stayId}
   </select>
 
-  <!-- 2026/08/18 장우철 — 사업자 숙소 환불 탭별 건수 (WAIT / APPROVED+DONE / REJECTED) -->
+  <!-- 사업자 숙소 환불 탭별 건수 (WAIT / APPROVED+DONE / REJECTED) -->
   <select id="countStayRefundByStayId" resultType="int">
     SELECT COUNT(*)
       FROM TB_INQUIRY I
@@ -115,8 +115,8 @@
     </choose>
   </select>
 
-  <!-- 2026-08-11 박유정 — 사업자 숙소 환불신청 목록 -->
-  <!-- 2026/08/18 장우철 — DONE=APPROVED/DONE, REJECTED 탭 분리 (관리자 처리상태와 동일) -->
+  <!-- 사업자 숙소 환불신청 목록 -->
+  <!-- DONE=APPROVED/DONE, REJECTED 탭 분리 (관리자 처리상태와 동일) -->
   <select id="selectStayRefundListByStayId" resultType="com.petcare.petcare.member.inquiry.vo.MemberInquiryVO">
     SELECT I.INQUIRY_ID   AS inquiryId,
            I.INQUIRY_TYPE AS inquiryType,
@@ -188,7 +188,7 @@
       <when test="statusCd == null or statusCd == '' or statusCd == 'ALL'">
       </when>
       <when test="statusCd == 'DONE'">
-       <!-- 2026/08/06 장우철 — 처리완료 = APPROVED/REJECTED + 레거시 DONE -->
+       <!-- 처리완료 = APPROVED/REJECTED + 레거시 DONE -->
        AND I.STATUS_CD IN ('DONE', 'APPROVED', 'REJECTED')
       </when>
       <otherwise>
@@ -225,7 +225,7 @@
        AND I.REF_TYPE = 'RESV'
   </select>
 
-  <!-- 2026/08/11 장우철 — STATUS_CD CHAR 패딩 대비 TRIM -->
+  <!-- STATUS_CD CHAR 패딩 대비 TRIM -->
   <update id="updateInquiryAnswer">
     UPDATE TB_INQUIRY
        SET STATUS_CD   = #{statusCd},
@@ -235,7 +235,7 @@
      WHERE INQUIRY_ID = #{inquiryId}
        AND TRIM(STATUS_CD) = 'WAIT'
   </update>
-<!-- 2026-08-11 박유정 — 관리자 일반 1:1 문의 목록 -->
+<!-- 관리자 일반 1:1 문의 목록 -->
 <select id="selectGeneralInquiryList"
         resultType="com.petcare.petcare.member.inquiry.vo.MemberInquiryVO">
   SELECT I.INQUIRY_ID      AS inquiryId,
@@ -261,7 +261,7 @@
    ORDER BY I.REG_DATE DESC, I.INQUIRY_ID DESC
 </select>
 
-<!-- 2026-08-11 박유정 — 관리자 일반 1:1 문의 상세 -->
+<!-- 관리자 일반 1:1 문의 상세 -->
 <select id="selectGeneralInquiryDetail"
         resultType="com.petcare.petcare.member.inquiry.vo.MemberInquiryVO">
   SELECT I.INQUIRY_ID      AS inquiryId,

@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /*
- * HYJ 26.08.07
  * 역할: 모든 HTTP 응답에 보안 헤더를 추가하는 인터셉터
  * 
  * [왜 보안 헤더가 필요한가]

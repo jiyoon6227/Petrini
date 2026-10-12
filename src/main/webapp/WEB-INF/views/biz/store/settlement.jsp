@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
 <%--
-  2026/08/05 장우철 — 쇼핑 정산 내역 (S9 + S10)
+  쇼핑 정산 내역
   - 2-1 상단 요약 / 2-2 목록 / 2-3·2-4 상세
   - S10 중간정산 요청 버튼·폼
 --%>
@@ -111,7 +111,7 @@
         <option value="fail" <c:if test="${filterStatus eq 'fail'}">selected</c:if>>지급실패</option>
         <option value="done" <c:if test="${filterStatus eq 'done'}">selected</c:if>>지급완료</option>
       </select>
-      <%-- 2026/08/06 장우철 — 필터 줄 오른쪽 정산계좌 버튼 --%>
+      <%-- 필터 줄 오른쪽 정산계좌 버튼 --%>
       <button type="button" class="biz-btn btn-settle-account" onclick="openSettleAccountModal()">정산계좌</button>
     </form>
   </div>
@@ -209,7 +209,7 @@
   </div>
 </main>
 
-<%-- 2026/08/06 장우철 — 정산계좌 조회/변경 모달 --%>
+<%-- 정산계좌 조회/변경 모달 --%>
 <div class="adhoc-modal-bg" id="settleAccountModalBg" onclick="if(event.target===this) closeSettleAccountModal()">
   <div class="adhoc-modal" role="dialog" aria-labelledby="settleAccountModalTitle">
     <div class="adhoc-modal-head">

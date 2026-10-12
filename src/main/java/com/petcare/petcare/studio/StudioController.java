@@ -16,8 +16,6 @@ public class StudioController {
     // ── 사진관 목록 ─────────────────────────────────────────
     @GetMapping({"", "/"})
     public String list(Model model) throws JsonMappingException, JsonProcessingException {
-        //test
-        //kakaoMapService.addMapAttributes(model, "서울 중구 세종대로 110", "행복 동물병원");
         return "studio/list";
     }
 
@@ -26,8 +24,6 @@ public class StudioController {
     public String detail(@RequestParam(defaultValue = "1") String id, Model model) {
         model.addAttribute("id", id);
 
-        //test
-        //kakaoMapService.addMapAttributes(model, "서울 중구 세종대로 110", "행복 동물병원");
         return "studio/detail";
     }
 

@@ -43,28 +43,28 @@ public class BizStoreServiceImpl implements BizStoreService {
     @Autowired
     private FileService fileService;
 
-    //지윤 26.07.22 추가: 주문취소 승인 시 토스 결제취소 API 호출용
+    // 주문취소 승인 시 토스 결제취소 API 호출용
     @Autowired
     private TossPaymentService tossPaymentService;
 
-    //지윤 26.07.22 추가: 취소승인 DB반영 트랜잭션 전용 (self-invocation 문제로 별도 빈 분리)
+    // 취소승인 DB반영 트랜잭션 전용 (self-invocation 문제로 별도 빈 분리)
     @Autowired
     private OrderCancelTxService orderCancelTxService;
 
-    // 2026/08/04 장우철 — 환불 처리 알림
+    // 환불 처리 알림
     @Autowired
     private MypageNotifyService mypageNotifyService;
 
-    //지윤 26.07.14 페이지당 상품 개수 (요청대로 10개)
+    // 페이지당 상품 개수 (10개)
     private static final int PAGE_SIZE = 10;
 
-    //지윤 26.07.14 로그인 ID로 BIZ_NO 조회 (컨트롤러가 세션에서 로그인 ID만 갖고 있어서 매 요청마다 이걸로 실제 사업자번호를 알아냄)
+    // 로그인 ID로 BIZ_NO 조회 (세션에는 로그인 ID만 있어 요청마다 사업자번호 조회)
     @Override
     public Long getBizNo(String bizId) {
         return bizStoreMapper.selectBizNoByBizId(bizId);
     }
 
-    //지윤 26.07.15 수정: 상품목록 조회 + 할인율 계산 + 상품마다 옵션 목록도 같이 채워넣음 (옵션별 재고 표시용)
+    // 상품목록 조회 + 할인율 계산 + 상품별 옵션 목록 채우기 (옵션별 재고 표시용)
     @Override
     public List<BizProductVO> getProductList(Long bizNo, String keyword, String categoryName, String statusCd, int pageNo) {
         int offset = (pageNo - 1) * PAGE_SIZE;
@@ -83,14 +83,14 @@ public class BizStoreServiceImpl implements BizStoreService {
         return list;
     }
 
-    //지윤 26.07.14 상품목록 총 페이지 수 (페이지네이션 버튼 개수 계산용)
+    // 상품목록 총 페이지 수 (페이지네이션 버튼 개수 계산용)
     @Override
     public int getTotalPages(Long bizNo, String keyword, String categoryName, String statusCd) {
         int totalCount = bizStoreMapper.selectProductCount(bizNo, keyword, categoryName, statusCd);
         return (int) Math.ceil(totalCount / (double) PAGE_SIZE);
     }
 
-   //지윤 26.07.15 수정: 옵션 재고 합계로 STOCK_QTY 자동 계산, 합계 0이면 STATUS_CD 강제 SOLDOUT
+   // 옵션 재고 합계로 STOCK_QTY 자동 계산, 합계 0이면 STATUS_CD 강제 SOLDOUT
    //이미지도 공용 FileService로 등록 (REF_TYPE='PRODUCT')
     @Override
     public void addProduct(BizProductVO product, List<OptionVO> options, MultipartFile image) throws Exception {
@@ -112,7 +112,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
     }
 
-    //지윤 26.07.15 수정: 옵션 리스트도 같이 채워서 반환 (수정 모달 프리필용)
+    // 옵션 리스트도 같이 채워서 반환 (수정 모달 프리필용)
     @Override
     public BizProductVO getProductDetail(Long productId, Long bizNo) {
         BizProductVO vo = bizStoreMapper.selectProductDetail(productId, bizNo);
@@ -122,7 +122,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return vo;
     }
 
-    //지윤 26.07.15 수정: 옵션 전체 삭제 후 재등록, 재고 합계 0이면 강제 SOLDOUT, 이미지 새로 올렸을 때만 교체
+    // 옵션 전체 삭제 후 재등록, 재고 합계 0이면 강제 SOLDOUT, 이미지 새로 올렸을 때만 교체
     @Override
     public boolean updateProduct(BizProductVO product, List<OptionVO> options, MultipartFile image) throws Exception {
         int totalStock = sumStock(options);
@@ -134,11 +134,11 @@ public class BizStoreServiceImpl implements BizStoreService {
                 product.getDescription(), product.getBrandName(), statusCd, product.getTags());
         if (updated == 0) return false;
 
-        //지윤 26.07.24 수정: "전체삭제 후 재생성" -> OPTION_ID 기준 upsert로 변경
+        // OPTION_ID 기준 upsert (전체삭제 후 재생성 방식 대체)
         //이유: 이미 주문된 적 있는 옵션은 TB_ORDER_ITEM이 참조 중이라 삭제하면 ORA-02292(FK위반) 에러 발생
         saveOptionsForUpdate(product.getProductId(), options);
 
-       //지윤 26.07.15 수정: 새 이미지 올릴 때 기존 이미지 먼저 삭제 (안 그러면 옛날 이미지가 계속 썸네일로 뜸)
+       // 새 이미지 업로드 시 기존 이미지 먼저 삭제 (옛 이미지가 썸네일로 남는 문제 방지)
         if (image != null && !image.isEmpty()) {
             fileService.deleteFilesByRef("PRODUCT", product.getProductId());
             fileService.uploadFile(image, "PRODUCT", product.getProductId());
@@ -146,7 +146,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return true;
     }
 
-    //지윤 26.07.24 추가: 상품수정 전용 옵션 저장 로직 (OPTION_ID 기준 upsert)
+    // 상품수정 전용 옵션 저장 로직 (OPTION_ID 기준 upsert)
     //1) optionId 있는 옵션 -> 그 OPTION_ID로 정확히 찍어서 UPDATE (지우지 않음, 색상/사이즈 이름 바꿔도 같은 옵션으로 인식)
     //2) optionId 없는 옵션(새로 추가한 행) -> INSERT
     //3) 원래 있었는데 이번 제출 목록에서 빠진 옵션 -> 주문 이력 없으면 진짜 DELETE, 있으면 재고 0으로만 처리 (화면엔 숨겨지되 데이터/주문이력은 보존)
@@ -159,7 +159,7 @@ public class BizStoreServiceImpl implements BizStoreService {
             } else {
                 Long optId = bizStoreMapper.selectNextOptionId();
                 bizStoreMapper.insertProductOption(optId, productId, color, opt.getOptionSize(), opt.getAddPrice(), opt.getStockQty());
-                // 2026/08/13 장우철 — INSERT 직후 optionId를 안 넣으면, 아래 정리 루프가 새 옵션을 미제출로 보고 바로 삭제함
+                // INSERT 직후 optionId 세팅 (없으면 아래 정리 루프가 새 옵션을 미제출로 보고 삭제)
                 opt.setOptionId(optId);
             }
         }
@@ -179,7 +179,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
     }
 
-    //지윤 26.07.15 옵션 리스트 저장 공통 처리 (등록/수정 둘 다 사용), 색상 비워두면 "기본"으로 저장
+    // 옵션 리스트 저장 공통 처리 (등록/수정 둘 다 사용), 색상 비워두면 "기본"으로 저장
     private void saveOptions(Long productId, List<OptionVO> options) {
         for (OptionVO opt : options) {
             Long optId = bizStoreMapper.selectNextOptionId();
@@ -188,7 +188,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
     }
 
-    //지윤 26.07.15 옵션 재고 합계 계산
+    // 옵션 재고 합계 계산
     private int sumStock(List<OptionVO> options) {
         int total = 0;
         for (OptionVO opt : options) {
@@ -197,26 +197,26 @@ public class BizStoreServiceImpl implements BizStoreService {
         return total;
     }
 
-    //지윤 26.07.14 상품 등록/수정 폼 카테고리 드롭다운 목록
+    // 상품 등록/수정 폼 카테고리 드롭다운 목록
     @Override
     public List<CategoryVO> getLeafCategories() {
         return bizStoreMapper.selectLeafCategories();
     }
 
-    //2026/08/06 장우철: 상품목록 필터용 카테고리명(중복 제거)
+    // 상품목록 필터용 카테고리명(중복 제거)
     @Override
     public List<String> getFilterCategoryNames() {
         return bizStoreMapper.selectFilterCategoryNames();
     }
 
-    //지윤 26.07.15 상품목록 총 개수 (화면에 "총 N개" 표시용)
+    // 상품목록 총 개수 (화면에 "총 N개" 표시용)
     @Override
     public int getTotalCount(Long bizNo, String keyword, String categoryName, String statusCd) {
         return bizStoreMapper.selectProductCount(bizNo, keyword, categoryName, statusCd);
     }
 
-    //지윤 26.07.20 추가: 사업자 주문 목록 조회
-    // 2026/08/13 장우철 — 유저와 같은 환불완료/부분환불/환불진행중 뱃지
+    // 사업자 주문 목록 조회
+    // 유저와 같은 환불완료/부분환불/환불진행중 뱃지
     @Override
     public List<BizOrderVO> getOrderList(Long bizNo, String statusCd) {
         List<BizOrderVO> list = bizStoreMapper.selectOrderList(bizNo, statusCd);
@@ -255,7 +255,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         o.setStatusBadge(o.getOrderStatus());
     }
 
-    //지윤 26.07.20 추가: 상태별 주문 개수를 Map으로 가공 (화면에서 statusCounts.PAID 이런 식으로 바로 꺼내쓰기 위함)
+    // 상태별 주문 개수를 Map으로 가공 (화면에서 statusCounts.PAID 형태로 사용)
     @Override
     public java.util.Map<String, Integer> getOrderStatusCounts(Long bizNo) {
         java.util.Map<String, Integer> result = new java.util.HashMap<>();
@@ -264,12 +264,12 @@ public class BizStoreServiceImpl implements BizStoreService {
             Number cnt = (Number) row.get("CNT");
             result.put(status, cnt.intValue());
         }
-        //지윤 26.07.22 추가: 취소신청 대기중 건수도 같은 Map에 넣어서 화면에서 statusCounts.CLAIM_PENDING으로 바로 사용
+        // 취소신청 대기 건수도 같은 Map에 저장 (화면에서 statusCounts.CLAIM_PENDING으로 사용)
         result.put("CLAIM_PENDING", bizStoreMapper.selectClaimPendingCount(bizNo));
         return result;
     }
 
-    //지윤 26.07.20 추가: 주문 상세 조회 (상품목록까지 같이 채워서 반환)
+    // 주문 상세 조회 (상품목록까지 같이 채워서 반환)
     @Override
     public BizOrderVO getOrderDetail(Long orderId, Long bizNo) {
         BizOrderVO vo = bizStoreMapper.selectOrderDetail(orderId, bizNo);
@@ -279,7 +279,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return vo;
     }
 
-    //지윤 26.07.22 추가: 취소신청 승인
+    // 취소신청 승인
     //순서 중요: 토스 API를 먼저 부르고, 성공했을 때만 DB를 건드림
     @Override
     public String approveOrderCancel(Long orderId, Long bizNo) {
@@ -291,7 +291,7 @@ public class BizStoreServiceImpl implements BizStoreService {
             return "결제 정보를 찾을 수 없습니다.";
         }
 
-        // 2026/08/11 장우철 — P5: PAY_METHOD(빌링/토스)에 맞는 시크릿 + 주문분 부분취소
+        // PAY_METHOD(빌링/토스)에 맞는 시크릿 + 주문분 부분취소
         // (과거 BILLING인데 TOSS로 저장된 건은 cancelPaymentSmart 가 반대 시크릿 재시도)
         Long cancelAmt = order.getPayAmount() != null ? order.getPayAmount().longValue() : null;
         String reason = order.getCancelReason() != null && !order.getCancelReason().isBlank()
@@ -303,7 +303,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
 
         orderCancelTxService.applyCancelToDb(order, bizNo);
-        // 2026/08/07 장우철 — 취소 승인 → 구매자 알림
+        // 취소 승인 → 구매자 알림
         try {
             mypageNotifyService.sendCancelApproveToBuyerNotification(order.getMemberNo(), order.getOrderNo());
         } catch (Exception ignored) {
@@ -311,12 +311,12 @@ public class BizStoreServiceImpl implements BizStoreService {
         return null;
     }
 
-    //지윤 26.07.22 추가: 취소신청 반려 (토스 호출 없이 상태만 변경)
+    // 취소신청 반려 (토스 호출 없이 상태만 변경)
     @Override
     public boolean rejectOrderCancel(Long orderId, Long bizNo) {
         BizOrderVO order = bizStoreMapper.selectOrderDetail(orderId, bizNo);
         boolean ok = bizStoreMapper.updateClaimReject(orderId, bizNo) > 0;
-        // 2026/08/07 장우철 — 취소 거절 → 구매자 알림
+        // 취소 거절 → 구매자 알림
         if (ok && order != null) {
             try {
                 mypageNotifyService.sendCancelRejectToBuyerNotification(order.getMemberNo(), order.getOrderNo());
@@ -326,11 +326,11 @@ public class BizStoreServiceImpl implements BizStoreService {
         return ok;
     }
 
-    //지윤 26.07.20 추가: 주문 상태 변경 + 배송정보(택배사/송장번호) 저장
+    // 주문 상태 변경 + 배송정보(택배사/송장번호) 저장
     //송장번호가 입력되면 배송상태를 자동으로 SHIPPING으로, 이미 배송정보 있으면 UPDATE 없으면 INSERT
     @Override
     public boolean updateOrderStatus(Long orderId, Long bizNo, String orderStatus, String courierName, String courierCode, String trackingNo) {
-        //지윤 26.07.28 수정: 송장번호가 입력됐는데 드롭다운에서 주문상태를 "배송중"으로 안 바꾸고 저장하면
+        // 송장번호가 입력됐는데 드롭다운에서 주문상태를 "배송중"으로 안 바꾸고 저장하면
         //TB_ORDER.ORDER_STATUS(=READY)와 TB_ORDER_DELIVERY.DELIVERY_STATUS(=SHIPPING)가 서로 어긋나는 문제가 있었음.
         //송장번호가 있으면, 사람이 드롭다운을 안 바꿔도 PAID/READY인 경우엔 자동으로 SHIPPING으로 승격시켜서 두 값이 항상 일치하도록 보정
         if (trackingNo != null && !trackingNo.isBlank()
@@ -360,12 +360,12 @@ public class BizStoreServiceImpl implements BizStoreService {
                 bizStoreMapper.insertOrderDelivery(orderId, bizNo, courierName, courierCode, trackingNo, deliveryStatus);
             }
         }
-        // 2026/08/07 장우철 — 배송중/배송완료 → 구매자 알림
+        // 배송중/배송완료 → 구매자 알림
         notifyBuyerDeliveryStatus(orderId, bizNo, orderStatus);
         return true;
     }
 
-    //지윤 26.07.27 추가: 배송조회 API 호출 시점에만 동기화 (스마트택배 무료플랜 월 100건 제한이라 스케줄러 폴링 대신 이 방식 선택)
+    // 배송조회 API 호출 시점에만 동기화 (스마트택배 무료플랜 월 100건 제한으로 스케줄러 폴링 대신)
     //autoCompleteOrderStatus가 이미 DONE인 건은 0건 UPDATE하므로 그 경우 false 반환 -> DELIVERED_AT 중복갱신 안 됨
     @Override
     public boolean autoCompleteDeliveryIfDone(Long orderId, Long bizNo) {
@@ -377,7 +377,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return true;
     }
 
-    //지윤 26.07.28 추가: 배송조회 시 level 2~5(이동중) 확인되면 PAID/READY인 주문을 SHIPPING으로 자동승격
+    // 배송조회 시 level 2~5(이동중) 확인되면 PAID/READY인 주문을 SHIPPING으로 자동승격
     //autoElevateToShipping이 이미 SHIPPING 이상인 건은 0건 UPDATE하므로 그 경우 false 반환 (역행 방지)
     @Override
     public boolean autoElevateToShippingIfNeeded(Long orderId, Long bizNo) {
@@ -389,7 +389,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return true;
     }
 
-    /** 2026/08/07 장우철 — 배송 상태 변경 시 구매자 알림 */
+    /** 배송 상태 변경 시 구매자 알림 */
     private void notifyBuyerDeliveryStatus(Long orderId, Long bizNo, String orderStatus) {
         try {
             if (!"SHIPPING".equals(orderStatus) && !"DONE".equals(orderStatus)) {
@@ -408,7 +408,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
     }
 
-    //지윤 26.07.20 추가: 배송관리 목록 조회 + 지연여부(3일 이상 SHIPPING) 자바에서 계산
+    // 배송관리 목록 조회 + 지연여부(3일 이상 SHIPPING) 자바에서 계산
     @Override
     public List<BizDeliveryVO> getDeliveryList(Long bizNo, String carrier, String statusCd, String keyword) {
         List<BizDeliveryVO> list = bizStoreMapper.selectDeliveryList(bizNo, carrier, statusCd, keyword);
@@ -418,7 +418,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return list;
     }
 
-    //지윤 26.07.20 추가: 상단 요약카드 - 필터 없이 전체 기준으로 다시 조회해서 상태별 개수 집계
+    // 상단 요약카드: 필터 없이 전체 기준 상태별 개수 집계
     @Override
     public java.util.Map<String, Integer> getDeliverySummary(Long bizNo) {
         List<BizDeliveryVO> all = bizStoreMapper.selectDeliveryList(bizNo, null, null, null);
@@ -437,7 +437,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return result;
     }
 
-    //지윤 26.07.20 지연 판단: SHIPPING 상태이고, 송장 등록일(shipDate)로부터 3일 이상 지난 경우
+    // 지연 판단: SHIPPING 상태이고, 송장 등록일(shipDate)로부터 3일 이상 지난 경우
     private boolean isDelayed(BizDeliveryVO d) {
         if (!"SHIPPING".equals(d.getOrderStatus()) || d.getShipDate() == null) return false;
         try {
@@ -449,7 +449,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
     }
 
-    //지윤 26.07.20 추가: 송장 일괄등록 - 한 줄씩 파싱해서 주문번호로 ORDER_ID 찾고, 기존 updateOrderStatus 재사용해서 저장
+    // 송장 일괄등록: 한 줄씩 파싱 → 주문번호로 ORDER_ID 조회 → updateOrderStatus 재사용 저장
     @Override
     public java.util.Map<String, Object> bulkRegisterDelivery(Long bizNo, String bulkText) {
         java.util.List<String> validCarriers = java.util.List.of("cj", "hanjin", "lotte", "post");
@@ -473,9 +473,9 @@ public class BizStoreServiceImpl implements BizStoreService {
             Long orderId = bizStoreMapper.selectOrderIdByOrderNo(orderNo, bizNo);
             if (orderId == null) { failLines.add(line); continue; }
 
-            //지윤 26.07.20 참고: 아까 주문관리(orders.jsp)용으로 만든 updateOrderStatus를 그대로 재사용
+            // 주문관리(orders.jsp)용 updateOrderStatus 재사용
             //(택배사/송장번호 넣으면 자동으로 SHIPPING 상태 + 배송정보 upsert 처리됨)
-            //지윤 26.07.24 수정: courierCode 파라미터 추가된 시그니처에 맞춰 null로 넘김 (일괄등록은 API 코드 없이 텍스트만 씀)
+            // courierCode는 null (일괄등록은 API 코드 없이 텍스트만 사용)
             boolean ok = updateOrderStatus(orderId, bizNo, "SHIPPING", carrier, null, trackingNo);
             if (ok) okCount++; else failLines.add(line);
         }
@@ -486,20 +486,20 @@ public class BizStoreServiceImpl implements BizStoreService {
         return result;
     }
 
-    //지윤 26.07.20 추가: 리뷰관리 목록
+    // 리뷰관리 목록
     @Override
     public List<com.petcare.petcare.biz.store.vo.BizReviewVO> getBizReviewList(Long bizNo) {
         return bizStoreMapper.selectBizReviewList(bizNo);
     }
 
-    //지윤 26.07.20 추가: 답글 작성/수정 (본인 상품 리뷰만 반영됨 - UPDATE 조건에 BIZ_NO 포함)
+    // 답글 작성/수정 (UPDATE 조건에 BIZ_NO 포함, 본인 상품 리뷰만 반영)
     @Override
     public boolean saveReviewBizReply(Long bizNo, Long reviewId, String bizReply) {
         int updated = bizStoreMapper.updateReviewBizReply(reviewId, bizNo, bizReply);
         return updated > 0;
     }
 
-    //지윤 26.07.20 추가: 리뷰 삭제요청 - 즉시 삭제 X, TB_REVIEW_REPORT에 PENDING 등록만 (관리자 승인 후 실제 삭제)
+    // 리뷰 삭제요청: 즉시 삭제 없이 TB_REVIEW_REPORT에 PENDING 등록 (관리자 승인 후 삭제)
     @Override
     public void requestReviewDelete(Long bizNo, Long reviewId, String reason) {
         if (bizStoreMapper.selectReviewOwnedByBiz(reviewId, bizNo) == 0) {
@@ -511,38 +511,38 @@ public class BizStoreServiceImpl implements BizStoreService {
         bizStoreMapper.insertReviewDeleteRequest(reviewId, bizNo, reason);
     }
 
-   //지윤 26.07.21 추가: 사이드바 "주문관리" 뱃지용 - 결제완료(PAID) 상태 주문 개수
+   // 사이드바 "주문관리" 뱃지용 - 결제완료(PAID) 상태 주문 개수
    @Override
    public int getPaidOrderCount(Long bizNo) {
        return bizStoreMapper.selectPaidOrderCount(bizNo);
    }
 
-   //지윤 26.07.23 추가: 오늘 신규 주문 건수
+   // 오늘 신규 주문 건수
    @Override
    public int getTodayNewOrderCount(Long bizNo) {
        return bizStoreMapper.selectTodayNewOrderCount(bizNo);
    }
 
-   //지윤 26.07.21 추가: Q&A관리 목록
+   // Q&A관리 목록
    @Override
    public List<com.petcare.petcare.biz.store.vo.BizQnaVO> getBizQnaList(Long bizNo) {
        return bizStoreMapper.selectBizQnaList(bizNo);
    }
 
-   //지윤 26.07.21 추가: Q&A 답변 등록/수정 (본인 상품 질문만 반영됨 - UPDATE 조건에 BIZ_NO 포함)
+   // Q&A 답변 등록/수정 (UPDATE 조건에 BIZ_NO 포함, 본인 상품 질문만 반영)
    @Override
    public boolean saveQnaAnswer(Long bizNo, Long qnaId, String answer) {
        int updated = bizStoreMapper.updateQnaAnswer(qnaId, bizNo, answer);
        return updated > 0;
    }
 
-   //지윤 26.07.23 추가: 사업자 정보 조회
+   // 사업자 정보 조회
    @Override
    public com.petcare.petcare.biz.store.vo.BizInfoVO getBusinessInfo(Long bizNo) {
        return bizStoreMapper.selectBusinessInfo(bizNo);
    }
 
-   //지윤 26.07.23 추가: 사업자 정보 수정 (등록증 새로 올리면 기존 것 삭제 후 교체)
+   // 사업자 정보 수정 (등록증 새로 올리면 기존 것 삭제 후 교체)
    @Override
    public void updateBusinessInfo(Long bizNo, com.petcare.petcare.biz.store.vo.BizInfoVO info,
                                    org.springframework.web.multipart.MultipartFile certFile) throws Exception {
@@ -555,13 +555,13 @@ public class BizStoreServiceImpl implements BizStoreService {
        }
    }
 
-   //2026/08/06 장우철 — 정산 계좌 조회
+   // 정산 계좌 조회
    @Override
    public com.petcare.petcare.biz.store.vo.BizInfoVO getSettleAccount(Long bizNo) {
        return bizStoreMapper.selectSettleAccount(bizNo);
    }
 
-   //2026/08/06 장우철 — 정산 계좌 변경
+   // 정산 계좌 변경
    @Override
    public boolean updateSettleAccount(Long bizNo, String settleBank, String settleBankCode,
                                       String settleAccount, String settleHolder) {
@@ -575,7 +575,7 @@ public class BizStoreServiceImpl implements BizStoreService {
                settleAccount.replaceAll("[^0-9]", ""), settleHolder.trim()) > 0;
    }
 
-    // 2026/08/04 장우철 — 환불 목록
+    // 환불 목록
     @Override
     public List<BizReturnVO> getReturnList(Long bizNo, String statusCd) {
         if (statusCd == null || statusCd.isBlank()) {
@@ -640,7 +640,7 @@ public class BizStoreServiceImpl implements BizStoreService {
 
     /**
      * 회수완료 → 토스 부분환불 → DB DONE + 재고복구
-     * 2026/08/13 장우철 — 환불액 = 이 상품 실결제 (+ 상품이상이면 반송 3,000, 카드 잔액 한도)
+     * 환불액 = 이 상품 실결제 (+ 상품이상이면 반송 3,000, 카드 잔액 한도)
      */
     @Override
     @org.springframework.transaction.annotation.Transactional
@@ -659,7 +659,7 @@ public class BizStoreServiceImpl implements BizStoreService {
             if (detail.getTossPaymentKey() == null || detail.getTossPaymentKey().isBlank()) {
                 return "결제 정보를 찾을 수 없습니다.";
             }
-            // 2026/08/11 장우철 — P9: 결제수단(빌링/토스위젯)에 맞는 시크릿으로 부분환불
+            // 결제수단(빌링/토스위젯)에 맞는 시크릿으로 부분환불
             String tossError = tossPaymentService.cancelPaymentSmart(
                     detail.getTossPaymentKey(),
                     "상품 환불(회수완료)",
@@ -691,7 +691,7 @@ public class BizStoreServiceImpl implements BizStoreService {
             bizStoreMapper.insertPointRefundHistory(
                     detail.getMemberNo(), pointRestore, newBalance, detail.getOrderId());
         }
-        // 2026/08/13 장우철 — 주문 상품이 모두 환불(DONE)될 때만 쿠폰 복구
+        // 주문 상품이 모두 환불(DONE)될 때만 쿠폰 복구
         if (lastItem && detail.getMemberCouponId() != null) {
             bizStoreMapper.restoreCoupon(detail.getMemberCouponId());
         }
@@ -701,7 +701,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         return null;
     }
 
-    // 지윤 26/08/06 쇼핑몰 쿠폰기능
+    // 쇼핑몰 쿠폰기능
     @Override
     public List<BizCouponVO> getCouponList(Long bizNo) {
         return bizStoreMapper.selectCouponListByBizNo(bizNo);
@@ -709,7 +709,7 @@ public class BizStoreServiceImpl implements BizStoreService {
 
     @Override
     public void applyCoupon(Long bizNo, BizCouponVO vo) {
-        // 2026-08-13 박유정 — 빈 최소주문금액·정액 쿠폰 maxDiscountAmt 서버 기본값 (Integer 바인딩 보완)
+        // 빈 최소주문금액·정액 쿠폰 maxDiscountAmt 서버 기본값 (Integer 바인딩 보완)
         if (vo.getMinOrderAmt() == null) {
             vo.setMinOrderAmt(0);
         }
@@ -746,7 +746,6 @@ public class BizStoreServiceImpl implements BizStoreService {
     }
 
     /**
-     * 지윤 26.08.06
      * 쇼핑몰 사업자 쿠폰 조기 마감
      *
      * 관리자 승인을 받은 ACTIVE 쿠폰만 조기 마감할 수 있다.

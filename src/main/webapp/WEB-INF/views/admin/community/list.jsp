@@ -1,5 +1,4 @@
 <%--
-  - 박유정 / 2026-07-15
   - GET /admin/community/list → ${list}, ${totalCount}
   - POST 숨김·삭제·복구 (상태별 버튼 분기)
 --%>
@@ -20,7 +19,7 @@
     </div>
 
     <c:if test="${not empty successMsg}">
-        <%-- 2026-07-15 박유정 — 처리 결과 flash (숨김/삭제/복구 redirect) --%>
+        <%-- 처리 결과 flash (숨김/삭제/복구 redirect) --%>
         <div style="background:#ECFDF5;border:1px solid #BBF7D0;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px">${successMsg}</div>
     </c:if>
     <c:if test="${not empty errorMsg}">
@@ -33,7 +32,7 @@
             <span class="adm-card-head-sub">총 ${totalCount}건</span>
         </div>
         <div class="adm-card-body" style="padding-bottom:0">
-            <%-- 2026-07-15 박유정 — GET 검색 (keyword, boardType, statusCd) --%>
+            <%-- GET 검색 (keyword, boardType, statusCd) --%>
             <form method="get" action="${contextPath}/admin/community/list" class="adm-filter-bar">
                 <input type="text" name="keyword" class="adm-filter-input"
                        placeholder="제목, 작성자로 검색" value="${keyword}">
@@ -93,7 +92,7 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <%-- 2026/08/06 장우철 — 신고 대기 > 신고 기각 > 게시글 상태 --%>
+                                        <%-- 신고 대기 > 신고 기각 > 게시글 상태 --%>
                                         <c:choose>
                                             <c:when test="${item.pendingReportCount != null && item.pendingReportCount > 0}">
                                                 <span class="adm-badge wait">신고 대기</span>
@@ -119,13 +118,12 @@
                                     </td>
                                     <td style="white-space:nowrap">
                                         <a href="${contextPath}/admin/community/detail?id=${item.postId}" class="adm-btn blue">보기</a>
-                                        <%-- 2026-07-15 박유정 — 상태별 처리: ACTIVE=숨김+삭제, HIDDEN=복구+삭제, DELETED=복구 --%>
+                                        <%-- 상태별 처리: ACTIVE=숨김+삭제, HIDDEN=복구+삭제, DELETED=복구 --%>
                                         <c:choose>
                                             <c:when test="${item.statusCd eq 'HIDDEN'}">
                                                 <form method="post" action="${contextPath}/admin/community/restore"
                                                       style="display:inline;margin:0"
                                                       onsubmit="return confirm('다시 게시하시겠습니까?')">
-                                                    <!--HYJ 26.08.05-->
                                                     <input type="hidden" name="_csrf" value="${_csrf}">  
                                                     
                                                     <input type="hidden" name="postId" value="${item.postId}">
@@ -134,7 +132,6 @@
                                                 <form method="post" action="${contextPath}/admin/community/delete"
                                                       style="display:inline;margin:0"
                                                       onsubmit="return confirm('삭제하시겠습니까?')">
-                                                    <!--HYJ 26.08.05-->
                                                     <input type="hidden" name="_csrf" value="${_csrf}">  
                                                     
                                                     <input type="hidden" name="postId" value="${item.postId}">
@@ -146,7 +143,6 @@
                                                 <form method="post" action="${contextPath}/admin/community/restore"
                                                       style="display:inline;margin:0"
                                                       onsubmit="return confirm('다시 게시하시겠습니까?')">
-                                                    <!--HYJ 26.08.05-->
                                                     <input type="hidden" name="_csrf" value="${_csrf}">  
                                                     
                                                     <input type="hidden" name="postId" value="${item.postId}">
@@ -157,7 +153,6 @@
                                                 <form method="post" action="${contextPath}/admin/community/hide"
                                                       style="display:inline;margin:0"
                                                       onsubmit="return confirm('숨김 처리하시겠습니까?')">
-                                                    <!--HYJ 26.08.05-->
                                                     <input type="hidden" name="_csrf" value="${_csrf}">  
                                                     
                                                     <input type="hidden" name="postId" value="${item.postId}">
@@ -166,7 +161,6 @@
                                                 <form method="post" action="${contextPath}/admin/community/delete"
                                                       style="display:inline;margin:0"
                                                       onsubmit="return confirm('삭제하시겠습니까?')">
-                                                    <!--HYJ 26.08.05-->
                                                     <input type="hidden" name="_csrf" value="${_csrf}">  
                                                     
                                                     <input type="hidden" name="postId" value="${item.postId}">

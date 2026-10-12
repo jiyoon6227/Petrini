@@ -1,6 +1,5 @@
 /**
  * 역할: 관리자 숙소 예약 목록·상세 VO
- * 2026/07/31 장우철
  */
 package com.petcare.petcare.admin.reservation.vo;
 
@@ -33,7 +32,7 @@ public class AdminStayReservationVO {
     private Date cancelAt;
     private Date regDate;
     private String petName;
-    // 2026/08/11 장우철 — 결제수단·결제일 (TB_PAYMENT)
+    // 결제수단·결제일 (TB_PAYMENT)
     private String payMethod;
     private Date payDate;
 }

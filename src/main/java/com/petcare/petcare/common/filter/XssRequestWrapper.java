@@ -55,7 +55,6 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         if (value == null) {
             return null;
         }
-        // return cleanXss(value);
         return XssPreventer.escape(value);
     }
 
@@ -71,7 +70,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         }
         String[] cleanValues = new String[values.length];
         for (int i = 0; i < values.length; i++) {
-            cleanValues[i] = XssPreventer.escape(values[i]);//cleanXss(values[i]);
+            cleanValues[i] = XssPreventer.escape(values[i]);
         }
         return cleanValues;
     }
@@ -85,7 +84,6 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         if (value == null) {
             return null;
         }
-        //return cleanXss(value);
         return XssPreventer.escape(value);
     }
 

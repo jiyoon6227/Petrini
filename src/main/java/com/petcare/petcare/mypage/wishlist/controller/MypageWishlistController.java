@@ -1,5 +1,5 @@
 /**
- * 2026/08/13 장우철 — 관심상품 목록 + 찜 토글 API
+ * 관심상품 목록 + 찜 토글 API
  */
 package com.petcare.petcare.mypage.wishlist.controller;
 

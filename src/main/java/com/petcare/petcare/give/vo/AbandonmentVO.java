@@ -15,7 +15,7 @@ import lombok.Setter;
  * 농림축산식품부 유기동물 공공API 응답 VO
  * API: https://apis.data.go.kr/1543061/abandonmentPublicService_v2/abandonmentPublic_v2
  *
- * 2026-07-06 박유정 — API v2 필드(upKindCd·kindNm·kindFullNm) 및 종/품종 파싱
+ * API v2 필드(upKindCd·kindNm·kindFullNm) 및 종/품종 파싱
  */
 
 @Component("abandonmentVO")
@@ -102,7 +102,7 @@ public class AbandonmentVO {
         vo.setHappenDt    (item.path("happenDt").asText(""));
         vo.setHappenPlace (item.path("happenPlace").asText(""));
         vo.setKindCd      (item.path("kindCd").asText(""));
-        // 2026-07-06 박유정 — v2 API 축종·품종 필드 매핑
+        // v2 API 축종·품종 필드 매핑
         vo.setUpKindCd    (item.path("upKindCd").asText(""));
         vo.setKindNm      (item.path("kindNm").asText(""));
         vo.setKindFullNm  (item.path("kindFullNm").asText(""));

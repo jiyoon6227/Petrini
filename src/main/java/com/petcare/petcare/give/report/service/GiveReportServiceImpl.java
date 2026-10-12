@@ -1,9 +1,8 @@
 /**
  * 역할: GiveReportService 구현체 (@Service)
  *
- * - 박유정 / 2026-07-06~07
- * - 박유정 / 2026-07-29 — insertReport 주소 geocode → LOST_LAT/LNG (Kakao REST)
- * - 2026/07/22 장우철 — 사진 저장/삭제 gcs.enabled 분기 (로컬 ↔ GCS)
+ * - insertReport 주소 geocode → LOST_LAT/LNG (Kakao REST)
+ * - 사진 저장/삭제 gcs.enabled 분기 (로컬 ↔ GCS)
  *
  * [insertReport — 등록]
  * 1. 세션 회원 → TB_MEMBER 조회 후 MEMBER_NO 세팅
@@ -18,7 +17,7 @@
  * 1. TB_POST 1건 조회
  * 2. TB_FILE 사진 URL 목록 → photoUrls
  *
- * [deletePhotosByPostId] 2026/07/22 장우철
+ * [deletePhotosByPostId]
  * - 글/관리자 삭제 시 물리 파일 + TB_FILE 정리 (호출부 연결용)
  *
  * 연결
@@ -75,7 +74,7 @@ public class GiveReportServiceImpl implements GiveReportService {
     @Autowired
     private FileMapper fileMapper;
 
-    // 2026-07-29 박유정 — 주소 → 위·경도 변환 (insertReport, 병원 BizHospital 저장과 동일 패턴)
+    // 주소 → 위·경도 변환 (insertReport, 병원 BizHospital 저장과 동일 패턴)
     @Autowired
     private KakaoMapService kakaoMapService;
 
@@ -98,7 +97,7 @@ public class GiveReportServiceImpl implements GiveReportService {
         vo.setLostFeature(truncate(buildLostFeature(vo), 500));
         vo.setTags(truncate(buildTags(vo), 500));
         vo.setRegion(truncate(extractRegion(vo.getAddress()), 50));
-        // 2026-07-29 박유정 — 주소 → LOST_LAT/LNG (Kakao REST geocode, 병원 저장과 동일)
+        // 주소 → LOST_LAT/LNG (Kakao REST geocode, 병원 저장과 동일)
         if (vo.getAddress() != null && !vo.getAddress().isBlank()) {
             Map<String, Double> coords = kakaoMapService.geocodeAddress(vo.getAddress());
             if (coords != null) {
@@ -106,7 +105,7 @@ public class GiveReportServiceImpl implements GiveReportService {
                 vo.setLostLng(coords.get("lng"));
             }
         }
-        // 2026-07-29 박유정 — geocode·폼 hidden 모두 실패 시 서울시청 기본 좌표 (write.jsp 기본값과 동일)
+        // geocode·폼 hidden 모두 실패 시 서울시청 기본 좌표 (write.jsp 기본값과 동일)
         if (vo.getLostLat() == null) {
             vo.setLostLat(37.5665);
         }
@@ -283,7 +282,7 @@ public class GiveReportServiceImpl implements GiveReportService {
      * 사진을 로컬 또는 GCS에 저장하고 TB_FILE에 메타데이터 INSERT
      * 저장 경로: community와 동일하게 objectPath = give/report/{postId}/{uuid}.ext
      * 접근 URL:  /upload/give/report/{postId}/{uuid}.ext
-     * 2026/07/22 장우철 — gcs.enabled 분기
+     * gcs.enabled 분기
      */
     private void savePhotos(Long postId, MultipartFile[] photos) {
         if (postId == null || photos == null) {
@@ -303,7 +302,7 @@ public class GiveReportServiceImpl implements GiveReportService {
             String fileUrl = "/upload/" + objectPath;
 
             if (gcsEnabled) {
-                // [GCS 업로드 — gcs.enabled=true] 2026/07/22 장우철
+                // [GCS 업로드 — gcs.enabled=true]
                 //#region구글 스토리지 GCS 전환코드 START
                 if (storage == null) {
                     throw new IllegalStateException("GCS enabled but Storage bean is missing");
@@ -322,7 +321,7 @@ public class GiveReportServiceImpl implements GiveReportService {
                 }
                 //#endregion GCS 전환코드 END
             } else {
-                // [로컬 저장 — gcs.enabled=false] 2026/07/22 장우철
+                // [로컬 저장 — gcs.enabled=false]
                 //#region로컬 파일관리
                 Path dir = Paths.get(uploadDir, "give", "report", String.valueOf(postId));
                 try {
@@ -347,7 +346,7 @@ public class GiveReportServiceImpl implements GiveReportService {
 
     /**
      * 제보 사진 물리 삭제 + TB_FILE 삭제
-     * 유저/관리자 글 삭제 연동용 — 2026/07/22 장우철
+     * 유저/관리자 글 삭제 연동용
      */
     @Override
     public void deletePhotosByPostId(long postId) {
@@ -373,14 +372,14 @@ public class GiveReportServiceImpl implements GiveReportService {
         }
         String objectPath = toObjectPath(fileUrl);
         if (gcsEnabled) {
-            // [GCS 삭제 — gcs.enabled=true] 2026/07/22 장우철
+            // [GCS 삭제 — gcs.enabled=true]
             //#region구글 스토리지 GCS 전환코드 START
             if (storage != null) {
                 storage.delete(BlobId.of(gcsBucket, objectPath));
             }
             //#endregion GCS 전환코드 END
         } else {
-            // [로컬 삭제 — gcs.enabled=false] 2026/07/22 장우철
+            // [로컬 삭제 — gcs.enabled=false]
             //#region로컬 파일관리
             try {
                 Files.deleteIfExists(Paths.get(uploadDir, objectPath));

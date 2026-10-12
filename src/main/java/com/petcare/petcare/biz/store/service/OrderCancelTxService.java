@@ -28,7 +28,7 @@ public class OrderCancelTxService {
             if (item.getOptionId() != null) {
                 bizStoreMapper.restoreStock(item.getOptionId(), item.getQty());
             }
-            //지윤 26.07.23 추가: 재고 복구로 다시 재고가 생겼으면 품절 상태 자동 해제
+            // 재고 복구로 다시 재고가 생겼으면 품절 상태 자동 해제
             bizStoreMapper.restoreProductStatusIfNeeded(item.getProductId());
         }
 

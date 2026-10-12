@@ -23,8 +23,8 @@
   .btn-complete-store{flex:1;padding:13px;border:none;border-radius:var(--radius-sm);background:#0284C7;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 </style>
 
-<%-- 2026-07-10 장우철 — 예약 완료 DB 연동 (F3) --%>
-<%-- 2026/07/16 장우철 — reservation null·resvDate null 시 JSP 500 방지 (숙소 complete.jsp 패턴) --%>
+<%-- 예약 완료 --%>
+<%-- reservation null·resvDate null 시 JSP 500 방지 (숙소 complete.jsp 패턴) --%>
 <div class="complete-wrap">
   <div class="complete-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
   <div class="complete-title">예약이 완료되었습니다!</div>

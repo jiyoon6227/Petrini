@@ -17,7 +17,7 @@ import lombok.Setter;
 @Setter
 public class HospitalResvExceptionVO {
 
-    // 2026/07/16 장우철 고도화작업 — 예약예외 VO
+    // 예약예외 VO
     private Long excId;
     private Long hospitalId;
     private Long doctorId;       // null = 공통

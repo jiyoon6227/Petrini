@@ -1,5 +1,5 @@
 /**
- * 2026/07/28 장우철 — 금결원 계좌실명조회 결과 VO
+ * 금결원 계좌실명조회 결과 VO
  */
 package com.petcare.petcare.common.external.vo;
 

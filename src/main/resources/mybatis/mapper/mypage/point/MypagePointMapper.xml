@@ -15,12 +15,12 @@
   - TB_POINT_HISTORY
 -->
 
-<!-- 지윤 26.07.29 추가: 보유 포인트 잔액 -->
+<!-- 보유 포인트 잔액 -->
 <select id="selectPointBalance" resultType="int">
     SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
 </select>
 
-<!-- 지윤 26.07.29 재수정: REG_DATE 저장 형식이 'YYYY-MM-DD'와 'YY/MM/DD' 두 가지로 섞여있는 걸 실제 데이터로 확인함
+<!-- REG_DATE 저장 형식이 'YYYY-MM-DD'와 'YY/MM/DD' 두 가지로 혼재
      (INSERT하는 곳마다 SYSDATE 그대로 넣은 곳/TO_CHAR로 변환해서 넣은 곳이 달라서 생긴 문제)
      -> 두 형식 다 이번 달로 인식되도록 OR 조건 추가 -->
 <select id="selectThisMonthEarnedPoint" resultType="int">
@@ -34,11 +34,11 @@
           )
 </select>
 
-<!-- 지윤 26.07.29 수정: REG_DATE에 TO_CHAR() 씌우던 것 제거 (이미 문자열이라 그대로 SELECT) -->
+<!-- REG_DATE는 이미 문자열이라 TO_CHAR() 없이 SELECT -->
 <select id="selectPointHistory" resultType="com.petcare.petcare.mypage.point.vo.MypagePointVO">
     SELECT
         POINT_ID    AS pointId,
-        <!-- 지윤 26.07.29 추가: 'YY/MM/DD'(예: 26/07/29) 형식이면 'YYYY-MM-DD'(2026-07-29)로 변환, 이미 그 형식이면 그대로 -->
+        <!-- 'YY/MM/DD'(예: 26/07/29) 형식이면 'YYYY-MM-DD'(2026-07-29)로 변환, 이미 그 형식이면 그대로 -->
         CASE
             WHEN REG_DATE LIKE '__/__/__' THEN '20' || SUBSTR(REG_DATE,1,2) || '-' || SUBSTR(REG_DATE,4,2) || '-' || SUBSTR(REG_DATE,7,2)
             ELSE REG_DATE

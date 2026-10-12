@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class HospitalTreatTypeVO {
 
-    // 2026/07/16 장우철 고도화작업 — 진료유형 VO
+    // 진료유형 VO
     private Long treatTypeId;
     private Long hospitalId;
     private String typeName;

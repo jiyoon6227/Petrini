@@ -1,6 +1,6 @@
 /**
  * 역할: 중간정산 요청 (TB_SETTLEMENT_REQUEST)
- * 2026/07/30 장우철 — 숙소 정산 구현순서 1-2 VO
+ * 숙소 정산 VO
  *
  * 참고 테이블: TB_SETTLEMENT_REQUEST
  * 사용처: BizStay 요청 등록 / AdminSettlement 승인·거절

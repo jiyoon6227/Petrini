@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.petcare.petcare.mypage.reserve.mapper.MypageReserveMapper;
 
 /**
- * 2026-07-28 박유정 — 숙소 평점 요약 갱신 (리뷰 INSERT와 분리)
+ * 숙소 평점 요약 갱신 (리뷰 INSERT와 분리)
  */
 @Service
 public class MypageReserveRatingService {

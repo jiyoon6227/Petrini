@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 <link rel="stylesheet" href="${contextPath}/resources/css/mypage.css">
 
-<%-- 지윤 26.07.20 수정: 밋밋했던 rd-card 스타일 -> 섹션별 라벨/아이콘/여백 보강한 od- 전용 스타일로 리디자인
+<%-- 섹션별 라벨/아이콘/여백을 보강한 od- 전용 스타일
      결제내역/배송지/배송정보까지 자세히 보여주는 읽기전용 페이지. 리뷰작성은 여기 없음 (목록에서 모달로 처리) --%>
 <style>
 .od-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
@@ -55,8 +55,8 @@
     </div>
   </div>
 
-  <%-- 지윤 26.07.21 추가: 주문정보 섹션 - 주문번호/주문일자/주문자 한눈에 정리 --%>
-  <%-- 지윤 26.07.30 수정: 주문처리상태는 사업자마다 다를 수 있어서 이 섹션에서 빼고, 사업자별 블록으로 이동 --%>
+  <%-- 주문정보 섹션 - 주문번호/주문일자/주문자 한눈에 정리 --%>
+  <%-- 주문처리상태는 사업자마다 다를 수 있어 사업자별 블록에 표시 --%>
   <div class="od-section">
     <p class="od-section-title">📋 주문정보</p>
     <div class="od-row"><span class="label">주문번호</span><span class="value">#${order.orderNo}</span></div>
@@ -64,17 +64,17 @@
     <div class="od-row"><span class="label">주문자</span><span class="value">${order.ordererName}</span></div>
   </div>
 
-  <%-- 지윤 26.07.30 수정: 같은 결제로 쪼개진 사업자별 주문(orderGroup)을 각각 섹션으로 반복 렌더링.
+  <%-- 같은 결제로 나뉜 사업자별 주문(orderGroup)을 섹션별로 반복 렌더링
        사업자마다 상태/배송정보/상품/소계(상품금액·배송비)가 따로 있고, 취소신청도 사업자 단위로 가능함 --%>
   <c:forEach var="o" items="${orderGroup}">
     <div class="od-section">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <p class="od-section-title" style="margin-bottom:0"><c:out value="${o.bizName}"/></p>
         <div style="display:flex;align-items:center;gap:10px">
-          <%-- 2026/08/13 장우철 — #7 환불완료/부분환불 뱃지 --%>
+          <%-- 환불완료/부분환불 뱃지 --%>
           <%@ include file="/WEB-INF/views/mypage/orders-status-badge.jsp" %>
-          <%-- 지윤 26.07.30 수정: 주문취소 버튼을 사업자 단위로 이동 (하단 공용 버튼 -> 여기로) --%>
-          <%-- 2026/08/04 장우철 — 결제완료·배송준비 = 주문취소 (배송중부터는 환불) --%>
+          <%-- 주문취소 버튼 (사업자 단위) --%>
+          <%-- 결제완료·배송준비 = 주문취소 (배송중부터는 환불) --%>
           <c:if test="${(o.orderStatus == 'PAID' || o.orderStatus == 'READY') && empty o.claimStatus}">
             <button type="button" class="btn-sm" style="background:#fff;border:1px solid #E2445C;color:#E2445C;" onclick="openCancelModal(${o.orderId})">주문취소</button>
           </c:if>
@@ -133,7 +133,7 @@
       <div style="margin-top:16px;">
         <c:forEach var="it" items="${o.itemList}">
           <div class="od-item">
-            <%-- 2026/08/18 장우철 — FILE_URL이 /upload/ 포함이어도 경로가 겹치지 않게 --%>
+            <%-- FILE_URL이 /upload/ 포함이어도 경로가 겹치지 않게 --%>
             <c:choose>
               <c:when test="${not empty it.thumbnailUrl}">
                 <c:choose>
@@ -171,11 +171,11 @@
         </c:forEach>
       </div>
 
-      <%-- 지윤 26.07.30 추가: 이 사업자 몫만의 소계 (장바구니/주문서와 동일한 방식) --%>
+      <%-- 이 사업자 몫만의 소계 (장바구니/주문서와 동일한 방식) --%>
       <div class="od-row" style="margin-top:8px;"><span class="label">상품금액</span><span class="value"><fmt:formatNumber value="${o.totalAmount}" pattern="#,###"/>원</span></div>
       <div class="od-row"><span class="label">배송비</span><span class="value"><fmt:formatNumber value="${o.deliveryFee}" pattern="#,###"/>원</span></div>
 
-      <%-- 지윤 26.07.30 수정: 취소신청 내역도 사업자 단위로 이동 --%>
+      <%-- 취소신청 내역 (사업자 단위) --%>
       <c:if test="${not empty o.claimStatus}">
         <div class="od-row" style="border-top:1px dashed #F0AD4E;padding-top:12px;margin-top:8px;">
           <span class="label">취소상태</span>
@@ -192,7 +192,7 @@
     </div>
   </c:forEach>
 
-  <%-- 지윤 26.07.30 수정: 결제 내역은 사업자별 소계를 전부 합산한 "전체 결제 그룹" 기준으로 표시 --%>
+  <%-- 결제 내역은 사업자별 소계를 전부 합산한 "전체 결제 그룹" 기준으로 표시 --%>
   <div class="od-section">
     <p class="od-section-title">💳 결제 내역</p>
     <c:set var="couponOnlyAmt" value="${groupDiscountAmount - groupPointUsed}" />
@@ -220,14 +220,13 @@
 </div>
 </div>
 
-<%-- 지윤 26.07.22 추가: 취소사유 입력 모달 --%>
-<%-- 지윤 26.07.30 수정: 사업자별로 취소 버튼이 여러 개일 수 있어서, orderId를 고정값이 아니라 openCancelModal()에서 그때그때 채워넣게 변경 --%>
+<%-- 취소사유 입력 모달 --%>
+<%-- 사업자별 취소 버튼이 여러 개라 orderId는 openCancelModal()에서 채움 --%>
 <div id="cancelModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1000; align-items:center; justify-content:center;">
   <div style="background:#fff; border-radius:14px; padding:24px; width:360px;">
     <p style="font-weight:800; font-size:15px; margin:0 0 12px;">주문취소 신청</p>
     <p style="font-size:13px; color:var(--text-muted); margin:0 0 14px;">결제완료·배송준비 단계에서만 취소 가능합니다. (배송중부터는 환불 신청) 신청 후 사업자 확인을 거쳐 환불됩니다.</p>
     <form id="cancelForm" method="post" action="${contextPath}/mypage/orders/cancel">
-      <!--HYJ 26.08.05-->
       <input type="hidden" name="_csrf" value="${_csrf}">
       
       <input type="hidden" id="cancelOrderId" name="orderId" value="">
@@ -240,7 +239,7 @@
   </div>
 </div>
 
-<%-- 지윤 26.07.29 추가: 배송조회 결과 모달 (주문목록 orders.jsp와 동일 로직) --%>
+<%-- 배송조회 결과 모달 (주문목록 orders.jsp와 동일 로직) --%>
 <div id="trackModalBg" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center;">
   <div style="background:#fff; border-radius:16px; padding:24px; max-width:480px; width:90%; max-height:80vh; overflow-y:auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
@@ -254,14 +253,14 @@
 <script>
 var contextPath = '${contextPath}';
 
-//지윤 26.07.30 수정: 사업자별로 취소 버튼이 여러 개일 수 있어서, 클릭한 주문의 orderId를 hidden input에 채워넣도록 변경
+// 사업자별 취소 버튼이 여러 개라 클릭한 주문의 orderId를 hidden input에 채움
 function openCancelModal(orderId) {
   document.getElementById('cancelOrderId').value = orderId;
   document.getElementById('cancelModal').style.display = 'flex';
 }
 function closeCancelModal() { document.getElementById('cancelModal').style.display = 'none'; }
 
-//지윤 26.07.29 추가: 배송조회 - orders.jsp와 동일 패턴 (levelLabel 매핑, 조회결과 표시)
+// 배송조회 - orders.jsp와 동일 패턴 (levelLabel 매핑, 조회결과 표시)
 var levelLabel = { 1: '배송준비중', 2: '집화완료', 3: '배송중', 4: '지점도착', 5: '배송출발', 6: '배송완료' };
 
 function trackDelivery(orderId, courierCode, trackingNo) {

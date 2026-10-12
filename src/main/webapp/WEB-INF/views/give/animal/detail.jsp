@@ -2,7 +2,6 @@
 <%--
   역할: 유기동물 상세 화면 (give/animal/detail)
 
-  - 박유정 / 2026-07-06
 
   [상세 화면 흐름]
   1. 사용자가 /give/animal/detail?desertionNo=번호 로 들어옴

@@ -8,7 +8,7 @@
  * SQL·비즈니스 로직은 넣지 말 것 → Service로 위임
  * return 경로는 담당 JSP와 동일하게 맞출 것
  *
- * 2026-08-06 박유정 — 배너 관리 API 확장
+ * 배너 관리 API 확장
  * - GET  /banner?tab=&category=  목록(대분류+중분류)
  * - POST /banner/hold             대기(노출예정)
  * - POST /banner/period|activate|deactivate|delete
@@ -46,7 +46,7 @@ public class AdminCMSController extends AdminBaseController {
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     //  관리자: 배너 목록 (기존 AdminCMSController의 /admin/cms/banner 대체)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // 2026-08-06 박유정 — 배너 목록 (대분류 category + 중분류 tab)
+    // 배너 목록 (대분류 category + 중분류 tab)
     @GetMapping("/banner")
     public String adminBannerList(@RequestParam(defaultValue = "pending") String tab,
                                   @RequestParam(defaultValue = "main") String category,
@@ -96,7 +96,7 @@ public class AdminCMSController extends AdminBaseController {
         }
     }
 
-    // 2026-08-06 박유정 — 배너 대기 (PENDING → HOLD, 사유 입력)
+    // 배너 대기 (PENDING → HOLD, 사유 입력)
     @PostMapping("/banner/hold")
     @ResponseBody
     public String adminBannerHold(@RequestParam Long bannerId,
@@ -111,7 +111,7 @@ public class AdminCMSController extends AdminBaseController {
         }
     }
 
-    // 2026-08-06 박유정 — 배너 상세 (기간 변경·올리기/내리기)
+    // 배너 상세 (기간 변경·올리기/내리기)
     @GetMapping("/banner/detail")
     public String adminBannerDetail(@RequestParam Long bannerId,
                                     HttpSession session,
@@ -142,7 +142,7 @@ public class AdminCMSController extends AdminBaseController {
         return "redirect:/admin/cms/banner/detail?bannerId=" + bannerId;
     }
 
-    // 2026-08-07 박유정 — 관리자 배너 정보 수정 (제목·링크·이미지, POST /banner/update)
+    // 관리자 배너 정보 수정 (제목·링크·이미지, POST /banner/update)
     @PostMapping("/banner/update")
     public String adminBannerUpdateInfo(@RequestParam Long bannerId,
                                         @RequestParam String title,
@@ -205,7 +205,7 @@ public class AdminCMSController extends AdminBaseController {
         }
     }
     
-    // 2026-08-11 박유정 — 공지사항 목록
+    // 공지사항 목록
     @GetMapping("/notice")
     public String cmsNotice(HttpSession session, Model model) {
         if (getAdmin(session) == null) {
@@ -216,7 +216,7 @@ public class AdminCMSController extends AdminBaseController {
         return "admin/cms/notice";
     }
 
-    // 2026-08-11 박유정 — 공지 등록/수정 폼
+    // 공지 등록/수정 폼
     @GetMapping("/notice/form")
     public String noticeForm(@RequestParam(value = "noticeId", required = false) Long noticeId,
                              HttpSession session,
@@ -240,7 +240,7 @@ public class AdminCMSController extends AdminBaseController {
         return "admin/cms/notice-form";
     }
 
-    // 2026-08-11 박유정 — 공지 등록
+    // 공지 등록
     @PostMapping("/notice/save")
     public String noticeSave(@RequestParam String title,
                              @RequestParam String body,
@@ -270,7 +270,7 @@ public class AdminCMSController extends AdminBaseController {
         return "redirect:/admin/cms/notice";
     }
 
-    // 2026-08-11 박유정 — 공지 수정
+    // 공지 수정
     @PostMapping("/notice/update")
     public String noticeUpdate(@RequestParam Long noticeId,
                                @RequestParam String title,
@@ -302,7 +302,7 @@ public class AdminCMSController extends AdminBaseController {
         return "redirect:/admin/cms/notice";
     }
 
-    // 2026-08-11 박유정 — 공지 삭제
+    // 공지 삭제
     @PostMapping("/notice/delete")
     public String noticeDelete(@RequestParam Long noticeId,
                                HttpSession session,
@@ -319,7 +319,7 @@ public class AdminCMSController extends AdminBaseController {
         return "redirect:/admin/cms/notice";
     }
 
-    // 2026-08-11 박유정 — FAQ 목록
+    // FAQ 목록
     @GetMapping("/faq")
     public String cmsFaq(HttpSession session, Model model) {
         if (getAdmin(session) == null) {
@@ -330,7 +330,7 @@ public class AdminCMSController extends AdminBaseController {
         return "admin/cms/faq";
     }
 
-    // 2026-08-11 박유정 — FAQ 등록/수정 폼
+    // FAQ 등록/수정 폼
     @GetMapping("/faq/form")
     public String faqForm(@RequestParam(value = "faqId", required = false) Long faqId,
                           HttpSession session,
@@ -354,7 +354,7 @@ public class AdminCMSController extends AdminBaseController {
         return "admin/cms/faq-form";
     }
 
-    // 2026-08-11 박유정 — FAQ 등록
+    // FAQ 등록
     @PostMapping("/faq/save")
     public String faqSave(@RequestParam String categoryCd,
                           @RequestParam String question,
@@ -382,7 +382,7 @@ public class AdminCMSController extends AdminBaseController {
         return "redirect:/admin/cms/faq";
     }
 
-    // 2026-08-11 박유정 — FAQ 수정
+    // FAQ 수정
     @PostMapping("/faq/update")
     public String faqUpdate(@RequestParam Long faqId,
                             @RequestParam String categoryCd,
@@ -412,7 +412,7 @@ public class AdminCMSController extends AdminBaseController {
         return "redirect:/admin/cms/faq";
     }
 
-    // 2026-08-11 박유정 — FAQ 삭제
+    // FAQ 삭제
     @PostMapping("/faq/delete")
     public String faqDelete(@RequestParam Long faqId,
                             HttpSession session,

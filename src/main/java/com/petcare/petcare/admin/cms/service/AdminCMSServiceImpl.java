@@ -12,7 +12,7 @@
  *
  * 비즈니스 로직은 여기에 작성 (Controller, Mapper에 직접 작성 X)
  *
- * 2026-08-06 박유정 — 배너 관리 확장
+ * 배너 관리 확장
  * - 탭(현재광고/광고대기/승인/승인대기/반려) + 대분류(메인/숙소/쇼핑/병원) 필터
  * - 승인·대기(HOLD)·반려 + 사업자 알림
  * - 광고 올리기/내리기, 기간 변경, 종료일 자동 만료 연동
@@ -65,7 +65,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
     @Autowired
     private FileService fileService;
     
-    // ── 2026-08-06 박유정 — 관리자: 탭·대분류별 배너 목록 ──
+    // ── 관리자: 탭·대분류별 배너 목록 ──
     @Override
     public List<MainBannerVO> getBannerListByTabAndCategory(String tab, String category) {
         String safeTab = normalizeTab(tab);
@@ -164,7 +164,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         return false;
     }
 
-    // 2026-08-06 박유정 — 중분류 탭: live/scheduled/approved/pending/rejected
+    // 중분류 탭: live/scheduled/approved/pending/rejected
     private boolean matchesTab(MainBannerVO banner, String tab) {
         if (banner == null || banner.getStatusCd() == null) {
             return false;
@@ -195,7 +195,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
             testStayBannersCleaned = true;
         }
     }
-    // 2026-08-07 박유정 — 관리자 배너 상세 1건 (만료 동기화 후 조회)
+    // 관리자 배너 상세 1건 (만료 동기화 후 조회)
     @Override
     public MainBannerVO getBannerDetail(Long bannerId) {
         bannerExpiryService.expirePastEndDateBanners();
@@ -206,7 +206,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         return banner;
     }
 
-    // 2026-08-07 박유정 — 관리자 배너 정보 수정 (제목·링크·이미지)
+    // 관리자 배너 정보 수정 (제목·링크·이미지)
     @Override
     @Transactional
     public void updateBannerInfo(Long bannerId, String title, String linkUrl,
@@ -227,7 +227,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         Long oldFileId = banner.getFileId();
 
         if (bannerImage != null && !bannerImage.isEmpty()) {
-            // 2026-08-07 박유정 — PDF·문서 업로드 차단 후 BANNER 파일 교체
+            // PDF·문서 업로드 차단 후 BANNER 파일 교체
             String name = bannerImage.getOriginalFilename();
             if (name != null) {
                 String lower = name.toLowerCase();
@@ -269,7 +269,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
     @Override
     @Transactional
     public void deactivateBanner(Long bannerId) {
-        // 2026-08-06 박유정 — 광고 내리기 (ACTIVE → EXPIRED)
+        // 광고 내리기 (ACTIVE → EXPIRED)
         MainBannerVO banner = adminCMSMapper.selectBannerById(bannerId);
         if (banner == null) {
             throw new IllegalArgumentException("배너를 찾을 수 없습니다.");
@@ -283,7 +283,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         adminCMSMapper.updateBannerStatus(vo);
     }
 
-    // 2026-08-06 박유정 — 광고 올리기 (EXPIRED → ACTIVE)
+    // 광고 올리기 (EXPIRED → ACTIVE)
     @Override
     @Transactional
     public String activateBanner(Long bannerId) {
@@ -320,7 +320,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         return adminCMSMapper.selectPendingBannerCount();
     }
 
-    // 2026-08-06 박유정 — 배너 승인 (PENDING/HOLD → ACTIVE, 시작일 유지·예약 노출)
+    // 배너 승인 (PENDING/HOLD → ACTIVE, 시작일 유지·예약 노출)
     @Override
     @Transactional
     public String approveBanner(Long bannerId) {
@@ -344,7 +344,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         return "배너 승인이 완료되었습니다.";
     }
 
-    // 2026-08-06 박유정 — 배너 대기 (PENDING → HOLD 노출예정, 사유 알림)
+    // 배너 대기 (PENDING → HOLD 노출예정, 사유 알림)
     @Override
     @Transactional
     public void holdBanner(Long bannerId, String holdReason) {
@@ -368,9 +368,9 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         notifyBannerHold(banner, holdReason.trim());
     }
 
-    // 2026-08-06 박유정 — 위치별 노출 슬롯 제한 (기간 만료 전 ACTIVE 기준)
+    // 위치별 노출 슬롯 제한 (기간 만료 전 ACTIVE 기준)
     private void ensureActiveSlotAvailable(String positionCd) {
-        // 2026-08-07 박유정 — MAIN_MID 1개, 그 외 MAX_PER_POSITION
+        // MAIN_MID 1개, 그 외 MAX_PER_POSITION
         int maxSlots = BannerConstants.getMaxPerPosition(positionCd);
         int activeCount = mainBannerMapper.countLiveSlotsByPosition(positionCd);
         if (activeCount >= maxSlots) {
@@ -379,7 +379,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         }
     }
 
-    // 2026-08-06 박유정 — 배너 반려 (사유 저장 + 사업자 알림)
+    // 배너 반려 (사유 저장 + 사업자 알림)
     @Override
     @Transactional
     public void rejectBanner(Long bannerId, String rejectReason) {
@@ -404,7 +404,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
     }
 
     private void notifyBannerHold(MainBannerVO banner, String holdReason) {
-        // 2026-08-06 박유정 — 대기 사유 사업자 알림 (실패해도 트랜잭션 유지)
+        // 대기 사유 사업자 알림 (실패해도 트랜잭션 유지)
         if (banner == null || banner.getBizNo() == null) {
             return;
         }
@@ -422,7 +422,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
     }
 
     private void notifyBannerRejected(MainBannerVO banner, String rejectReason) {
-        // 2026-08-06 박유정 — 반려 사유 사업자 알림 (실패해도 트랜잭션 유지)
+        // 반려 사유 사업자 알림 (실패해도 트랜잭션 유지)
         if (banner == null || banner.getBizNo() == null) {
             return;
         }
@@ -467,7 +467,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         };
     }
 
-    // 2026-08-11 박유정 — FAQ CMS
+    // FAQ CMS
     @Override
     @Transactional(readOnly = true)
     public List<FaqVO> getFaqList() {
@@ -514,7 +514,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         adminCMSMapper.deleteFaq(faqId);
     }
 
-    // 2026-08-11 박유정 — FAQ 입력값 검증
+    // FAQ 입력값 검증
     private void validateFaq(FaqVO faq, boolean isUpdate) {
         if (faq == null) {
             throw new IllegalArgumentException("FAQ 정보가 없습니다.");
@@ -536,7 +536,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         faq.setAnswer(faq.getAnswer().trim());
     }
 
-    // 2026-08-11 박유정 — FAQ 기본값
+    // FAQ 기본값
     private void applyFaqDefaults(FaqVO faq) {
         if (faq.getVisibleYn() == null || faq.getVisibleYn().isBlank()) {
             faq.setVisibleYn("Y");
@@ -548,7 +548,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         }
     }
 
-    // 2026-08-11 박유정 — 공지사항 CMS
+    // 공지사항 CMS
     @Override
     @Transactional(readOnly = true)
     public List<NoticeVO> getNoticeList() {
@@ -595,7 +595,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         adminCMSMapper.deleteNotice(noticeId);
     }
 
-    // 2026-08-11 박유정 — 공지 입력값 검증
+    // 공지 입력값 검증
     private void validateNotice(NoticeVO notice, boolean isUpdate) {
         if (notice == null) {
             throw new IllegalArgumentException("공지 정보가 없습니다.");
@@ -616,7 +616,7 @@ public class AdminCMSServiceImpl implements AdminCMSService {
         }
     }
 
-    // 2026-08-11 박유정 — 공지 기본값
+    // 공지 기본값
     private void applyNoticeDefaults(NoticeVO notice) {
         if (notice.getNoticeTypeCd() == null || notice.getNoticeTypeCd().isBlank()) {
             notice.setNoticeTypeCd("NOTICE");

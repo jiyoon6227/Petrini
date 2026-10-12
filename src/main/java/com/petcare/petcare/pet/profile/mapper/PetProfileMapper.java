@@ -1,5 +1,5 @@
 /**
- * 2026/07/11 장우철 — 반려동물 프로필 DB 접근
+ * 반려동물 프로필 DB 접근
  *
  * XML: resources/mybatis/mapper/pet/profile/PetProfileMapper.xml
  * 참고 테이블: TB_PET
@@ -34,7 +34,7 @@ public interface PetProfileMapper {
 
     int updatePet(PetProfileVO vo);
 
-    // 2026/08/11 장우철 — 대표사진 PHOTO_URL 갱신
+    // 대표사진 PHOTO_URL 갱신
     int updatePetPhotoUrl(@Param("petId") Long petId,
                           @Param("memberNo") Long memberNo,
                           @Param("photoUrl") String photoUrl);

@@ -13,7 +13,6 @@ package com.petcare.petcare.member.auth.vo;
 
 import lombok.Getter;
 import lombok.Setter;
-/* 2026/07/06 장우철 */
 @Getter
 @Setter
 public class MemberAuthVO {
@@ -26,9 +25,9 @@ public class MemberAuthVO {
     private String email;         // 이메일 — TB_MEMBER.EMAIL
     private String statusCd;      // 회원 상태 — TB_MEMBER.STATUS_CD (NORMAL만 로그인 허용)
     private String gradeCd;       // 회원 등급 코드 — TB_MEMBER.GRADE_CD (BRONZE/SILVER/GOLD)
-    // 2026/07/08 장우철 — 마이페이지 DB 연동 (A단계)
+    // 마이페이지용
     private Long pointBalance;    // 보유 포인트 — TB_MEMBER.POINT_BALANCE
-    // 2026/07/10 지윤 — 주문서 배송지 자동입력용으로 추가
+    // 주문서 배송지 자동입력용
     private String phone;         // 휴대폰 번호 — TB_MEMBER.PHONE
     private String zipcode;       // 우편번호 — TB_MEMBER.ZIP_CODE
     private String addr1;         // 기본 주소 — TB_MEMBER.ADDR1

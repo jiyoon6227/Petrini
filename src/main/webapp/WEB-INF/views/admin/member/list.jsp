@@ -1,5 +1,4 @@
 <%--
-  - 박유정 / 2026-07-16 (목록), 2026-07-20 (STEP 7), 2026-07-21 (STEP 12·②), 2026-07-22 (일괄복구·목록정지제거)
   - POST /admin/member/bulk-suspend  — 선택 일괄 정지 (suspendType)
   - POST /admin/member/bulk-restore  — 선택 일괄 복구
   - POST /admin/member/bulk-withdraw   — 선택 일괄 탈퇴
@@ -29,7 +28,7 @@
         </div>
     </div>
 
-    <%-- 2026-07-16 박유정 — 처리 결과 flash (상세 redirect) --%>
+    <%-- 처리 결과 flash (상세 redirect) --%>
     <c:if test="${not empty successMsg}">
         <div style="background:#ECFDF5;border:1px solid #BBF7D0;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px">${successMsg}</div>
     </c:if>
@@ -43,7 +42,7 @@
             <span class="adm-card-head-sub">총 ${totalCount}명</span>
         </div>
         <div class="adm-card-body" style="padding-bottom:0">
-            <%-- 2026-07-16 박유정 — GET 검색 (keyword, roleType, statusCd) --%>
+            <%-- GET 검색 (keyword, roleType, statusCd) --%>
             <form method="get" action="${contextPath}/admin/member/list" class="adm-filter-bar">
                 <input type="text" name="keyword" class="adm-filter-input"
                        placeholder="이름, 이메일, 전화번호로 검색" value="${keyword}">
@@ -111,7 +110,7 @@
                                             <c:when test="${item.statusCd eq 'NORMAL'}">
                                                 <span class="adm-badge active">활성</span>
                                             </c:when>
-                                            <%-- 2026-07-21 박유정 STEP ② — 기간 정지 뱃지 (영구 / ~종료일) --%>
+                                            <%-- 기간 정지 뱃지 (영구 / ~종료일) --%>
                                             <c:when test="${item.statusCd eq 'SUSPENDED'}">
                                                 <span class="adm-badge banned">
                                       <c:choose>
@@ -147,14 +146,14 @@
         </div>
         <div style="padding:16px 20px;border-top:1px solid #E4E6ED;display:flex;justify-content:space-between;align-items:center">
             <div style="display:flex;gap:8px">
-               <%-- 2026-07-21 박유정 STEP ② — 일괄 정지 기간 선택 --%>
+               <%-- 일괄 정지 기간 선택 --%>
                <select id="bulkSuspendType" class="adm-filter-select" style="width:auto">
                <option value="DAY3">3일 정지</option>
                <option value="DAY7">7일 정지</option>
                 <option value="PERMANENT" selected>영구 정지</option>
                 </select>
                 <button type="button" class="adm-btn red" id="btnBulkSuspend">선택 정지</button>
-                <%-- 2026-07-22 박유정 — 선택 일괄 복구 --%>
+                <%-- 선택 일괄 복구 --%>
                 <button type="button" class="adm-btn green" id="btnBulkRestore">선택 복구</button>
                 <button type="button" class="adm-btn gray" id="btnBulkWithdraw">선택 탈퇴처리</button>
             </div>
@@ -178,7 +177,7 @@
     </div>
 </main>
 
-<%-- 2026-07-16 박유정 — 목록 전체 선택 체크박스 --%>
+<%-- 목록 전체 선택 체크박스 --%>
 <script>
 (function () {
     var checkAll = document.getElementById('checkAllMembers');
@@ -199,8 +198,8 @@
     });
 })();
 
-// 2026-07-21 박유정 STEP 12 — 선택 일괄 정지·탈퇴
-// 2026-07-21 박유정 STEP ② — extraFields로 suspendType 전달
+// 선택 일괄 정지·탈퇴
+// extraFields로 suspendType 전달
 var listQuery = 'keyword=${keyword}&statusCd=${statusCd}&roleType=${roleType}&page=${page}';
 
 function submitBulkAction(url, confirmMsg, extraFields) {
@@ -215,7 +214,7 @@ function submitBulkAction(url, confirmMsg, extraFields) {
     form.method = 'post';
     form.action = url + '?' + listQuery;
 
-    // 2026/08/07 장우철 CSRF
+    // CSRF
     var csrf = document.createElement('input');
     csrf.type = 'hidden';
     csrf.name = '_csrf';
@@ -250,7 +249,7 @@ document.getElementById('btnBulkSuspend').addEventListener('click', function () 
     );
 });
 
-// 2026-07-22 박유정 — 선택 일괄 복구
+// 선택 일괄 복구
 document.getElementById('btnBulkRestore').addEventListener('click', function () {
     submitBulkAction(
         '${contextPath}/admin/member/bulk-restore',

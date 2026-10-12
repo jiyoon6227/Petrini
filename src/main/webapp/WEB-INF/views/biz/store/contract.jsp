@@ -7,7 +7,7 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%-- 7/3, 사업자(쇼핑몰) 계약 관리 UI 구성 — 숙박 contract.jsp와 동일 레이아웃, 매출 수수료 방식 --%>
+<%-- 사업자(쇼핑몰) 계약 관리 UI 구성 — 숙박 contract.jsp와 동일 레이아웃, 매출 수수료 방식 --%>
 <style>
     .contract-grid {
         display: grid;

@@ -1,7 +1,7 @@
 /**
  * 역할: 진료기록(TB_MEDICAL_RECORD) 데이터 객체
  *
- * 2026/07/13 장우철 — 사업자 진료완료 모달·진료기록관리
+ * 사업자 진료완료 모달·진료기록관리
  */
 
 package com.petcare.petcare.hospital.vo;

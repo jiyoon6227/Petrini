@@ -7,7 +7,7 @@ import com.petcare.petcare.admin.review.mapper.AdminReviewMapper;
 import com.petcare.petcare.admin.review.vo.AdminReviewDeleteRequestVO;
 
 /**
- * 2026-07-28 박유정 — 관리자 리뷰 삭제 승인 핵심 처리 (짧은 트랜잭션)
+ * 관리자 리뷰 삭제 승인 핵심 처리 (짧은 트랜잭션)
  */
 @Service
 public class AdminReviewApproveTxService {

@@ -2,7 +2,6 @@
 <%--
   역할: 분실/보호 신고 작성 (give/report/write)
 
-  - 박유정 / 2026-07-06~07
 
   [등록 화면 흐름]
   1. 로그인 후 이 페이지 진입
@@ -72,12 +71,11 @@
   </c:if>
 
   <form method="post" action="${contextPath}/give/report/write" enctype="multipart/form-data" onsubmit="return collectFeatureTags()">
-    <!--HYJ 26.08.05-->
     <input type="hidden" name="_csrf" value="${_csrf}">
     
   <input type="hidden" name="reportKind" value="FOUND">
   <input type="hidden" name="featureTags" id="featureTags">
-  <%-- 2026-07-29 박유정 — 주소 검색·지도 클릭 시 갱신, POST 시 TB_POST LOST_LAT/LNG 저장 --%>
+  <%-- 주소 검색·지도 클릭 시 갱신, POST 시 TB_POST LOST_LAT/LNG 저장 --%>
   <input type="hidden" name="lostLat" id="lostLat" value="37.5665">
   <input type="hidden" name="lostLng" id="lostLng" value="126.9780">
   <!-- 기존 섹션들 (동물정보, 위치, 사진, 연락처) -->
@@ -155,7 +153,7 @@
       </div>
     </div>
     <%-- 카카오맵 자리 --%>
-  <%-- 2026-07-29 박유정 — 발견 위치 카카오맵 (Controller에서 kakaoJsApiKey 전달) --%>
+  <%-- 발견 위치 카카오맵 (Controller에서 kakaoJsApiKey 전달) --%>
   <div id="kakao-map" style="width:100%;height:220px;border-radius:8px;border:1px solid var(--border)"></div>
   <%@ include file="/WEB-INF/views/common/kakaomap.jsp" %>
   </div>
@@ -213,7 +211,7 @@ function collectFeatureTags() {
   return true;
 }
 
-// 2026-07-29 박유정 — 다음 주소 검색 → Kakao Geocoder → 지도 중심·마커·lostLat/lostLng hidden 갱신
+// 다음 주소 검색 → Kakao Geocoder → 지도 중심·마커·lostLat/lostLng hidden 갱신
 document.getElementById('btnSearchAddr').addEventListener('click', function () {
   if (typeof daum === 'undefined' || !daum.Postcode) {
     alert('주소 API를 불러오지 못했습니다.');

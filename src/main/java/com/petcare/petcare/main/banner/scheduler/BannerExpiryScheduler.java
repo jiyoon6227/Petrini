@@ -1,7 +1,7 @@
 /**
  * 역할: 종료일 경과 배너 자동 만료 (스케줄)
  *
- * 2026-08-06 박유정 — 종료일 경과 배너 자동 EXPIRED 처리 (매일 자정)
+ * 종료일 경과 배너 자동 EXPIRED 처리 (매일 자정)
  * - STATUS_CD = 'ACTIVE' 이고 END_DATE < 오늘 인 배너 → EXPIRED
  *
  * 연결
@@ -29,7 +29,7 @@ public class BannerExpiryScheduler {
         this.bannerExpiryService = bannerExpiryService;
     }
 
-    @Scheduled(cron = "0 0 0 * * *") // 2026-08-06 박유정 — 매일 00:00
+    @Scheduled(cron = "0 0 0 * * *") // 매일 00:00
     public void expirePastEndDateBanners() {
         log.info("=== 배너 자동 만료 스케줄러 시작 ===");
         int count = bannerExpiryService.expirePastEndDateBanners();

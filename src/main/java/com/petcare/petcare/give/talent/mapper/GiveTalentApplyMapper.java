@@ -1,8 +1,6 @@
 /**
  * 역할: 재능나눔 참여 신청 DB 접근 (MyBatis interface)
  *
- * - 박유정 / 2026-08-10 — STEP 2
- *
  * XML: resources/mybatis/mapper/give/talent/GiveTalentApplyMapper.xml
  *
  * 테이블: TB_TALENT_APPLY
@@ -51,12 +49,12 @@ public interface GiveTalentApplyMapper {
     /** 확인 알림용 — APPLY_ID로 1건 (회원번호·제목 포함) */
     GiveTalentApplyVO selectApplyById(@Param("applyId") long applyId);
 
-    /** 사업자 사이드바 — 확인 대기(PENDING) 신청 건수 — 2026-08-10 박유정 */
+    /** 사업자 사이드바 — 확인 대기(PENDING) 신청 건수 */
     int countPendingAppliesByBizId(@Param("bizId") String bizId);
 
-    /** 회원 취소 — PENDING → CANCELLED — 2026-08-10 박유정 */
+    /** 회원 취소 — PENDING → CANCELLED */
     int updateApplyCancelled(@Param("applyId") long applyId, @Param("memberNo") long memberNo);
 
-    /** 취소 시 모집 인원 카운트 감소 — 2026-08-10 박유정 */
+    /** 취소 시 모집 인원 카운트 감소 */
     int decrementTalentCurrentCnt(@Param("talentId") long talentId);
 }

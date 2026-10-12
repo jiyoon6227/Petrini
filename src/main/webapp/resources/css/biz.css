@@ -304,7 +304,7 @@
 .bs-badge.bs-done  { background: #DCFCE7; color: #16A34A; }
 .bs-badge.bs-cancel{ background: #FEE2E2; color: #DC2626; }
 .bs-badge.bs-empty { background: #F5F5F5; color: #aaa; border: 1px solid #E2E8E4; }
-/* 지윤 26.07.29 추가: 배송준비(READY) 전용 - 기존 4색(결제완료/배송중/배송완료/취소)과 안 겹치는 보라색 */
+/* 배송준비(READY) 전용 - 기존 4색(결제완료/배송중/배송완료/취소)과 안 겹치는 보라색 */
 .bs-badge.bs-prep  { background: #F3E8FF; color: #9333EA; }
 
 /* 배너·공통 상태 뱃지 */
@@ -373,7 +373,7 @@
 
 
 /* ================================================================
-   병원 대시보드 (dashboard.jsp "after" 버전) 전용 CSS , 7/2 지윤
+   병원 대시보드 (dashboard.jsp "after" 버전) 전용 CSS
 ================================================================ */
 .dashboard-top {
     display: flex; justify-content: space-between; align-items: flex-start;
@@ -446,7 +446,7 @@
 .fake-line-chart .dot-green  { fill: #2BAB82; stroke: #fff; stroke-width: 2; }
 .fake-line-chart .dot-blue   { fill: #0284C7; stroke: #fff; stroke-width: 2; }
 
-/* 지윤 26.08.13 추가: 실제 Chart.js 캔버스용 - position 없으면 캔버스가 계속 커지는 버그 있음 */
+/* Chart.js 캔버스용 (position 없으면 캔버스가 계속 커짐) */
 .line-chart { position: relative; width: 100%; height: 240px; }
 .line-chart canvas { width: 100% !important; height: 100% !important; }
 
@@ -516,7 +516,7 @@
 .review-item em { font-style: normal; font-size: 11px; color: #bbb; margin-left: auto; white-space: nowrap; }
 
 /* ================================================================
-   리뷰 답글 인라인 박스 (모달 대신 카드 안에서 펼쳐지는 방식) 7/2 지윤
+   리뷰 답글 인라인 박스 (모달 대신 카드 안에서 펼쳐지는 방식)
 ================================================================ */
 .biz-reply-box {
     background: #fff; border: 1px solid #E2E8E4; border-radius: 12px;
@@ -550,7 +550,7 @@
 .biz-reply-box-actions .btn-cancel:hover { background: #F5F5F5; }
 
 /* ================================================================
-   7/2, [지윤] — info.jsp (업체정보 수정) 화면 전용
+   info.jsp (업체정보 수정) 화면 전용
    좌측 이미지 + 우측 폼 필드 레이아웃, 저장/취소 버튼
 ================================================================ */
 .biz-form-grid {
@@ -639,7 +639,7 @@
 .biz-btn-ghost:hover { background: #F5F5F5; }
 
 /* ================================================================
-   7/2, [지윤] — info.jsp 저장 완료 / reviews.jsp 답글 등록 완료
+   info.jsp 저장 완료 / reviews.jsp 답글 등록 완료
    화면 하단에 잠깐 떴다 사라지는 토스트 알림 (두 화면 공용)
 ================================================================ */
 .biz-toast {
@@ -658,7 +658,7 @@
 .biz-toast svg { width: 16px; height: 16px; stroke: #4ADE80; }
 
 /* ================================================================
-   7/2, [지윤] — reviews.jsp 상단 "전체 / 신고관리" 탭 + 정렬 드롭다운
+   reviews.jsp 상단 "전체 / 신고관리" 탭 + 정렬 드롭다운
 ================================================================ */
 .biz-tabs {
     display: flex; gap: 26px;
@@ -682,7 +682,7 @@
 }
 
 /* ================================================================
-   7/2, [지윤] — reviews.jsp 리뷰 카드 리스트 (별점/작성자/내용/답글 표시)
+   reviews.jsp 리뷰 카드 리스트 (별점/작성자/내용/답글 표시)
    "답글쓰기" 눌렀을 때 펼쳐지는 입력창(.biz-reply-box)은 이미 파일에 있음
 ================================================================ */
 .biz-review-list { display: flex; flex-direction: column; padding: 0 20px 20px; }
@@ -690,8 +690,7 @@
     display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px;
     padding: 22px 4px; border-bottom: 1px solid #E2E8E4;
 }
-/* 지윤 26.07.22 추가: 답변수정 입력창(.biz-edit-box)이 flex 3번째 자식으로 끼어들면서 본문이 눌려 깨지던 문제 -
-   무조건 다음 줄로 내려가서 카드 전체 폭을 쓰게 강제 */
+/* 답변수정 입력창(.biz-edit-box)은 다음 줄로 내려 카드 전체 폭 사용 (flex 3번째 자식으로 끼어 본문 깨짐 방지) */
 .biz-edit-box { flex: 1 1 100%; order: 3; }
 
 .biz-review-item:last-child { border-bottom: none; }
@@ -734,19 +733,19 @@
     font-size: 12px; color: #DC2626; background: #FFF5F5;
     border-radius: 6px; padding: 6px 10px; margin-bottom: 8px;
 }
-/* 2026-07-24 박유정 — 삭제요청 승인(삭제) 완료 뱃지 */
+/* 삭제요청 승인(삭제) 완료 뱃지 */
 .biz-review-status-done {
     font-size: 11px; font-weight: 700; color: #1A1A2E;
     background: #F1F5F4; padding: 2px 8px; border-radius: 20px;
 }
-/* 2026-07-24 박유정 — 삭제요청 반려 뱃지 */
+/* 삭제요청 반려 뱃지 */
 .biz-review-status-rejected {
     font-size: 11px; font-weight: 700; color: #6B7280;
     background: #F3F4F6; padding: 2px 8px; border-radius: 20px;
 }
 .biz-review-content { font-size: 14px; color: #555; line-height: 1.55; }
 
-/* 2026/08/12 장우철 — 사업자 답글 긴 문자열 줄바꿈 */
+/* 사업자 답글 긴 문자열 줄바꿈 */
 .biz-review-reply {
     background: #EAF7F2; border-radius: 8px; border-left: 3px solid #2BAB82;
     padding: 14px 16px; margin-top: 14px; font-size: 13px; color: #555;

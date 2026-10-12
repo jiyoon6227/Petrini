@@ -36,16 +36,16 @@ import com.petcare.petcare.admin.store.vo.AdminStoreProductVO;
 
 public interface AdminStoreService {
 
-    //지윤 26.07.21 추가: 대기중인 리뷰 삭제요청 목록
+    // 대기중인 리뷰 삭제요청 목록
     List<AdminReviewReportVO> getPendingReviewReports();
 
-    //지윤 26.07.21 추가: 승인 - 리뷰 실제 삭제 + 요청 DONE 처리
+    // 승인 - 리뷰 실제 삭제 + 요청 DONE 처리
     void approveReviewReport(Long reportId, Long reviewId, Long adminNo);
 
-    //지윤 26.07.21 추가: 반려 - 리뷰는 그대로 두고 요청만 DONE 처리 (블라인드 자동 해제됨)
+    // 반려: 리뷰는 유지하고 요청만 DONE 처리 (블라인드 자동 해제)
     void rejectReviewReport(Long reportId, Long adminNo);
 
-    // 2026/08/11 장우철 — 전 사업자 상품/주문 목록
+    // 전 사업자 상품/주문 목록
     List<AdminStoreProductVO> getProductList(String keyword, String statusCd, int page, int size);
 
     int getProductCount(String keyword, String statusCd);

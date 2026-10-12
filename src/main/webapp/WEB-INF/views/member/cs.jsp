@@ -1,6 +1,6 @@
 <%--
   역할: 고객센터 메인
-  - 박유정 / 2026-07-22 — 정지 회원 접근 허용 화면 (스타일은 petcare.css)
+  - 정지 회원 접근 허용 화면 (스타일은 petcare.css)
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -19,7 +19,7 @@
 </div>
 
 <div class="cs-wrap">
-    <%-- 2026-07-24 박유정 — 정지 회원이 다른 메뉴 접근 시 인터셉터 리다이렉트 안내 --%>
+    <%-- 정지 회원이 다른 메뉴 접근 시 인터셉터 리다이렉트 안내 --%>
     <c:if test="${param.restricted eq '1'}">
         <div class="cs-restricted-notice" role="alert">
             정지된 회원은 고객센터만 이용할 수 있습니다.
@@ -46,7 +46,7 @@
         </div>
     </div>
 
-    <%-- 2026-08-11 박유정 — FAQ DB 연동 (TB_FAQ, VISIBLE_YN=Y) --%>
+    <%-- FAQ DB 연동 (TB_FAQ, VISIBLE_YN=Y) --%>
     <section class="cs-section">
         <h2 class="cs-section-title">자주 묻는 질문</h2>
         <c:choose>
@@ -69,7 +69,7 @@
         </c:choose>
     </section>
 
-    <%-- 2026-08-11 박유정 — 공지사항 DB 연동 (TB_NOTICE, VISIBLE_YN=Y) --%>
+    <%-- 공지사항 DB 연동 (TB_NOTICE, VISIBLE_YN=Y) --%>
     <section class="cs-section">
         <h2 class="cs-section-title">공지사항</h2>
         <div class="cs-notice-list">

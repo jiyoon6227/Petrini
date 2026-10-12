@@ -11,21 +11,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
-/*
-@jakarta.servlet.annotation.WebFilter("/*")
-public class XssFilter implements Filter {
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-    }
-}
-
-    - @webconfig 사용시, SpringBoot에 자동으로 등록되기 때문에 FilterConfig 필요없음
-    - Spring Boot는 기본적으로 @webconfig(tomcat 어노테이션) 자동으로 스캔하지 않기때문에 
-      메인클래스에 @servletcomponentscan 설정 필요
-*/
-
 public class XssFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

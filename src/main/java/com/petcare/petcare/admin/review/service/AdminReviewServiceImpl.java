@@ -1,8 +1,7 @@
 /**
  * 역할: AdminReviewService 구현체 (@Service)
  *
- * - 박유정 / 2026-07-24
- * - 2026/08/11 장우철 — 쇼핑(TB_REVIEW_REPORT) 삭제요청 통합 처리
+ * - 쇼핑(TB_REVIEW_REPORT) 삭제요청 통합 처리
  */
 
 package com.petcare.petcare.admin.review.service;

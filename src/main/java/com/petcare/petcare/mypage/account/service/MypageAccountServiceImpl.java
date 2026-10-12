@@ -1,8 +1,8 @@
 /**
  * 역할: MypageAccountService 구현체 (@Service)
  *
- * - 2026-08-04 박유정 — 프로필 사진 로컬 저장 (C:/upload/member/profile/) + DB URL UPDATE
- * - 2026/08/14 장우철 — gcs.enabled 분기 (로컬 ↔ GCS)
+ * - 프로필 사진 로컬 저장 (C:/upload/member/profile/) + DB URL UPDATE
+ * - gcs.enabled 분기 (로컬 ↔ GCS)
  */
 
 package com.petcare.petcare.mypage.account.service;
@@ -63,7 +63,7 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 2026-07-28 박유정 — 회원정보 수정 화면용 프로필 조회
+    // 회원정보 수정 화면용 프로필 조회
     @Override
     @Transactional(readOnly = true)
     public MypageAccountVO getMemberProfile(Long memberNo) {
@@ -73,12 +73,12 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         return mypageAccountMapper.selectMemberProfile(memberNo);
     }
 
-    // 2026-08-04 박유정 — 프로필 사진 저장 + DB URL UPDATE
+    // 프로필 사진 저장 + DB URL UPDATE
     @Override
     @Transactional
     public String updateProfileImage(Long memberNo, MultipartFile file) {
 
-    // 2026-08-04 박유정 — [1] 회원번호·파일 기본 검증
+    // [1] 회원번호·파일 기본 검증
     if (memberNo == null) {
         throw new IllegalArgumentException("회원 정보가 없습니다.");
     }
@@ -86,14 +86,14 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         throw new IllegalArgumentException("업로드할 사진을 선택해 주세요.");
     }
 
-    // 2026-08-04 박유정 — [2] 이미지 MIME 타입 검증
+    // [2] 이미지 MIME 타입 검증
     String contentType = file.getContentType();
     if (contentType == null || !contentType.startsWith("image/")) {
         throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
     }
 
-    // 2026-08-04 박유정 — [3] 저장 (분실신고와 동일 경로 패턴)
-    // 2026/08/14 장우철 — gcs.enabled 분기
+    // [3] 저장 (분실신고와 동일 경로 패턴)
+    // gcs.enabled 분기
     String savedName = UUID.randomUUID() + resolveExtension(file.getOriginalFilename());
     String objectPath = "member/profile/" + memberNo + "/" + savedName;
     String fileUrl = "/upload/" + objectPath;
@@ -124,8 +124,8 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         }
     }
 
-    // 2026-08-04 박유정 — [4] TB_MEMBER.PROFILE_IMG_URL UPDATE
-    // 2026/08/06 장우철 — updateProfileImageUrl 로 분리 (회원정보 UPDATE 와 구분)
+    // [4] TB_MEMBER.PROFILE_IMG_URL UPDATE
+    // updateProfileImageUrl 로 분리 (회원정보 UPDATE 와 구분)
     MypageAccountVO vo = new MypageAccountVO();
     vo.setMemberNo(memberNo);
     vo.setProfileImgUrl(fileUrl);
@@ -177,7 +177,7 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         // 회원 이름·전화번호를 수령인 정보로 사용
         MypageAccountVO profile = mypageAccountMapper.selectMemberProfile(memberNo);
         String recvName  = profile.getMemberName();
-        // 2026/08/11 장우철 — 기본배송지 전화 하이픈 정규화 (주문서 SSR 파싱용)
+        // 기본배송지 전화 하이픈 정규화 (주문서 SSR 파싱용)
         String recvPhone = com.petcare.petcare.common.util.PhoneNormalizeUtil.toHyphenPhone(vo.getPhone());
 
         MypageAddressVO existing = mypageAddressMapper.selectDefaultAddress(memberNo);
@@ -238,7 +238,7 @@ public class MypageAccountServiceImpl implements MypageAccountService {
     }
 
     /**
-     * HYJ 26.07.29 회원 탈퇴
+     * 회원 탈퇴
      * [1] DB 에서 암호화된 비밀번호 조회
      * [2] 입력된 비밀번호와 비교
      * [3] 일치하면 STATUS_CD = 'WITHDRAWN'
@@ -263,7 +263,7 @@ public class MypageAccountServiceImpl implements MypageAccountService {
     }
 
     /**
-     * HYJ 26.07.29 7일 경과 탈퇴 회원 개인정보 삭제
+     * 7일 경과 탈퇴 회원 개인정보 삭제
      *
      * 삭제 범위:
      * - TB_MEMBER: 개인정보 익명화 (이름, 이메일, 전화번호 등 → NULL)
@@ -290,7 +290,7 @@ public class MypageAccountServiceImpl implements MypageAccountService {
             // TB_MEMBER 익명화 (삭제가 아닌 NULL 처리)
             mypageAccountMapper.anonymizeMember(memberNo);
 
-            //HYJ 26.07.29 TB_MEMBER FK참조하는 테이블 확인 후 추가 필요
+            // TB_MEMBER FK참조하는 테이블 확인 후 추가 필요
             //....
 
             // TB_MEMBER_WITHDRAW (탈퇴회원관리테이블 삭제)
@@ -302,7 +302,7 @@ public class MypageAccountServiceImpl implements MypageAccountService {
         log.info("총 {}명의 탈퇴 회원 개인정보 삭제 완료", memberNos.size());
         return memberNos.size();
     }
-    // 2026-08-04 박유정 — 업로드 파일 확장자 정규화 (.jpg/.jpeg/.png/.webp)
+    // 업로드 파일 확장자 정규화 (.jpg/.jpeg/.png/.webp)
     private String resolveExtension(String originalName) {
         if (originalName == null) {
             return ".jpg";

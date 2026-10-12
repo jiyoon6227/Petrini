@@ -24,8 +24,8 @@
       <p style="color:#166534;font-size:14px;margin-bottom:12px"><c:out value="${msg}"/></p>
     </c:if>
 
-    <%-- 2026/07/21 장우철 — 좌측 상태 필터 + 우측 유형(전체/병원/숙소) 드롭다운 --%>
-    <%-- 2026-08-10 박유정 — 재능나눔 유형·카드 표시 추가 --%>
+    <%-- 좌측 상태 필터 + 우측 유형(전체/병원/숙소) 드롭다운 --%>
+    <%-- 재능나눔 유형·카드 표시 --%>
     <c:set var="curType" value="${empty typeFilter ? 'all' : typeFilter}" />
     <c:set var="curStatus" value="${empty statusFilter ? 'all' : statusFilter}" />
     <div class="order-filter-bar">
@@ -67,7 +67,7 @@
       <a href="${contextPath}${detailUrl}"
          class="resv-card" style="text-decoration:none;color:inherit;display:flex;cursor:pointer">
 
-        <%-- 2026/08/18 장우철 — 숙소·병원도 TB_FILE 썸네일 표시 (재능 THUMB_URL은 /upload/ 포함) --%>
+        <%-- 숙소·병원도 TB_FILE 썸네일 표시 (재능 THUMB_URL은 /upload/ 포함) --%>
         <c:choose>
           <c:when test="${r.resvType eq 'TALENT'}"><c:set var="thumbFallback" value="https://placehold.co/88x88/EAF7F2/2BAB82?text=재능"/></c:when>
           <c:when test="${r.resvType eq 'STAY'}"><c:set var="thumbFallback" value="https://placehold.co/88x88/E0F2FE/0284C7?text=숙소"/></c:when>
@@ -171,7 +171,7 @@
             <c:when test="${r.statusCd eq 'CONFIRMED'}">
               <span class="badge-status badge-ready">예약확정</span>
             </c:when>
-            <%-- 2026/08/06 장우철 — 숙박 운영 상태만 표시 (환불은 상세에서 확인) --%>
+            <%-- 숙박 운영 상태만 표시 (환불은 상세에서 확인) --%>
             <c:when test="${r.statusCd eq 'CHECKIN'}">
               <span class="badge-status badge-ready">체크인</span>
             </c:when>
@@ -180,7 +180,7 @@
             </c:when>
             <c:when test="${r.statusCd eq 'DONE'}">
               <span class="badge-status badge-done">이용완료</span>
-              <%-- 2026/07/13 장우철 — DONE + 미작성 시 리뷰 안내 --%>
+              <%-- DONE + 미작성 시 리뷰 안내 --%>
               <c:if test="${r.reviewedYn ne 'Y'}">
                 <span class="btn-sm" style="pointer-events:none;margin-top:6px;background:#2BAB82;color:#fff">리뷰 작성</span>
               </c:if>

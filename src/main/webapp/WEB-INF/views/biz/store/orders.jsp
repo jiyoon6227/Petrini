@@ -8,7 +8,7 @@
 <%@ include file="/WEB-INF/views/biz/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/biz/common/sidebar_store.jsp" %>
 
-<%-- 지윤 26.07.20 수정: 하드코딩(JS mock 배열 orders[]) -> 실데이터 연동
+<%--
      Controller: BizStoreController.storeOrders() / getOrderDetailJson() / updateOrderStatus()
      Service: BizStoreService.getOrderList / getOrderDetail / updateOrderStatus
      화면 레이아웃(CSS, HTML 뼈대)은 원본 그대로 유지, 데이터 표시/저장 로직만 실데이터로 교체 --%>
@@ -363,15 +363,15 @@
     <p class="biz-page-desc">주문 확인·출고 처리. 배송·송장은 배송 관리, 환불은 환불 신청에서 처리합니다.</p>
   </div>
 
-  <%-- 지윤 26.08.07: biz-main은 다른 관리자 화면도 같이 쓰는 공통 클래스라 여기서 못 줄임
+  <%-- biz-main은 다른 관리자 화면 공통 클래스라 여기서 조정 불가
        -> 이 페이지 전용 래퍼로 목록 카드 + 상세 카드를 한 번에 좁게 잡음 --%>
   <div class="order-page-wrap">
 
   <div class="biz-card" style="margin-bottom:16px">
     <div style="padding:20px 20px 0">
-      <%-- 지윤 26.07.20 수정: <button onclick="switchTab(...)"> (JS로 배열 필터링) -> <a href="?statusCd=..."> (서버에 GET 요청, statusCd 파라미터로 필터)
+      <%-- <a href="?statusCd=..."> 링크로 서버 GET 필터
            탭 옆 숫자도 JS로 orders.filter().length 세던 것 -> Controller가 넘겨준 statusCounts(Map)로 표시 --%>
-      <%-- 2026/08/13 장우철 — 전체·결제완료·배송준비·배송전취소. 배송중/완료는 배송관리, 환불은 환불신청 --%>
+      <%-- 전체·결제완료·배송준비·배송전취소. 배송중/완료는 배송관리, 환불은 환불신청 --%>
       <div class="biz-tabs">
         <a href="${contextPath}/biz/store/orders" class="biz-tab ${empty selectedStatusCd ? 'active' : ''}">전체<span class="biz-tab-count">${statusCounts.PAID + statusCounts.READY + statusCounts.SHIPPING + statusCounts.DONE + statusCounts.CANCEL}</span></a>
         <a href="${contextPath}/biz/store/orders?statusCd=PAID" class="biz-tab ${selectedStatusCd == 'PAID' ? 'active' : ''}">결제완료<span class="biz-tab-count">${statusCounts.PAID}</span></a>
@@ -382,8 +382,7 @@
 
     <table class="biz-table">
       <thead><tr><th>주문번호</th><th>구매자</th><th>상품명</th><th>결제금액</th><th>상태</th><th>관리</th></tr></thead>
-      <%-- 지윤 26.07.20 수정: <tbody id="orderBody"></tbody> (JS render()가 채워넣던 빈 껍데기)
-           -> JSTL <c:forEach>로 ${orderList}(Controller가 넘겨준 실데이터) 바로 렌더링. render() 함수 자체가 필요없어져서 삭제됨 --%>
+      <%-- JSTL <c:forEach>로 ${orderList} 렌더링 --%>
       <tbody>
         <c:choose>
           <c:when test="${empty orderList}">
@@ -399,9 +398,9 @@
                   <c:if test="${o.itemCount > 1}"> 외 ${o.itemCount - 1}건</c:if>
                 </td>
                 <td><fmt:formatNumber value="${o.payAmount}" pattern="#,###"/>원</td>
-                <%-- 지윤 26.07.20 수정: JS statusBadgeClass 딕셔너리 조회 -> JSTL c:choose로 상태별 배지 클래스 직접 분기 --%>
+                <%-- JSTL c:choose로 상태별 배지 클래스 분기 --%>
                 <td>
-                  <%-- 2026/08/13 장우철 — 유저와 동일: 환불완료/부분환불/환불진행중/결제취소신청 --%>
+                  <%-- 유저와 동일: 환불완료/부분환불/환불진행중/결제취소신청 --%>
                   <c:choose>
                     <c:when test="${o.statusBadge == 'CANCEL_REQUEST'}"><span class="bs-badge bs-cancel">결제취소신청</span></c:when>
                     <c:when test="${o.statusBadge == 'REFUND_DONE'}"><span class="bs-badge bs-cancel">환불완료</span></c:when>
@@ -415,8 +414,7 @@
                     <c:otherwise><span class="bs-badge bs-empty"><c:out value="${o.orderStatus}"/></span></c:otherwise>
                   </c:choose>
                 </td>
-                <%-- 지윤 26.07.20 수정: onclick="openDetail('ORD-2026-0892')" (문자열 주문코드로 배열 검색)
-                     -> onclick="openDetail(25)" (진짜 ORDER_ID 숫자키로 AJAX 조회) --%>
+                <%-- openDetail(ORDER_ID)로 AJAX 조회 --%>
                 <td><button class="biz-btn" onclick="openDetail(${o.orderId})">상세</button></td>
               </tr>
             </c:forEach>
@@ -540,9 +538,7 @@
   </div>
 </main>
 
-<%-- 지윤 26.07.20 참고: 이 토스트 팝업은 원본엔 showToast()가 호출하던 건데,
-     지금은 상태변경 성공 시 location.reload()로 바로 새로고침하는 방식이라 안 쓰임.
-     화면에 남겨는 두지만 지금은 죽은 코드 - 필요하면 saveStatus()에서 다시 연결 가능 --%>
+<%-- 미사용 토스트 팝업 (상태변경 성공 시 location.reload() 방식, 필요 시 saveStatus()에서 재연결) --%>
 <div class="biz-toast" id="saveToast">
   <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
   <span id="saveToastMsg">처리되었습니다.</span>
@@ -551,15 +547,12 @@
 <script>
   var contextPath = '${contextPath}';
 
-  //지윤 26.07.20 수정: statusLabel 딕셔너리는 그대로 유지(상세보기 라벨 표시용), key만 소문자(paid) -> 대문자(PAID)로 변경
-  //지윤 26.07.20 삭제: statusBadgeClass 딕셔너리 - 목록 배지는 이제 JSTL c:choose로 서버에서 렌더링해서 JS에서 더 이상 안 씀
+  // statusLabel 딕셔너리 (상세보기 라벨 표시용, key는 대문자 PAID 등)
   var statusLabel = { PAID:'결제완료', READY:'배송준비', SHIPPING:'배송중', DONE:'배송완료', CANCEL:'취소완료' };
 
-  //지윤 26.07.20 삭제: var orders = [ {...}, {...}, ... ] 하드코딩 배열 5건 통째로 삭제 (이제 서버가 실데이터를 줌)
-  //지윤 26.07.20 삭제: var currentTab = 'all' - 탭 필터링이 서버 GET 파라미터 방식으로 바뀌면서 필요없어짐
   var currentOrderId = null;
 
-//지윤 26.07.27 추가: delivery.jsp와 동일 - 스마트택배 API로 전체 택배사 목록 가져와서 드롭다운 채움
+// 스마트택배 API로 택배사 전체 목록을 드롭다운에 채움 (delivery.jsp와 동일)
 //courierList는 openDetail()에서 courierCode -> 옵션 매칭할 때도 재사용
 var courierList = [];
 fetch(contextPath + '/biz/store/delivery/companies')
@@ -579,11 +572,9 @@ fetch(contextPath + '/biz/store/delivery/companies')
 
 function fmtWon(n){ return (n || 0).toLocaleString('ko-KR') + '원'; }
 
-  //지윤 26.07.20 삭제: function switchTab(tab) {...} - JS로 탭 active 토글 + orders 배열 필터링하던 함수.
   //탭이 이제 실제 <a href="?statusCd=...">라 페이지 이동만으로 처리, JS 함수 자체가 필요없어져서 삭제
 
-  //지윤 26.07.20 수정: function openDetail(id) - orders.find(x => x.id === id)로 로컬 배열에서 찾던 것
-  //-> fetch()로 서버(/biz/store/orders/{id})에 AJAX 요청해서 실제 DB 값 받아오는 방식으로 교체
+  // openDetail(): 서버(/biz/store/orders/{id}) AJAX로 DB 값 조회
   function openDetail(orderId) {
     fetch(contextPath + '/biz/store/orders/' + orderId)
       .then(function (res) { return res.json(); })
@@ -594,12 +585,12 @@ function fmtWon(n){ return (n || 0).toLocaleString('ko-KR') + '원'; }
         document.getElementById('dOrderNo').textContent    = o.orderNo;
         document.getElementById('dOrderDate').textContent  = o.orderDate;
         document.getElementById('dBuyer').textContent      = o.buyerName;
-        //지윤 26.07.20 추가: 구매자 연락처/이메일 - 원본은 목업 데이터 그대로 표시, 지금은 TB_MEMBER 조인해서 가져온 실제 값
+        // 구매자 연락처/이메일 (TB_MEMBER 조인값)
         document.getElementById('dPhone').textContent      = o.buyerPhone || '-';
         document.getElementById('dEmail').textContent      = o.buyerEmail || '-';
         document.getElementById('dPayAmount').textContent  = fmtWon(o.payAmount);
-        //지윤 26.07.20 수정: 결제방법 - 원본은 o.payMethod 목업 문자열, 지금은 TB_PAYMENT.PAY_METHOD 조인값
-        // 2026/08/11 장우철 — BILLING/TOSS 한글 라벨
+        // 결제방법 (TB_PAYMENT.PAY_METHOD 조인값)
+        // BILLING/TOSS 한글 라벨
         document.getElementById('dPayMethod').textContent  = (function(m) {
           if (!m) return '-';
           var u = String(m).toUpperCase();
@@ -609,7 +600,7 @@ function fmtWon(n){ return (n || 0).toLocaleString('ko-KR') + '원'; }
           return m;
         })(o.payMethod);
         document.getElementById('dStatusLabel').textContent = (function() {
-          // 2026/08/13 장우철 — 목록과 동일: 환불완료/부분환불/환불진행중
+          // 목록과 동일: 환불완료/부분환불/환불진행중
           if (o.claimStatus === 'PENDING') return '결제취소신청';
           var items = o.itemList || [];
           var total = items.length, done = 0, active = 0;
@@ -626,10 +617,10 @@ function fmtWon(n){ return (n || 0).toLocaleString('ko-KR') + '원'; }
 
         document.getElementById('dReceiver').textContent      = o.recvName;
         document.getElementById('dReceiverPhone').textContent = o.recvPhone;
-        //지윤 26.07.20 수정: 배송지 - 원본은 o.address 문자열 하나, 지금은 ZIP_CODE+ADDR1+ADDR2를 조합해서 표시
+        // 배송지 (ZIP_CODE+ADDR1+ADDR2 조합 표시)
         document.getElementById('dAddress').textContent       = (o.zipCode ? '[' + o.zipCode + '] ' : '') + o.addr1 + ' ' + (o.addr2 || '');
 
-        //지윤 26.07.28 수정: select에 이제 PAID/READY만 남음. SHIPPING/DONE/CANCEL 상태인 주문을 열면
+        // select에는 PAID/READY만 있음. SHIPPING/DONE/CANCEL 상태인 주문을 열면
 //표시용 임시 옵션을 하나 끼워넣어서 값이 정확히 보이게 함 (선택 불가 disabled 처리는 아래 별도)
 var dSelect = document.getElementById('dStatusSelect');
 var extraLabels = { SHIPPING: '배송중', DONE: '배송완료', CANCEL: '취소/반품' };
@@ -640,13 +631,13 @@ if (extraLabels[o.orderStatus] && !dSelect.querySelector('option[value="' + o.or
 }
 dSelect.value = o.orderStatus;
 
-//지윤 26.07.20 수정: 택배사/송장번호 - 원본은 o.carrier/o.trackingNo(주문 객체 안 하드코딩), 지금은 TB_ORDER_DELIVERY 조인값(courierName/trackingNo)
-//지윤 26.07.27 수정: select value로 courierCode(예: "04") 우선 사용 -> API 목록의 실제 옵션과 매칭됨.
+// 택배사/송장번호 (TB_ORDER_DELIVERY 조인값 courierName/trackingNo)
+// select value는 courierCode(예: "04") 우선 (API 목록 옵션과 매칭)
 //courierCode가 없는 예전 데이터(하드코딩 시절 저장된 cj/hanjin 등)는 courierName 값을 그대로 넣어 폴백(못 찾으면 "선택 안 함"으로 보임)
 document.getElementById('dCarrier').value       = o.courierCode || o.courierName || '';
 document.getElementById('dTrackingNo').value    = o.trackingNo || '';
 
-        // 지윤 26.08.07: 주문상품 영역을 테이블형(레이아웃2)으로 정리
+        // 주문상품 영역을 테이블형(레이아웃2)으로 정리
         var itemsBody = document.getElementById('orderItemsBody');
         itemsBody.innerHTML = '';
 
@@ -662,7 +653,7 @@ document.getElementById('dTrackingNo').value    = o.trackingNo || '';
           var row = document.createElement('div');
           row.className = 'od-item-row';
 
-          // 지윤 26.08.07: 실제 서버 응답 필드명(thumbnailUrl)으로 수정 + 로컬 업로드 이미지 /upload/ 접두사 처리
+          // 서버 응답 필드 thumbnailUrl 사용 + 로컬 업로드 이미지 /upload/ 접두사 처리
           var imageHtml = '<div class="od-item-thumb">';
           var imageUrl = it.thumbnailUrl || '';
           if (imageUrl) {
@@ -688,7 +679,7 @@ document.getElementById('dTrackingNo').value    = o.trackingNo || '';
         document.getElementById('dItemQty').textContent = totalQty + '개';
         document.getElementById('dItemSummaryTotal').textContent = fmtWon(o.productTotal);
 
-        // 지윤 26.08.07: 결제금액 세부내역 - 쿠폰/포인트 안 썼어도 행 자체는 항상 표시
+        // 결제금액 세부내역 - 쿠폰/포인트 안 썼어도 행 자체는 항상 표시
         document.getElementById('dProductTotal').textContent = fmtWon(o.productTotal);
         document.getElementById('dDeliveryFee').textContent  = fmtWon(o.deliveryFee);
 
@@ -716,14 +707,14 @@ document.getElementById('dTrackingNo').value    = o.trackingNo || '';
 document.getElementById('claimInfoBox').style.display = isPending ? 'block' : 'none';
 document.getElementById('approveBtn').style.display = isPending ? 'inline-block' : 'none';
 document.getElementById('rejectBtn').style.display = isPending ? 'inline-block' : 'none';
-//지윤 26.07.28 수정: isDone -> isLocked로 확장. PAID/READY가 아니면(SHIPPING/DONE/CANCEL) 전부 읽기전용으로 잠금
+// isLocked: PAID/READY가 아니면(SHIPPING/DONE/CANCEL) 읽기전용
 var isLocked = !(o.orderStatus === 'PAID' || o.orderStatus === 'READY');
 document.getElementById('saveBtn').style.display = (isPending || isLocked) ? 'none' : 'inline-block';
 document.getElementById('dStatusSelect').disabled = isLocked;
 document.getElementById('dCarrier').disabled = isLocked;
 document.getElementById('dTrackingNo').disabled = isLocked;
 
-//지윤 26.07.27 추가: 배송완료 수동처리 버튼은 SHIPPING 상태일 때만 노출 (READY/PAID면 아직 발송 전이라 의미없고, 이미 DONE이면 중복처리 방지)
+// 배송완료 수동처리 버튼은 SHIPPING 상태일 때만 노출 (발송 전·중복처리 방지)
 document.getElementById('forceCompleteBtn').style.display = (o.orderStatus === 'SHIPPING') ? 'inline-block' : 'none';
 if (isPending) {
   document.getElementById('dCancelReason').textContent = o.cancelReason || '-';
@@ -738,7 +729,6 @@ if (isPending) {
   function approveCancel() {
     if (!currentOrderId) return;
     if (!confirm('취소를 승인하시겠습니까? 승인 즉시 결제가 취소되고 재고/포인트/쿠폰이 복구됩니다.')) return;
-    //HYJ 26.08.05
     csrfFetch(contextPath + '/biz/store/orders/' + currentOrderId + '/cancel/approve', { method: 'POST' })
       .then(function (res) { return res.text(); })
       .then(function (result) {
@@ -754,7 +744,6 @@ if (isPending) {
   function rejectCancel() {
     if (!currentOrderId) return;
     if (!confirm('취소신청을 반려하시겠습니까?')) return;
-    //HYJ 26.08.05
     csrfFetch(contextPath + '/biz/store/orders/' + currentOrderId + '/cancel/reject', { method: 'POST' })
       .then(function (res) { return res.text(); })
       .then(function (result) {
@@ -767,18 +756,16 @@ if (isPending) {
       });
   }
 
-  //지윤 26.07.20 수정: closeDetail()은 원본 그대로 (화면 숨기기만 하는 단순 함수라 안 건드림)
+  // closeDetail(): 화면 숨기기만 하는 단순 함수
   function closeDetail() {
     document.getElementById('detailCard').style.display = 'none';
   }
 
-  //지윤 26.07.20 수정: function saveStatus() - orders.find()로 로컬 배열 값만 바꾸고 render() 다시 그리던 것(진짜 저장 안 됨)
-  //-> fetch()로 서버(/biz/store/orders/{id}/status)에 실제 POST, 성공하면 location.reload()로 최신 데이터 다시 불러옴
-  //지윤 26.07.27 추가: 배송완료 수동처리 (확인창 필수 - 실수로 누르는 것 방지, 서버는 autoCompleteDeliveryIfDone 재사용)
+  // saveStatus(): 서버(/biz/store/orders/{id}/status) POST 후 location.reload()
+  // 배송완료 수동처리 (확인창 필수 - 실수로 누르는 것 방지, 서버는 autoCompleteDeliveryIfDone 재사용)
 function forceComplete() {
   if (!currentOrderId) return;
   if (!confirm('이 처리는 보통 스마트택배 API로 자동으로 이뤄집니다.\n실제로 배송이 완료된 것이 맞습니까?')) return;
-  //HYJ 26.08.05
   csrfFetch(contextPath + '/biz/store/orders/' + currentOrderId + '/force-complete', { method: 'POST' })
     .then(function (res) { return res.text(); })
     .then(function (result) {
@@ -793,7 +780,7 @@ function forceComplete() {
 
 function saveStatus() {
   if (!currentOrderId) return;
-  //지윤 26.07.27 수정: delivery.jsp와 동일 패턴 - courierName은 선택된 옵션의 실제 택배사명(텍스트), courierCode는 API 코드(value)로 분리해서 전송
+  // delivery.jsp와 동일 패턴 - courierName은 선택된 옵션의 실제 택배사명(텍스트), courierCode는 API 코드(value)로 분리해서 전송
   var carrierSelect = document.getElementById('dCarrier');
   var selectedOption = carrierSelect.options[carrierSelect.selectedIndex];
 
@@ -818,9 +805,6 @@ function saveStatus() {
       });
   }
 
-  //지윤 26.07.20 삭제: function showToast(msg) {...} - saveStatus()가 이제 location.reload() 방식이라 토스트 팝업 호출 안 함
-  //지윤 26.07.20 삭제: function render() {...} - JS로 orders 배열 필터링해서 <tbody> DOM 새로 그리던 함수. 이제 JSTL이 서버에서 다 그려줘서 필요없어짐
-  //지윤 26.07.20 삭제: render(); (페이지 로드 시 초기 렌더링 호출) - 위와 같은 이유로 삭제
 </script>
 
 <%@ include file="/WEB-INF/views/biz/common/footer.jsp" %>

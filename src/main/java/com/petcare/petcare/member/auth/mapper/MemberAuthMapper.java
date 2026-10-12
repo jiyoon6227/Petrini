@@ -20,13 +20,13 @@ import com.petcare.petcare.member.auth.vo.MemberRegisterVO;
 @Mapper
 public interface MemberAuthMapper {
 
-    // 2026/07/06 장우철 — login(로그인)
+    // login(로그인)
 
     /** 로그인 ID(이메일)로 TB_MEMBER 1건 조회 — 없으면 null */
     MemberAuthVO selectMemberByLoginId(
             @Param("loginId") String loginId);
 
-    // 2026/07/07 장우철 — 관리자 로그인 확장
+    // 관리자 로그인 확장
     /** 로그인 ID(admin 등)로 TB_ADMIN 1건 조회 — 없으면 null */
     AdminAuthVO selectAdminByLoginId(
             @Param("loginId") String loginId);
@@ -35,12 +35,12 @@ public interface MemberAuthMapper {
     int updateLastLoginDate(
             @Param("memberNo") Long memberNo);
 
-    // 2026-07-09 장우철 — 사업자 승인 완료 조회 (로그인 세션 role=BIZ 세팅용)
+    // 사업자 승인 완료 조회 (로그인 세션 role=BIZ 세팅용)
     // 이유: TB_BUSINESS.STATUS_CD=APPROVED 이면 신청 시 저장된 BIZ_TYPE 으로 사업자 화면 분기
     MemberAuthBizVO selectApprovedBusinessByBizId(
             @Param("bizId") String bizId);
 
-    // 2026/07/07 장우철 — join(회원가입)
+    // join(회원가입)
 
     /* 이메일 중복 확인 */
     int countMemberByEmail(@Param("email") String email);
@@ -61,13 +61,13 @@ public interface MemberAuthMapper {
     /* 반려동물 1건 INSERT */
     int insertPet(MemberRegisterVO vo);
 
-    // 2026/08/11 장우철 — 가입 시 펫 사진 PHOTO_URL 갱신
+    // 가입 시 펫 사진 PHOTO_URL 갱신
     int updatePetPhotoUrl(
             @Param("petId") Long petId,
             @Param("memberNo") Long memberNo,
             @Param("photoUrl") String photoUrl);
 
-    // 2026/07/15 — 카카오 로그인
+    // 카카오 로그인
 
     /** 카카오 PROVIDER_UID 로 TB_MEMBER_SOCIAL → TB_MEMBER 조인 조회 — 없으면 null */
     MemberAuthVO selectMemberBySocialId(
@@ -78,9 +78,9 @@ public interface MemberAuthMapper {
             @Param("memberNo") Long memberNo,
             @Param("providerUid") String providerUid);
 
-    // 2026-07-21 박유정 STEP ② — 기간 정지 만료 시 STATUS_CD=NORMAL 복구
+    // 기간 정지 만료 시 STATUS_CD=NORMAL 복구
     int releaseExpiredSuspensions();
 
-    // 2026-07-22 박유정 — 탈퇴 회원 이메일 재가입 차단
+    // 탈퇴 회원 이메일 재가입 차단
     int countWithdrawnMemberByEmail(@Param("email")String email);
 }

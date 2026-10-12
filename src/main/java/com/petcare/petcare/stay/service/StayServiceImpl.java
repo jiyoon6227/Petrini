@@ -48,7 +48,7 @@ public class StayServiceImpl implements StayService {
     @Autowired
     private StayMapper stayMapper;
 
-    // 지윤 26.08.07: 숙소 예약 쿠폰 적용용
+    // 숙소 예약 쿠폰 적용용
     @Autowired
     private CouponMapper couponMapper;
 
@@ -77,7 +77,7 @@ public class StayServiceImpl implements StayService {
         if (stay != null) {
             List<StayRoomVO> rooms = stayMapper.selectRoomsByStayId(stayId);
             stay.setRooms(rooms);
-            // 2026/08/11 장우철 — 고객 노출 환불정책은 플랫폼 고정 문구
+            // 고객 노출 환불정책은 플랫폼 고정 문구
             stay.setRefundPolicy(StayCancelFeeCalculator.FIXED_POLICY_TEXT);
         }
         return stay;
@@ -97,7 +97,7 @@ public class StayServiceImpl implements StayService {
         return stayMapper.selectStayReviews(stayId);
     }
 
-    // HYJ 26.07.20 가용성 체크 (단순 조회 — 락 없음)
+    // 가용성 체크 (단순 조회 — 락 없음)
     @Override
     public boolean checkRoomAvailability(Long roomId, Date checkinDate, Date checkoutDate) {
         StayRoomVO room = stayMapper.selectRoomById(roomId);
@@ -116,12 +116,12 @@ public class StayServiceImpl implements StayService {
         return count == 0;
     }
 
-    // HYJ 26.07.20 예약 생성 (비관적 락 + 가용성 검증)
-    // 2026/08/11 장우철 — PET_CNT·PET_FEE(추가 마리×박) 반영
+    // 예약 생성 (비관적 락 + 가용성 검증)
+    // PET_CNT·PET_FEE(추가 마리×박) 반영
     @Override
-    @Transactional  //HYJ 26.08.13 누락되있어서 추가
+    @Transactional
     public Long createStayReservation(ReservationVO vo) {
-        // 2026-08-05 박유정 — PET_ID NOT NULL 제약 (반려동물 미선택 시 INSERT 방지)
+        // PET_ID NOT NULL 제약 (반려동물 미선택 시 INSERT 방지)
         if (vo.getPetId() == null) {
             throw new RuntimeException("반려동물을 선택해 주세요. 등록된 반려동물이 없으면 마이페이지에서 등록 후 이용해 주세요.");
         }
@@ -175,8 +175,8 @@ public class StayServiceImpl implements StayService {
         return vo.getResvId();
     }
 
-    // HYJ 26.07.20 결제 확정 (PENDING → CONFIRMED + TB_PAYMENT INSERT + 포인트 차감)
-    // 2026/07/31 장우철 — 위젯 결제는 토스 confirm API 필수 (미호출 시 취소 불가)
+    // 결제 확정 (PENDING → CONFIRMED + TB_PAYMENT INSERT + 포인트 차감)
+    // 위젯 결제는 토스 confirm API 필수 (미호출 시 취소 불가)
     @Override
     @Transactional
     public void confirmPayment(Long resvId, String tossPaymentKey, String tossOrderId, String payMethod,
@@ -193,7 +193,7 @@ public class StayServiceImpl implements StayService {
 
         long total = resv.getTotalAmount() != null ? resv.getTotalAmount() : 0L;
 
-        // 지윤 26.08.07: 쿠폰 서버 재검증 (클라이언트가 보낸 memberCouponId를 그대로 믿지 않음)
+        // 쿠폰 서버 재검증 (클라이언트가 보낸 memberCouponId를 그대로 믿지 않음)
         long couponDiscount = 0L;
         if (memberCouponId != null && memberCouponId > 0) {
             CouponVO coupon = couponMapper.selectMemberCouponForUse(memberCouponId, memberNo);
@@ -213,7 +213,7 @@ public class StayServiceImpl implements StayService {
             }
             if ("RATE".equals(coupon.getCouponType())) {
                 long rawDiscount = total * coupon.getDiscountValue() / 100;
-                // 지윤 26.08.11 수정: 최대할인금액 캡 적용. maxDiscountAmt가 NULL/0인 레거시 쿠폰은 캡 미적용
+                // 최대할인금액 캡 적용. maxDiscountAmt가 NULL/0인 레거시 쿠폰은 캡 미적용
                 Integer maxAmt = coupon.getMaxDiscountAmt();
                 couponDiscount = (maxAmt != null && maxAmt > 0)
                         ? Math.min(rawDiscount, (long) maxAmt)
@@ -271,7 +271,7 @@ public class StayServiceImpl implements StayService {
             Map<String, Object> deductParam = new HashMap<>();
             deductParam.put("memberNo", memberNo);
             deductParam.put("pointAmount", usedPoint);
-            // 2026/07/27 장우철 — SQL 가드 실패 시 롤백
+            // SQL 가드 실패 시 롤백
             int updated = stayMapper.deductMemberPointBalance(deductParam);
             if (updated != 1) {
                 throw new RuntimeException("보유 포인트가 부족합니다.");
@@ -296,7 +296,7 @@ public class StayServiceImpl implements StayService {
         statusParam.put("statusCd", "CONFIRMED");
         stayMapper.updateReservationStatus(statusParam);
 
-        // 지윤 26.08.07: 쿠폰·포인트 사용 확정 — 예약에 기록 (완료화면에 정확한 결제금액 표시용)
+        // 쿠폰·포인트 사용 확정 — 예약에 기록 (완료화면에 정확한 결제금액 표시용)
         // 쿠폰을 안 썼어도 포인트만 썼으면 그 내역도 남겨야 완료화면이 정확해짐
         Map<String, Object> paymentInfoParam = new HashMap<>();
         paymentInfoParam.put("resvId", resvId);
@@ -330,7 +330,7 @@ public class StayServiceImpl implements StayService {
         payParam.put("payStatus", "DONE");
         stayMapper.insertPayment(payParam);
 
-        // 2026-07-28 박유정 — 결제 완료 시 사업자에게 예약 접수 알림
+        // 결제 완료 시 사업자에게 예약 접수 알림
         try {
             Long stayId = resv.getTargetId() != null ? Long.parseLong(resv.getTargetId()) : null;
             Long bizMemberNo = stayId != null ? stayMapper.selectStayMemberNo(stayId) : null;
@@ -341,7 +341,7 @@ public class StayServiceImpl implements StayService {
             log.warn("[Stay] 사업자 예약 알림 발송 실패 — resvId={}, 예약은 정상 처리됨", resvId, e);
         }
 
-        // HYJ 26.07.20 카카오톡 "나에게 보내기" 알림 발송
+        // 카카오톡 "나에게 보내기" 알림 발송
         // 카카오 로그인 사용자만 (accessToken 있을 때) + 실패해도 결제는 정상 유지
         if (kakaoAccessToken != null && !kakaoAccessToken.isBlank()) {
             try {
@@ -377,14 +377,14 @@ public class StayServiceImpl implements StayService {
         return stayMapper.selectReservationById(resvId);
     }
 
-    // 2026/07/27 장우철 — DB 실제 보유 포인트
+    // DB 실제 보유 포인트
     @Override
     public Long getMemberPointBalance(Long memberNo) {
         Long bal = stayMapper.selectMemberPointBalance(memberNo);
         return bal != null ? bal : 0L;
     }
 
-    // 지윤 26.08.07: 이 숙소(사업자)가 발급한, 회원이 사용 가능한 쿠폰 목록
+    // 이 숙소(사업자)가 발급한, 회원이 사용 가능한 쿠폰 목록
     @Override
     public List<CouponVO> getUsableCoupons(Long memberNo, Long bizNo) {
         if (memberNo == null || bizNo == null) {

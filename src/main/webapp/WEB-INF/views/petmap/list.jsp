@@ -184,10 +184,6 @@
     <div class="pm-body">
       <%-- 지도 --%>
       <div class="pm-map-wrap">
-        <%-- <div class="pm-map-search">
-          <input type="text" id="mapSearchInput" placeholder="장소명으로 지도 이동...">
-          <button type="button" onclick="searchPlace()">검색</button>
-        </div> --%>
         <div class="pm-map" id="kakao-map"></div>
         <%@ include file="/WEB-INF/views/common/kakaomap.jsp" %>
       </div>

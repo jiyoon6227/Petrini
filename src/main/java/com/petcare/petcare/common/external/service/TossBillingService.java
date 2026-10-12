@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — 토스 자동결제(빌링) API 연동
+ * 토스 자동결제(빌링) API 연동
  *
  * 키
  * - toss.billing.client-key / toss.billing.secret-key  (API 개별 연동 키)
@@ -36,7 +36,7 @@ import com.petcare.petcare.common.billing.vo.BillingIssueResultVO;
 @Service
 public class TossBillingService {
 
-    // 2026/07/27 장우철 — 빌링 전용 클라이언트/시크릿 키 (위젯 키와 분리)
+    // 빌링 전용 클라이언트/시크릿 키 (위젯 키와 분리)
     @Value("${toss.billing.client-key}")
     private String billingClientKey;
 
@@ -45,13 +45,13 @@ public class TossBillingService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // 2026/07/27 장우철 — 프론트 requestBillingAuth 용 클라이언트 키
+    // 프론트 requestBillingAuth 용 클라이언트 키
     public String getBillingClientKey() {
         return billingClientKey;
     }
 
     /**
-     * 2026/07/27 장우철 — authKey + customerKey 로 빌링키 발급
+     * authKey + customerKey 로 빌링키 발급
      * @return 성공 시 BillingIssueResultVO, 실패 시 null (에러 메시지는 outError 에 담음)
      */
     public BillingIssueResultVO issueBillingKey(String authKey, String customerKey, StringBuilder outError) {
@@ -94,7 +94,7 @@ public class TossBillingService {
     }
 
     /**
-     * 2026/07/27 장우철 — 등록카드(빌링키) 자동결제 승인
+     * 등록카드(빌링키) 자동결제 승인
      * @return 성공 시 paymentKey 포함 VO, 실패 시 null (outError 에 메시지)
      */
     public BillingApproveResultVO approveBilling(String billingKey, String customerKey, int amount,
@@ -136,7 +136,7 @@ public class TossBillingService {
         }
     }
 
-    // 2026/07/27 장우철 — Basic auth + JSON POST 공통
+    // Basic auth + JSON POST 공통
     private HttpResult postJson(String urlStr, String body) throws Exception {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

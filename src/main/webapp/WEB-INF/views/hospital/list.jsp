@@ -77,7 +77,7 @@
   </div>
 </div>
 
-<%-- 2026-08-07 박유정 — 병원 목록 광고 배너 (POSITION_CD=HOSPITAL, store/list.jsp 동일) --%>
+<%-- 병원 목록 광고 배너 (POSITION_CD=HOSPITAL, store/list.jsp 동일) --%>
 <%@ include file="/WEB-INF/views/common/ad-banner.jsp" %>
 
 <%-- 검색 폼 (hidden) --%>
@@ -121,11 +121,6 @@
   </aside>
 
   <div>
-    <%-- 검색바 --%>
-    <%-- <div class="hosp-map-search">
-      <input type="text" id="mapSearchInput" placeholder="장소명, 지역명 검색...">
-      <button onclick="searchPlace()">검색</button>
-    </div> --%>
 
     <div class="hosp-map-area" id="kakao-map"></div>
     <c:set var="mapLevel" value="3"/>
@@ -177,10 +172,6 @@
                   <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   ${h.addr}
                 </div>
-                <%-- <div class="hosp-meta-row">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  ${h.tagList}
-                </div> --%>
                 <div class="hosp-meta-row">
                   <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                   <c:choose>
@@ -208,18 +199,6 @@
                   <c:otherwise>-</c:otherwise>
                 </c:choose>
               </div>
-              <%-- 2026/07/08 장우철 — 목록 버튼 예약하기 → 상세보기, 경로 /hospital/detail --%>
-              <%--
-              <button class="btn-reserve"
-                      onclick="event.stopPropagation();location.href='${contextPath}/hospital/reserve?id=${h.hospitalId}'">
-                예약하기
-              </button>
-              --%>
-              <%-- HYJ 26.07.09 사업자가 아직 사업정보 등록 안했을 경우 이용중비중 --%>
-              <%-- <button class="btn-reserve"
-                      onclick="event.stopPropagation();location.href='${contextPath}/hospital/detail?id=${h.hospitalId}'">
-                상세보기
-              </button> --%>
               <c:choose>
                 <c:when test="${h.lat != null}">
                   <button class="btn-reserve"

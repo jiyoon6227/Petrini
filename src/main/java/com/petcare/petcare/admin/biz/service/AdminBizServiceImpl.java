@@ -32,25 +32,25 @@ public class AdminBizServiceImpl implements AdminBizService {
     @Autowired
     private AdminBizMapper adminBizMapper;
 
-    // 2026-07-09 장우철 — 신청 서류 조회용 (MypageBiz apply 시 REF_TYPE=BIZ_AUTH / BIZ_LICENSE)
+    // 신청 서류 조회용 (MypageBiz apply 시 REF_TYPE=BIZ_AUTH / BIZ_LICENSE)
     // 이유: 상세 화면에서 TB_FILE 메타를 그대로 재사용 (FK 없이 refType+refId 패턴)
     @Autowired
     private FileMapper fileMapper;
 
-    //HYJ 26.07.09 사업자 승인 시, insert tb_hospital 필요
+    // 사업자 승인 시, insert tb_hospital 필요
     @Autowired
     private BizHospitalMapper bizHospitalMapper;
     @Autowired
     private BizStayMapper bizStayMapper;
 
-    // 2026-07-09 장우철 — 반려 알림 발송 (TB_NOTIFICATION)
+    // 반려 알림 발송 (TB_NOTIFICATION)
     // 이유: rejectBiz 트랜잭션 안에서 해당 유저에게만 알림 INSERT
     @Autowired
     private MypageNotifyService mypageNotifyService;
 
     @Override
     public List<AdminBizVO> getBizApplyList(String statusCd, String bizType) {
-        // 2026/07/28 장우철 — 승인/관리 탭 업종 필터 (null/ALL = 전체)
+        // 승인/관리 탭 업종 필터 (null/ALL = 전체)
         return adminBizMapper.selectBizApplyList(statusCd, bizType);
     }
 
@@ -89,7 +89,7 @@ public class AdminBizServiceImpl implements AdminBizService {
         }
     }
 
-    // 2026-07-09 장우철 — 승인 처리 (TB_BUSINESS + TB_BUSINESS_AUTH 동시 갱신)
+    // 승인 처리 (TB_BUSINESS + TB_BUSINESS_AUTH 동시 갱신)
     // 이유: USER 신청(applyBusiness)이 두 테이블에 PENDING 으로 넣으므로 승인도 쌍으로 맞춤
     // 후속: 로그인 시 TB_BUSINESS APPROVED 이면 세션 role=BIZ 세팅은 MemberAuth 쪽 별도 작업
     @Override
@@ -99,7 +99,7 @@ public class AdminBizServiceImpl implements AdminBizService {
         adminBizMapper.updateBusinessStatus(biz.getBizNo(), "APPROVED");
         adminBizMapper.updateBusinessAuthStatus(biz.getBizNo(), "APPROVED");
 
-        //HYJ 26.07.09 병원 사업자인 경우, TB_HOSPITAL 빈 껍데기 INSERT
+        // 병원 사업자인 경우, TB_HOSPITAL 빈 껍데기 INSERT
         if ("HOSPITAL".equals(biz.getBizType())) {
             bizHospitalMapper.insertHospital(biz.getBizId());
         }
@@ -107,14 +107,14 @@ public class AdminBizServiceImpl implements AdminBizService {
             bizStayMapper.insertStay(biz.getBizId());
         }
 
-        // 2026-07-10 장우철 — 승인 알림 INSERT (반려와 동일하게 TB_NOTIFICATION, 이메일/푸시 후순위)
+        // 승인 알림 INSERT (반려와 동일하게 TB_NOTIFICATION, 이메일/푸시 후순위)
         Long memberNo = adminBizMapper.selectMemberNoByBizId(biz.getBizId());
         if (memberNo != null) {
             mypageNotifyService.sendBizApproveNotification(memberNo, biz.getBizName(), biz.getBizType());
         }
     }
 
-    // 2026-07-09 장우철 — [변경 후] 반려 처리 + 사유 저장 + 유저 알림
+    // 반려 처리 + 사유 저장 + 유저 알림
     // 이유: DATABASE_TABLE.sql TB_BUSINESS_AUTH.REJECT_REASON / TB_NOTIFICATION 활용
     @Override
     @Transactional
@@ -132,11 +132,6 @@ public class AdminBizServiceImpl implements AdminBizService {
         if (memberNo != null) {
             mypageNotifyService.sendBizRejectNotification(memberNo, biz.getBizName(), reason);
         }
-
-        /* [변경 전] 2026-07-09 장우철 — STATUS 만 REJECTED, 사유·알림 없음
-        adminBizMapper.updateBusinessStatus(biz.getBizNo(), "REJECTED");
-        adminBizMapper.updateBusinessAuthStatus(biz.getBizNo(), "REJECTED");
-        */
     }
 
     private AdminBizVO requirePendingBiz(Long bizNo) {
@@ -153,10 +148,10 @@ public class AdminBizServiceImpl implements AdminBizService {
         return biz;
     }
 
-    //HYJ 26.07.29 쿠폰관리
+    // 쿠폰관리
     @Override
     public List<BizCouponVO> getCouponListByStatus(String approvalStatus) {
-        // 2026-08-13 박유정 — selectCouponListFiltered 재사용 (Mapper Java 선언 통일)
+        // selectCouponListFiltered 재사용 (Mapper Java 선언 통일)
         return adminBizMapper.selectCouponListFiltered(approvalStatus, null);
     }
     @Override
@@ -173,7 +168,7 @@ public class AdminBizServiceImpl implements AdminBizService {
         return counts;
     }
 
-    // 2026-08-13 박유정 — 관리자승인 / 게시중(ACTIVE) / 예산소진(EXHAUSTED)
+    // 관리자승인 / 게시중(ACTIVE) / 예산소진(EXHAUSTED)
     @Override
     public List<BizCouponVO> getCouponListByTab(String tab, String status) {
         if ("published".equals(tab)) {

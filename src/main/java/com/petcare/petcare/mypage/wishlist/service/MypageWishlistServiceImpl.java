@@ -1,5 +1,5 @@
 /**
- * 2026/08/13 장우철 — 찜 토글 (있으면 삭제, 없으면 INSERT)
+ * 찜 토글 (있으면 삭제, 없으면 INSERT)
  */
 package com.petcare.petcare.mypage.wishlist.service;
 

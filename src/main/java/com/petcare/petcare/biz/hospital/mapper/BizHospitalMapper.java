@@ -91,18 +91,18 @@ public interface BizHospitalMapper {
                              @Param("reviewId") Long reviewId,
                              @Param("bizReply") String bizReply) throws Exception;
 
-    // 2026-07-24 박유정 — 리뷰 삭제 요청 INSERT
+    // 리뷰 삭제 요청 INSERT
     int insertReviewDeleteRequest(ReviewDeleteRequestVO vo) throws Exception;
 
-    // 2026-07-24 박유정 — 동일 리뷰 PENDING 중복 요청 방지
+    // 동일 리뷰 PENDING 중복 요청 방지
     int countPendingReviewDeleteRequest(@Param("reviewId") Long reviewId,
                                         @Param("bizNo") Long bizNo) throws Exception;
 
-    // 2026-07-24 박유정 — 사업자 리뷰관리 삭제요청 탭 목록
+    // 사업자 리뷰관리 삭제요청 탭 목록
     List<ReviewDeleteRequestVO> selectBizReviewDeleteRequests(@Param("hospitalId") Long hospitalId,
                                                               @Param("bizNo") Long bizNo) throws Exception;
 
-    // 2026/07/16 장우철 고도화작업 — 병원 스케줄 (유형·의사·규칙·예외)
+    // 병원 스케줄 (유형·의사·규칙·예외)
     List<HospitalTreatTypeVO> selectTreatTypeList(@Param("hospitalId") Long hospitalId) throws Exception;
     HospitalTreatTypeVO selectTreatType(@Param("hospitalId") Long hospitalId,
                                         @Param("treatTypeId") Long treatTypeId) throws Exception;
@@ -119,12 +119,12 @@ public interface BizHospitalMapper {
     int deleteDoctor(@Param("hospitalId") Long hospitalId,
                      @Param("doctorId") Long doctorId) throws Exception;
 
-    // 2026/07/16 장우철 고도화작업 — 병원 예약 시작 간격
+    // 병원 예약 시작 간격
     Integer selectResvIntervalMin(@Param("hospitalId") Long hospitalId) throws Exception;
     int updateResvIntervalMin(@Param("hospitalId") Long hospitalId,
                               @Param("intervalMin") Integer intervalMin) throws Exception;
 
-    // 2026/07/16 장우철 고도화작업 — RESV_RULE 제거, 예외만 유지
+    // RESV_RULE 제거, 예외만 유지
     List<HospitalResvExceptionVO> selectResvExceptionList(@Param("hospitalId") Long hospitalId,
                                                           @Param("fromDate") String fromDate,
                                                           @Param("toDate") String toDate) throws Exception;
@@ -143,10 +143,10 @@ public interface BizHospitalMapper {
    List<Map<String, Object>> countByStatus(@Param("targetId") Long targetId);
    List<DailyStatVO> selectDailyStats(@Param("targetId") Long targetId, @Param("days") int days);
 
-   // 지윤 26.08.13 추가: 월별 통계 (최근 N개월)
+   // 월별 통계 (최근 N개월)
    List<DailyStatVO> selectMonthlyStats(@Param("targetId") Long targetId, @Param("months") int months);
 
-   // 지윤 26.08.13 추가: 이번 달 진료완료 건수 (매출 대신 상단 카드용)
+   // 이번 달 진료완료 건수 (매출 대신 상단 카드용)
    int sumMonthDoneCount(@Param("targetId") Long targetId, @Param("dt") String dt);
    List<ReservationVO> selectTodayResvList(@Param("hospitalId") Long hospitalId);
    List<HospitalReviewVO> selectRecentReviews(@Param("hospitalId") Long hospitalId);

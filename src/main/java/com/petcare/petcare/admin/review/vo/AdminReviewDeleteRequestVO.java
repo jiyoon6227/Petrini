@@ -1,8 +1,6 @@
 /**
  * 역할: 관리자 리뷰 삭제 요청 목록·상세 표시용 VO
  *
- * - 박유정 / 2026-07-24
- *
  * 참고 테이블
  * - TB_REVIEW_DELETE_REQUEST
  * - TB_REVIEW, TB_HOSPITAL, TB_BUSINESS, TB_MEMBER (JOIN)
@@ -42,6 +40,6 @@ public class AdminReviewDeleteRequestVO {
     private String reviewerNickname; // M.NICKNAME — 리뷰 작성자 닉네임
     private Date reviewRegDate;      // R.REG_DATE — 리뷰 작성일
 
-    // 2026/08/11 장우철 — DELETE_REQ(병원·숙소) / REPORT(쇼핑 TB_REVIEW_REPORT)
+    // DELETE_REQ(병원·숙소) / REPORT(쇼핑 TB_REVIEW_REPORT)
     private String sourceCd;
 }

@@ -1,6 +1,6 @@
 /**
  * 역할: 관리자 쇼핑 중간정산 요청 목록용 VO
- * 2026/08/05 장우철 — 쇼핑 정산 S11
+ * 쇼핑 정산
  *
  * TB_SETTLEMENT_REQUEST + TB_BUSINESS(+상품명) JOIN
  */

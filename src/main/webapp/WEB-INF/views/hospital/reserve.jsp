@@ -57,9 +57,8 @@
 .reserve-hint{font-size:13px;color:var(--text-muted);margin-bottom:12px}
 </style>
 
-<%-- 2026/07/16 장우철 — 예약 UI: 1)일정(날짜·의사·유형·시간) 2)펫·증상, 선점(hold) --%>
+<%-- 예약 UI: 1)일정(날짜·의사·유형·시간) 2)펫·증상, 선점(hold) --%>
 <form id="reserveForm" method="post" action="${contextPath}/hospital/reserve">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
   
   <input type="hidden" name="hospitalId" value="${hospitalId}">
@@ -204,7 +203,7 @@
 <script>
 var contextPath = '${contextPath}';
 var hospitalId = ${hospitalId};
-// 2026/08/07 장우철 — CSRF (hold/release POST)
+// CSRF (hold/release POST)
 var csrfToken = '${_csrf}';
 var currentStep = 1;
 var selectedDoctorId = null;
@@ -216,11 +215,11 @@ var selectedResvTime = '';
 var selectedResvDate = '';
 var selectedPetCard = null;
 var loadingTimes = false;
-// 2026/08/07 장우철 — 예약 제출 중에는 이탈 해제 스킵 (서버가 hold 소비)
+// 예약 제출 중에는 이탈 해제 스킵 (서버가 hold 소비)
 var skipLeaveHoldRelease = false;
 
 function goStep(n) {
-  // 2026/07/16 장우철 — 1·2단계 전환 (선점 성공 후 goStep(2) 호출)
+  // 1·2단계 전환 (선점 성공 후 goStep(2) 호출)
   document.getElementById('step' + currentStep).classList.remove('on');
   for (var i = 1; i <= 2; i++) {
     var si = document.getElementById('si' + i);
@@ -233,7 +232,7 @@ function goStep(n) {
   window.scrollTo(0, 0);
 }
 
-// 2026/07/20 장우철 — 2단계 이전: hold 해제 후 1단계 (다른 회원 즉시 재선택)
+// 2단계 이전: hold 해제 후 1단계 (다른 회원 즉시 재선택)
 function goBackToStep1() {
   var holdId = document.getElementById('holdIdInput').value;
   function afterRelease() {
@@ -263,7 +262,7 @@ function goBackToStep1() {
 }
 
 /**
- * 2026/08/07 장우철 — 예약 중 이탈 시 hold 즉시 해제 시도
+ * 예약 중 이탈 시 hold 즉시 해제 시도
  * - 성공하면 다른 회원이 바로 선택 가능
  * - 실패(브라우저 제한 등)해도 서버 TTL 5분 + 만료 스케줄러가 안전망
  */
@@ -536,7 +535,7 @@ function submitReserve() {
     return;
   }
   if (confirm('예약을 확정하시겠습니까?')) {
-    // 2026/08/07 장우철 — 제출 시 unload 해제와 경합 방지
+    // 제출 시 unload 해제와 경합 방지
     skipLeaveHoldRelease = true;
     document.getElementById('reserveForm').submit();
   }
@@ -550,7 +549,7 @@ function submitReserve() {
   var firstPet = document.querySelector('.pet-select-card');
   if (firstPet) selectPet(firstPet);
 
-  // 2026/08/07 장우철 — 이탈(닫기/뒤로/다른 페이지) 시 hold 즉시 해제 시도
+  // 이탈(닫기/뒤로/다른 페이지) 시 hold 즉시 해제 시도
   window.addEventListener('pagehide', releaseHoldOnLeave);
   window.addEventListener('beforeunload', releaseHoldOnLeave);
 })();

@@ -22,18 +22,18 @@
 -->
 
 
-<!-- 지윤 26.07.14 로그인 ID로 BIZ_NO 조회 -->
+<!-- 로그인 ID로 BIZ_NO 조회 -->
 <select id="selectBizNoByBizId" resultType="Long">
     SELECT BIZ_NO FROM TB_BUSINESS WHERE BIZ_ID = #{bizId}
 </select>
 
-<!-- 지윤 26.07.14 사업자 상품목록 공통 필터 (검색어/카테고리/상태). 삭제 개념 없음(삭제 대신 STOPPED 상태로 통합) -->
+<!-- 사업자 상품목록 공통 필터 (검색어/카테고리/상태). 삭제 개념 없음(삭제 대신 STOPPED 상태로 통합) -->
 <sql id="bizProductFilter">
     p.BIZ_NO = #{bizNo}
     <if test="keyword != null and keyword != ''">
         AND UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
     </if>
-    <!-- 2026/08/06 장우철: 카테고리명 기준 필터 (같은 이름이면 종/타입 구분 없이 전부 포함) -->
+    <!-- 카테고리명 기준 필터 (같은 이름이면 종/타입 구분 없이 전부 포함) -->
     <if test="categoryName != null and categoryName != ''">
         AND p.CATEGORY_ID IN (
             SELECT CATEGORY_ID FROM TB_PRODUCT_CATEGORY
@@ -46,9 +46,9 @@
     </if>
 </sql>
 
-<!-- 지윤 26.07.14 상품목록 조회 (상품명/카테고리명/가격/재고/상태/썸네일 한번에 조인해서 가져옴) -->
-<!-- 지윤 26.07.16 수정: STOCK_QTY 컬럼 삭제 -> 옵션 재고 합계로 대체 -->
-<!-- 지윤 26.08.13 수정: 최하위 카테고리명만 나오던 문제 -> 동물종류 > 상품종류 > 나이대 전체 경로로 표시 (관리자 목록과 동일 방식) -->
+<!-- 상품목록 조회 (상품명/카테고리명/가격/재고/상태/썸네일 한번에 조인해서 가져옴) -->
+<!-- 재고는 옵션 재고 합계 (STOCK_QTY 컬럼 없음) -->
+<!-- 카테고리는 동물종류 > 상품종류 > 나이대 전체 경로로 표시 (관리자 목록과 동일) -->
 <select id="selectProductList" resultType="com.petcare.petcare.biz.store.vo.BizProductVO">
     SELECT
         p.PRODUCT_ID, p.PRODUCT_CD, p.PRODUCT_NAME, p.BIZ_NO, p.CATEGORY_ID, cp.CATEGORY_PATH AS CATEGORY_NAME,
@@ -77,17 +77,17 @@
     OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
 </select>
 
-<!-- 지윤 26.07.14 상품목록 총 개수 (페이지네이션 계산용, 위 목록 조회랑 필터 조건 동일하게 맞춤) -->
+<!-- 상품목록 총 개수 (페이지네이션 계산용, 위 목록 조회랑 필터 조건 동일하게 맞춤) -->
 <select id="selectProductCount" resultType="int">
     SELECT COUNT(*) FROM TB_PRODUCT p WHERE <include refid="bizProductFilter"/>
 </select>
 
-<!-- 지윤 26.07.14 다음 PRODUCT_ID 조회 (등록할 때 PRODUCT_CD 생성용으로 미리 뽑음) -->
+<!-- 다음 PRODUCT_ID 조회 (등록할 때 PRODUCT_CD 생성용으로 미리 뽑음) -->
 <select id="selectNextProductId" resultType="Long">
     SELECT NVL(MAX(PRODUCT_ID), 0) + 1 FROM TB_PRODUCT
 </select>
 
-<!-- 지윤 26.07.16 수정: STOCK_QTY 컬럼 삭제 -> 재고는 이제 TB_PRODUCT_OPTION에서만 관리 -->
+<!-- 재고는 TB_PRODUCT_OPTION에서만 관리 (STOCK_QTY 컬럼 없음) -->
 <insert id="insertProduct">
     INSERT INTO TB_PRODUCT (
         PRODUCT_ID, PRODUCT_CD, PRODUCT_NAME, BIZ_NO, CATEGORY_ID,
@@ -99,14 +99,14 @@
     )
 </insert>
 
-<!-- 지윤 26.07.14 상품 이미지 등록 (다른 모듈과 동일하게 SEQ_FILE.NEXTVAL로 채번) -->
+<!-- 상품 이미지 등록 (다른 모듈과 동일하게 SEQ_FILE.NEXTVAL로 채번) -->
 <insert id="insertProductImage">
     INSERT INTO TB_FILE (FILE_ID, REF_TYPE, REF_ID, FILE_URL, ORIGIN_NAME, REG_DATE)
     VALUES (SEQ_FILE.NEXTVAL, 'PRODUCT', #{productId}, #{fileUrl}, #{originName}, SYSDATE)
 </insert>
 
 
-<!-- 지윤 26.07.16 수정: STOCK_QTY 컬럼 삭제 -> 옵션 재고 합계로 대체 -->
+<!-- 재고는 옵션 재고 합계 (STOCK_QTY 컬럼 없음) -->
 <select id="selectProductDetail" resultType="com.petcare.petcare.biz.store.vo.BizProductVO">
     SELECT
         p.PRODUCT_ID, p.PRODUCT_CD, p.PRODUCT_NAME, p.BIZ_NO, p.CATEGORY_ID,
@@ -126,7 +126,7 @@
     WHERE p.PRODUCT_ID = #{productId} AND p.BIZ_NO = #{bizNo}
 </select>
 
-<!-- 지윤 26.07.14 상품 수정: WHERE절에 BIZ_NO도 걸어서 본인 상품만 수정되게 함. STATUS_CD로 판매중/품절/입고대기/판매중지 강제 변경 -->
+<!-- 상품 수정: WHERE절 BIZ_NO 조건으로 본인 상품만 수정. STATUS_CD로 판매중/품절/입고대기/판매중지 강제 변경 -->
 <update id="updateProduct">
     UPDATE TB_PRODUCT
     SET PRODUCT_NAME = #{productName}, CATEGORY_ID = #{categoryId}, PRICE = #{price},
@@ -135,7 +135,7 @@
     WHERE PRODUCT_ID = #{productId} AND BIZ_NO = #{bizNo}
 </update>
 
-<!-- 지윤 26.07.14 등록/수정 폼 카테고리 드롭다운용 - 최하위(4단계) 카테고리만 -->
+<!-- 등록/수정 폼 카테고리 드롭다운용 - 최하위(4단계) 카테고리만 -->
 <select id="selectLeafCategories" resultType="com.petcare.petcare.store.vo.CategoryVO">
     SELECT CATEGORY_ID, PARENT_ID, CATEGORY_NAME, DEPTH
     FROM TB_PRODUCT_CATEGORY
@@ -143,7 +143,7 @@
     ORDER BY DEPTH, CATEGORY_ID
 </select>
 
-<!-- 2026/08/06 장우철: 상품목록 필터용 — 카테고리명 중복 제거 (강아지/사료/시니어 각 1개) -->
+<!-- 상품목록 필터용 — 카테고리명 중복 제거 (강아지/사료/시니어 각 1개) -->
 <select id="selectFilterCategoryNames" resultType="string">
     SELECT CATEGORY_NAME
     FROM TB_PRODUCT_CATEGORY
@@ -152,7 +152,7 @@
     ORDER BY MIN(TO_NUMBER(DEPTH)), CATEGORY_NAME
 </select>
 
-<!-- 지윤 26.07.15 상품 옵션 목록 조회 (store 모듈의 selectProductOptions와 동일 쿼리 재사용, 목록에서 옵션별 재고 표시용) -->
+<!-- 상품 옵션 목록 조회 (store 모듈의 selectProductOptions와 동일 쿼리 재사용, 목록에서 옵션별 재고 표시용) -->
 <select id="selectProductOptions" resultType="com.petcare.petcare.store.vo.OptionVO">
     SELECT OPTION_ID, PRODUCT_ID, OPTION_COLOR, OPTION_SIZE, ADD_PRICE, STOCK_QTY
     FROM TB_PRODUCT_OPTION
@@ -160,41 +160,41 @@
     ORDER BY OPTION_ID
 </select>
 
-<!-- 지윤 26.07.15 다음 OPTION_ID 조회 (시퀀스 있으면 SELECT SEQ_PRODUCT_OPTION.NEXTVAL FROM DUAL 로 교체) -->
+<!-- 다음 OPTION_ID 조회 (시퀀스 있으면 SELECT SEQ_PRODUCT_OPTION.NEXTVAL FROM DUAL 로 교체) -->
 <select id="selectNextOptionId" resultType="Long">
     SELECT NVL(MAX(OPTION_ID), 0) + 1 FROM TB_PRODUCT_OPTION
 </select>
 
-<!-- 지윤 26.07.15 상품 옵션 등록 -->
+<!-- 상품 옵션 등록 -->
 <insert id="insertProductOption">
     INSERT INTO TB_PRODUCT_OPTION (OPTION_ID, PRODUCT_ID, OPTION_COLOR, OPTION_SIZE, ADD_PRICE, STOCK_QTY)
     VALUES (#{optionId}, #{productId}, #{optionColor}, #{optionSize}, #{addPrice}, #{stockQty})
 </insert>
 
-<!-- 지윤 26.07.24 추가: OPTION_ID로 정확히 찍어서 값 갱신 (색상/사이즈 이름을 바꿔도 같은 옵션으로 인식됨) -->
+<!-- OPTION_ID 기준 값 갱신 (색상/사이즈 이름이 바뀌어도 같은 옵션으로 인식) -->
 <update id="updateProductOptionById">
     UPDATE TB_PRODUCT_OPTION
     SET OPTION_COLOR = #{optionColor}, OPTION_SIZE = #{optionSize}, ADD_PRICE = #{addPrice}, STOCK_QTY = #{stockQty}
     WHERE OPTION_ID = #{optionId}
 </update>
 
-<!-- 지윤 26.07.24 추가: 이 옵션이 실제로 주문된 적 있는지 확인 (있으면 삭제 못 하게 막기 위함) -->
+<!-- 옵션 주문 이력 확인 (이력 있으면 삭제 차단) -->
 <select id="selectOrderItemCountByOption" resultType="int">
     SELECT COUNT(*) FROM TB_ORDER_ITEM WHERE OPTION_ID = #{optionId}
 </select>
 
-<!-- 지윤 26.07.24 추가: 옵션 1개만 삭제 (주문 이력 없는 것만 이걸로 지움) -->
+<!-- 옵션 1개만 삭제 (주문 이력 없는 것만 이걸로 지움) -->
 <delete id="deleteProductOptionById">
     DELETE FROM TB_PRODUCT_OPTION WHERE OPTION_ID = #{optionId}
 </delete>
 
-<!-- 지윤 26.07.15 상품 옵션 전체 삭제 (수정 시 재등록 방식) -->
+<!-- 상품 옵션 전체 삭제 (수정 시 재등록 방식) -->
 <delete id="deleteProductOptions">
     DELETE FROM TB_PRODUCT_OPTION WHERE PRODUCT_ID = #{productId}
 </delete>
 
-<!-- 지윤 26.07.20 추가: 사업자 주문 목록 조회 (상품명은 주문당 첫 상품 + 외 N건으로 요약) -->
-<!-- 지윤 26.07.22 수정: statusCd='CLAIM_PENDING'이면 ORDER_STATUS 대신 CLAIM_STATUS='PENDING'으로 필터링 (취소신청 탭용) -->
+<!-- 사업자 주문 목록 조회 (상품명은 주문당 첫 상품 + 외 N건으로 요약) -->
+<!-- statusCd='CLAIM_PENDING'이면 ORDER_STATUS 대신 CLAIM_STATUS='PENDING'으로 필터링 (취소신청 탭용) -->
 <select id="selectOrderList" resultType="com.petcare.petcare.biz.store.vo.BizOrderVO">
     SELECT
         o.ORDER_ID, o.ORDER_NO, o.ORDER_STATUS, o.PAY_AMOUNT, o.ORDER_DATE,
@@ -205,7 +205,7 @@
         (SELECT COUNT(*) FROM TB_ORDER_ITEM oi
           WHERE oi.ORDER_ID = o.ORDER_ID
             AND oi.RETURN_STATUS_CD IN ('REQUESTED', 'RETURNING')) AS ACTIVE_RETURN_COUNT,
-        <!-- 2026/08/13 장우철 — 환불완료/부분환불 뱃지용 -->
+        <!-- 환불완료/부분환불 뱃지용 -->
         (SELECT COUNT(*) FROM TB_ORDER_ITEM oi
           WHERE oi.ORDER_ID = o.ORDER_ID
             AND oi.RETURN_STATUS_CD = 'DONE') AS DONE_RETURN_COUNT
@@ -221,7 +221,7 @@
     ORDER BY o.ORDER_ID DESC
 </select>
 
-<!-- 지윤 26.07.20 추가: 상태별 개수 (탭에 숫자 표시용) -->
+<!-- 상태별 개수 (탭에 숫자 표시용) -->
 <select id="selectOrderStatusCounts" resultType="map">
     SELECT ORDER_STATUS AS STATUS, COUNT(*) AS CNT
     FROM TB_ORDER
@@ -229,20 +229,20 @@
     GROUP BY ORDER_STATUS
 </select>
 
-<!-- 지윤 26.07.22 추가: 취소신청 대기중 건수 (탭 숫자용, ORDER_STATUS와 별개 카운트) -->
+<!-- 취소신청 대기중 건수 (탭 숫자용, ORDER_STATUS와 별개 카운트) -->
 <select id="selectClaimPendingCount" resultType="int">
     SELECT COUNT(*) FROM TB_ORDER WHERE BIZ_NO = #{bizNo} AND CLAIM_STATUS = 'PENDING'
 </select>
 
-<!-- 지윤 26.07.23 추가: 오늘 들어온 신규 주문 건수 (홈 대시보드용) -->
+<!-- 오늘 들어온 신규 주문 건수 (홈 대시보드용) -->
 <select id="selectTodayNewOrderCount" resultType="int">
     SELECT COUNT(*) FROM TB_ORDER
     WHERE BIZ_NO = #{bizNo} AND SUBSTR(ORDER_DATE, 1, 10) = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
 </select>
 
-<!-- 지윤 26.07.20 추가: 주문 상세 조회 (구매자 정보 + 배송정보 + 결제방법 다 조인) -->
-<!-- 지윤 26.07.22 수정: 취소신청 처리에 필요한 컬럼 추가 -->
-<!-- 지윤 26.08.07 수정: 상품금액/배송비/할인합계/쿠폰명 추가 (상세화면에 결제 세부내역 표시 안 되던 문제) -->
+<!-- 주문 상세 조회 (구매자 정보 + 배송정보 + 결제방법 다 조인) -->
+<!-- 취소신청 처리용 컬럼 포함 -->
+<!-- 상품금액/배송비/할인합계/쿠폰명 포함 (상세화면 결제 세부내역 표시용) -->
 <select id="selectOrderDetail" resultType="com.petcare.petcare.biz.store.vo.BizOrderVO">
     SELECT
         o.ORDER_ID, o.ORDER_NO, o.ORDER_STATUS, o.PAY_AMOUNT, o.ORDER_DATE,
@@ -263,11 +263,11 @@
     WHERE o.ORDER_ID = #{orderId} AND o.BIZ_NO = #{bizNo}
 </select>
 
-<!-- 지윤 26.07.20 추가: 주문 상세 - 상품 목록 -->
-<!-- 지윤 26.07.22 수정: OPTION_ID 추가 (취소승인 시 재고복구용) -->
-<!-- 지윤 26.08.07 수정: 상품 썸네일 조인 추가 (TB_FILE, REF_TYPE='PRODUCT' 첫 번째 이미지) -->
+<!-- 주문 상세 - 상품 목록 -->
+<!-- OPTION_ID: 취소승인 시 재고복구용 -->
+<!-- 상품 썸네일 조인 (TB_FILE, REF_TYPE='PRODUCT' 첫 번째 이미지) -->
 <select id="selectOrderItems" resultType="com.petcare.petcare.biz.store.vo.BizOrderItemVO">
-    <!-- 2026/08/10 장우철 — jiyoon 썸네일 조인 + woochul 환불 컬럼 병합 -->
+    <!-- 썸네일 조인 + 환불 컬럼 -->
     SELECT oi.ORDER_ITEM_ID, oi.PRODUCT_ID, oi.OPTION_ID, oi.PRODUCT_NAME,
            oi.OPTION_COLOR, oi.OPTION_SIZE, oi.QTY, oi.UNIT_PRICE, oi.TOTAL_PRICE,
            f.FILE_URL AS THUMBNAIL_URL,
@@ -283,28 +283,28 @@
     ORDER BY oi.ORDER_ITEM_ID
 </select>
 
-<!-- 지윤 26.07.20 추가: 주문 상태 변경 (WHERE절에 BIZ_NO 걸어서 본인 주문만) -->
+<!-- 주문 상태 변경 (WHERE절에 BIZ_NO 걸어서 본인 주문만) -->
 <update id="updateOrderStatus">
     UPDATE TB_ORDER
     SET ORDER_STATUS = #{orderStatus}
     WHERE ORDER_ID = #{orderId} AND BIZ_NO = #{bizNo}
 </update>
 
-<!-- 지윤 26.07.27 추가: 배송조회 자동완료 - 이미 DONE인 주문은 WHERE절에서 걸려서 0건 -->
+<!-- 배송조회 자동완료 - 이미 DONE인 주문은 WHERE절에서 걸려서 0건 -->
 <update id="autoCompleteOrderStatus">
     UPDATE TB_ORDER
     SET ORDER_STATUS = 'DONE'
     WHERE ORDER_ID = #{orderId} AND BIZ_NO = #{bizNo} AND ORDER_STATUS != 'DONE'
 </update>
 
-<!-- 지윤 26.07.28 추가: PAID/READY인 주문만 SHIPPING으로 승격 (이미 SHIPPING 이상이면 0건, 역행 방지) -->
+<!-- PAID/READY인 주문만 SHIPPING으로 승격 (이미 SHIPPING 이상이면 0건, 역행 방지) -->
 <update id="autoElevateToShipping">
     UPDATE TB_ORDER
     SET ORDER_STATUS = 'SHIPPING'
     WHERE ORDER_ID = #{orderId} AND BIZ_NO = #{bizNo} AND ORDER_STATUS IN ('PAID','READY')
 </update>
 
-<!-- 지윤 26.07.28 추가: 자동동기화 스케줄러(DeliveryAutoSyncScheduler, 기본 비활성화)가 순회할 대상 -->
+<!-- 자동동기화 스케줄러(DeliveryAutoSyncScheduler, 기본 비활성화)가 순회할 대상 -->
 <select id="selectOrdersNeedingSync" resultType="map">
     SELECT o.ORDER_ID AS ORDER_ID, o.BIZ_NO AS BIZ_NO, d.COURIER_CODE AS COURIER_CODE, d.TRACKING_NO AS TRACKING_NO
     FROM TB_ORDER o
@@ -314,38 +314,38 @@
       AND d.TRACKING_NO IS NOT NULL
 </select>
 
-<!-- 지윤 26.07.27 추가: 배송조회 자동완료 시 TB_ORDER_DELIVERY 상태만 같이 맞춰줌 -->
+<!-- 배송조회 자동완료 시 TB_ORDER_DELIVERY 상태도 동기화 -->
 <update id="updateDeliveryStatusOnly">
     UPDATE TB_ORDER_DELIVERY
     SET DELIVERY_STATUS = #{deliveryStatus}
     WHERE ORDER_ID = #{orderId}
 </update>
 
-<!-- 지윤 26.07.22 추가: 취소신청 승인 (토스취소 성공 후 호출, ORDER_STATUS까지 CANCEL로 확정) -->
+<!-- 취소신청 승인 (토스취소 성공 후 호출, ORDER_STATUS까지 CANCEL로 확정) -->
 <update id="updateClaimApprove">
     UPDATE TB_ORDER
     SET CLAIM_STATUS = 'DONE', ORDER_STATUS = 'CANCEL', REFUND_AMOUNT = #{refundAmount}
     WHERE ORDER_ID = #{orderId} AND BIZ_NO = #{bizNo} AND CLAIM_STATUS = 'PENDING'
 </update>
 
-<!-- 지윤 26.07.22 추가: 취소신청 반려 (토스 호출 없이 상태만 변경) -->
+<!-- 취소신청 반려 (토스 호출 없이 상태만 변경) -->
 <update id="updateClaimReject">
     UPDATE TB_ORDER
     SET CLAIM_STATUS = 'REJECTED'
     WHERE ORDER_ID = #{orderId} AND BIZ_NO = #{bizNo} AND CLAIM_STATUS = 'PENDING'
 </update>
 
-<!-- 지윤 26.07.22 추가: 결제 상태를 취소로 변경 -->
+<!-- 결제 상태를 취소로 변경 -->
 <update id="updatePaymentCancelStatus">
     UPDATE TB_PAYMENT SET PAY_STATUS = 'CANCEL' WHERE ORDER_ID = #{orderId}
 </update>
 
-<!-- 지윤 26.07.22 추가: 취소승인 시 옵션 재고 복구 -->
+<!-- 취소승인 시 옵션 재고 복구 -->
 <update id="restoreStock">
     UPDATE TB_PRODUCT_OPTION SET STOCK_QTY = STOCK_QTY + #{qty} WHERE OPTION_ID = #{optionId}
 </update>
 
-<!-- 지윤 26.07.23 추가: 취소승인으로 재고 복구된 상품이 SOLDOUT이었으면, 재고 합계가 0보다 클 때 자동으로 NORMAL 복귀 -->
+<!-- 취소승인으로 재고 복구된 상품이 SOLDOUT이었으면, 재고 합계가 0보다 클 때 자동으로 NORMAL 복귀 -->
 <update id="restoreProductStatusIfNeeded">
     UPDATE TB_PRODUCT
     SET STATUS_CD = 'NORMAL'
@@ -354,33 +354,33 @@
       AND (SELECT NVL(SUM(STOCK_QTY),0) FROM TB_PRODUCT_OPTION WHERE PRODUCT_ID = #{productId}) > 0
 </update>
 
-<!-- 지윤 26.07.22 추가: 포인트 복구 전 현재 잔액 조회 -->
+<!-- 포인트 복구 전 현재 잔액 조회 -->
 <select id="selectMemberPointBalance" resultType="int">
     SELECT NVL(POINT_BALANCE, 0) FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}
 </select>
 
-<!-- 지윤 26.07.22 추가: 포인트 잔액 복구 -->
+<!-- 포인트 잔액 복구 -->
 <update id="restoreMemberPoint">
     UPDATE TB_MEMBER SET POINT_BALANCE = #{newBalance} WHERE MEMBER_NO = #{memberNo}
 </update>
 
-<!-- 지윤 26.07.22 추가: 포인트 복구 이력 -->
+<!-- 포인트 복구 이력 -->
 <insert id="insertPointRefundHistory">
     INSERT INTO TB_POINT (POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT, BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE)
     VALUES ((SELECT NVL(MAX(POINT_ID),0)+1 FROM TB_POINT), #{memberNo}, 'REFUND', #{pointAmount}, #{balanceAfter}, 'ORDER_CANCEL', 'ORDER', #{orderId}, SYSDATE)
 </insert>
 
-<!-- 지윤 26.07.22 추가: 취소승인 시 쿠폰 복구 -->
+<!-- 취소승인 시 쿠폰 복구 -->
 <update id="restoreCoupon">
     UPDATE TB_MEMBER_COUPON SET STATUS_CD = 'UNUSED' WHERE MEMBER_COUPON_ID = #{memberCouponId}
 </update>
 
-<!-- 지윤 26.07.20 추가: 배송정보(택배사/송장번호) 저장 - 있으면 UPDATE, 없으면 INSERT -->
+<!-- 배송정보(택배사/송장번호) 저장 - 있으면 UPDATE, 없으면 INSERT -->
 <select id="selectDeliveryExists" resultType="int">
     SELECT COUNT(*) FROM TB_ORDER_DELIVERY WHERE ORDER_ID = #{orderId}
 </select>
 
-<!-- 2026/08/01 장우철 — TB_ORDER_DELIVERY.DELIVERY_FEE NOT NULL 대응: 주문 배송비 복사(없으면 0) -->
+<!-- TB_ORDER_DELIVERY.DELIVERY_FEE NOT NULL 대응: 주문 배송비 복사(없으면 0) -->
 <update id="updateDeliveryTimestamp">
     MERGE INTO TB_ORDER_DELIVERY d
     USING (SELECT #{orderId} AS ORDER_ID FROM DUAL) src
@@ -395,7 +395,7 @@
         )
 </update>
 
-<!-- 2026/08/01 장우철 — INSERT 시에도 DELIVERY_FEE NOT NULL 맞춤 -->
+<!-- INSERT 시에도 DELIVERY_FEE NOT NULL 맞춤 -->
 <insert id="insertOrderDelivery">
     INSERT INTO TB_ORDER_DELIVERY (
         DELIVERY_ID, ORDER_ID, BIZ_NO, COURIER_NAME, COURIER_CODE, TRACKING_NO,
@@ -415,7 +415,7 @@
     WHERE ORDER_ID = #{orderId}
 </update>
 
-<!-- 지윤 26.07.20 추가: 배송관리 목록 조회 (배송준비/배송중/배송완료 상태만, 택배사/상태/키워드 필터) -->
+<!-- 배송관리 목록 조회 (배송준비/배송중/배송완료 상태만, 택배사/상태/키워드 필터) -->
 <select id="selectDeliveryList" resultType="com.petcare.petcare.biz.store.vo.BizDeliveryVO">
     SELECT
         o.ORDER_ID, o.ORDER_NO, m.NICKNAME AS BUYER_NAME,
@@ -427,7 +427,7 @@
     LEFT JOIN TB_ORDER_DELIVERY d ON d.ORDER_ID = o.ORDER_ID
     WHERE o.BIZ_NO = #{bizNo}
       AND o.ORDER_STATUS IN ('READY','SHIPPING','DONE')
-    <!-- 지윤 26.07.29 수정: 드롭다운이 택배사 코드(예: 04)를 넘기는데 COURIER_NAME(이름)과 비교하고 있어서 항상 매칭 실패하던 버그 수정 -->
+    <!-- 드롭다운 값은 택배사 코드(예: 04)이므로 COURIER_NAME이 아닌 코드로 비교 -->
    <if test="carrier != null and carrier != ''">
     AND d.COURIER_CODE = #{carrier}
    </if>
@@ -442,7 +442,7 @@
 </select>
 
 
-<!-- 지윤 26.07.20 추가: 일괄등록 시 주문번호(문자열)로 ORDER_ID 찾기 (본인 사업자 주문인지도 같이 확인) -->
+<!-- 일괄등록 시 주문번호(문자열)로 ORDER_ID 찾기 (본인 사업자 주문인지도 같이 확인) -->
 <select id="selectOrderIdByOrderNo" resultType="Long">
     SELECT ORDER_ID FROM TB_ORDER WHERE ORDER_NO = #{orderNo} AND BIZ_NO = #{bizNo}
 </select>
@@ -484,7 +484,7 @@
      ORDER BY r.REG_DATE DESC, r.REVIEW_ID DESC
 </select>
 
-<!-- 지윤 26.07.20 추가: 답글 저장 - TARGET_ID(상품)의 BIZ_NO가 본인 것인지까지 확인 -->
+<!-- 답글 저장 - TARGET_ID(상품)의 BIZ_NO가 본인 것인지까지 확인 -->
 <update id="updateReviewBizReply">
     UPDATE TB_REVIEW
        SET BIZ_REPLY = #{bizReply}
@@ -493,7 +493,7 @@
        AND TARGET_ID IN (SELECT PRODUCT_ID FROM TB_PRODUCT WHERE BIZ_NO = #{bizNo})
 </update>
 
-<!-- 지윤 26.07.20 추가: 삭제요청 대상 리뷰 소유 확인 (0/1) -->
+<!-- 삭제요청 대상 리뷰 소유 확인 (0/1) -->
 <select id="selectReviewOwnedByBiz" resultType="int">
     SELECT COUNT(*) FROM TB_REVIEW r
      WHERE r.REVIEW_ID = #{reviewId}
@@ -501,24 +501,24 @@
        AND r.TARGET_ID IN (SELECT PRODUCT_ID FROM TB_PRODUCT WHERE BIZ_NO = #{bizNo})
 </select>
 
-<!-- 지윤 26.07.20 추가: 이미 대기중인 삭제요청 있는지 확인 (0/1) -->
+<!-- 이미 대기중인 삭제요청 있는지 확인 (0/1) -->
 <select id="selectPendingReportExists" resultType="int">
     SELECT COUNT(*) FROM TB_REVIEW_REPORT
      WHERE REVIEW_ID = #{reviewId} AND REPORTER_TYPE = 'BIZ' AND STATUS_CD = 'PENDING'
 </select>
 
-<!-- 지윤 26.07.20 추가: 리뷰 삭제요청 등록 (관리자 승인 대기) -->
+<!-- 리뷰 삭제요청 등록 (관리자 승인 대기) -->
 <insert id="insertReviewDeleteRequest">
     INSERT INTO TB_REVIEW_REPORT (REPORT_ID, REPORTER_TYPE, REPORTER_NO, REVIEW_ID, BIZ_NO, REASON, STATUS_CD, REG_DATE)
     VALUES ((SELECT NVL(MAX(REPORT_ID), 0) + 1 FROM TB_REVIEW_REPORT), 'BIZ', #{bizNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
 </insert>
 
-<!-- 지윤 26.07.21 추가: 사이드바 "주문관리" 뱃지용 - 결제완료(PAID) 상태 주문 개수 -->
+<!-- 사이드바 "주문관리" 뱃지용 - 결제완료(PAID) 상태 주문 개수 -->
 <select id="selectPaidOrderCount" resultType="int">
     SELECT COUNT(*) FROM TB_ORDER WHERE BIZ_NO = #{bizNo} AND ORDER_STATUS = 'PAID'
 </select>
 
-<!-- 지윤 26.07.21 추가: Q&A관리 목록 - 내 상품(BIZ_NO)에 달린 질문 전체, 미답변 먼저 -->
+<!-- Q&A관리 목록 - 내 상품(BIZ_NO)에 달린 질문 전체, 미답변 먼저 -->
 <select id="selectBizQnaList" resultType="com.petcare.petcare.biz.store.vo.BizQnaVO">
     SELECT  q.QNA_ID       AS qnaId,
             q.PRODUCT_ID   AS productId,
@@ -548,7 +548,7 @@
      ORDER BY (CASE WHEN q.ANSWER IS NULL THEN 0 ELSE 1 END), q.QNA_ID DESC
 </select>
 
-<!-- 지윤 26.07.21 추가: Q&A 답변 등록/수정 - 상품(TARGET) BIZ_NO가 본인 것인지까지 확인 -->
+<!-- Q&A 답변 등록/수정 - 상품(TARGET) BIZ_NO가 본인 것인지까지 확인 -->
 <update id="updateQnaAnswer">
     UPDATE TB_PRODUCT_QNA
        SET ANSWER = #{answer}, ANSWER_DATE = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
@@ -556,7 +556,7 @@
        AND PRODUCT_ID IN (SELECT PRODUCT_ID FROM TB_PRODUCT WHERE BIZ_NO = #{bizNo})
 </update>
 
-<!-- 지윤 26.07.23 추가: 사업자 정보 조회 (등록증은 최신 파일 1건만) -->
+<!-- 사업자 정보 조회 (등록증은 최신 파일 1건만) -->
 <select id="selectBusinessInfo" resultType="com.petcare.petcare.biz.store.vo.BizInfoVO">
     SELECT
         b.BIZ_NAME AS shopName, b.CEO_NAME, b.BIZ_REG_NO, b.BIZ_TYPE, b.ADDR, b.ADDR_DETAIL, b.PHONE,
@@ -570,7 +570,7 @@
     WHERE b.BIZ_NO = #{bizNo}
 </select>
 
-<!-- 지윤 26.07.23 수정: SHOP_NAME(안 쓰는 예전 컬럼) -> BIZ_NAME(신청서 업체명이 실제 저장되는 컬럼)으로 수정 -->
+<!-- BIZ_NAME 사용 (신청서 업체명 저장 컬럼, SHOP_NAME은 미사용) -->
 <update id="updateBusinessInfo">
     UPDATE TB_BUSINESS
     SET BIZ_NAME = #{shopName}, CEO_NAME = #{ceoName}, BIZ_REG_NO = #{bizRegNo}, BIZ_TYPE = #{bizType},
@@ -578,7 +578,7 @@
     WHERE BIZ_NO = #{bizNo}
 </update>
 
-<!-- 2026/08/06 장우철 — 정산 계좌 조회 (정산관리 모달) -->
+<!-- 정산 계좌 조회 (정산관리 모달) -->
 <select id="selectSettleAccount" resultType="com.petcare.petcare.biz.store.vo.BizInfoVO">
     SELECT BIZ_REG_NO,
            SETTLE_BANK AS settleBank,
@@ -590,7 +590,7 @@
      WHERE BIZ_NO = #{bizNo}
 </select>
 
-<!-- 2026/08/06 장우철 — 정산 계좌 변경 (인증 완료 후 저장) -->
+<!-- 정산 계좌 변경 (인증 완료 후 저장) -->
 <update id="updateSettleAccount">
     UPDATE TB_BUSINESS
        SET SETTLE_BANK = #{settleBank},
@@ -602,7 +602,7 @@
      WHERE BIZ_NO = #{bizNo}
 </update>
 
-<!-- ========== 2026/08/04 장우철 — 상품단위 환불(RETURN_*) ========== -->
+<!-- ========== 상품단위 환불(RETURN_*) ========== -->
 
 <!-- 환불신청/진행/완료 목록 (statusCd: REQUESTED | RETURNING | DONE) -->
 <select id="selectReturnList" resultType="com.petcare.petcare.biz.store.vo.BizReturnVO">
@@ -640,7 +640,7 @@
            oi.RETURN_FEE_AMOUNT, oi.RETURN_FEE_PAYER, oi.REFUND_AMOUNT, oi.RETURN_REJECT_REASON,
            oi.RETURN_REQUESTED_AT, oi.RETURN_APPROVED_AT, oi.RETURN_REJECTED_AT, oi.RETURN_DONE_AT,
            p.TOSS_PAYMENT_KEY, p.PAY_METHOD, o.PAY_AMOUNT,
-           NVL(p.REFUND_AMT, 0) AS paidRefundAmt, <!-- 2026/08/13 장우철 — 이미 카드환불된 금액(한도) -->
+           NVL(p.REFUND_AMT, 0) AS paidRefundAmt, <!-- 이미 카드환불된 금액(한도) -->
            o.POINT_USED, o.MEMBER_COUPON_ID,
            o.TOTAL_AMOUNT AS orderProductTotal, o.DELIVERY_FEE, o.DISCOUNT_AMOUNT,
            c.COUPON_NAME AS couponName,
@@ -708,7 +708,7 @@
      WHERE ORDER_ID = #{orderId}
 </update>
 
-<!-- 지윤 26.08.06 쿠폰 기능-->
+<!-- 쿠폰 기능-->
 <select id="selectCouponListByBizNo" parameterType="long" resultType="com.petcare.petcare.biz.vo.BizCouponVO">
   SELECT COUPON_ID, COUPON_CODE, COUPON_NAME, COUPON_TYPE, DISCOUNT_VALUE, MAX_DISCOUNT_AMT, MIN_ORDER_AMT,
          TOTAL_BUDGET, ISSUED_BUDGET, TOTAL_QTY, ISSUED_QTY, USE_START_DATE, USE_END_DATE,
@@ -756,7 +756,6 @@
 </delete>
 
 <!--
-  지윤 26.08.06
   쇼핑몰 사업자 쿠폰 조기 마감
 
   관리자 승인 없이 ACTIVE 쿠폰을 INACTIVE로 변경한다.

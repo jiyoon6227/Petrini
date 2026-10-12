@@ -3,7 +3,6 @@ package com.petcare.petcare.main.section.vo;
 import lombok.Getter;
 import lombok.Setter;
 /*
- * 2026/07/06 장우철 생성
  * 메인페이지 커뮤니티 미리보기 데이터
  */
 @Getter

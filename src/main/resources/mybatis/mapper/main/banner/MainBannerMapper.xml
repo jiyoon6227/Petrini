@@ -12,13 +12,13 @@
   - TB_BUSINESS
 -->
 
-    <!-- 배너 이미지: TB_BANNER.FILE_ID 기준 (2026/08/03 장우철 — BIZ_NO JOIN은 다른 배너 이미지 섞임/누락) -->
+    <!-- 배너 이미지: TB_BANNER.FILE_ID 기준 (BIZ_NO JOIN은 다른 배너 이미지 섞임/누락) -->
     <sql id="bannerImageJoin">
         LEFT JOIN TB_FILE f ON f.FILE_ID = b.FILE_ID
     </sql>
 
     <!-- ─── 사용자: 위치별 활성 배너 조회 ─── -->
-    <!-- 2026/08/03 장우철 — START/END_DATE = DATE 기준 조회 + VO String용 TO_CHAR -->
+    <!-- START/END_DATE = DATE 기준 조회 + VO String용 TO_CHAR -->
     <resultMap id="bannerActiveMap" type="com.petcare.petcare.main.banner.vo.MainBannerVO">
         <id     property="bannerId"   column="BANNER_ID"/>
         <result property="title"      column="TITLE"/>
@@ -30,7 +30,7 @@
         <result property="imageUrl"   column="IMAGE_URL"/>
     </resultMap>
 
-    <!-- 2026-08-07 박유정 — Oracle ROWNUM + maxCount 바인드 (FETCH FIRST #{n} 은 바인드 미지원 환경 있음) -->
+    <!-- Oracle ROWNUM + maxCount 바인드 (FETCH FIRST #{n} 은 바인드 미지원 환경 있음) -->
     <select id="selectActiveBannersByPosition"
             resultMap="bannerActiveMap">
         SELECT * FROM (
@@ -53,7 +53,7 @@
         ) WHERE ROWNUM &lt;= #{maxCount}
     </select>
 
-    <!-- 2026-08-06 박유정 — 위치·상태별 건수 (레거시) -->
+    <!-- 위치·상태별 건수 (레거시) -->
     <select id="countByPositionAndStatuses" resultType="int">
         SELECT  COUNT(*)
         FROM    TB_BANNER
@@ -64,7 +64,7 @@
         </foreach>
     </select>
 
-    <!-- 2026-08-06 박유정 — 사업자 신청 슬롯 (PENDING + 기간 만료 전 ACTIVE) -->
+    <!-- 사업자 신청 슬롯 (PENDING + 기간 만료 전 ACTIVE) -->
     <select id="countReservedSlotsByPosition" resultType="int">
         SELECT  COUNT(*)
         FROM    TB_BANNER
@@ -75,7 +75,7 @@
                 )
     </select>
 
-    <!-- 2026-08-06 박유정 — 승인·올리기 슬롯 (기간 만료 전 ACTIVE) -->
+    <!-- 승인·올리기 슬롯 (기간 만료 전 ACTIVE) -->
     <select id="countLiveSlotsByPosition" resultType="int">
         SELECT  COUNT(*)
         FROM    TB_BANNER
@@ -84,7 +84,7 @@
           AND   TRUNC(END_DATE) >= TRUNC(SYSDATE)
     </select>
 
-    <!-- 2026-08-06 박유정 — 종료일 지난 ACTIVE 배너 자동 EXPIRED -->
+    <!-- 종료일 지난 ACTIVE 배너 자동 EXPIRED -->
     <update id="expirePastEndDateBanners">
         UPDATE  TB_BANNER
         SET     STATUS_CD = 'EXPIRED',

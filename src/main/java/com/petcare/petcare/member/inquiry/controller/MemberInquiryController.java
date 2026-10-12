@@ -1,6 +1,6 @@
 /**
  * 역할: 1:1 문의 URL 처리
- * 2026/07/31 장우철 — memberNo 기준 DB 연동 + 숙소 환불 작성 프리필
+ * memberNo 기준 DB 연동 + 숙소 환불 작성 프리필
  */
 package com.petcare.petcare.member.inquiry.controller;
 
@@ -58,8 +58,8 @@ public class MemberInquiryController {
             }
             return "redirect:/login?redirect=" + redirect;
         }
-        // 2026/08/06 장우철 — 진행중/거절 시 작성 폼 진입 차단
-        // 2026-08-10 박유정 — getMyReservationDetail 3번째 인자(resvType) 추가 대응 (null=병원·숙소)
+        // 진행중/거절 시 작성 폼 진입 차단
+        // getMyReservationDetail 3번째 인자 resvType (null=병원·숙소)
         if (resvId != null && "stay_refund".equalsIgnoreCase(type)) {
             MypageReserveVO detail = mypageReserveService.getMyReservationDetail(
                     member.getMemberNo(), resvId, null);

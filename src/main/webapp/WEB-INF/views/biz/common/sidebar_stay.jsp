@@ -22,7 +22,7 @@
       </svg>
       홈
     </a>
-    <%--사업자(숙박) 숙소관리 왼쪽 메뉴사이드바에 추가(지윤)--%>
+    <%--사업자(숙박) 숙소관리 사이드바 메뉴--%>
     <div class="biz-nav-group">숙소 관리</div>
     <a href="${contextPath}/biz/stay/profile" class="biz-nav-link ${bizPage eq 'profile' ? 'active' : ''}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -46,7 +46,7 @@
       </svg>
       예약 관리<c:if test="${pendingReserveCount > 0}"><span class="biz-nav-badge">${pendingReserveCount}</span></c:if>
     </a>
-    <%-- 2026-08-11 박유정 — 환불 신청 메뉴·대기 배지 (승인은 관리자) --%>
+    <%-- 환불 신청 메뉴·대기 배지 (승인은 관리자) --%>
     <a href="${contextPath}/biz/stay/refunds" class="biz-nav-link ${bizPage eq 'refunds' ? 'active' : ''}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
@@ -76,13 +76,6 @@
       리뷰 관리
     </a>
     
-    <%--HYJ 26.07.31 교체 <a href="${contextPath}/biz/stay/contract" class="biz-nav-link ${bizPage eq 'contract' ? 'active' : ''}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"/>
-        <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-      </svg>
-      계약 관리
-    </a> --%>
     <a href="${contextPath}/biz/stay/banner" class="biz-nav-link ${bizPage eq 'banner' ? 'active' : ''}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">

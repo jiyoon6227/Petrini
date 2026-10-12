@@ -45,7 +45,7 @@ ul, ol { list-style: none; }
 .inner { max-width: var(--inner-width); margin: 0 auto; padding: 0 20px; }
 
 /* ---------- Header ---------- */
-/* 2026-07-22 박유정 — 정지 회원 상단 안내 배너 (common/header.jsp) */
+/* 정지 회원 상단 안내 배너 (common/header.jsp) */
 .suspended-banner {
     display: block;
     width: 100%;
@@ -59,7 +59,7 @@ ul, ol { list-style: none; }
     font-weight: 600;
 }
 
-/* 2026-07-22 박유정 — 고객센터 (member/cs.jsp) */
+/* 고객센터 (member/cs.jsp) */
 .cs-restricted-notice {
     background: #FEF2F2;
     border: 1px solid #FECACA;
@@ -184,7 +184,7 @@ ul, ol { list-style: none; }
 }
 .search-btn:hover { background: var(--primary-dark); }
 
-/* HYJ 26.08.06 Autocomplete dropdown */
+/* Autocomplete dropdown */
 .header-search { position: relative; }
 .ac-dropdown {
     display: none;
@@ -421,7 +421,7 @@ ul, ol { list-style: none; }
 .hero-slide.active {
     display: block;             /* grid → block */
 }
-/* 2026-08-06 박유정 — 메인 히어로 기본 배너 (DB 배너 없을 때) */
+/* 메인 히어로 기본 배너 (DB 배너 없을 때) */
 .hero-slide.hero-slide-default {
     display: none;
     position: relative;
@@ -495,7 +495,7 @@ ul, ol { list-style: none; }
     color: #fff;
 }
 
-/* 2026-08-07 박유정 — 메인 중간 배너 (MAIN_MID) */
+/* 메인 중간 배너 (MAIN_MID) */
 .main-mid-banner-wrap {
     max-width: var(--inner-width);
     margin: 0 auto 48px;
@@ -532,7 +532,7 @@ ul, ol { list-style: none; }
 .hero-float.f3 { width: 44px; height: 44px; bottom: 60px; right: 0; animation-delay: 1.6s; }
 @keyframes floatBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
-/* 슬라이드 좌우 화살표 — 2026-09-23 곽지윤: 좌하단 묶음 → 배너 양옆 세로 중앙 */
+/* 슬라이드 좌우 화살표 — 좌하단 묶음 → 배너 양옆 세로 중앙 */
 .hero-controls {
     position: absolute;
     inset: 0;                /* 배너 전체를 덮는 투명 레이어 */

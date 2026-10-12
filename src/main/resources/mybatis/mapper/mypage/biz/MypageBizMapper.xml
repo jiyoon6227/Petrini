@@ -12,8 +12,8 @@
         <selectKey keyProperty="bizNo" resultType="long" order="AFTER">
             SELECT MAX(BIZ_NO) FROM TB_BUSINESS WHERE BIZ_ID = #{bizId}
         </selectKey>
-        <!-- 2026-07-10 장우철 — 신청 주소(ZIP/ADDR) 저장 → 승인 시 병원 ADDR 복사 -->
-        <!-- 2026/07/28 장우철 — 정산 계좌 SETTLE_* (숙소·쇼핑 인증 후) -->
+        <!-- 신청 주소(ZIP/ADDR) 저장 → 승인 시 병원 ADDR 복사 -->
+        <!-- 정산 계좌 SETTLE_* (숙소·쇼핑 인증 후) -->
         INSERT INTO TB_BUSINESS (
                                     BIZ_ID, 
                                     BIZ_TYPE, 
@@ -71,7 +71,7 @@
                                     )
     </insert>
 
-    <!-- 2026-07-09 장우철 — [변경 후] 최신 AUTH + 반려사유, 상태는 TB_BUSINESS 기준
+    <!-- 최신 AUTH + 반려사유, 상태는 TB_BUSINESS 기준
          이유: 반려 시 B.STATUS_CD=REJECTED 와 A.REJECT_REASON 을 유저 화면에 표시 -->
     <select id="selectBizAuthStatus" parameterType="string" resultType="com.petcare.petcare.biz.vo.BusinessVO">
         SELECT      B.BIZ_NO        AS bizNo,
@@ -87,11 +87,6 @@
         FETCH FIRST 1 ROW ONLY
     </select>
 
-    <!-- [변경 전] 2026-07-09 장우철 — A.STATUS_CD 만 조회, REJECT_REASON 없음
-    SELECT B.BIZ_NO, B.BIZ_NAME, B.BIZ_TYPE, B.BIZ_REG_NO, A.STATUS_CD
-    FROM TB_BUSINESS B JOIN TB_BUSINESS_AUTH A ...
-    -->
-
     <select id="selectBusinessByBizId" resultType="com.petcare.petcare.biz.vo.BusinessVO">
         SELECT      BIZ_NO      AS bizNo,
                     BIZ_ID      AS bizId,
@@ -99,7 +94,7 @@
                     BIZ_REG_NO  AS bizRegNo,
                     BIZ_NAME    AS bizName,
                     CEO_NAME    AS ceoName,
-                    <!--HYJ 26.07.28 사업자신청 결과 이메일 안내-->
+                    <!-- 사업자신청 결과 이메일 안내-->
                     EMAIL       AS mail,
                     PHONE       AS phone,
                     ZIP_CODE    AS zipCode,

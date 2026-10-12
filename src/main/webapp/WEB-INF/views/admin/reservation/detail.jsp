@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026/07/31 장우철 — 관리자 숙소 예약 상세 · 전액 환불 취소 --%>
+<%-- 관리자 숙소 예약 상세 · 전액 환불 취소 --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="adminPage"   value="reservation-list" />
 <%@ include file="/WEB-INF/views/admin/common/header.jsp" %>
@@ -69,7 +69,7 @@
         <c:if test="${empty reservation.totalAmount}">-</c:if>
       </span>
     </div>
-    <%-- 2026/08/11 장우철 — 결제수단·결제일 표시 --%>
+    <%-- 결제수단·결제일 표시 --%>
     <div class="rd-row">
       <span>결제수단</span>
       <span>
@@ -112,7 +112,6 @@
       </p>
       <form method="post" action="${contextPath}/admin/reservation/cancel"
             onsubmit="return confirm('전액 환불 취소하시겠습니까?');">
-        <!--HYJ 26.08.05-->
         <input type="hidden" name="_csrf" value="${_csrf}">    
         
         <input type="hidden" name="resvId" value="${reservation.resvId}">

@@ -5,8 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
-//지윤 26.07.09 회원 보유쿠폰(TB_MEMBER_COUPON + TB_COUPON 조인) 조회용 VO
-//2026/08/01 장우철 — yeju 머지: bizNo(지윤 주문서) + 쿠폰함/발급 필드(yeju) 모두 유지
+// 회원 보유쿠폰(TB_MEMBER_COUPON + TB_COUPON 조인) 조회용 VO
 @Getter @Setter
 @ToString
 @NoArgsConstructor
@@ -16,13 +15,12 @@ public class CouponVO {
     private String couponName;
     private String couponType;
     private Integer discountValue;
-    private Integer maxDiscountAmt; // 정률(RATE) 쿠폰 최대 할인금액 (FIXED는 NULL) // 지윤 26.08.11 추가
+    private Integer maxDiscountAmt; // 정률(RATE) 쿠폰 최대 할인금액 (FIXED는 NULL)
     private Integer minOrderAmt;
-    private String bizNo; //지윤 26.07.30 추가: 이 쿠폰이 어느 사업자 발급인지
-    private String bizType;      //2026.08.06 지윤 추가: HOSPITAL/STAY/STORE 등 업종
-    private Long targetId;       //2026.08.06 지윤 추가: HOSPITAL→hospitalId, STAY→stayId
+    private String bizNo; // 이 쿠폰이 어느 사업자 발급인지
+    private String bizType;      // HOSPITAL/STAY/STORE 등 업종
+    private Long targetId;       // HOSPITAL→hospitalId, STAY→stayId
 
-    //HYJ 26.07.31
     private String  couponCode;
     private Integer totalBudget;
     private Integer issuedBudget;

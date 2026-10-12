@@ -1,5 +1,5 @@
 /**
- * 2026/07/07 장우철 — join(회원가입) 이메일 중복 확인 응답 VO
+ * join(회원가입) 이메일 중복 확인 응답 VO
  *
  * GET /join/check-email → join.jsp [중복 확인] Ajax 에 JSON 으로 반환
  */

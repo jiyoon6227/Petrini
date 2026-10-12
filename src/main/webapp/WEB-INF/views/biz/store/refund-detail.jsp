@@ -2,8 +2,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
-<%-- 2026/08/04 장우철 — 사업자 환불신청 상세 (승인/거절/회수완료) --%>
-<%-- 2026/08/11 장우철 — 결제수단 표시·상세 UI 정리·환불 확인문구(빌링/토스위젯) --%>
+<%-- 사업자 환불신청 상세 (승인/거절/회수완료) --%>
+<%-- 결제수단 표시·상세 UI 정리·환불 확인문구(빌링/토스위젯) --%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="bizTypeLabel" value="반려동물 쇼핑몰" />
 <c:set var="bizPage" value="refunds" />

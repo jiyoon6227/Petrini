@@ -42,7 +42,7 @@ public class MainBannerController {
     public List<MainBannerVO> getActiveBanners(@RequestParam(defaultValue = "MAIN_HERO") String position,
                                                HttpServletRequest request) {
         List<MainBannerVO> result = mainBannerService.getBannersByPosition(position);
-        // 2026-08-07 박유정 — FILE_URL 형식 통일 후 브라우저용 절대 경로로 변환
+        // FILE_URL 형식 통일 후 브라우저용 절대 경로로 변환
         String ctx = request.getContextPath();
         for (MainBannerVO banner : result) {
             banner.setImageUrl(UploadUrlUtil.toPublicUrl(banner.getImageUrl(), ctx));

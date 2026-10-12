@@ -1,7 +1,7 @@
 /**
  * 역할: 마이페이지 배송지록(TB_MEMBER_ADDRESS) 데이터 객체
  *
- * 지윤 26.07.29 추가: 회원 한 명이 여러 배송지를 등록/선택할 수 있는 기능용
+ * 회원 한 명이 여러 배송지를 등록/선택할 수 있는 기능용
  * 참고 테이블: TB_MEMBER_ADDRESS (ADDR_ID, MEMBER_NO, RECV_NAME, RECV_PHONE, ZIP_CODE, ADDR1, ADDR2, IS_DEFAULT)
  */
 package com.petcare.petcare.mypage.address.vo;

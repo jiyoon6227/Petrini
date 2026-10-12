@@ -45,7 +45,7 @@
     padding:6px 12px; font-size:12px; color:#333;
     outline:none; width:220px; display:none;
 }
-/* 2026/07/28 장우철 — 승인/관리 업종 필터 드롭다운 */
+/* 승인/관리 업종 필터 드롭다운 */
 .biz-type-filter-wrap { margin-bottom:16px; position:relative; max-width:220px; }
 .biz-type-filter-btn {
     width:100%; display:flex; align-items:center; justify-content:space-between;
@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <%-- 2026-07-09 장우철 — 처리 결과 메시지 (승인/반려 redirect 후) --%>
+    <%-- 처리 결과 메시지 (승인/반려 redirect 후) --%>
     <c:if test="${not empty successMsg}">
         <div style="background:#ECFDF5;border:1px solid #BBF7D0;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px">${successMsg}</div>
     </c:if>
@@ -84,7 +84,7 @@
         <div style="background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px">${errorMsg}</div>
     </c:if>
 
-    <%-- 2026/07/28 장우철 — 탭: 대기 / 승인/관리(APPROVED) / 반려 --%>
+    <%-- 탭: 대기 / 승인/관리(APPROVED) / 반려 --%>
     <div style="display:flex;gap:0;border-bottom:2px solid #E4E6ED;margin-bottom:20px">
         <a href="${contextPath}/admin/biz/list?status=PENDING"
            style="padding:10px 20px;font-size:14px;font-weight:${status eq 'PENDING' ? '700' : '600'};color:${status eq 'PENDING' ? '#3B5BDB' : '#999'};text-decoration:none;border:none;background:none;border-bottom:2px solid ${status eq 'PENDING' ? '#3B5BDB' : 'transparent'};margin-bottom:-2px">
@@ -100,7 +100,7 @@
         </a>
     </div>
 
-    <%-- 2026/07/28 장우철 — 승인/관리 업종 필터 (전체→병원→숙소→쇼핑→미용→스튜디오) --%>
+    <%-- 승인/관리 업종 필터 (전체→병원→숙소→쇼핑→미용→스튜디오) --%>
     <c:if test="${status eq 'APPROVED'}">
     <div class="biz-type-filter-wrap" id="bizTypeFilter">
         <button type="button" class="biz-type-filter-btn" id="bizTypeFilterBtn">
@@ -141,7 +141,7 @@
     </script>
     </c:if>
 
-    <%-- 2026-07-09 장우철 — [변경 후] 신청 목록 실데이터 반복 --%>
+    <%-- 신청 목록 실데이터 반복 --%>
     <c:choose>
     <c:when test="${empty list}">
         <p style="text-align:center;color:#999;padding:48px 0">해당 조건의 사업자가 없습니다.</p>
@@ -184,11 +184,10 @@
                 <c:if test="${item.statusCd eq 'PENDING'}">
                 <form method="post" action="${contextPath}/admin/biz/approve" style="display:inline"
                       onsubmit="return confirm('${item.bizName} 신청을 승인하시겠습니까?')">
-                    <!--HYJ 26.08.05-->
                     <input type="hidden" name="_csrf" value="${_csrf}">
                     
                     <input type="hidden" name="bizNo" value="${item.bizNo}">
-                    <!--HYJ 26.07.28 메일조회-->
+                    <!-- 메일조회-->
                     <input type="hidden" name="bizId" value="${item.bizId}">
                     <button type="submit" class="adm-btn green">승인</button>
                 </form>
@@ -199,107 +198,6 @@
     </c:forEach>
     </c:otherwise>
     </c:choose>
-
-    <%-- ========== [변경 전] 2026-07-09 장우철 — 더미 카드 3건 (목업) 보존
-         이유: 기존 UI 목업을 삭제하지 않고 참고용으로 남김 ==========
-    <div style="display:flex;gap:0;border-bottom:2px solid #E4E6ED;margin-bottom:20px">
-        <button style="padding:10px 20px;font-size:14px;font-weight:700;color:#3B5BDB;border:none;background:none;border-bottom:2px solid #3B5BDB;margin-bottom:-2px;cursor:pointer">대기 <span style="background:#EEF2FF;color:#3B5BDB;font-size:11px;padding:1px 7px;border-radius:20px;margin-left:4px">3</span></button>
-        <button style="padding:10px 20px;font-size:14px;font-weight:600;color:#999;border:none;background:none;cursor:pointer">승인완료</button>
-        <button style="padding:10px 20px;font-size:14px;font-weight:600;color:#999;border:none;background:none;cursor:pointer">반려</button>
-    </div>
-    <div class="biz-apply-card">
-        <div class="biz-apply-head">
-            <div class="biz-apply-type hospital">
-                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><rect x="9" y="10" width="6" height="11" rx="1"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg>
-            </div>
-            <div>
-                <div class="biz-apply-name">행복 동물병원</div>
-                <div class="biz-apply-meta">동물병원 · 대표자: 김철수 · 010-1234-5678</div>
-            </div>
-            <span class="adm-badge wait" style="margin-left:12px">승인 대기</span>
-            <span class="biz-apply-date">신청일: 2025.06.25</span>
-        </div>
-        <div class="biz-apply-body">
-            <div class="biz-apply-field"><label>사업자 등록번호</label><span>123-45-67890 ✓ 인증됨</span></div>
-            <div class="biz-apply-field"><label>사업장 주소</label><span>서울 마포구 합정동 123-4</span></div>
-            <div class="biz-apply-field"><label>이메일</label><span>happy@hospital.com</span></div>
-            <div class="biz-apply-field"><label>연락처</label><span>02-1234-5678</span></div>
-        </div>
-        <div class="biz-apply-foot">
-            <div>
-                <span class="biz-doc-link" onclick="alert('서류 미리보기')">사업자등록증 보기</span>
-                <span class="biz-doc-link" style="margin-left:14px" onclick="alert('서류 미리보기')">영업신고증 보기</span>
-            </div>
-            <div class="biz-action-area">
-                <a href="${contextPath}/admin/biz/detail?id=1" class="adm-btn blue">상세 검토</a>
-                <input type="text" class="biz-reject-input" id="reject1" placeholder="반려 사유를 입력하세요">
-                <button class="adm-btn gray" onclick="var el=document.getElementById('reject1');el.style.display=el.style.display==='none'?'block':'none'">반려</button>
-                <button class="adm-btn green" onclick="if(confirm('행복 동물병원을 승인하시겠습니까?\n승인 시 사업자 권한이 부여되고 이메일이 발송됩니다.'))alert('승인 처리되었습니다.')">승인</button>
-            </div>
-        </div>
-    </div>
-    <div class="biz-apply-card">
-        <div class="biz-apply-head">
-            <div class="biz-apply-type stay">
-                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
-            </div>
-            <div>
-                <div class="biz-apply-name">강아지숲 펫호텔</div>
-                <div class="biz-apply-meta">반려동물 숙소 · 대표자: 이영희 · 010-2345-6789</div>
-            </div>
-            <span class="adm-badge wait" style="margin-left:12px">승인 대기</span>
-            <span class="biz-apply-date">신청일: 2025.06.24</span>
-        </div>
-        <div class="biz-apply-body">
-            <div class="biz-apply-field"><label>사업자 등록번호</label><span>234-56-78901 ✓ 인증됨</span></div>
-            <div class="biz-apply-field"><label>사업장 주소</label><span>경기 고양시 일산동구 456-7</span></div>
-            <div class="biz-apply-field"><label>이메일</label><span>dogforest@hotel.com</span></div>
-            <div class="biz-apply-field"><label>연락처</label><span>031-2345-6789</span></div>
-        </div>
-        <div class="biz-apply-foot">
-            <div>
-                <span class="biz-doc-link" onclick="alert('서류 미리보기')">사업자등록증 보기</span>
-            </div>
-            <div class="biz-action-area">
-                <a href="${contextPath}/admin/biz/detail?id=2" class="adm-btn blue">상세 검토</a>
-                <input type="text" class="biz-reject-input" id="reject2" placeholder="반려 사유를 입력하세요">
-                <button class="adm-btn gray" onclick="var el=document.getElementById('reject2');el.style.display=el.style.display==='none'?'block':'none'">반려</button>
-                <button class="adm-btn green" onclick="if(confirm('강아지숲 펫호텔을 승인하시겠습니까?'))alert('승인 처리되었습니다.')">승인</button>
-            </div>
-        </div>
-    </div>
-    <div class="biz-apply-card">
-        <div class="biz-apply-head">
-            <div class="biz-apply-type grooming">
-                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
-            </div>
-            <div>
-                <div class="biz-apply-name">냥냥 그루밍샵</div>
-                <div class="biz-apply-meta">애견미용실 · 대표자: 박수진 · 010-3456-7890</div>
-            </div>
-            <span class="adm-badge wait" style="margin-left:12px">승인 대기</span>
-            <span class="biz-apply-date">신청일: 2025.06.23</span>
-        </div>
-        <div class="biz-apply-body">
-            <div class="biz-apply-field"><label>사업자 등록번호</label><span>345-67-89012 ✓ 인증됨</span></div>
-            <div class="biz-apply-field"><label>사업장 주소</label><span>서울 강남구 역삼동 789-1</span></div>
-            <div class="biz-apply-field"><label>이메일</label><span>nyang@grooming.com</span></div>
-            <div class="biz-apply-field"><label>연락처</label><span>02-3456-7890</span></div>
-        </div>
-        <div class="biz-apply-foot">
-            <div>
-                <span class="biz-doc-link" onclick="alert('서류 미리보기')">사업자등록증 보기</span>
-                <span class="biz-doc-link" style="margin-left:14px" onclick="alert('서류 미리보기')">영업신고증 보기</span>
-            </div>
-            <div class="biz-action-area">
-                <a href="${contextPath}/admin/biz/detail?id=3" class="adm-btn blue">상세 검토</a>
-                <input type="text" class="biz-reject-input" id="reject3" placeholder="반려 사유를 입력하세요">
-                <button class="adm-btn gray" onclick="var el=document.getElementById('reject3');el.style.display=el.style.display==='none'?'block':'none'">반려</button>
-                <button class="adm-btn green" onclick="if(confirm('냥냥 그루밍샵을 승인하시겠습니까?'))alert('승인 처리되었습니다.')">승인</button>
-            </div>
-        </div>
-    </div>
-    ========== [변경 전] 끝 ========== --%>
 
 </main>
 

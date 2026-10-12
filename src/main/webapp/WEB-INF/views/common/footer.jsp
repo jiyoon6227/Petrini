@@ -48,7 +48,7 @@
 </footer>
 <script>window.__CONTEXT_PATH__ = '${contextPath}';</script>
 
-<%-- 2026-08-05 HYJ — CSRF 토큰 공통 처리 (AJAX fetch 용) --%>
+<%-- CSRF 토큰 공통 처리 (AJAX fetch 용) --%>
 <script>
 /**
  * CSRF 토큰을 자동으로 포함하는 fetch 래퍼
@@ -76,7 +76,7 @@ window.csrfFetch = function(url, options) {
     return fetch(url, options);
 };
 
-// HYJ 26.08.05 모든 $.ajax POST 요청에 CSRF 토큰 자동 포함
+// 모든 $.ajax POST 요청에 CSRF 토큰 자동 포함
 if (typeof $ !== 'undefined' && $.ajaxSetup) {
     $.ajaxSetup({
         beforeSend: function(xhr) {
@@ -90,15 +90,15 @@ if (typeof $ !== 'undefined' && $.ajaxSetup) {
 </script>
 <script src="${contextPath}/resources/js/search.js?v=20260705"></script>
 <script src="${contextPath}/resources/js/wishlist.js?v=20260813"></script>
-<%-- 지윤 26.07.08 추가: 헤더 장바구니 뱃지 숫자 실시간 갱신. 모든 페이지 로드마다 호출되고, 담기/삭제 후에도 재호출됨 --%>
-<%-- 2026/07/11 장우철 — 헤더 미읽음 알림 배지 (장바구니와 동일 패턴) --%>
+<%-- 헤더 장바구니 뱃지 숫자 실시간 갱신 (페이지 로드 시와 담기/삭제 후 호출) --%>
+<%-- 헤더 미읽음 알림 배지 (장바구니와 동일 패턴) --%>
 <script>
 window.refreshCartCount = function () {
   fetch(window.__CONTEXT_PATH__ + '/store/cart/count')
     .then(function(res){ return res.text(); })
     .then(function(count){
-      // 2026/07/23 장우철 — 숫자만 반영 (HTML 리다이렉트 응답이 뱃지에 덤프되지 않게)
-      // 2026-07-24 박유정 — 헤더 뱃지만 갱신 (.header-utils)
+      // 숫자만 반영 (HTML 리다이렉트 응답이 뱃지에 덤프되지 않게)
+      // 헤더 뱃지만 갱신 (.header-utils)
       var n = parseInt(String(count).trim(), 10);
       if (isNaN(n)) return;
       document.querySelectorAll('.header-utils .cart-count').forEach(function(el){

@@ -110,12 +110,12 @@ public interface BizStayMapper {
                          @Param("stayId") Long stayId,
                          @Param("statusCd") String statusCd);
 
-    // 2026/08/13 장우철 — 진행 중 예약 건수 (객실 삭제 가능 여부)
+    // 진행 중 예약 건수 (객실 삭제 가능 여부)
     int countActiveReservationsForRoom(@Param("roomId") Long roomId);
 
 
 
-    // 2026-07-10 장우철 — 병원 예약 1차 (F4~F7) 사업자 측 Mapper
+    // 병원 예약 사업자 측 Mapper
 
     List<ReservationVO> selectReservationList(@Param("stayId") Long stayId,
 
@@ -147,7 +147,7 @@ public interface BizStayMapper {
 
 
 
-    // 2026-07-28 박유정 — 사이드바 예약관리 배지 (PENDING + CONFIRMED)
+    // 사이드바 예약관리 배지 (PENDING + CONFIRMED)
 
     int countPendingReservations(@Param("stayId") Long stayId) throws Exception;
 
@@ -165,9 +165,9 @@ public interface BizStayMapper {
 
 
 
-    //HYJ 26.07.29 쿠폰관리
+    // 쿠폰관리
 
-    // 2026/08/01 장우철 — BIZ_MEMBER_NO = TB_BUSINESS.BIZ_NO (NUMBER)
+    // BIZ_MEMBER_NO = TB_BUSINESS.BIZ_NO (NUMBER)
 
     // 사업자 본인 쿠폰 목록
 
@@ -197,13 +197,13 @@ public interface BizStayMapper {
     int deleteCoupon(@Param("couponId") Long couponId,
                      @Param("bizMemberNo") Long bizMemberNo);
 
-    // 지윤 26.08.07: 쿠폰 조기 마감 (병원/숙소 공용)
+    // 쿠폰 조기 마감 (병원/숙소 공용)
     int closeCoupon(@Param("couponId") Long couponId,
                     @Param("bizMemberNo") Long bizMemberNo);
 
 
 
-    //HYJ 26.07.31 배너관리
+    // 배너관리
 
     Long selectBizNoByBizId(@Param("bizId") String bizId);
 
@@ -219,7 +219,7 @@ public interface BizStayMapper {
 
 
 
-    // 2026-07-27 박유정 STEP 2 — 사업자 숙소 리뷰 관리
+    // 사업자 숙소 리뷰 관리
 
     // 목록
 
@@ -255,7 +255,7 @@ public interface BizStayMapper {
 
     List<ReviewDeleteRequestVO> selectBizReviewDeleteRequests(@Param("stayId") Long stayId, @Param("bizNo") Long bizNo);
 
-    // ── HYJ 26.08.06 대시보드 집계 ──
+    // ── 대시보드 집계 ──
     int countResvByDate(@Param("targetId") Long targetId, @Param("dt") String dt);
     int countCheckoutByDate(@Param("targetId") Long targetId, @Param("dt") String dt);
     long sumMonthRevenue(@Param("targetId") Long targetId, @Param("dt") String dt);

@@ -18,8 +18,6 @@ public class GroomingController extends CommonUtilController {
     // ── 애견미용실 목록 ─────────────────────────────────────
     @GetMapping({"", "/"})
     public String list(Model model) throws JsonMappingException, JsonProcessingException {
-        //test
-        //addMapAttributes(model, "서울 중구 세종대로 110", "행복 동물병원");
         
         return "grooming/list";
     }
@@ -28,8 +26,6 @@ public class GroomingController extends CommonUtilController {
     @GetMapping("/detail")
     public String detail(@RequestParam(defaultValue = "1") String id, Model model) {
         model.addAttribute("id", id);
-
-        //addMapAttributes(model, "서울 중구 세종대로 110", "행복 동물병원");
 
         return "grooming/detail";
     }

@@ -22,10 +22,10 @@
 .btn-complete-store{flex:1;padding:13px;border:none;border-radius:var(--radius-sm);background:var(--primary);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 </style>
 <div class="complete-wrap">
-<%-- 지윤 26.07.13 수정: 하드코딩 -> 세션 정보로 실제 저장된 orderNo/orderItems/payAmount 표시. 세션 만료 시 안내문구로 대체 --%>
+<%-- 세션의 orderNo/orderItems/payAmount 표시, 세션 만료 시 안내문구 --%>
 <c:choose>
   <c:when test="${not empty noOrderData}">
-    <%-- 지윤 26.07.23 추가: confirmError 있으면(승인 실패) 그 이유를, 없으면(세션만료 등) 기존 문구를 보여줌 --%>
+    <%-- confirmError(승인 실패) 있으면 그 사유, 없으면(세션만료 등) 기본 문구 표시 --%>
     <c:choose>
       <c:when test="${not empty confirmError}">
         <div class="complete-title">결제 승인에 실패했습니다.</div>

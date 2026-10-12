@@ -1,7 +1,6 @@
 /**
  * 역할: 관리자 숙소 환불(1:1) 승인/거절
- * 2026/07/31 장우철 — R2 2-7 / R3 정산 연결
- * 2026/08/06 장우철 — B: STATUS APPROVED/REJECTED + 승인 시 보상숙박(예약 유지)
+ * B: STATUS APPROVED/REJECTED + 승인 시 보상숙박(예약 유지)
  */
 package com.petcare.petcare.admin.inquiry.service;
 
@@ -45,7 +44,7 @@ public class AdminInquiryService {
         return buildStatusCounts(all);
     }
 
-    // 2026-08-11 박유정 — 관리자 사이드바 숙소 환불신청 대기 배지
+    // 관리자 사이드바 숙소 환불신청 대기 배지
     @Transactional(readOnly = true)
     public int countPendingStayRefund() {
         Map<String, Integer> counts = getStayRefundStatusCounts();
@@ -63,7 +62,7 @@ public class AdminInquiryService {
 
     /**
      * 승인: 전액 환불 + 예약 이용 유지(보상 숙박) + 정산 REFUNDED + 문의 APPROVED
-     * 2026/08/06 장우철 — CANCEL 하지 않음
+     * CANCEL 하지 않음
      */
     @Transactional
     public void approveStayRefund(Long inquiryId, Long adminNo, String answer) throws Exception {
@@ -88,7 +87,7 @@ public class AdminInquiryService {
                 resvId, "관리자 환불승인(이용유지)");
         staySettlementMapper.recalcUnpaidSettlementTotalsByResvId(resvId);
 
-        // 2026/08/11 장우철 — 보상숙박: 결제 환불만 하고 예약 STATUS 유지 (cancelWithFullRefund 사용 안 함)
+        // 보상숙박: 결제 환불만 하고 예약 STATUS 유지 (cancelWithFullRefund 사용 안 함)
         stayFullCancelService.refundPaymentKeepReservation(resvId, "관리자");
 
         int updated = memberInquiryMapper.updateInquiryAnswer(inquiryId, "APPROVED", msg, adminNo);
@@ -96,7 +95,7 @@ public class AdminInquiryService {
             throw new IllegalStateException("문의 상태 갱신에 실패했습니다.");
         }
 
-        // 2026-08-11 박유정 — 환불 승인 알림 (예약 취소 문구 없음)
+        // 환불 승인 알림 (예약 취소 문구 없음)
         String stayName = detail.getStayName() != null ? detail.getStayName() : "숙소";
         Long refundAmt = detail.getTotalAmount() != null ? detail.getTotalAmount() : 0L;
         mypageNotifyService.sendStayRefundApprovedToMemberNotification(
@@ -105,7 +104,7 @@ public class AdminInquiryService {
 
     /**
      * 거절: 예약 유지 + 문의 REJECTED → 다음 정산 기간에 이월 합산(R3-3)
-     * 2026/08/06 장우철 — STATUS_CD = REJECTED (B방식)
+     * STATUS_CD = REJECTED (B방식)
      */
     @Transactional
     public void rejectStayRefund(Long inquiryId, Long adminNo, String answer) {
@@ -125,13 +124,13 @@ public class AdminInquiryService {
             throw new IllegalStateException("문의 상태 갱신에 실패했습니다.");
         }
 
-        // 2026-08-11 박유정 — 환불 거절 알림
+        // 환불 거절 알림
         String stayName = detail.getStayName() != null ? detail.getStayName() : "숙소";
         mypageNotifyService.sendStayRefundRejectedToMemberNotification(
                 detail.getMemberNo(), stayName, detail.getApplyDate(), answer.trim(), detail.getRefId());
     }
 
-    // 2026-08-11 박유정 — 관리자 일반 1:1 문의 (숙소 환불 제외)
+    // 관리자 일반 1:1 문의 (숙소 환불 제외)
 
   /** 목록 조회 */
     @Transactional(readOnly = true)
@@ -147,7 +146,7 @@ public class AdminInquiryService {
         return buildStatusCounts(all);
     }
 
-    // 2026-08-11 박유정 — 관리자 사이드바 1:1 문의 대기 배지
+    // 관리자 사이드바 1:1 문의 대기 배지
     @Transactional(readOnly = true)
     public int countPendingGeneralInquiry() {
         Map<String, Integer> counts = getGeneralInquiryStatusCounts();
@@ -185,7 +184,7 @@ public class AdminInquiryService {
         }
     }
 
-    // 2026-08-11 박유정 — 목록 탭 건수·검색 공통
+    // 목록 탭 건수·검색 공통
     private String normalizeStatus(String statusCd) {
         if (statusCd == null || statusCd.isBlank() || "ALL".equalsIgnoreCase(statusCd)) {
             return null;

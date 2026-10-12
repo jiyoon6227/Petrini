@@ -1,6 +1,6 @@
 /**
  * 역할: 정산 마스터 (TB_SETTLEMENT) — 쇼핑(STORE) 매핑
- * 2026/08/04 장우철 — 쇼핑 정산 S8 VO
+ * 쇼핑 정산 VO
  *
  * 참고 테이블: TB_SETTLEMENT (BIZ_TYPE=STORE)
  */

@@ -16,7 +16,7 @@
 
 
 
-<%-- 7/2, 사업자(병원) 리뷰 관리 UI — 2026/07/14 장우철 DB 목록·답글 저장 연동 --%>
+<%-- 사업자(병원) 리뷰 관리 UI — DB 목록·답글 저장 --%>
 
 <main class="biz-main">
 
@@ -30,7 +30,7 @@
 
 
 
-  <%-- 2026-07-27 박유정 — 답글·삭제요청 처리 결과 flash --%>
+  <%-- 답글·삭제요청 처리 결과 flash --%>
   <c:if test="${not empty msg}">
 
     <div style="margin-bottom:12px;padding:12px 16px;background:#E8F8F1;color:#1F8464;border-radius:8px;font-size:14px">${msg}</div>
@@ -51,7 +51,7 @@
 
       <div class="biz-tabs">
 
-        <%-- 2026-07-24 박유정 — 삭제요청 상태별 탭 --%>
+        <%-- 삭제요청 상태별 탭 --%>
 
         <button type="button" class="biz-tab active" data-tab="pending" onclick="switchTab('pending')">삭제요청<span class="biz-tab-count" id="cntPending"></span></button>
 
@@ -97,9 +97,8 @@
 
 
 
-<%-- 2026-07-27 박유정 — 답글 저장 POST (BizStayController) --%>
+<%-- 답글 저장 POST (BizStayController) --%>
 <form id="replyForm" method="post" action="${contextPath}/biz/stay/reviews/reply" style="display:none">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
 
   <input type="hidden" name="reviewId" id="replyReviewId" value="">
@@ -110,10 +109,9 @@
 
 
 
-<%-- 2026-07-24 박유정 — 리뷰 삭제 요청 --%>
+<%-- 리뷰 삭제 요청 --%>
 
 <form id="deleteRequestForm" method="post" action="${contextPath}/biz/stay/reviews/delete-request" style="display:none">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
   
   <input type="hidden" name="reviewId" id="deleteReviewId" value="">
@@ -126,7 +124,7 @@
 
 <script>
 
-  // 2026-07-27 박유정 — 컨트롤러 JSON 목록·삭제요청 연동
+  // 컨트롤러 JSON 목록·삭제요청 연동
   var reviews = ${empty reviewListJson ? '[]' : reviewListJson};
 
   var deleteRequests = ${empty deleteRequestListJson ? '[]' : deleteRequestListJson};
@@ -247,7 +245,7 @@
 
 
 
-  // 2026-07-27 박유정 — 리뷰 카드 HTML (답글 입력·삭제요청 버튼)
+  // 리뷰 카드 HTML (답글 입력·삭제요청 버튼)
   function buildReviewItemHtml(r, options) {
 
     options = options || {};
@@ -326,7 +324,7 @@
 
 
 
-  // 2026-07-24 박유정 — 삭제요청 탭: 답글·신규 요청 + 대기 내역
+  // 삭제요청 탭: 답글·신규 요청 + 대기 내역
 
   function renderPendingTab(box) {
 
@@ -406,7 +404,7 @@
 
 
 
-  // 2026-07-24 박유정 — 삭제승인·삭제반려 탭
+  // 삭제승인·삭제반려 탭
 
   function renderDeleteRequestHistory(box, statusCd, emptyMsg) {
 
@@ -470,7 +468,7 @@
 
 
 
-  // 2026-07-27 박유정 — 탭별 목록 렌더·건수 갱신
+  // 탭별 목록 렌더·건수 갱신
   function renderList() {
 
     updateTabCounts();
@@ -505,7 +503,7 @@
 
 
 
-  // 2026-07-24 박유정 — 삭제 요청 사유 입력 후 form submit
+  // 삭제 요청 사유 입력 후 form submit
   function submitDeleteRequest(id) {
 
     var reason = prompt('삭제 요청 사유를 입력해 주세요.');
@@ -528,7 +526,7 @@
 
 
 
-  // 2026-07-27 박유정 — 답글 hidden form 제출
+  // 답글 hidden form 제출
   function submitReply(id) {
 
     var text = document.getElementById('replyInput-' + id).value.trim();

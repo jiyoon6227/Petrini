@@ -1,7 +1,7 @@
 /**
  * 역할: 관리자 정산 DB 접근 (MyBatis) — 사업자 SettlementMapper 와 분리
- * 2026/07/30 장우철 — 숙소 정산 구현순서 3-1 ~ 3-5 / 4-3
- * 2026/08/05 장우철 — 쇼핑 STORE 탭 S11
+ * 숙소 정산
+ * 쇼핑 STORE 탭
  *
  * XML: resources/mybatis/mapper/admin/settlement/AdminSettlementMapper.xml
  */
@@ -35,7 +35,7 @@ public interface AdminSettlementMapper {
 
     int updateStaySettlementPaidBatch(@Param("settleIds") List<Long> settleIds);
 
-    /** 2026/08/05 장우철 — S12 FAIL 표시 */
+    /** FAIL 표시 */
     int updateStaySettlementFail(@Param("settleId") Long settleId);
 
     List<Long> selectStayWaitSettleIds();
@@ -55,7 +55,7 @@ public interface AdminSettlementMapper {
 
     int updateStoreSettlementPaid(@Param("settleId") Long settleId);
 
-    /** 2026/08/05 장우철 — S12 FAIL 표시 */
+    /** FAIL 표시 */
     int updateStoreSettlementFail(@Param("settleId") Long settleId);
 
     List<Long> selectStoreWaitSettleIds();

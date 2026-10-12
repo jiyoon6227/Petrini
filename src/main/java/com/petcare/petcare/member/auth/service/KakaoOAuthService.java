@@ -1,5 +1,5 @@
 /**
- * 2026/07/15 — 카카오 로그인
+ * 카카오 로그인
  *
  * 역할: 카카오 OAuth2 인증 처리 (@Service)
  *
@@ -44,7 +44,7 @@ public class KakaoOAuthService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ── [1단계] 카카오 로그인 페이지 URL 생성 ──
-    // 2026/08/18 장우철 — state 로 로그인/회원가입 구분 (카카오 왕복 시 세션 intent 유실 대비)
+    // state 로 로그인/회원가입 구분 (카카오 왕복 시 세션 intent 유실 대비)
     public String buildAuthorizeUrl() {
         return buildAuthorizeUrl(null);
     }

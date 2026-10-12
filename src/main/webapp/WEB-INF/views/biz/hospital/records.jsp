@@ -282,7 +282,7 @@
         <p class="biz-page-desc">내원 환자의 진료기록을 조회하고 관리하세요.</p>
     </div>
 
-    <%-- 2026/07/13 장우철 — 검색·기간 필터 서버 조회 --%>
+    <%-- 검색·기간 필터 서버 조회 --%>
     <c:if test="${not empty msg}">
       <div style="margin-bottom:12px;padding:12px 16px;background:#E8F8F1;color:#1F8464;border-radius:8px;font-size:14px">${msg}</div>
     </c:if>
@@ -304,7 +304,7 @@
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             조회
         </button>
-        <%-- 2026/07/13 장우철 — 작성 버튼 복구 (확정·미기록 예약 선택 후 저장) --%>
+        <%-- 작성 버튼 복구 (확정·미기록 예약 선택 후 저장) --%>
         <button type="button" class="rec-write-btn" onclick="openRecordModal(null)">
             <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             진료기록 작성
@@ -334,7 +334,7 @@
             </div>
             <div class="rec-head-right">
                 <span class="rec-date"><fmt:formatDate value="${rec.visitDate}" pattern="yyyy.MM.dd"/></span>
-                <%-- 2026-07-28 박유정 — MEMO 파싱된 진료 유형 표시 --%>
+                <%-- MEMO 파싱된 진료 유형 표시 --%>
                 <span class="rec-type rec-treat"><c:out value="${empty rec.treatType ? '진료기록' : rec.treatType}"/></span>
             </div>
         </div>
@@ -350,7 +350,7 @@
                 <c:out value="${empty rec.vetName ? '담당 수의사 미입력' : rec.vetName}"/>
             </span>
             <div class="rec-action-btns">
-                <%-- 2026-07-28 박유정 — 상세보기: 파싱된 유형·신체계측 data-* 전달 --%>
+                <%-- 상세보기: 파싱된 유형·신체계측 data-* 전달 --%>
                 <button type="button" class="biz-btn"
                         data-name="<c:out value='${rec.petName}'/>"
                         data-meta="<c:out value='${rec.petBreed}'/> · 보호자: <c:out value='${rec.memberName}'/>"
@@ -375,7 +375,7 @@
 
 </main>
 
-<%-- ── 진료기록 작성/상세 모달 (2026/07/13 장우철 — 저장 연동) ── --%>
+<%-- ── 진료기록 작성/상세 모달 (저장 연동) ── --%>
 <div class="rm-modal-bg" id="recordModalBg" onclick="if(event.target===this) closeRecordModal()">
   <div class="rm-modal">
     <div class="rm-header">
@@ -383,7 +383,6 @@
       <button type="button" class="rm-close" onclick="closeRecordModal()">×</button>
     </div>
     <form id="recordWriteForm" method="post" action="${contextPath}/biz/hospital/records/complete">
-      <!--HYJ 26.08.05-->
       <input type="hidden" name="_csrf" value="${_csrf}">
       
       <input type="hidden" name="redirect" value="records">
@@ -515,8 +514,8 @@
 </div>
 
 <script>
-    // 2026/07/13 장우철 — DB 카드 data-* 로 상세 모달 오픈
-    // 2026-07-28 박유정 — 유형·신체계측·다음방문 필드 분리 전달 (MEMO 통째 표시 오류 수정)
+    // DB 카드 data-* 로 상세 모달 오픈
+    // 유형·신체계측·다음방문 필드 분리 전달 (MEMO 통째 표시 방지)
     function openRecordFromBtn(btn) {
         openRecordModal({
             name: btn.dataset.name || '',
@@ -628,7 +627,7 @@
         setRecordFieldsReadonly(false);
     }
 
-    // 2026/07/13 장우철 — 작성 모달 → complete API (진료완료 + TB_MEDICAL_RECORD)
+    // 작성 모달 → complete API (진료완료 + TB_MEDICAL_RECORD)
     function saveRecord() {
         var resvId = document.getElementById('rm-resv-id').value;
         if (!resvId) { alert('대상 예약을 선택해 주세요.'); return; }

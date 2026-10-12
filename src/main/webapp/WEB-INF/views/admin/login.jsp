@@ -160,7 +160,6 @@
         </c:if>
 
         <form action="${contextPath}/admin/login" method="post">
-            <!--HYJ 26.08.05-->
             <input type="hidden" name="_csrf" value="${_csrf}">
             
             <div class="adm-login-field">

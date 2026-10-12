@@ -1,5 +1,5 @@
 /**
- * 2026/07/27 장우철 — 토스 빌링키 발급 API 응답 요약 VO
+ * 토스 빌링키 발급 API 응답 요약 VO
  *
  * 역할
  * - POST /v1/billing/authorizations/issue 성공 시 billingKey·카드정보 전달

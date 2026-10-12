@@ -15,7 +15,7 @@ public class ReservationVO {
     private String  resvType;       // HOSPITAL / STAY / GROOMING / STUDIO
     private Long    memberNo;
     private Long    petId;
-    // 2026/08/11 장우철 — 숙소 다펫: 대표 PET_ID + 마리수
+    // 숙소 다펫: 대표 PET_ID + 마리수
     private Integer petCnt;
     private String  targetId;
     private Long    roomId;
@@ -47,9 +47,9 @@ public class ReservationVO {
     private String  stayAddr;
     private String  roomName;
 
-    // 지윤 26.08.07: 쿠폰 적용 결제
+    // 쿠폰 적용 결제
     private Long    memberCouponId;
     private Long    couponDiscount;
-    // 지윤 26.08.07: 결제 완료 화면에 정확한 실결제금액 표시용
+    // 결제 완료 화면에 정확한 실결제금액 표시용
     private Long    pointUsed;
 }

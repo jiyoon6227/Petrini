@@ -13,8 +13,6 @@ import com.petcare.petcare.member.vo.MemberVO;
 
 import jakarta.servlet.http.HttpSession;
 
-// @Controller("adminController")
-// @RequestMapping("/admin")
 public class AdminBaseController {
 
     /** 관리자 권한 체크 헬퍼 */

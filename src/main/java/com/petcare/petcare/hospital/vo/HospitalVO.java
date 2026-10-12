@@ -39,7 +39,7 @@ public class HospitalVO implements Mapperable{
     private String hoursJson;      // HOURS_JSON
     private String tagList;       // DEPT_LIST    
     private String thumbPath;
-    // 2026/07/16 장우철 고도화작업 — RESV_RULE 통합: 예약 시작 간격(분)
+    // RESV_RULE 통합: 예약 시작 간격(분)
     private Integer resvIntervalMin; // RESV_INTERVAL_MIN
     private Integer resvCapacity;    // RESV_CAPACITY
 

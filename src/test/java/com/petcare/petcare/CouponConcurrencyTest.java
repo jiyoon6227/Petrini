@@ -18,8 +18,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.petcare.petcare.coupon.service.CouponService;
 
-// 지윤 26.09.27 추가: 쿠폰 동시 발급 테스트 (10장 쿠폰에 100명 동시 요청)
-// 지윤 26.10.05 수정: 출력만 하던 것 -> assert로 검증 + 테스트 데이터 준비/정리 추가
+// 쿠폰 동시 발급 테스트 (10장 쿠폰에 100명 동시 요청)
+// assert 검증 + 테스트 데이터 준비/정리
 //   - 테스트 전: 수량 10장 쿠폰(99번) + 테스트 회원 100명(9001~9100) 생성
 //   - 검증: 성공 10건 / 실패 90건, DB 실제 발급 행수 10건, ISSUED_QTY 10, 상태 EXHAUSTED
 //   - 테스트 후: 생성한 데이터 전부 삭제 (데모 데이터에 영향 없음)

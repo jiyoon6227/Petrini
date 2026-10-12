@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%-- 2026-08-07 박유정 — 사업자 배너 목록: effectiveStatusLabel·미리보기 URL 분기 --%>
+<%-- 사업자 배너 목록: effectiveStatusLabel·미리보기 URL 분기 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%-- 2026-08-07 박유정 — fn:startsWith (이미지 URL 분기) --%>
+<%-- fn:startsWith (이미지 URL 분기) --%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <c:set var="bizTypeLabel" value="반려동물 숙소" />
@@ -56,7 +56,7 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${not empty banner.imageUrl}">
-                                                <%-- 2026-08-07 박유정 — /upload/ 접두어·외부 URL 분기 (ad-banner.jsp 동일) --%>
+                                                <%-- /upload/ 접두어·외부 URL 분기 (ad-banner.jsp 동일) --%>
                                                 <c:set var="imgSrc" value="${banner.imageUrl}" />
                                                 <c:choose>
                                                     <c:when test="${fn:startsWith(banner.imageUrl, 'http')}">
@@ -86,7 +86,7 @@
                                         ${banner.startDate} ~ ${banner.endDate}
                                     </td>
                                     <td>
-                                        <%-- 2026-08-07 박유정 — effectiveStatusLabel (기간 반영, 관리자 목록과 동일) --%>
+                                        <%-- effectiveStatusLabel (기간 반영, 관리자 목록과 동일) --%>
                                         <c:choose>
                                             <c:when test="${banner.effectiveStatusLabel eq '심사중'}">
                                                 <span class="biz-badge warning">심사중</span>

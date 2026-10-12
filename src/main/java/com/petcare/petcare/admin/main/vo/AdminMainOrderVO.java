@@ -1,7 +1,7 @@
 /**
  * 역할: 관리자 대시보드 — 최근 주문 1건
  *
- * - 박유정 / 2026-07-30 — Phase 3-A: dashboard.jsp 최근 주문 표
+ * - dashboard.jsp 최근 주문 표
  *
  * 참고 테이블
  * - TB_ORDER

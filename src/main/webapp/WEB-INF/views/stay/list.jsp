@@ -126,7 +126,7 @@
   </div>
 </div>
 
-<%-- 2026-08-07 박유정 — 숙소 목록 광고 배너 (POSITION_CD=STAY, store/list.jsp 동일) --%>
+<%-- 숙소 목록 광고 배너 (POSITION_CD=STAY, store/list.jsp 동일) --%>
 <%@ include file="/WEB-INF/views/common/ad-banner.jsp" %>
 
 <%-- 검색 폼 (hidden) --%>
@@ -137,7 +137,7 @@
   <%-- facilityFilter는 JS에서 동적으로 추가 --%>
 </form>
 
-<%-- 2026/08/10 장우철 — 결제 실패 flash 메시지 (paymentSuccess / paymentFail) --%>
+<%-- 결제 실패 flash 메시지 (paymentSuccess / paymentFail) --%>
 <c:if test="${not empty errorMsg}">
   <div style="max-width:var(--inner-width);margin:16px auto 0;padding:0 20px;">
     <div style="background:#FEE2E2;border:1px solid #FCA5A5;border-radius:8px;padding:14px 16px;font-size:14px;color:#B91C1C;line-height:1.6;">
@@ -201,7 +201,7 @@
     <div class="stay-toolbar">
       <span style="font-size:14px;color:var(--text-sub)">총 <strong style="color:var(--text-main)">${stayList.size()}</strong>개 숙소</span>
       <div class="stay-sort">
-        <%-- 2026/08/13 장우철 — 추천순(ID순) → 리뷰순. 옛 recommend 값도 리뷰순으로 표시 --%>
+        <%-- 기본 정렬 리뷰순 (옛 recommend 값도 리뷰순) --%>
         <c:set var="sortVal" value="${empty search.sort ? 'review' : search.sort}" />
         <span class="sort-chip ${sortVal == 'review' || sortVal == 'recommend' ? 'on' : ''}" onclick="selSortSearch('review')">리뷰순</span>
         <span class="sort-chip ${sortVal == 'priceLow' ? 'on' : ''}" onclick="selSortSearch('priceLow')">낮은 가격순</span>
@@ -244,9 +244,6 @@
                 </div>
                 <c:if test="${not empty s.facilities}">
                   <div class="sc-tags">
-                    <%-- <c:forTokens items="${s.facilities}" delims="," var="tag">
-                      <span class="sc-tag">${tag}</span>
-                    </c:forTokens> --%>
                     <c:forEach var="facility" items="${fn:split(s.facilities, ',')}" varStatus="st">
                       <c:set var="f" value="${fn:trim(facility)}" />
                       <c:if test="${f == 'PETYARD'}"><span class="sc-tag">애견 놀이터</span></c:if>
@@ -262,7 +259,7 @@
                 <div class="sc-foot">
                   <span class="sc-rooms">
                     객실 ${s.roomCount}개
-                    <%-- 2026-07-28 박유정 — TB_STAY 평균별점·리뷰수 목록 표시 --%>
+                    <%-- TB_STAY 평균별점·리뷰수 목록 표시 --%>
                     <c:if test="${s.avgRating != null}">
                       · ★ ${s.avgRating} (${empty s.reviewCnt ? 0 : s.reviewCnt})
                     </c:if>

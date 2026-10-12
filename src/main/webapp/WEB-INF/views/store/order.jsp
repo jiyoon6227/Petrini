@@ -42,7 +42,6 @@
 </style>
 <div class="order-wrap">
 <form id="orderForm" action="${contextPath}/store/payment" method="post">
-  <!--HYJ 26.08.05-->
   <input type="hidden" name="_csrf" value="${_csrf}">
 
   <c:forEach var="item" items="${orderItems}">
@@ -71,7 +70,7 @@
   <%-- After --%>
   <div class="order-section">
     <h3>주문 상품</h3>
-    <%-- 지윤 26.07.30 수정: 사업자(BIZ_NO)별로 묶어서 렌더링, 그룹별 소계+배송비 계산 후 전체 배송비(totalDeliveryFee)로 누적 --%>
+    <%-- 사업자(BIZ_NO)별로 묶어서 렌더링, 그룹별 소계+배송비 계산 후 전체 배송비(totalDeliveryFee)로 누적 --%>
     <c:set var="productTotal" value="0" />
     <c:set var="totalDeliveryFee" value="0" />
     <c:set var="groupSubtotal" value="0" />
@@ -132,16 +131,16 @@
 
   <%-- After --%>
   <div class="order-section">
-    <%-- 지윤 26.07.30 수정: h3의 margin:0으로 인해 다른 섹션(h3 기본 여백 18px+밑줄)보다 간격이 좁아 보이던 문제 -> 감싸는 div에 동일한 여백/밑줄 부여 --%>
+    <%-- 감싸는 div에 다른 섹션(h3 기본 여백 18px+밑줄)과 동일한 여백/밑줄 부여 (h3 margin:0 보정) --%>
     <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:18px;">
       <h3 style="margin:0;padding:0;border:none;">배송지 정보</h3>
-      <%-- 지윤 26.07.30 수정: 초기화 버튼은 가시성 낮아서 주소 입력폼 하단으로 이동함 (아래 수정② 참고) --%>
+      <%-- 초기화 버튼은 주소 입력폼 하단에 배치 --%>
       <button type="button" onclick="openAddressModal()" style="font-size:13px;color:var(--primary,#2BAB82);background:none;border:none;text-decoration:underline;cursor:pointer;">배송지 관리 &gt;</button>
     </div>
 
     <div class="order-form-grid">
       
-    <%-- 지윤 26.07.29 수정: memberInfo.memberName 직접참조 -> Controller에서 배송지록 우선순위 계산해서 넘겨준 memberRecvName 사용 --%>
+    <%-- Controller가 배송지록 우선순위로 계산한 memberRecvName 사용 --%>
   <div class="order-form-group"><label>받는 분</label><input type="text" id="recvName" value="${memberRecvName}" placeholder="이름"></div>
       <div class="order-form-group">
         <label>연락처</label>
@@ -150,7 +149,7 @@
           <c:set var="phoneMidVal" value="" />
           <c:set var="phoneEndVal" value="" />
           <c:if test="${not empty memberPhone}">
-            <%-- 2026/08/11 장우철 — 하이픈·숫자만 모두 지원 (컨트롤러 정규화 + 방어) --%>
+            <%-- 하이픈·숫자만 모두 지원 (컨트롤러 정규화 + 방어) --%>
             <c:set var="phoneParts" value="${fn:split(memberPhone, '-')}" />
             <c:choose>
               <c:when test="${fn:length(phoneParts) == 3}">
@@ -194,13 +193,13 @@
       <div class="order-form-group full">
         <label>주소</label>
         <div class="addr-row">
-       <%-- 지윤 26.07.29 수정: memberInfo 직접참조 -> Controller에서 배송지록 우선순위 계산해서 넘겨준 값으로 원복 --%>
+       <%-- Controller가 배송지록 우선순위로 계산한 값 사용 --%>
         <input type="text" id="orderZipcode" name="orderZipcode" value="${memberZipCode}" placeholder="우편번호" style="max-width:120px" readonly>
         <button type="button" class="addr-btn" id="btnSearchAddr">주소 검색</button>
         </div>
         <input type="text" id="orderAddr1" name="orderAddr1" value="${memberAddr1}" placeholder="기본 주소" style="margin-top:8px" readonly>
         <input type="text" id="orderAddr2" name="orderAddr2" value="${memberAddr2}" placeholder="상세 주소" style="margin-top:8px">
-        <%-- 지윤 26.07.30 이동+수정: 헤더에 있던 초기화 버튼을 주소 필드 바로 아래로 이동, 아이콘+테두리 스타일로 변경 (가시성 개선) --%>
+        <%-- 초기화 버튼: 주소 필드 바로 아래, 아이콘+테두리 스타일 --%>
         <div style="text-align:right;margin-top:8px;">
           <%-- After --%>
           <button type="button" onclick="resetAddressForm()" style="display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);background:#f5f5f5;border:1px solid var(--border-strong);border-radius:6px;padding:5px 10px;cursor:pointer;font-weight:500;">
@@ -229,7 +228,7 @@
     </div>
   </div>
 
-  <%-- 지윤 26.07.09 수정: 쿠폰 코드 직접입력 -> 보유쿠폰 드롭다운으로 변경 (등록은 마이페이지에서, 여기선 적용만) --%>
+  <%-- 보유쿠폰 드롭다운 (등록은 마이페이지, 여기선 적용만) --%>
 <div class="order-section">
     <h3>쿠폰 / 포인트</h3>
     <div class="order-form-group">
@@ -237,7 +236,7 @@
       <select id="couponSelect" onchange="updateOrderTotal()">
         <option value="0" data-type="" data-value="0" data-max="0" data-min="0">쿠폰 선택 안 함</option>
         <c:forEach var="c" items="${memberCoupons}">
-          <%-- 지윤 26.08.11 추가: data-max = 정률쿠폰 최대할인금액(원), FIXED는 사용 안 함 --%>
+          <%-- data-max = 정률쿠폰 최대할인금액(원), FIXED는 사용 안 함 --%>
           <option value="${c.memberCouponId}" data-type="${c.couponType}" data-value="${c.discountValue}" data-max="${c.maxDiscountAmt}" data-min="${c.minOrderAmt}" data-biz="${c.bizNo}">
             ${c.couponName}
             <c:if test="${c.couponType == 'RATE'}">
@@ -289,7 +288,7 @@
 </form>
 </div>
 
-<%-- 2026/08/06 장우철: 결제에서 돌아온 복원값 (XSS 대비 c:out, JS는 data 속성으로 읽음) --%>
+<%-- 결제에서 돌아온 복원값 (XSS 대비 c:out, JS는 data 속성으로 읽음) --%>
 <c:if test="${not empty restoreCouponId or not empty restorePoint or not empty restoreDeliveryMemo}">
   <div id="restoreOrderMeta" style="display:none"
        data-coupon-id="<c:out value='${restoreCouponId}'/>"
@@ -297,7 +296,7 @@
        data-memo="<c:out value='${restoreDeliveryMemo}'/>"></div>
 </c:if>
 
-<%-- 지윤 26.07.29 추가: 배송지 목록 모달 (네이버페이 스타일 - 목록조회 + 선택 + 신규등록) --%>
+<%-- 배송지 목록 모달 (네이버페이 스타일 - 목록조회 + 선택 + 신규등록) --%>
 <div id="addressModalBg" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center;">
   <div style="background:#fff; border-radius:16px; padding:24px; max-width:480px; width:90%; max-height:80vh; overflow-y:auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
@@ -310,7 +309,7 @@
       + 배송지 신규입력
     </button>
 
-    <%-- 지윤 26.07.29 추가: 신규 배송지 등록 폼 (평소엔 숨김) --%>
+    <%-- 신규 배송지 등록 폼 (평소엔 숨김) --%>
     <div id="newAddressForm" style="display:none; border:1px solid #E2E8E4; border-radius:10px; padding:16px; margin-bottom:14px;">
       <div style="display:flex; gap:8px; margin-bottom:8px;">
         <input type="text" id="newRecvName" placeholder="받는 분" style="flex:1; border:1px solid #E2E8E4; border-radius:8px; padding:8px 10px; font-size:13px;">
@@ -332,20 +331,20 @@
 <!-- 카카오 우편번호 API -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
-//지윤 26.07.29 추가: 배송지 목록 모달 fetch 호출에 필요한 contextPath 선언 (누락되어 있었음)
+// 배송지 목록 모달 fetch 호출용 contextPath
 var contextPath = '${contextPath}';
 
-//지윤 26.07.09 추가: 쿠폰/포인트 선택 시 결제 예정 금액 실시간 계산
+// 쿠폰/포인트 선택 시 결제 예정 금액 실시간 계산
 var PRODUCT_TOTAL = ${productTotal};
 var MEMBER_POINT = ${memberPoint != null ? memberPoint : 0};
 
-//지윤 26.08.07 추가: 사업자(bizNo)별 상품 소계 — 쿠폰이 실제 적용 가능한 대상 금액을 알기 위함
+// 사업자(bizNo)별 상품 소계 (쿠폰 적용 대상 금액 계산용)
 //백엔드 StoreShopController의 groupSubtotals 계산과 동일한 개념
 var BIZ_SUBTOTALS = {};
 <c:forEach var="item" items="${orderItems}">
 BIZ_SUBTOTALS[${item.bizNo}] = (BIZ_SUBTOTALS[${item.bizNo}] || 0) + ${item.price * item.qty};
 </c:forEach>
-//지윤 26.07.30 추가: 배송비를 전체금액 기준(50000원)이 아니라, JSP에서 사업자별로 이미 계산해둔 합계로 사용
+// 배송비는 JSP에서 사업자별로 계산해 둔 합계 사용 (전체금액 기준 아님)
 var TOTAL_DELIVERY_FEE = ${totalDeliveryFee};
 function won(n){ return n.toLocaleString('ko-KR') + '원'; }
 
@@ -355,17 +354,17 @@ function updateOrderTotal() {
   var opt = couponSel.options[couponSel.selectedIndex];
   var couponType = opt.dataset.type;
   var couponValue = parseInt(opt.dataset.value) || 0;
-  var couponMax = parseInt(opt.dataset.max) || 0; // 지윤 26.08.11 추가: 정률쿠폰 최대할인금액
+  var couponMax = parseInt(opt.dataset.max) || 0; // 정률쿠폰 최대할인금액
   var minOrderAmt = parseInt(opt.dataset.min) || 0;
-  var couponBizNo = opt.dataset.biz; // 지윤 26.08.07: 쿠폰 발급 사업자
+  var couponBizNo = opt.dataset.biz; // 쿠폰 발급 사업자
 
-  //지윤 26.07.30 수정: 전체금액 기준 계산 -> 사업자별로 미리 합산해둔 TOTAL_DELIVERY_FEE 그대로 사용
+  // 사업자별로 미리 합산한 TOTAL_DELIVERY_FEE 사용
   var deliveryFee = TOTAL_DELIVERY_FEE;
 
   var couponDiscount = 0;
   if (couponType) {
-    // 지윤 26.08.07: 쿠폰은 발급한 사업자의 상품 소계 기준으로만 적용 (전체 장바구니 금액 X)
-    // 지윤 26.08.07(수정): 최소주문금액이 0으로 설정된 쿠폰은 "bizSubtotal < minOrderAmt"만으로는
+    // 쿠폰은 발급한 사업자의 상품 소계 기준으로만 적용 (전체 장바구니 금액 X)
+    // 최소주문금액이 0으로 설정된 쿠폰은 "bizSubtotal < minOrderAmt"만으로는
     // 안 걸러짐(0 < 0은 false) -> 이 주문에 해당 사업자 상품 자체가 있는지도 별도로 확인
     var hasBizItems = Object.prototype.hasOwnProperty.call(BIZ_SUBTOTALS, couponBizNo);
     var bizSubtotal = BIZ_SUBTOTALS[couponBizNo] || 0;
@@ -375,7 +374,7 @@ function updateOrderTotal() {
       couponSel.value = '0';
     } else if (couponType === 'RATE') {
     var rawDiscount = Math.floor(bizSubtotal * couponValue / 100);
-   // 지윤 26.08.11 수정: 최대할인금액 캡 적용 (없으면 무제한으로 새던 버그 수정)
+   // 최대할인금액 캡 적용
    // couponMax가 0(=DB에 값 없는 레거시 쿠폰)이면 캡 미적용, 있으면 min으로 제한
    couponDiscount = couponMax > 0 ? Math.min(rawDiscount, couponMax) : rawDiscount;
 } else if (couponType === 'FIXED') {
@@ -386,8 +385,8 @@ function updateOrderTotal() {
   var pointInput = document.getElementById('pointInput');
   var pointUsed = parseInt(pointInput.value) || 0;
   if (pointUsed < 0) pointUsed = 0;
-  //지윤 26.07.10 추가: 보유포인트와 결제금액(상품+배송비) 중 작은 값 넘지 못하게 제한
-  // 2026/07/27 장우철 — 사용량은 보유분·결제액 이내만 (보유가 음수면 0까지만)
+  // 보유포인트와 결제금액(상품+배송비) 중 작은 값 넘지 못하게 제한
+  // 사용량은 보유분·결제액 이내만 (보유가 음수면 0까지만)
   var held = Math.max(0, MEMBER_POINT || 0);
   var maxUsablePoint = Math.min(held, PRODUCT_TOTAL + deliveryFee);
   if (pointUsed > maxUsablePoint) {
@@ -404,16 +403,16 @@ function updateOrderTotal() {
   document.getElementById('orderFinalTotal').textContent = won(finalTotal);
 }
 
-//지윤 26.07.10 추가: 보유포인트 "최대사용" <-> "사용취소" 토글 버튼
+// 보유포인트 "최대사용" <-> "사용취소" 토글 버튼
 document.getElementById('btnUseAllPoint').addEventListener('click', function () {
   var btn = this;
   var pointInput = document.getElementById('pointInput');
 
   if (btn.textContent === '최대사용') {
-    //지윤 26.07.30 수정: TOTAL_DELIVERY_FEE 그대로 사용
+    // TOTAL_DELIVERY_FEE 그대로 사용
     var deliveryFee = TOTAL_DELIVERY_FEE;
     var paymentAmount = PRODUCT_TOTAL + deliveryFee;
-    // 2026/07/27 장우철 — 최대사용도 보유분 초과 불가
+    // 최대사용도 보유분 초과 불가
     var maxUsable = Math.min(Math.max(0, MEMBER_POINT || 0), paymentAmount);
     pointInput.value = maxUsable;
     btn.textContent = '사용취소';
@@ -424,7 +423,7 @@ document.getElementById('btnUseAllPoint').addEventListener('click', function () 
   updateOrderTotal();
 });
 
-//지윤 26.07.10 추가: 주문결제화면 연락처는 숫자만 입력, 4자리 채우면 다음 칸으로 자동 이동
+// 주문결제화면 연락처는 숫자만 입력, 4자리 채우면 다음 칸으로 자동 이동
 document.getElementById('phoneMid').addEventListener('input', function () {
   this.value = this.value.replace(/[^0-9]/g, '');
   if (this.value.length >= 4) document.getElementById('phoneEnd').focus();
@@ -433,7 +432,7 @@ document.getElementById('phoneEnd').addEventListener('input', function () {
   this.value = this.value.replace(/[^0-9]/g, '');
 });
 
-//지윤 26.07.10 추가: 결제 진행 전 배송지 필수 항목 검증
+// 결제 진행 전 배송지 필수 항목 검증
 function goToPayment() {
   var recvName = document.getElementById('recvName').value.trim();
   if (recvName === '') {
@@ -474,7 +473,7 @@ function goToPayment() {
   document.getElementById('orderForm').submit();
 }
 
-//지윤 26.07.10 추가: 배송메모 "직접입력" 선택 시 텍스트박스 보이기/숨기기
+// 배송메모 "직접입력" 선택 시 텍스트박스 보이기/숨기기
 function toggleMemoInput() {
   var select = document.getElementById('deliveryMemoSelect');
   var customInput = document.getElementById('deliveryMemoCustom');
@@ -487,7 +486,7 @@ function toggleMemoInput() {
   }
 }
 
-//2026/08/06 장우철: 결제→주문서 복원 시 쿠폰/포인트/배송메모 재적용
+// 결제→주문서 복원 시 쿠폰/포인트/배송메모 재적용
 (function restoreFromPayment() {
   var meta = document.getElementById('restoreOrderMeta');
   if (!meta) return;
@@ -526,7 +525,7 @@ function toggleMemoInput() {
   }
 })();
 
-//지윤 26.07.09 추가: 페이지 로드 시 배송비/총액 한 번 자동 계산 (쿠폰 안 골라도 정확한 값 보이게)
+// 페이지 로드 시 배송비/총액 한 번 자동 계산 (쿠폰 안 골라도 정확한 값 보이게)
 updateOrderTotal();
 
 // 주소 검색 (카카오/다음 우편번호 API)
@@ -560,7 +559,7 @@ document.getElementById('btnSearchAddr').addEventListener('click', function () {
   }).open();
 });
 
-//지윤 26.07.29 추가: 배송지 목록 모달
+// 배송지 목록 모달
 function openAddressModal() {
   document.getElementById('newAddressForm').style.display = 'none';
   document.getElementById('addressModalBg').style.display = 'flex';
@@ -570,7 +569,7 @@ function closeAddressModal() {
   document.getElementById('addressModalBg').style.display = 'none';
 }
 
-//지윤 26.07.29 수정: 네이버페이 스타일로 재구성 - 이름 옆에 "기본배송지"+"✓ 선택됨" 표시, 우측에 수정/삭제/선택 버튼
+// 이름 옆 "기본배송지"+"✓ 선택됨" 표시, 우측에 수정/삭제/선택 버튼
 function loadAddressList() {
   var box = document.getElementById('addressListBox');
   box.innerHTML = '<p style="text-align:center;color:#999;padding:16px 0">불러오는 중...</p>';
@@ -588,7 +587,7 @@ function loadAddressList() {
         var esc = function (s) { return (s || '').replace(/'/g, "\\'"); };
         var argStr = a.addrId + ", '" + esc(a.recvName) + "', '" + esc(a.recvPhone) + "', '" + esc(a.zipCode) + "', '" + esc(a.addr1) + "', '" + esc(a.addr2) + "'";
 
-        //지윤 26.07.29 수정: 네이버페이 레이아웃 그대로 - 이름줄 오른쪽 끝에 선택/선택됨 표시, 수정·삭제는 주소 아래 별도 줄
+        // 이름줄 오른쪽 끝에 선택/선택됨 표시, 수정·삭제는 주소 아래 별도 줄
         html += '<div style="border:1px solid ' + (isDefault ? 'var(--primary,#2BAB82)' : '#E2E8E4') + '; background:' + (isDefault ? 'var(--primary-light,#EAF7F2)' : '#fff') + '; border-radius:10px; padding:14px 16px; margin-bottom:10px;">';
         html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">';
         html += '    <div style="display:flex; align-items:center; gap:6px;">';
@@ -618,9 +617,9 @@ function loadAddressList() {
     });
 }
 
-//지윤 26.07.29 수정: "폼에 값 채우기"와 "서버에 기본배송지로 저장"을 분리
+// "폼에 값 채우기"와 "서버에 기본배송지로 저장"을 분리
 //기존엔 새 배송지 저장 시 selectAddress(null, ...)을 불러서 addrId 없이 /select를 또 호출 -> 항상 실패하는 불필요한 API 호출이 있었음
-// 2026/08/01 장우철 — 010-1234-5678 / 01012345678 둘 다 주문서 3칸에 반영
+// 010-1234-5678 / 01012345678 둘 다 주문서 3칸에 반영
 function fillOrderForm(recvName, recvPhone, zipCode, addr1, addr2) {
   document.getElementById('recvName').value = recvName;
   var digits = (recvPhone || '').replace(/[^0-9]/g, '');
@@ -641,11 +640,10 @@ function fillOrderForm(recvName, recvPhone, zipCode, addr1, addr2) {
   document.getElementById('orderAddr2').value = addr2;
 }
 
-//지윤 26.07.29 수정: 목록에서 기존 배송지를 선택할 때만 호출 (진짜 addrId가 있을 때만 /select 호출)
+// 목록에서 기존 배송지 선택 시에만 호출 (addrId 있을 때만 /select)
 function selectAddress(addrId, recvName, recvPhone, zipCode, addr1, addr2) {
   fillOrderForm(recvName, recvPhone, zipCode, addr1, addr2);
 
-  //HYJ 26.08.05
   csrfFetch(contextPath + '/mypage/address/select', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -655,10 +653,10 @@ function selectAddress(addrId, recvName, recvPhone, zipCode, addr1, addr2) {
   closeAddressModal();
 }
 
-//지윤 26.07.29 추가: 지금 수정 중인 배송지 ID (null이면 "신규 등록" 모드, 값 있으면 "수정" 모드)
+// 지금 수정 중인 배송지 ID (null이면 "신규 등록" 모드, 값 있으면 "수정" 모드)
 var editingAddrId = null;
 
-//지윤 26.07.29 수정: 신규 배송지 입력폼 토글 (신규 버튼으로 열 때는 수정모드 해제)
+// 신규 배송지 입력폼 토글 (신규 버튼으로 열 때는 수정모드 해제)
 function toggleNewAddressForm() {
   editingAddrId = null;
   document.getElementById('newRecvName').value = '';
@@ -670,7 +668,7 @@ function toggleNewAddressForm() {
   form.style.display = (form.style.display === 'none') ? 'block' : 'none';
 }
 
-//지윤 26.07.29 추가: "수정" 버튼 클릭 -> 같은 폼에 기존 값 채워서 열고, 수정모드로 전환
+// "수정" 버튼 클릭 -> 같은 폼에 기존 값 채워서 열고, 수정모드로 전환
 function editAddress(addrId, recvName, recvPhone, zipCode, addr1, addr2) {
   editingAddrId = addrId;
   document.getElementById('newRecvName').value = recvName;
@@ -681,11 +679,10 @@ function editAddress(addrId, recvName, recvPhone, zipCode, addr1, addr2) {
   document.getElementById('newAddressForm').style.display = 'block';
 }
 
-//지윤 26.07.29 추가: "삭제" 버튼 클릭 -> 확인창 거쳐서 삭제 후 목록 새로고침
+// "삭제" 버튼 클릭 -> 확인창 거쳐서 삭제 후 목록 새로고침
 function removeAddress(addrId) {
   if (!confirm('이 배송지를 삭제하시겠습니까?')) return;
 
-  //HYJ 26.08.05
   csrfFetch(contextPath + '/mypage/address/delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -701,7 +698,7 @@ function removeAddress(addrId) {
     });
 }
 
-//지윤 26.07.29 추가: 신규 배송지용 우편번호 검색 (기존 daum.Postcode 재사용, 대상만 다름)
+// 신규 배송지용 우편번호 검색 (기존 daum.Postcode 재사용, 대상만 다름)
 function searchNewAddress() {
   if (typeof daum === 'undefined' || !daum.Postcode) {
     alert('주소 검색 API를 불러오지 못했습니다.');
@@ -717,7 +714,7 @@ function searchNewAddress() {
   }).open();
 }
 
-//지윤 26.07.29 수정: editingAddrId가 있으면 수정(/update), 없으면 신규등록(/add)으로 분기
+// editingAddrId가 있으면 수정(/update), 없으면 신규등록(/add)으로 분기
 //기존 코드는 editingAddrId를 아예 확인 안 하고 무조건 /add만 호출해서, 수정해도 새 주소가 하나 더 생기는 버그가 있었음
 function saveNewAddress() {
   var recvName = document.getElementById('newRecvName').value.trim();
@@ -743,7 +740,6 @@ function saveNewAddress() {
   formData.set('addr2', addr2);
   if (!isEdit) formData.set('setDefault', 'true');
 
-  //HYJ 26.08.05
   csrfFetch(contextPath + url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -774,7 +770,7 @@ function saveNewAddress() {
     });
 }
 
-//지윤 26.07.30 추가: 배송지 입력 필드 일괄 초기화 (일회성 주소 입력 후 빠르게 지우고 싶을 때)
+// 배송지 입력 필드 일괄 초기화 (일회성 주소 입력 후 빠르게 지우고 싶을 때)
 function resetAddressForm() {
   if (!confirm('입력하신 배송지 정보를 모두 지우시겠습니까?')) return;
   document.getElementById('recvName').value = '';

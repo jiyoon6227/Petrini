@@ -1,8 +1,7 @@
 /**
  * 역할: 마이페이지 회원정보 URL 처리 → Service 호출 → JSP 반환
  *
- * - 2026-08-04 박유정 — 프로필 사진 업로드 POST /mypage/edit/profile-image
- * - 2026/08/06 장우철 — yeju merge: 회원정보·비밀번호 AJAX + 유정 프로필 사진 공존
+ * - 프로필 사진 업로드 POST /mypage/edit/profile-image
  *
  * 연결
  * - Service: MypageAccountService
@@ -42,7 +41,7 @@ public class MypageAccountController {
         this.mypageAccountService = mypageAccountService;
     }
 
-    // 2026-07-28 박유정 — 회원정보 수정 (DB에서 최신 프로필 조회)
+    // 회원정보 수정 (DB에서 최신 프로필 조회)
     @GetMapping("/edit")
     public String edit(HttpSession session, Model model) {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
@@ -96,8 +95,8 @@ public class MypageAccountController {
         return apiOk("회원정보가 수정되었습니다.");
     }
 
-    // 2026-08-04 박유정 — 프로필 사진 저장 (multipart)
-    // 2026/08/06 장우철 — yeju AJAX /edit 과 분리 → /edit/profile-image
+    // 프로필 사진 저장 (multipart)
+    // AJAX /edit 과 분리 → /edit/profile-image
     @PostMapping("/edit/profile-image")
     public String editProfileImage(
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
@@ -154,7 +153,7 @@ public class MypageAccountController {
         return apiOk("비밀번호가 변경되었습니다.");
     }
 
-    // HYJ 2026/07/29 — 회원 탈퇴
+    // 회원 탈퇴
     /** 탈퇴 페이지 (GET /mypage/withdraw) */
     @GetMapping("/withdraw")
     public String withdraw(HttpSession session) {

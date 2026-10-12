@@ -1,7 +1,6 @@
 /**
  * 역할: 재능나눔 DB 접근 (MyBatis interface)
  *
- * - 박유정 / 2026-07-13~14
  * - 팀 DDL: TB_TALENT (BIZ_NO FK, ADMIN_NO, STATUS_CD + DONE)
  *
  * XML: resources/mybatis/mapper/give/talent/GiveTalentMapper.xml
@@ -19,7 +18,7 @@ import com.petcare.petcare.give.talent.vo.GiveTalentVO;
 @Mapper
 public interface GiveTalentMapper {
 
-    // ── 사업자 신청 (2026-07-14 STEP 4) ───────────────────────────
+    // ── 사업자 신청  ───────────────────────────
 
     int insertTalent(GiveTalentVO vo);
 
@@ -32,7 +31,7 @@ public interface GiveTalentMapper {
     /** 사업자 본인 이력 — biz/hospital/talent.jsp */
     List<GiveTalentVO> selectTalentListByBizId(@Param("bizId") String bizId);
 
-    // ── 사용자 목록·상세 (2026-07-13) ─────────────────────────────
+    // ── 사용자 목록·상세 ─────────────────────────────
 
     List<GiveTalentVO> selectApprovedTalentList(@Param("talentType") String talentType);
 
@@ -40,7 +39,7 @@ public interface GiveTalentMapper {
 
     GiveTalentVO selectTalentDetail(@Param("talentId") long talentId);
 
-    // ── 관리자 승인 (2026-07-13) ───────────────────────────────────
+    // ── 관리자 승인 ───────────────────────────────────
 
     List<GiveTalentVO> selectTalentListByStatus(@Param("statusCd") String statusCd);
 
@@ -48,13 +47,13 @@ public interface GiveTalentMapper {
 
     int updateTalentStatus(GiveTalentVO vo);
 
-    /** 병원 수동 마감 — 내 글인지 + APPROVED 인지 (1이면 OK) — 2026-08-10 박유정 */
+    /** 병원 수동 마감 — 내 글인지 + APPROVED 인지 (1이면 OK) */
     int countTalentOwnedByBiz(@Param("talentId") long talentId,
     @Param("bizId") String bizId);
 
-    /** 알림 수신자(사업자) MEMBER_NO — 2026-08-10 박유정 */
+    /** 알림 수신자(사업자) MEMBER_NO */
     Long selectMemberNoByBizId(@Param("bizId") String bizId);
 
-    /** 대표 이미지 URL 갱신 — 2026-08-10 박유정 */
+    /** 대표 이미지 URL 갱신 */
     int updateTalentThumbUrl(GiveTalentVO vo);
 }

@@ -1,7 +1,7 @@
 /**
  * 역할: 관리자 정산 서비스 구현체
- * 2026/07/30 장우철 — 숙소
- * 2026/08/05 장우철 — 쇼핑 STORE S11
+ * 숙소
+ * 쇼핑 STORE
  */
 package com.petcare.petcare.admin.settlement.service;
 

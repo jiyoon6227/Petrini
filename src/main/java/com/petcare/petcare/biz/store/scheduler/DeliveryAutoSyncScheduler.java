@@ -1,6 +1,6 @@
 /**
- * 지윤 26.07.28 추가: 배송상태 자동 폴링 스케줄러
- * 지윤 26.10.05 수정: System.out.println -> @Slf4j 로그로 변경 (레벨/시각/클래스 기록, 실패 시 스택트레이스 포함)
+ * 배송상태 자동 폴링 스케줄러
+ Slf4j 로그 사용 (레벨/시각/클래스 기록, 실패 시 스택트레이스 포함)
  *
  * 역할: SHIPPING(또는 PAID/READY인데 송장이 이미 등록된) 주문들을 주기적으로 돌면서
  *      스마트택배 API로 실제 배송상태를 확인하고, 자동으로 DB 상태를 갱신함
@@ -10,7 +10,7 @@
  *    이유: 스마트택배 무료 플랜은 월 100건 제한이라, 이 스케줄러를 켜두면
  *          API 호출이 자동으로 계속 발생해서 순식간에 할당량을 다 씀.
  *    테스트하고 싶을 때만 아래 @Component 주석을 풀고 재기동 -> 테스트 끝나면 반드시 다시 주석처리 후 재기동.
- *    (@EnableScheduling 자체는 PetcareApplication에 이미 켜져있음 - 박유정님이 다른 스케줄러용으로 추가해둠)
+ *    (@EnableScheduling은 PetcareApplication에서 이미 활성화)
  *
  * 연결
  * - Mapper: BizStoreMapper.selectOrdersNeedingSync()
@@ -33,7 +33,7 @@ import com.petcare.petcare.common.external.service.SmartTrackerService;
 
 import lombok.extern.slf4j.Slf4j;
 
-// 지윤 26.07.28: 테스트할 때만 아래 줄 주석 풀기! 평소엔 반드시 주석 상태로 유지 (API 100건/월 제한 보호)
+// 테스트할 때만 아래 줄 주석 풀기! 평소엔 반드시 주석 상태로 유지 (API 100건/월 제한 보호)
 @Slf4j
  //@Component //TEST시 이거 주석처리or해제 -> 실시간 변경
 public class DeliveryAutoSyncScheduler {
@@ -47,7 +47,7 @@ public class DeliveryAutoSyncScheduler {
     @Autowired
     private SmartTrackerService smartTrackerService;
 
-    //지윤 26.07.28 수정: 테스트용으로 30초마다 실행 (평소/실서비스라면 30분 이상으로 늘려야 함 - API 100건/월 제한 때문)
+    // 테스트용 30초 주기 (실서비스는 30분 이상, API 월 100건 제한)
     //테스트 다 끝나면 30 * 60 * 1000(30분) 등으로 다시 늘려놓을 것
     @Scheduled(fixedDelay = 30 * 1000)
     public void syncDeliveryStatus() {

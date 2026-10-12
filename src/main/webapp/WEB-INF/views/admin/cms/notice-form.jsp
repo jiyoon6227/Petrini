@@ -46,7 +46,7 @@
 
                     <div style="display:flex;flex-direction:column;gap:6px">
                         <label style="font-size:13px;font-weight:600">작성자</label>
-                        <%-- 2026-08-11 박유정 — 등록 시 기본값 펫린이 운영팀 --%>
+                        <%-- 등록 시 기본값 펫린이 운영팀 --%>
                         <c:set var="writerNameVal" value="${empty notice || empty notice.writerName ? '펫린이 운영팀' : notice.writerName}"/>
                         <input type="text" name="writerName"
                                value="<c:out value='${writerNameVal}'/>"
