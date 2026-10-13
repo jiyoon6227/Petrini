@@ -68,7 +68,7 @@
   <div class="adm-page-head">
     <div class="adm-page-head-left">
       <h1 class="adm-page-title">정산 관리</h1>
-      <p class="adm-page-desc">쇼핑·숙소 정산 · 중간요청 · 월정산/15일 더미지급 · FAIL은 계좌확인 후 수동입금</p>
+      <p class="adm-page-desc">쇼핑·숙소 정산 · 중간요청 · 월정산/15일 일괄 지급처리 · FAIL은 계좌확인 후 수동입금</p>
     </div>
   </div>
 
@@ -76,10 +76,10 @@
   <div class="settle-batch-bar">
     <strong style="font-size:13px">정기 배치</strong>
     <label style="font-size:12px;color:#666">정산월
-      <input type="month" id="batchSettleMonth" value="2026-07">
+      <input type="month" id="batchSettleMonth">
     </label>
     <button type="button" class="settle-btn ghost" id="btnMonthlyCreate">월정산 생성</button>
-    <button type="button" class="settle-btn primary" id="btnAutoPay">WAIT 더미지급</button>
+    <button type="button" class="settle-btn primary" id="btnAutoPay">지급대기 일괄 지급처리</button>
     <span style="font-size:12px;color:#999">스케줄: 매월 1일 02:00 전월생성 · 15일 03:00 자동지급</span>
   </div>
 
@@ -186,12 +186,8 @@
           <option value="done" <c:if test="${filterStatus eq 'done'}">selected</c:if>>지급완료</option>
         </select>
       </form>
-      <span style="font-size:12px;color:#999">연결:
-        <c:choose>
-          <c:when test="${adminSettlementReady}">OK</c:when>
-          <c:otherwise>FAIL</c:otherwise>
-        </c:choose>
-        · 마스터 <c:out value="${staySettlementCount}"/>건
+      <span style="font-size:12px;color:#999">
+        마스터 <c:out value="${staySettlementCount}"/>건
       </span>
     </div>
 
@@ -211,7 +207,7 @@
           <c:choose>
             <c:when test="${empty staySettlements}">
               <tr>
-                <td colspan="6" style="text-align:center;color:#999;padding:28px 0">숙소 정산 데이터가 없습니다. (더미 INSERT 후 확인)</td>
+                <td colspan="6" style="text-align:center;color:#999;padding:28px 0">숙소 정산 데이터가 없습니다.</td>
               </tr>
             </c:when>
             <c:otherwise>
@@ -299,8 +295,9 @@
                       <div class="settle-detail-item"><label>사업장명</label><span><c:out value="${s.bizName}"/></span></div>
                       <div class="settle-detail-item"><label>입금계좌</label><span><c:out value="${s.settleBank}"/> <c:out value="${s.settleAccount}"/></span></div>
                       <div class="settle-detail-item"><label>예금주</label><span><c:out value="${s.settleHolder}"/></span></div>
-                      <div class="settle-detail-item"><label>총매출</label><span><fmt:formatNumber value="${s.totalSales}" pattern="#,###"/>원</span></div>
-                      <div class="settle-detail-item"><label>수수료</label><span><fmt:formatNumber value="${s.totalFee}" pattern="#,###"/>원</span></div>
+                      <div class="settle-detail-item"><label>예약매출</label><span><fmt:formatNumber value="${s.totalSales}" pattern="#,###"/>원</span></div>
+                      <div class="settle-detail-item"><label>쿠폰할인(사업자 부담)</label><span><fmt:formatNumber value="${empty s.couponDiscountAmount ? 0 : s.couponDiscountAmount}" pattern="#,##0"/>원</span></div>
+                      <div class="settle-detail-item"><label>수수료</label><span><fmt:formatNumber value="${s.totalFee}" pattern="#,##0"/>원 (<fmt:formatNumber value="${empty s.feeRate ? 10 : s.feeRate}" pattern="#,##0.##"/>%)</span></div>
                       <div class="settle-detail-item"><label>정산금</label><span><fmt:formatNumber value="${s.settleAmount}" pattern="#,###"/>원</span></div>
                       <div class="settle-item-box" style="grid-column:1/-1;color:#999;font-size:13px">예약 상세는 ▾ 열 때 불러옵니다.</div>
                     </div>
@@ -410,12 +407,8 @@
           <option value="done" <c:if test="${filterStatus eq 'done'}">selected</c:if>>지급완료</option>
         </select>
       </form>
-      <span style="font-size:12px;color:#999">연결:
-        <c:choose>
-          <c:when test="${adminSettlementReady}">OK</c:when>
-          <c:otherwise>FAIL</c:otherwise>
-        </c:choose>
-        · 마스터 <c:out value="${storeSettlementCount}"/>건
+      <span style="font-size:12px;color:#999">
+        마스터 <c:out value="${storeSettlementCount}"/>건
       </span>
     </div>
 
@@ -516,8 +509,10 @@
                       <div class="settle-detail-item"><label>사업장명</label><span><c:out value="${s.bizName}"/></span></div>
                       <div class="settle-detail-item"><label>입금계좌</label><span><c:out value="${s.settleBank}"/> <c:out value="${s.settleAccount}"/></span></div>
                       <div class="settle-detail-item"><label>예금주</label><span><c:out value="${s.settleHolder}"/></span></div>
-                      <div class="settle-detail-item"><label>총매출</label><span><fmt:formatNumber value="${s.totalSales}" pattern="#,###"/>원</span></div>
-                      <div class="settle-detail-item"><label>수수료</label><span><fmt:formatNumber value="${s.totalFee}" pattern="#,###"/>원</span></div>
+                      <div class="settle-detail-item"><label>상품매출</label><span><c:choose><c:when test="${empty s.productSalesAmount}">-</c:when><c:otherwise><fmt:formatNumber value="${s.productSalesAmount}" pattern="#,##0"/>원</c:otherwise></c:choose></span></div>
+                      <div class="settle-detail-item"><label>쿠폰할인(사업자 부담)</label><span><fmt:formatNumber value="${empty s.couponDiscountAmount ? 0 : s.couponDiscountAmount}" pattern="#,##0"/>원</span></div>
+                      <div class="settle-detail-item"><label>택배비</label><span><fmt:formatNumber value="${empty s.deliveryFeeAmount ? 0 : s.deliveryFeeAmount}" pattern="#,##0"/>원</span></div>
+                      <div class="settle-detail-item"><label>수수료</label><span><fmt:formatNumber value="${s.totalFee}" pattern="#,##0"/>원 (<fmt:formatNumber value="${empty s.feeRate ? 5 : s.feeRate}" pattern="#,##0.##"/>%)</span></div>
                       <div class="settle-detail-item"><label>정산금</label><span><fmt:formatNumber value="${s.settleAmount}" pattern="#,###"/>원</span></div>
                       <div class="settle-item-box" style="grid-column:1/-1;color:#999;font-size:13px">주문상품 상세는 ▾ 열 때 불러옵니다.</div>
                     </div>
@@ -551,6 +546,15 @@
     return String(v).substring(0, 10);
   }
 
+  // 배치 정산월 기본값: 지난달
+  var batchMonthEl = document.getElementById('batchSettleMonth');
+  if (batchMonthEl && !batchMonthEl.value) {
+    var prevMonth = new Date();
+    prevMonth.setDate(1);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    batchMonthEl.value = prevMonth.getFullYear() + '-' + ('0' + (prevMonth.getMonth() + 1)).slice(-2);
+  }
+
   // 배치 수동 실행
   var btnMonthly = document.getElementById('btnMonthlyCreate');
   if (btnMonthly) {
@@ -575,7 +579,7 @@
   var btnAutoPay = document.getElementById('btnAutoPay');
   if (btnAutoPay) {
     btnAutoPay.addEventListener('click', function () {
-      if (!confirm('WAIT 상태 정산을 전부 더미 지급할까요?\n(FAIL은 제외 · 숙소+쇼핑)')) return;
+      if (!confirm('지급대기 정산을 전부 지급완료로 처리할까요?\n(지급실패 건 제외 · 숙소+쇼핑)')) return;
       // CSRF
       csrfFetch(CTX + '/admin/settlement/batch/auto-pay', {
         method: 'POST',
@@ -658,7 +662,7 @@
         var manual = payBtn.getAttribute('data-manual') === 'Y';
         var msg = manual
           ? '계좌 입금 확인 후 수동입금완료 처리할까요?\n[' + name + '] ' + fmt(amount)
-          : '정말 정산(더미 지급) 하시겠습니까?\n[' + name + '] ' + fmt(amount);
+          : '정말 정산(지급처리) 하시겠습니까?\n[' + name + '] ' + fmt(amount);
         if (!confirm(msg)) return;
         csrfFetch(CTX + '/admin/settlement/stay/pay', {
           method: 'POST',
@@ -714,7 +718,7 @@
           }
           var html = '<table class="settle-item-table"><thead><tr>'
             + '<th>구분</th><th>예약번호</th><th>객실</th><th>체크인</th><th>체크아웃</th>'
-            + '<th>금액</th><th>수수료</th><th>정산금</th><th>상태</th>'
+            + '<th>금액</th><th>쿠폰 차감</th><th>수수료</th><th>정산금</th><th>상태</th>'
             + '</tr></thead><tbody>';
           items.forEach(function (it) {
             var typeLabel = (it.itemType === 'CANCEL_FEE') ? '위약금' : '숙박';
@@ -725,6 +729,7 @@
               + '<td>' + fmtDate(it.checkinDate) + '</td>'
               + '<td>' + fmtDate(it.checkoutDate) + '</td>'
               + '<td>' + fmt(it.resvAmount) + '</td>'
+              + '<td>-' + fmt(it.couponDiscountAmount) + '</td>'
               + '<td>-' + fmt(it.feeAmount) + '</td>'
               + '<td><b>' + fmt(it.settleAmount) + '</b></td>'
               + '<td>' + (it.statusCd || '-') + '</td>'
@@ -757,7 +762,7 @@
           alert('정산할 건을 선택하세요. (대기 상태만 선택 가능)');
           return;
         }
-        if (!confirm('선택한 ' + ids.length + '건을 정말 정산(더미 지급) 하시겠습니까?')) return;
+        if (!confirm('선택한 ' + ids.length + '건을 정말 정산(지급처리) 하시겠습니까?')) return;
         csrfFetch(CTX + '/admin/settlement/stay/pay-bulk', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -844,7 +849,7 @@
       var manual = payBtn.getAttribute('data-manual') === 'Y';
       var msg = manual
         ? '계좌 입금 확인 후 수동입금완료 처리할까요?\n[' + name + '] ' + fmt(amount)
-        : '정말 정산(더미 지급) 하시겠습니까?\n[' + name + '] ' + fmt(amount);
+        : '정말 정산(지급처리) 하시겠습니까?\n[' + name + '] ' + fmt(amount);
       if (!confirm(msg)) return;
       // CSRF
       csrfFetch(CTX + '/admin/settlement/store/pay', {
@@ -901,7 +906,7 @@
         }
         var html = '<table class="settle-item-table"><thead><tr>'
           + '<th>주문번호</th><th>상품</th><th>구매확정</th>'
-          + '<th>상품매출</th><th>택배비</th><th>수수료</th><th>정산금</th>'
+          + '<th>상품매출</th><th>쿠폰 차감</th><th>택배비</th><th>수수료</th><th>정산금</th>'
           + '</tr></thead><tbody>';
         items.forEach(function (it) {
           html += '<tr>'
@@ -909,6 +914,7 @@
             + '<td>' + (it.productName || it.productId || '-') + '</td>'
             + '<td>' + fmtDate(it.confirmedAt) + '</td>'
             + '<td>' + fmt(it.itemSalesAmount) + '</td>'
+            + '<td>-' + fmt(it.couponDiscountAmount) + '</td>'
             + '<td>' + fmt(it.deliveryFeeAmount) + '</td>'
             + '<td>-' + fmt(it.feeAmount) + '</td>'
             + '<td><b>' + fmt(it.settleAmount) + '</b></td>'
@@ -943,7 +949,7 @@
         alert('정산할 건을 선택하세요.');
         return;
       }
-      if (!confirm('선택한 ' + ids.length + '건을 더미 지급 완료할까요?')) return;
+      if (!confirm('선택한 ' + ids.length + '건을 지급처리할까요?')) return;
       // CSRF
       csrfFetch(CTX + '/admin/settlement/store/pay-bulk', {
         method: 'POST',

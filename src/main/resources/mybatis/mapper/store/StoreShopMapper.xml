@@ -419,12 +419,14 @@ SELECT
     INSERT INTO TB_ORDER (
         ORDER_ID, ORDER_NO, MEMBER_NO, ORDER_STATUS, TOTAL_AMOUNT, DELIVERY_FEE,
         DISCOUNT_AMOUNT, POINT_USED, PAY_AMOUNT, ORDER_DATE,
-        RECV_NAME, RECV_PHONE, ZIP_CODE, ADDR1, ADDR2, DELIVERY_MEMO, BIZ_NO, MEMBER_COUPON_ID
+        RECV_NAME, RECV_PHONE, ZIP_CODE, ADDR1, ADDR2, DELIVERY_MEMO, BIZ_NO, MEMBER_COUPON_ID,
+        COUPON_DISCOUNT
     ) VALUES (
         #{orderId}, #{orderNo}, #{memberNo}, 'PAID',
         #{totalAmount}, #{deliveryFee}, #{discountAmount}, #{pointUsed}, #{payAmount},
         SYSDATE,
-       #{recvName}, #{recvPhone}, #{zipCode}, #{addr1}, #{addr2}, #{deliveryMemo}, #{bizNo}, #{memberCouponId, jdbcType=NUMERIC}
+       #{recvName}, #{recvPhone}, #{zipCode}, #{addr1}, #{addr2}, #{deliveryMemo}, #{bizNo}, #{memberCouponId, jdbcType=NUMERIC},
+       NVL(#{couponDiscount, jdbcType=NUMERIC}, 0)
     )
 </insert>
 

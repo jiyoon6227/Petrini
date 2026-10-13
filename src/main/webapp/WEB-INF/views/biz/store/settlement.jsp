@@ -124,6 +124,7 @@
           <th style="width:48px"></th>
           <th>정산기간</th>
           <th>확정 매출</th>
+          <th>쿠폰 차감</th>
           <th>플랫폼 수수료</th>
           <th>정산금액</th>
           <th>정산상태</th>
@@ -134,7 +135,7 @@
         <c:choose>
           <c:when test="${empty settlements}">
             <tr>
-              <td colspan="7" style="text-align:center;color:#999;padding:24px 0">해당하는 정산 내역이 없습니다.</td>
+              <td colspan="8" style="text-align:center;color:#999;padding:24px 0">해당하는 정산 내역이 없습니다.</td>
             </tr>
           </c:when>
           <c:otherwise>
@@ -165,6 +166,7 @@
                   </c:if>
                 </td>
                 <td><fmt:formatNumber value="${s.totalSales}" pattern="#,###"/>원</td>
+                <td>-<fmt:formatNumber value="${empty s.couponDiscountAmount ? 0 : s.couponDiscountAmount}" pattern="#,##0"/>원</td>
                 <td>-<fmt:formatNumber value="${s.totalFee}" pattern="#,###"/>원</td>
                 <td><b><fmt:formatNumber value="${s.settleAmount}" pattern="#,###"/>원</b></td>
                 <td>
@@ -190,7 +192,7 @@
                 </td>
               </tr>
               <tr class="settle-detail-row" id="detail-${s.settleId}">
-                <td colspan="7">
+                <td colspan="8">
                   <div class="settle-detail-wrap" data-loaded="N">
                     <div class="settle-detail-empty">불러오는 중...</div>
                   </div>
@@ -584,7 +586,7 @@
 
         var html = '<table class="settle-detail-table"><thead><tr>'
           + '<th>주문번호</th><th>상품</th><th>구매확정</th>'
-          + '<th>상품매출</th><th>택배비</th><th>수수료</th><th>정산금</th><th>상태</th>'
+          + '<th>상품매출</th><th>쿠폰 차감</th><th>택배비</th><th>수수료</th><th>정산금</th><th>상태</th>'
           + '</tr></thead><tbody>';
 
         items.forEach(function (it) {
@@ -593,6 +595,7 @@
             + '<td>' + (it.productName || it.productId || '-') + '</td>'
             + '<td>' + fmtDate(it.confirmedAt) + '</td>'
             + '<td>' + fmtWon(it.itemSalesAmount) + '</td>'
+            + '<td>-' + fmtWon(it.couponDiscountAmount) + '</td>'
             + '<td>' + fmtWon(it.deliveryFeeAmount) + '</td>'
             + '<td>-' + fmtWon(it.feeAmount) + '</td>'
             + '<td><b>' + fmtWon(it.settleAmount) + '</b></td>'

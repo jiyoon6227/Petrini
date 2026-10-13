@@ -275,8 +275,12 @@
   <span id="orderDeliveryFee" style="color:var(--primary)">무료</span>
 </div>
 <div class="order-total-row">
-  <span>쿠폰/포인트 할인</span>
-  <span id="orderDiscount" style="color:var(--accent)">-0원</span>
+  <span>쿠폰 할인</span>
+  <span id="orderCouponDiscount" style="color:var(--accent)">0원</span>
+</div>
+<div class="order-total-row">
+  <span>포인트 사용</span>
+  <span id="orderPointUsed" style="color:var(--accent)">0원</span>
 </div>
 <div class="order-total-row final">
   <span>결제 예정 금액</span>
@@ -399,7 +403,8 @@ function updateOrderTotal() {
   if (finalTotal < 0) finalTotal = 0;
 
   document.getElementById('orderDeliveryFee').textContent = deliveryFee === 0 ? '무료' : won(deliveryFee);
-  document.getElementById('orderDiscount').textContent = '-' + won(totalDiscount);
+  document.getElementById('orderCouponDiscount').textContent = couponDiscount > 0 ? '-' + won(couponDiscount) : '0원';
+  document.getElementById('orderPointUsed').textContent = pointUsed > 0 ? '-' + won(pointUsed) : '0원';
   document.getElementById('orderFinalTotal').textContent = won(finalTotal);
 }
 

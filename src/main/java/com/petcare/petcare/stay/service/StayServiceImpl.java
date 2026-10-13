@@ -1,6 +1,8 @@
 package com.petcare.petcare.stay.service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,7 @@ import com.petcare.petcare.stay.vo.StayRoomVO;
 import com.petcare.petcare.stay.vo.StayVO;
 import com.petcare.petcare.store.vo.CouponVO;
 import com.petcare.petcare.coupon.mapper.CouponMapper;
+import com.petcare.petcare.coupon.service.CouponDiscountCalculator;
 
 @Service
 public class StayServiceImpl implements StayService {
@@ -178,34 +181,7 @@ public class StayServiceImpl implements StayService {
         // 쿠폰 서버 재검증 (클라이언트가 보낸 memberCouponId를 그대로 믿지 않음)
         long couponDiscount = 0L;
         if (memberCouponId != null && memberCouponId > 0) {
-            CouponVO coupon = couponMapper.selectMemberCouponForUse(memberCouponId, memberNo);
-            if (coupon == null) {
-                throw new RuntimeException("사용할 수 없는 쿠폰입니다.");
-            }
-            // 이 숙소를 발급한 사업자의 쿠폰인지 재확인
-            StayVO stay = getStayById(Long.valueOf(resv.getTargetId()));
-            Long stayBizNo = stay != null ? stay.getBizNo() : null;
-            if (stayBizNo == null || coupon.getBizNo() == null
-                    || !String.valueOf(stayBizNo).equals(coupon.getBizNo())) {
-                throw new RuntimeException("이 숙소에는 사용할 수 없는 쿠폰입니다.");
-            }
-            int minOrderAmt = coupon.getMinOrderAmt() != null ? coupon.getMinOrderAmt() : 0;
-            if (total < minOrderAmt) {
-                throw new RuntimeException("최소 예약금액 미달로 쿠폰을 사용할 수 없습니다.");
-            }
-            if ("RATE".equals(coupon.getCouponType())) {
-                long rawDiscount = total * coupon.getDiscountValue() / 100;
-                // 최대할인금액 캡 적용. maxDiscountAmt가 NULL/0인 레거시 쿠폰은 캡 미적용
-                Integer maxAmt = coupon.getMaxDiscountAmt();
-                couponDiscount = (maxAmt != null && maxAmt > 0)
-                        ? Math.min(rawDiscount, (long) maxAmt)
-                        : rawDiscount;
-            } else {
-                couponDiscount = coupon.getDiscountValue();
-            }
-            if (couponDiscount > total) {
-                couponDiscount = total;
-            }
+            couponDiscount = calcStayCouponDiscount(resv, memberCouponId, memberNo);
         }
 
         long payableAfterCoupon = total - couponDiscount;
@@ -216,8 +192,9 @@ public class StayServiceImpl implements StayService {
             usedPoint = payableAfterCoupon;
         }
         long cardAmount = payableAfterCoupon - usedPoint;
-        if (tossPaidAmount != null) {
-            cardAmount = tossPaidAmount;
+        // 클라이언트 결제금액이 서버 계산(예약금 − 쿠폰 − 포인트)과 다르면 승인 전 거절
+        if (tossPaidAmount != null && tossPaidAmount != cardAmount) {
+            throw new RuntimeException("결제 금액이 일치하지 않습니다. 다시 시도해 주세요.");
         }
 
         String key = tossPaymentKey != null ? tossPaymentKey.trim() : "";
@@ -373,5 +350,19 @@ public class StayServiceImpl implements StayService {
             return java.util.Collections.emptyList();
         }
         return couponMapper.selectMemberCouponsByBiz(memberNo, bizNo);
+    }
+
+    // 쿠폰 재검증 + 할인액 (본인·미사용·승인·사용기간·숙소 사업자·최소금액)
+    @Override
+    public long calcStayCouponDiscount(ReservationVO resv, Long memberCouponId, Long memberNo) {
+        if (resv == null || memberCouponId == null || memberCouponId <= 0) {
+            return 0L;
+        }
+        long total = resv.getTotalAmount() != null ? resv.getTotalAmount() : 0L;
+        CouponVO coupon = couponMapper.selectMemberCouponForUse(memberCouponId, memberNo);
+        StayVO stay = getStayById(Long.valueOf(resv.getTargetId()));
+        Long stayBizNo = stay != null ? stay.getBizNo() : null;
+        String todayYmd = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        return CouponDiscountCalculator.stayDiscount(coupon, stayBizNo, total, todayYmd);
     }
 }

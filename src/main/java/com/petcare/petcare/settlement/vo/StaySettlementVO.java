@@ -50,6 +50,7 @@ public class StaySettlementVO {
     private Long productSalesAmount;     // 상품매출 (택배비 제외, 쇼핑)
     private Long deliveryFeeAmount;      // 택배비 합 (패스스루, 쇼핑)
     private Long returnFeeAmount;        // 반품택배비 합 (사업자 부담분 등)
+    private Long couponDiscountAmount;   // 사업자 부담 쿠폰 합
 
     // 일시·사유
     private Date regDate;                // 등록일

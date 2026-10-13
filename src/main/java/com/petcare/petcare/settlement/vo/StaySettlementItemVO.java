@@ -23,6 +23,7 @@ public class StaySettlementItemVO {
     private Date checkinDate;            // 체크인 날짜
     private Date checkoutDate;           // 체크아웃 날짜
     private Long resvAmount;             // 예약 원금(숙소)
+    private Long couponDiscountAmount;   // 사업자 부담 쿠폰 차감액
 
     // 쇼핑용 (숙소 구현 단계에서는 보통 null)
     private Long orderId;                // 주문 ID

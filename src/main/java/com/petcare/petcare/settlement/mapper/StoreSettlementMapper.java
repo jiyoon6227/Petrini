@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.petcare.petcare.biz.store.vo.BizProductVO;
+import com.petcare.petcare.settlement.vo.OrderCouponBaseVO;
 import com.petcare.petcare.settlement.vo.StoreSettlementItemVO;
 import com.petcare.petcare.settlement.vo.StoreSettlementRequestVO;
 import com.petcare.petcare.settlement.vo.StoreSettlementSummaryVO;
@@ -20,6 +21,9 @@ public interface StoreSettlementMapper {
             @Param("periodStart") Date periodStart,
             @Param("periodEnd") Date periodEnd,
             @Param("productId") Long productId);
+
+    /** 쿠폰 배분 기준: 주문의 전체 주문상품 금액 + 주문 쿠폰액 */
+    List<OrderCouponBaseVO> selectOrderCouponBases(@Param("orderIds") List<Long> orderIds);
 
     Double selectStoreFeeRate(@Param("bizNo") Long bizNo);
 

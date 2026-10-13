@@ -20,6 +20,9 @@ public class AdminStaySettlementVO {
     private Date periodStart;        // 집계 시작
     private Date periodEnd;          // 집계 종료
     private Long totalSales;         // 확정 매출
+    private Long couponDiscountAmount; // 사업자 부담 쿠폰
+    private Long productSalesAmount; // 상품매출 (쇼핑, 택배비 제외)
+    private Long deliveryFeeAmount;  // 택배비 합 (쇼핑)
     private Long totalFee;           // 수수료
     private Long settleAmount;       // 실지급 정산금
     private Double feeRate;          // 수수료율

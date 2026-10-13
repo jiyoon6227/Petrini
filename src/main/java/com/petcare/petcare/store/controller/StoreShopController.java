@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.petcare.petcare.coupon.service.CouponDiscountCalculator;
 import com.petcare.petcare.member.vo.MemberVO;
 import com.petcare.petcare.store.service.StoreShopService;
 import com.petcare.petcare.store.vo.CartItemVO;
@@ -223,22 +224,12 @@ public String payment(@RequestParam(required = false) Long productId,
     if (couponId != null && couponId > 0) {
         // 결제 시에도 주문 사업자(BIZ_NO)에 해당하는 쿠폰만 재검증
         java.util.List<Long> orderBizNos = new java.util.ArrayList<>(groupSubtotals.keySet());
+        String todayYmd = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
         for (CouponVO c : storeShopService.getMemberCouponsForOrder(memberNo, orderBizNos)) {
             if (c.getMemberCouponId().equals(couponId)) {
-                Long couponBizNo = c.getBizNo() != null ? Long.valueOf(c.getBizNo()) : null;
-                int couponTargetAmt = groupSubtotals.getOrDefault(couponBizNo, 0);
-                if (couponTargetAmt >= c.getMinOrderAmt()) {
-                    if ("RATE".equals(c.getCouponType())) {
-                        int rawDiscount = couponTargetAmt * c.getDiscountValue() / 100;
-                        Integer maxAmt = c.getMaxDiscountAmt();
-                        couponDiscount = (maxAmt != null && maxAmt > 0)
-                                ? Math.min(rawDiscount, maxAmt)
-                                : rawDiscount;
-                    } else {
-                        couponDiscount = c.getDiscountValue();
-                    }
-                    // 쿠폰은 상품금액에만, 배송비에는 적용하지 않음
-                    couponDiscount = Math.min(couponDiscount, couponTargetAmt);
+                // 쿠폰은 상품금액에만, 배송비에는 적용하지 않음
+                couponDiscount = (int) CouponDiscountCalculator.storeDiscount(c, groupSubtotals, todayYmd);
+                if (couponDiscount > 0) {
                     couponName = c.getCouponName();
                     couponBizNoStr = c.getBizNo();
                 }
@@ -281,7 +272,7 @@ public String payment(@RequestParam(required = false) Long productId,
     orderTemp.setOrderItems(orderItems);
     orderTemp.setProductTotal(productTotal);
     orderTemp.setDeliveryFee(deliveryFee);
-    orderTemp.setCouponMemberCouponId((couponId != null && couponId > 0) ? couponId : null);
+    orderTemp.setCouponMemberCouponId(couponDiscount > 0 ? couponId : null);
     orderTemp.setCouponBizNo(couponBizNoStr);
     orderTemp.setCouponDiscount(couponDiscount);
     orderTemp.setPointUsed((int) pointUsed);

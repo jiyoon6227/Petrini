@@ -18,12 +18,4 @@ public class AdminBaseController {
     protected String redirectToLogin() {
         return "redirect:/admin/login";
     }
-
-    protected boolean isAdminAccount(String loginId) {
-        if (loginId == null) {
-            return false;
-        }
-        String id = loginId.trim();
-        return "admin".equalsIgnoreCase(id) || "admin@petcare.com".equalsIgnoreCase(id);
-    }
 }

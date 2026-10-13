@@ -44,7 +44,6 @@ public class AdminSettlementController extends AdminBaseController {
         }
 
         model.addAttribute("tab", tab);
-        model.addAttribute("adminSettlementReady", adminSettlementService.isReady());
         model.addAttribute("filterStatus", status);
         model.addAttribute("filterReqStatus", reqStatus);
 
@@ -97,7 +96,7 @@ public class AdminSettlementController extends AdminBaseController {
             result.put("ok", updated > 0);
             result.put("updated", updated);
             result.put("message", updated > 0
-                    ? "정산(더미 지급) 완료 처리되었습니다."
+                    ? "지급처리가 완료되었습니다."
                     : "이미 완료되었거나 대상이 없습니다.");
         } catch (IllegalArgumentException e) {
             result.put("ok", false);
@@ -181,7 +180,7 @@ public class AdminSettlementController extends AdminBaseController {
             result.put("ok", updated > 0);
             result.put("updated", updated);
             result.put("message", updated > 0
-                    ? "정산(더미 지급) 완료 처리되었습니다."
+                    ? "지급처리가 완료되었습니다."
                     : "이미 완료되었거나 대상이 없습니다.");
         } catch (IllegalArgumentException e) {
             result.put("ok", false);
@@ -255,7 +254,7 @@ public class AdminSettlementController extends AdminBaseController {
                     : adminSettlementService.payStoreSettlements(settleIds);
             result.put("ok", true);
             result.put("updated", updated);
-            result.put("message", "선택 " + settleIds.size() + "건 중 " + updated + "건 정산(더미 지급) 완료.");
+            result.put("message", "선택 " + settleIds.size() + "건 중 " + updated + "건 지급처리 완료.");
         } catch (IllegalArgumentException e) {
             result.put("ok", false);
             result.put("message", e.getMessage());
@@ -323,7 +322,7 @@ public class AdminSettlementController extends AdminBaseController {
         return result;
     }
 
-    /** WAIT 전체 더미 자동지급 */
+    /** 지급대기 전체 일괄 지급처리 */
     @PostMapping("/batch/auto-pay")
     @ResponseBody
     public Map<String, Object> batchAutoPay(HttpSession session) {
@@ -338,7 +337,7 @@ public class AdminSettlementController extends AdminBaseController {
             result.put("ok", true);
             result.put("result", r);
             result.put("message",
-                    "자동지급(더미) 완료 — 숙소 " + r.getStayPaid() + "건 · 쇼핑 " + r.getStorePaid() + "건");
+                    "일괄 지급처리 완료 — 숙소 " + r.getStayPaid() + "건 · 쇼핑 " + r.getStorePaid() + "건");
         } catch (Exception e) {
             result.put("ok", false);
             result.put("message", e.getMessage() != null ? e.getMessage() : "자동지급 실패");

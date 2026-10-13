@@ -110,7 +110,8 @@ public interface StoreShopMapper {
                   @Param("payAmount") Integer payAmount, @Param("recvName") String recvName,
                   @Param("recvPhone") String recvPhone, @Param("zipCode") String zipCode,
                   @Param("addr1") String addr1, @Param("addr2") String addr2, @Param("bizNo") Long bizNo,
-                  @Param("deliveryMemo") String deliveryMemo, @Param("memberCouponId") Long memberCouponId);
+                  @Param("deliveryMemo") String deliveryMemo, @Param("memberCouponId") Long memberCouponId,
+                  @Param("couponDiscount") Integer couponDiscount);
 
 // 주문번호(ORDER_NO) 생성에 사용할 다음 ORDER_ID를 시퀀스로 조회
 Long selectNextOrderId();

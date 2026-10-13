@@ -123,16 +123,6 @@
             font-weight: 600;
         }
         .adm-login-foot a:hover { text-decoration: underline; }
-        .adm-login-hint {
-            margin-top: 18px;
-            padding: 12px 14px;
-            background: #F8F9FF;
-            border-radius: 8px;
-            font-size: 12px;
-            color: #666;
-            line-height: 1.6;
-        }
-        .adm-login-hint strong { color: #3B5BDB; }
     </style>
 </head>
 <body>
@@ -156,7 +146,12 @@
             <div class="adm-login-error">아이디와 비밀번호를 입력해 주세요.</div>
         </c:if>
         <c:if test="${param.error eq 'invalid'}">
-            <div class="adm-login-error">관리자 계정이 아니거나 로그인 정보가 올바르지 않습니다.</div>
+            <div class="adm-login-error">관리자 계정이 아니거나 로그인 정보가 올바르지 않습니다.
+                <c:if test="${not empty param.remaining}">(남은 시도: <c:out value="${param.remaining}"/>회)</c:if>
+            </div>
+        </c:if>
+        <c:if test="${param.error eq 'locked'}">
+            <div class="adm-login-error">로그인 시도 횟수를 초과했습니다. <c:out value="${param.minutes}"/>분 후 다시 시도해 주세요.</div>
         </c:if>
 
         <form action="${contextPath}/admin/login" method="post">
@@ -164,7 +159,7 @@
             
             <div class="adm-login-field">
                 <label for="loginId">관리자 아이디</label>
-                <input type="text" id="loginId" name="loginId" placeholder="admin" autocomplete="username">
+                <input type="text" id="loginId" name="loginId" placeholder="관리자 아이디" autocomplete="username">
             </div>
             <div class="adm-login-field">
                 <label for="loginPw">비밀번호</label>
@@ -172,11 +167,6 @@
             </div>
             <button type="submit" class="adm-login-submit">관리자 로그인</button>
         </form>
-
-        <div class="adm-login-hint">
-            테스트 계정: <strong>admin</strong> / 비밀번호 아무 값<br>
-            (DB 연동 전 프로토타입용)
-        </div>
 
         <p class="adm-login-foot">
             <a href="${contextPath}/">← 일반 회원 사이트로 이동</a>

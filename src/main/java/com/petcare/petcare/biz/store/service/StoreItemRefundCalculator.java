@@ -8,9 +8,12 @@
  */
 package com.petcare.petcare.biz.store.service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.petcare.petcare.biz.store.vo.BizOrderItemVO;
+import com.petcare.petcare.common.util.CouponShareAllocator;
 import com.petcare.petcare.biz.store.vo.BizReturnVO;
 
 public final class StoreItemRefundCalculator {
@@ -45,8 +48,8 @@ public final class StoreItemRefundCalculator {
         int itemCoupon = 0;
         int itemPoint = 0;
         if (productTotal > 0 && orderItems != null && !orderItems.isEmpty()) {
-            itemCoupon = share(coupon, target.getOrderItemId(), orderItems, productTotal);
-            itemPoint = share(pointForItems, target.getOrderItemId(), orderItems, productTotal);
+            itemCoupon = share(coupon, target.getOrderItemId(), orderItems);
+            itemPoint = share(pointForItems, target.getOrderItemId(), orderItems);
         }
         target.setItemCouponAmount(itemCoupon);
         target.setItemPointAmount(itemPoint);
@@ -72,27 +75,25 @@ public final class StoreItemRefundCalculator {
         return "BIZ".equalsIgnoreCase(payer) || "DEFECT".equalsIgnoreCase(reason);
     }
 
-    private static int share(int benefit, Long itemId, List<BizOrderItemVO> items, int productTotal) {
+    /** 정산과 같은 배분 (ORDER_ITEM_ID 순, 1원 오차는 마지막 상품) */
+    private static int share(int benefit, Long itemId, List<BizOrderItemVO> items) {
         if (benefit <= 0 || itemId == null || items == null || items.isEmpty()) {
             return 0;
         }
-        Long lastId = items.get(items.size() - 1).getOrderItemId();
-        int allocated = 0;
-        int thisShare = 0;
-        for (BizOrderItemVO it : items) {
-            boolean isLastRow = lastId != null && lastId.equals(it.getOrderItemId());
-            int s;
-            if (isLastRow) {
-                s = Math.max(0, benefit - allocated);
-            } else {
-                s = (int) Math.floor(benefit * (nvl(it.getTotalPrice()) / (double) productTotal));
-                allocated += s;
-            }
-            if (itemId.equals(it.getOrderItemId())) {
-                thisShare = s;
+        List<BizOrderItemVO> sorted = new ArrayList<>(items);
+        sorted.sort(Comparator.comparing(BizOrderItemVO::getOrderItemId,
+                Comparator.nullsLast(Comparator.naturalOrder())));
+        List<Long> amounts = new ArrayList<>();
+        for (BizOrderItemVO it : sorted) {
+            amounts.add((long) nvl(it.getTotalPrice()));
+        }
+        long[] shares = CouponShareAllocator.allocate(benefit, amounts);
+        for (int i = 0; i < sorted.size(); i++) {
+            if (itemId.equals(sorted.get(i).getOrderItemId())) {
+                return (int) shares[i];
             }
         }
-        return thisShare;
+        return 0;
     }
 
     /** 이 상품까지 환불 완료되면 주문 상품이 전부 DONE인지 (쿠폰 복구용) */

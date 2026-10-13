@@ -1,5 +1,6 @@
 /**
- * 수수료는 상품매출에만 적용 (택배비 제외), 기본 5% (FEE_RATE 없을 때)
+ * 수수료는 쿠폰 차감 후 상품매출에만 적용 (택배비 제외), 기본 5% (FEE_RATE 없을 때)
+ * 사업자 쿠폰은 주문상품 금액 비율로 배분해 정산에서 차감 (포인트는 플랫폼 부담)
  * 중복 방지: 조회 NOT EXISTS + 저장 직전 ORDER_ITEM_ID 재검사 + UNIQUE INDEX
  */
 package com.petcare.petcare.settlement.service;
@@ -7,8 +8,13 @@ package com.petcare.petcare.settlement.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -19,8 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.petcare.petcare.biz.store.vo.BizProductVO;
+import com.petcare.petcare.common.util.CouponShareAllocator;
 import com.petcare.petcare.mypage.notify.service.MypageNotifyService;
 import com.petcare.petcare.settlement.mapper.StoreSettlementMapper;
+import com.petcare.petcare.settlement.vo.OrderCouponBaseVO;
 import com.petcare.petcare.settlement.vo.StoreSettlementItemVO;
 import com.petcare.petcare.settlement.vo.StoreSettlementRequestVO;
 import com.petcare.petcare.settlement.vo.StoreSettlementSummaryVO;
@@ -46,17 +54,22 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
 
         long itemSales = item.getItemSalesAmount() == null ? 0L : item.getItemSalesAmount();
         long deliveryFee = item.getDeliveryFeeAmount() == null ? 0L : item.getDeliveryFeeAmount();
+        long coupon = item.getCouponDiscountAmount() == null ? 0L : item.getCouponDiscountAmount();
+        coupon = Math.max(0L, Math.min(coupon, itemSales));
         double feeRate = item.getFeeRate() == null ? DEFAULT_STORE_FEE_RATE : item.getFeeRate();
 
-        long feeAmount = Math.round(itemSales * feeRate / 100.0);
-        // (상품매출 − 수수료) + 택배비
-        long settleAmount = (itemSales - feeAmount) + deliveryFee;
+        // 수수료는 쿠폰 차감 후 금액 기준
+        long netSales = itemSales - coupon;
+        long feeAmount = Math.round(netSales * feeRate / 100.0);
+        // (상품매출 − 쿠폰 − 수수료) + 택배비
+        long settleAmount = (netSales - feeAmount) + deliveryFee;
 
         item.setFeeRate(feeRate);
         item.setFeeAmount(feeAmount);
         item.setSettleAmount(settleAmount);
         item.setDeliveryFeeAmount(deliveryFee);
         item.setItemSalesAmount(itemSales);
+        item.setCouponDiscountAmount(coupon);
 
         if (item.getStatusCd() == null || item.getStatusCd().isBlank()) {
             item.setStatusCd("INCLUDED");
@@ -77,6 +90,7 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
 
         long productSales = 0L;
         long deliverySum = 0L;
+        long couponSum = 0L;
         long totalFee = 0L;
         long settleSum = 0L;
         Double masterFeeRate = null;
@@ -85,6 +99,7 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
             fillItemAmounts(item);
             productSales += item.getItemSalesAmount() == null ? 0L : item.getItemSalesAmount();
             deliverySum += item.getDeliveryFeeAmount() == null ? 0L : item.getDeliveryFeeAmount();
+            couponSum += item.getCouponDiscountAmount() == null ? 0L : item.getCouponDiscountAmount();
             totalFee += item.getFeeAmount() == null ? 0L : item.getFeeAmount();
             settleSum += item.getSettleAmount() == null ? 0L : item.getSettleAmount();
             if (masterFeeRate == null && item.getFeeRate() != null) {
@@ -96,6 +111,7 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
         master.setProductSalesAmount(productSales);
         master.setDeliveryFeeAmount(deliverySum);
         master.setReturnFeeAmount(0L);
+        master.setCouponDiscountAmount(couponSum);
         master.setTotalSales(productSales + deliverySum);
         master.setTotalFee(totalFee);
         master.setSettleAmount(settleSum);
@@ -118,8 +134,7 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
             String requestType,
             String requestScope) {
 
-        List<StoreSettlementItemVO> targets = storeSettlementMapper.selectUnsettleStoreTargets(
-                bizNo, periodStart, periodEnd, productId);
+        List<StoreSettlementItemVO> targets = loadTargetsWithCoupon(bizNo, periodStart, periodEnd, productId);
 
         // 조회에 feeRate 없으면 사업자율로 보정
         Double bizRate = resolveFeeRate(bizNo);
@@ -223,11 +238,18 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
 
         StoreSettlementSummaryVO summary = storeSettlementMapper.selectStoreSettlementSummary(bizNo);
         if (summary == null) {
-            return empty;
+            summary = empty;
         }
         if (summary.getPendingAmount() == null) {
             summary.setPendingAmount(0L);
         }
+        // 미정산 구매확정분은 쿠폰 배분이 필요해 Java에서 계산
+        long unsettled = 0L;
+        for (StoreSettlementItemVO item : loadTargetsWithCoupon(bizNo, null, null, null)) {
+            fillItemAmounts(item);
+            unsettled += item.getSettleAmount();
+        }
+        summary.setPendingAmount(summary.getPendingAmount() + unsettled);
         if (summary.getPaidAmount() == null) {
             summary.setPaidAmount(0L);
         }
@@ -494,6 +516,61 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
         }
         Double rate = storeSettlementMapper.selectStoreFeeRate(bizNo);
         return rate != null ? rate : DEFAULT_STORE_FEE_RATE;
+    }
+
+    /** 미정산 대상 조회 + 주문 쿠폰을 주문상품 금액 비율로 배분 */
+    private List<StoreSettlementItemVO> loadTargetsWithCoupon(
+            Long bizNo, Date periodStart, Date periodEnd, Long productId) {
+        List<StoreSettlementItemVO> targets = storeSettlementMapper.selectUnsettleStoreTargets(
+                bizNo, periodStart, periodEnd, productId);
+        if (targets == null || targets.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> orderIds = targets.stream()
+                .map(StoreSettlementItemVO::getOrderId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        // Oracle IN 1000개 제한 → 묶음 조회
+        List<OrderCouponBaseVO> bases = new ArrayList<>();
+        for (int i = 0; i < orderIds.size(); i += 900) {
+            List<OrderCouponBaseVO> chunk = storeSettlementMapper.selectOrderCouponBases(
+                    orderIds.subList(i, Math.min(i + 900, orderIds.size())));
+            if (chunk != null) {
+                bases.addAll(chunk);
+            }
+        }
+        Map<Long, Long> shareByItem = allocateOrderCoupons(bases);
+
+        for (StoreSettlementItemVO item : targets) {
+            item.setCouponDiscountAmount(shareByItem.getOrDefault(item.getOrderItemId(), 0L));
+        }
+        return targets;
+    }
+
+    /** 주문별 쿠폰을 전체 주문상품(ORDER_ITEM_ID 순)에 배분 → 주문상품ID별 배분액 */
+    static Map<Long, Long> allocateOrderCoupons(List<OrderCouponBaseVO> bases) {
+        Map<Long, List<OrderCouponBaseVO>> byOrder = new LinkedHashMap<>();
+        if (bases != null) {
+            for (OrderCouponBaseVO b : bases) {
+                byOrder.computeIfAbsent(b.getOrderId(), k -> new ArrayList<>()).add(b);
+            }
+        }
+        Map<Long, Long> result = new HashMap<>();
+        for (List<OrderCouponBaseVO> rows : byOrder.values()) {
+            rows.sort(Comparator.comparing(OrderCouponBaseVO::getOrderItemId));
+            long coupon = rows.get(0).getCouponDiscount() == null ? 0L : rows.get(0).getCouponDiscount();
+            List<Long> amounts = new ArrayList<>();
+            for (OrderCouponBaseVO r : rows) {
+                amounts.add(r.getItemAmount() == null ? 0L : r.getItemAmount());
+            }
+            long[] shares = CouponShareAllocator.allocate(coupon, amounts);
+            for (int i = 0; i < rows.size(); i++) {
+                result.put(rows.get(i).getOrderItemId(), shares[i]);
+            }
+        }
+        return result;
     }
 
     private void assertNoDuplicateOrderItems(List<StoreSettlementItemVO> items) {

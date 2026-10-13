@@ -42,6 +42,7 @@ public class StoreSettlementVO {
     private Long productSalesAmount;     // 상품매출 합 (택배 제외)
     private Long deliveryFeeAmount;      // 택배비 합 (패스스루)
     private Long returnFeeAmount;
+    private Long couponDiscountAmount;   // 사업자 부담 쿠폰 합
 
     private Date regDate;
     private Date applyDate;

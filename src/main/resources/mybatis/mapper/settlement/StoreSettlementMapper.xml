@@ -59,8 +59,12 @@
                     ON b.BIZ_NO = NVL(o.BIZ_NO, p.BIZ_NO)
                  WHERE NVL(o.BIZ_NO, p.BIZ_NO) = #{bizNo}
                    AND oi.CONFIRMED_AT IS NOT NULL
+                <if test="periodStart != null">
                    AND oi.CONFIRMED_AT &gt;= TRUNC(#{periodStart})
+                </if>
+                <if test="periodEnd != null">
                    AND oi.CONFIRMED_AT &lt;  TRUNC(#{periodEnd}) + 1
+                </if>
                    AND o.ORDER_STATUS &lt;&gt; 'CANCEL'
                    AND NVL(oi.RETURN_STATUS_CD, 'NONE') NOT IN ('REQUESTED', 'RETURNING', 'DONE')
                    AND NOT EXISTS (
@@ -74,6 +78,24 @@
                 </if>
                ) T
          ORDER BY T.confirmedAt ASC, T.orderItemId ASC
+    </select>
+
+    <!-- 쿠폰 배분 기준: 주문 쿠폰액 (COUPON_DISCOUNT 없던 옛 주문은 할인액 − 포인트) -->
+    <select id="selectOrderCouponBases"
+            resultType="com.petcare.petcare.settlement.vo.OrderCouponBaseVO">
+        SELECT oi.ORDER_ID      AS orderId,
+               oi.ORDER_ITEM_ID AS orderItemId,
+               NVL(oi.TOTAL_PRICE, 0) AS itemAmount,
+               NVL(o.COUPON_DISCOUNT,
+                   GREATEST(NVL(o.DISCOUNT_AMOUNT, 0) - NVL(o.POINT_USED, 0), 0)) AS couponDiscount
+          FROM TB_ORDER_ITEM oi
+          JOIN TB_ORDER o
+            ON o.ORDER_ID = oi.ORDER_ID
+         WHERE oi.ORDER_ID IN
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+         ORDER BY oi.ORDER_ID, oi.ORDER_ITEM_ID
     </select>
 
     <select id="selectStoreFeeRate" resultType="java.lang.Double">
@@ -126,7 +148,8 @@
             REJECT_REASON,
             PRODUCT_SALES_AMOUNT,
             DELIVERY_FEE_AMOUNT,
-            RETURN_FEE_AMOUNT
+            RETURN_FEE_AMOUNT,
+            COUPON_DISCOUNT_AMOUNT
         ) VALUES (
             #{settleId},
             #{settleType, jdbcType=VARCHAR},
@@ -156,7 +179,8 @@
             #{rejectReason, jdbcType=VARCHAR},
             #{productSalesAmount, jdbcType=NUMERIC},
             #{deliveryFeeAmount, jdbcType=NUMERIC},
-            #{returnFeeAmount, jdbcType=NUMERIC}
+            #{returnFeeAmount, jdbcType=NUMERIC},
+            NVL(#{couponDiscountAmount, jdbcType=NUMERIC}, 0)
         )
     </insert>
 
@@ -182,6 +206,7 @@
             DELIVERY_FEE_AMOUNT,
             RETURN_FEE_AMOUNT,
             RETURN_FEE_PAYER,
+            COUPON_DISCOUNT_AMOUNT,
             FEE_RATE,
             FEE_AMOUNT,
             SETTLE_AMOUNT,
@@ -205,6 +230,7 @@
             #{deliveryFeeAmount, jdbcType=NUMERIC},
             #{returnFeeAmount, jdbcType=NUMERIC},
             #{returnFeePayer, jdbcType=VARCHAR},
+            NVL(#{couponDiscountAmount, jdbcType=NUMERIC}, 0),
             #{feeRate},
             #{feeAmount},
             #{settleAmount},
@@ -216,7 +242,7 @@
 
     <!--
       상단 요약
-      pending = 미정산 구매확정 실정산금 + PAY_STATUS=WAIT 정산마스터
+      pending = PAY_STATUS=WAIT 정산마스터 (미정산 구매확정분은 서비스에서 합산)
       paid    = 이번 달 PAY_STATUS=DONE
       fee     = STORE 정산 누적 TOTAL_FEE
     -->
@@ -224,52 +250,6 @@
             resultType="com.petcare.petcare.settlement.vo.StoreSettlementSummaryVO">
         SELECT
             (
-                NVL((
-                    SELECT SUM(
-                               (NVL(T.itemSalesAmount, 0)
-                                - ROUND(NVL(T.itemSalesAmount, 0) * NVL(T.feeRate, 5) / 100))
-                               + NVL(T.deliveryFeeAmount, 0)
-                           )
-                      FROM (
-                            SELECT NVL(oi.TOTAL_PRICE, 0) AS itemSalesAmount,
-                                   CASE
-                                       WHEN ROW_NUMBER() OVER (
-                                                PARTITION BY oi.ORDER_ID
-                                                ORDER BY oi.ORDER_ITEM_ID
-                                            ) = 1
-                                        AND NOT EXISTS (
-                                                SELECT 1
-                                                  FROM TB_SETTLEMENT_ITEM si2
-                                                  JOIN TB_ORDER_ITEM oi2
-                                                    ON oi2.ORDER_ITEM_ID = si2.ORDER_ITEM_ID
-                                                 WHERE oi2.ORDER_ID = oi.ORDER_ID
-                                                   AND NVL(si2.DELIVERY_FEE_AMOUNT, 0) &gt; 0
-                                                   AND si2.STATUS_CD IN ('INCLUDED', 'HOLD', 'EXCLUDED', 'REFUNDED')
-                                            )
-                                       THEN NVL(o.DELIVERY_FEE, 0)
-                                       ELSE 0
-                                   END AS deliveryFeeAmount,
-                                   NVL(b.FEE_RATE, 5) AS feeRate
-                              FROM TB_ORDER_ITEM oi
-                              JOIN TB_ORDER o
-                                ON o.ORDER_ID = oi.ORDER_ID
-                              JOIN TB_PRODUCT p
-                                ON p.PRODUCT_ID = oi.PRODUCT_ID
-                              JOIN TB_BUSINESS b
-                                ON b.BIZ_NO = NVL(o.BIZ_NO, p.BIZ_NO)
-                             WHERE NVL(o.BIZ_NO, p.BIZ_NO) = #{bizNo}
-                               AND oi.CONFIRMED_AT IS NOT NULL
-                               AND o.ORDER_STATUS &lt;&gt; 'CANCEL'
-                               AND NVL(oi.RETURN_STATUS_CD, 'NONE') NOT IN ('REQUESTED', 'RETURNING', 'DONE')
-                               AND NOT EXISTS (
-                                       SELECT 1
-                                         FROM TB_SETTLEMENT_ITEM si
-                                        WHERE si.ORDER_ITEM_ID = oi.ORDER_ITEM_ID
-                                          AND si.STATUS_CD IN ('INCLUDED', 'HOLD', 'EXCLUDED', 'REFUNDED')
-                                   )
-                           ) T
-                ), 0)
-                +
                 NVL((
                     SELECT SUM(ST.SETTLE_AMOUNT)
                       FROM TB_SETTLEMENT ST
@@ -319,6 +299,7 @@
                 ST.REQUEST_ID     AS requestId,
                 ST.PRODUCT_SALES_AMOUNT AS productSalesAmount,
                 ST.DELIVERY_FEE_AMOUNT  AS deliveryFeeAmount,
+                NVL(ST.COUPON_DISCOUNT_AMOUNT, 0) AS couponDiscountAmount,
                 ST.REG_DATE       AS regDate
           FROM  TB_SETTLEMENT ST
          WHERE  ST.BIZ_NO = #{bizNo}
@@ -361,6 +342,7 @@
                 SI.DELIVERY_FEE_AMOUNT AS deliveryFeeAmount,
                 SI.RETURN_FEE_AMOUNT AS returnFeeAmount,
                 SI.RETURN_FEE_PAYER AS returnFeePayer,
+                NVL(SI.COUPON_DISCOUNT_AMOUNT, 0) AS couponDiscountAmount,
                 SI.FEE_RATE       AS feeRate,
                 SI.FEE_AMOUNT     AS feeAmount,
                 SI.SETTLE_AMOUNT  AS settleAmount,

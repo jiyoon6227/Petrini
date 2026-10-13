@@ -281,7 +281,7 @@ public String completeOrder(OrderTempVO p, String tossPaymentKey, String tossOrd
         storeShopMapper.insertOrder(orderId, orderNo, p.getMemberNo(), groupSubtotal, groupDeliveryFee,
                 groupDiscountAmount, groupPointUsed, groupFinalTotal,
                 p.getRecvName(), p.getRecvPhone(), p.getZipCode(), p.getAddr1(), p.getAddr2(), bizNo,
-                p.getDeliveryMemo(), groupMemberCouponId);
+                p.getDeliveryMemo(), groupMemberCouponId, groupCouponDiscount);
 
         // 주문 접수 즉시 사업자에게 알림 (알림함 "주문" 탭). 대표 상품명은 이 그룹 첫 상품 기준
         Long bizMemberNoForOrder = storeShopMapper.selectBizMemberNoByBizNo(bizNo);

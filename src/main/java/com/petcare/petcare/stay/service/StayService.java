@@ -36,4 +36,7 @@ public interface StayService {
 
     // 이 숙소(사업자)가 발급한, 회원이 사용 가능한 쿠폰 목록
     List<CouponVO> getUsableCoupons(Long memberNo, Long bizNo);
+
+    // 예약 쿠폰 할인액 서버 계산 (사용 불가 쿠폰이면 예외)
+    long calcStayCouponDiscount(ReservationVO resv, Long memberCouponId, Long memberNo);
 }

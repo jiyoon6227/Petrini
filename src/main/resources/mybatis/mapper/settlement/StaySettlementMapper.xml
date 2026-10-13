@@ -25,6 +25,7 @@
                 R.CHECKIN_DATE   AS checkinDate,
                 R.CHECKOUT_DATE  AS checkoutDate,
                 R.TOTAL_AMOUNT   AS resvAmount,
+                NVL(R.COUPON_DISCOUNT, 0) AS couponDiscountAmount,
                 NVL(B.FEE_RATE, 10) AS feeRate,
                 'STAY'           AS itemType
           FROM  TB_RESERVATION R
@@ -89,6 +90,7 @@
                 R.CHECKIN_DATE   AS checkinDate,
                 R.CHECKOUT_DATE  AS checkoutDate,
                 R.CANCEL_FEE_AMT AS resvAmount,
+                0                AS couponDiscountAmount,
                 NVL(B.FEE_RATE, 10) AS feeRate,
                 'CANCEL_FEE'     AS itemType
           FROM  TB_RESERVATION R
@@ -140,7 +142,7 @@
     <!--
       숙소 정산
       상단 요약 3칸
-      - pendingAmount  = (미정산 DONE 예약의 실정산금 합)
+      - pendingAmount  = (미정산 DONE 예약의 실정산금 합, 쿠폰 차감 후 수수료)
                        + (이미 저장됐지만 PAY_STATUS=WAIT 인 정산의 SETTLE_AMOUNT 합)
       - paidAmount     = 이번 달 PAY_STATUS=DONE 인 SETTLE_AMOUNT 합
       - totalFeeAmount = 해당 사업자 STAY 정산 TOTAL_FEE 누적
@@ -151,8 +153,9 @@
             (
                 NVL((
                     SELECT SUM(
-                               R.TOTAL_AMOUNT
-                               - ROUND(R.TOTAL_AMOUNT * NVL(B.FEE_RATE, 10) / 100)
+                               (R.TOTAL_AMOUNT - LEAST(NVL(R.COUPON_DISCOUNT, 0), R.TOTAL_AMOUNT))
+                               - ROUND((R.TOTAL_AMOUNT - LEAST(NVL(R.COUPON_DISCOUNT, 0), R.TOTAL_AMOUNT))
+                                       * NVL(B.FEE_RATE, 10) / 100)
                            )
                       FROM TB_RESERVATION R
                       JOIN TB_STAY S
@@ -253,6 +256,7 @@
                 ST.PERIOD_START   AS periodStart,
                 ST.PERIOD_END     AS periodEnd,
                 ST.TOTAL_SALES    AS totalSales,
+                NVL(ST.COUPON_DISCOUNT_AMOUNT, 0) AS couponDiscountAmount,
                 ST.TOTAL_FEE      AS totalFee,
                 ST.FEE_AMOUNT     AS feeAmount,
                 ST.SETTLE_AMOUNT  AS settleAmount,
@@ -307,6 +311,7 @@
                 SI.CHECKIN_DATE   AS checkinDate,
                 SI.CHECKOUT_DATE  AS checkoutDate,
                 SI.RESV_AMOUNT    AS resvAmount,
+                NVL(SI.COUPON_DISCOUNT_AMOUNT, 0) AS couponDiscountAmount,
                 SI.FEE_RATE       AS feeRate,
                 SI.FEE_AMOUNT     AS feeAmount,
                 SI.SETTLE_AMOUNT  AS settleAmount,
@@ -366,7 +371,8 @@
             REJECT_REASON,
             PRODUCT_SALES_AMOUNT,
             DELIVERY_FEE_AMOUNT,
-            RETURN_FEE_AMOUNT
+            RETURN_FEE_AMOUNT,
+            COUPON_DISCOUNT_AMOUNT
         ) VALUES (
             #{settleId},
             #{settleType, jdbcType=VARCHAR},
@@ -396,7 +402,8 @@
             #{rejectReason, jdbcType=VARCHAR},
             #{productSalesAmount, jdbcType=NUMERIC},
             #{deliveryFeeAmount, jdbcType=NUMERIC},
-            #{returnFeeAmount, jdbcType=NUMERIC}
+            #{returnFeeAmount, jdbcType=NUMERIC},
+            NVL(#{couponDiscountAmount, jdbcType=NUMERIC}, 0)
         )
     </insert>
 
@@ -419,6 +426,7 @@
             CHECKIN_DATE,
             CHECKOUT_DATE,
             RESV_AMOUNT,
+            COUPON_DISCOUNT_AMOUNT,
             ORDER_ID,
             ORDER_ITEM_ID,
             PRODUCT_ID,
@@ -442,6 +450,7 @@
             #{checkinDate, jdbcType=DATE},
             #{checkoutDate, jdbcType=DATE},
             #{resvAmount, jdbcType=NUMERIC},
+            NVL(#{couponDiscountAmount, jdbcType=NUMERIC}, 0),
             #{orderId, jdbcType=NUMERIC},
             #{orderItemId, jdbcType=NUMERIC},
             #{productId, jdbcType=NUMERIC},
@@ -603,6 +612,12 @@
         UPDATE TB_SETTLEMENT ST
            SET TOTAL_SALES   = NVL((
                     SELECT SUM(SI.RESV_AMOUNT)
+                      FROM TB_SETTLEMENT_ITEM SI
+                     WHERE SI.SETTLE_ID = ST.SETTLE_ID
+                       AND SI.STATUS_CD = 'INCLUDED'
+                ), 0),
+               COUPON_DISCOUNT_AMOUNT = NVL((
+                    SELECT SUM(NVL(SI.COUPON_DISCOUNT_AMOUNT, 0))
                       FROM TB_SETTLEMENT_ITEM SI
                      WHERE SI.SETTLE_ID = ST.SETTLE_ID
                        AND SI.STATUS_CD = 'INCLUDED'

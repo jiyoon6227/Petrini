@@ -33,6 +33,7 @@ public class StoreSettlementItemVO {
     private Long deliveryFeeAmount;
     private Long returnFeeAmount;
     private String returnFeePayer;
+    private Long couponDiscountAmount;   // 사업자 부담 쿠폰 배분액
 
     private Double feeRate;
     private Long feeAmount;

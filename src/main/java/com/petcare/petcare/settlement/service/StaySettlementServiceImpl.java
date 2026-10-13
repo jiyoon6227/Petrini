@@ -1,5 +1,6 @@
 /**
- * 수수료는 예약 원금에만 적용, 기본 10% (TB_BUSINESS.FEE_RATE 없을 때)
+ * 수수료는 쿠폰 차감 후 예약 원금에만 적용, 기본 10% (TB_BUSINESS.FEE_RATE 없을 때)
+ * 사업자 쿠폰(RESERVATION.COUPON_DISCOUNT)은 정산에서 차감, 포인트는 플랫폼 부담
  * 중복 방지: 조회 NOT EXISTS + 저장 직전 RESV_ID 재검사 + UNIQUE INDEX
  */
 package com.petcare.petcare.settlement.service;
@@ -49,12 +50,16 @@ public class StaySettlementServiceImpl implements StaySettlementService {
         }
 
         long resvAmount = item.getResvAmount() == null ? 0L : item.getResvAmount();
+        long coupon = item.getCouponDiscountAmount() == null ? 0L : item.getCouponDiscountAmount();
+        coupon = Math.max(0L, Math.min(coupon, resvAmount));
         double feeRate = item.getFeeRate() == null ? DEFAULT_STAY_FEE_RATE : item.getFeeRate();
 
-        // 수수료 = 원금 * 율 / 100 (원 단위 반올림)
-        long feeAmount = Math.round(resvAmount * feeRate / 100.0);
-        long settleAmount = resvAmount - feeAmount;
+        // 수수료 = (원금 − 쿠폰) * 율 / 100 (원 단위 반올림)
+        long netAmount = resvAmount - coupon;
+        long feeAmount = Math.round(netAmount * feeRate / 100.0);
+        long settleAmount = netAmount - feeAmount;
 
+        item.setCouponDiscountAmount(coupon);
         item.setFeeRate(feeRate);           // 적용한 수수료율 보존
         item.setFeeAmount(feeAmount);       // 건별 수수료
         item.setSettleAmount(settleAmount); // 건별 실정산금
@@ -82,6 +87,7 @@ public class StaySettlementServiceImpl implements StaySettlementService {
                 items == null ? new ArrayList<>() : items;
 
         long totalSales = 0L; // 원금 합
+        long couponSum = 0L;  // 사업자 부담 쿠폰 합
         long totalFee = 0L;   // 수수료 합
         long settleSum = 0L;  // 실정산 합
         Double masterFeeRate = null;
@@ -89,6 +95,7 @@ public class StaySettlementServiceImpl implements StaySettlementService {
         for (StaySettlementItemVO item : safeItems) {
             fillItemAmounts(item);
             totalSales += item.getResvAmount() == null ? 0L : item.getResvAmount();
+            couponSum += item.getCouponDiscountAmount() == null ? 0L : item.getCouponDiscountAmount();
             totalFee += item.getFeeAmount() == null ? 0L : item.getFeeAmount();
             settleSum += item.getSettleAmount() == null ? 0L : item.getSettleAmount();
             // 마스터 표시용 수수료율: 첫 건 기준 (사업자 단일율)
@@ -99,6 +106,7 @@ public class StaySettlementServiceImpl implements StaySettlementService {
 
         master.setItems(safeItems);
         master.setTotalSales(totalSales);
+        master.setCouponDiscountAmount(couponSum);
         master.setTotalFee(totalFee);
         master.setSettleAmount(settleSum);
         master.setFeeAmount(totalFee);

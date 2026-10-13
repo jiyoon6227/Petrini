@@ -31,8 +31,6 @@ import com.petcare.petcare.stay.vo.ReservationVO;
 import com.petcare.petcare.member.vo.MemberVO;
 import com.petcare.petcare.stay.service.StayServiceImpl;
 import com.petcare.petcare.stay.vo.StayVO;
-import com.petcare.petcare.store.vo.CouponVO;
-import com.petcare.petcare.coupon.mapper.CouponMapper;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -59,9 +57,6 @@ public class StayController {
     private BillingCardService billingCardService;
     @Autowired
     private TossBillingService tossBillingService;
-    // 등록카드 결제 시 쿠폰 할인 미리계산용
-    @Autowired
-    private CouponMapper couponMapper;
 
     @GetMapping({"", "/"})
     public String list(@ModelAttribute("search") StayVO searchVO, Model model) throws Exception {
@@ -285,26 +280,17 @@ public class StayController {
 
         long total = reservation.getTotalAmount() != null ? reservation.getTotalAmount() : 0L;
 
-        // 등록카드 결제도 쿠폰 할인 반영 (확정 검증은 confirmPayment에서 재수행)
-        // 여기선 청구 금액 산정용으로만 미리 계산
-        long couponDiscountPreview = 0L;
-        if (couponMemberCouponId != null && couponMemberCouponId > 0) {
-            CouponVO couponPreview = couponMapper.selectMemberCouponForUse(couponMemberCouponId, member.getMemberNo());
-            if (couponPreview != null) {
-                if ("RATE".equals(couponPreview.getCouponType())) {
-                    long rawDiscount = total * couponPreview.getDiscountValue() / 100;
-                    // 최대할인금액 캡 적용 (실제 확정은 confirmPayment/StayServiceImpl에서 재검증)
-                    Integer maxAmt = couponPreview.getMaxDiscountAmt();
-                    couponDiscountPreview = (maxAmt != null && maxAmt > 0)
-                            ? Math.min(rawDiscount, (long) maxAmt)
-                            : rawDiscount;
-                } else {
-                    couponDiscountPreview = couponPreview.getDiscountValue();
-                }
-                if (couponDiscountPreview > total) couponDiscountPreview = total;
-            }
+        // 청구 전 쿠폰 검증 (confirmPayment와 같은 계산, 사용 불가면 결제하지 않음)
+        long couponDiscount;
+        try {
+            couponDiscount = stayService.calcStayCouponDiscount(
+                    reservation, couponMemberCouponId, member.getMemberNo());
+        } catch (IllegalArgumentException e) {
+            res.put("ok", false);
+            res.put("message", e.getMessage());
+            return res;
         }
-        long payableAfterCoupon = total - couponDiscountPreview;
+        long payableAfterCoupon = total - couponDiscount;
 
         if (usedPoint < 0) usedPoint = 0;
         if (usedPoint > payableAfterCoupon) usedPoint = payableAfterCoupon;
