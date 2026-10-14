@@ -2,6 +2,8 @@ package com.petcare.petcare.store.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -32,6 +34,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller("storeController")
 @RequestMapping("/store")
 public class StoreShopController {
+
+    private static final Logger log = LoggerFactory.getLogger(StoreShopController.class);
 
     // 토스결제 api key
     @Value("${toss.client-key}")
@@ -189,7 +193,8 @@ public String payment(@RequestParam(required = false) Long productId,
                        @RequestParam(required = false) String addr2,
                        @RequestParam(required = false) String deliveryMemo,
                        Model model,
-                       HttpSession session) {
+                       HttpSession session,
+                       RedirectAttributes redirectAttributes) {
     Long memberNo = getLoginMemberNo(session);
     if (memberNo == null) {
         return "redirect:/login";
@@ -200,6 +205,15 @@ public String payment(@RequestParam(required = false) Long productId,
     List<CartItemVO> orderItems = (productId != null)
             ? storeShopService.getDirectOrderItem(productId, optionId, qty)
             : storeShopService.getCartOrderItems(cartItemIds);
+
+    // 재고가 없는데 결제창까지 가서 결제 후 자동 취소되는 일을 막으려고 미리 확인
+    for (CartItemVO item : orderItems) {
+        if (item.getStockQty() != null && item.getQty() > item.getStockQty()) {
+            redirectAttributes.addFlashAttribute("stockError",
+                    "'" + item.getProductName() + "' 상품의 재고가 부족합니다. (남은 재고: " + item.getStockQty() + "개)");
+            return "redirect:/store/cart";
+        }
+    }
 
     int productTotal = 0;
     for (CartItemVO item : orderItems) {
@@ -362,7 +376,32 @@ public String payment(@RequestParam(required = false) Long productId,
             return "store/order-complete";
         }
 
-        String orderNo = storeShopService.completeOrder(orderTemp, paymentKey, orderId, "TOSS");
+        // 주문 저장이 실패하면 이미 승인된 결제를 취소해 돈만 빠지는 상황을 막음
+        String orderNo;
+        try {
+            orderNo = storeShopService.completeOrder(orderTemp, paymentKey, orderId, "TOSS");
+        } catch (Exception e) {
+            // 실제 결제키가 아니면 취소가 안 되므로 "취소했다"고 안내하지 않고 실패로 처리
+            String cancelError = com.petcare.petcare.common.external.service.TossPaymentService.isSkipCancelPaymentKey(paymentKey)
+                    ? "실제 결제키가 없어 자동 취소 불가"
+                    : tossPaymentService.cancelPaymentSmart(
+                            paymentKey, "주문 처리 실패로 결제 자동 취소", null, "TOSS");
+            session.removeAttribute("orderTemp");
+            model.addAttribute("noOrderData", true);
+            // 화면 제목을 "결제 승인 실패" 대신 "주문 처리 실패"로 보여주기 위함
+            model.addAttribute("autoCanceled", true);
+            if (cancelError == null) {
+                model.addAttribute("confirmError",
+                        "주문 처리 중 문제가 생겨 결제를 자동으로 취소했습니다. (사유: " + e.getMessage() + ")");
+            } else {
+                // 자동 취소도 실패하면 나중에 수동 환불할 수 있게 결제 정보를 남김
+                log.error("주문 저장 실패 후 결제 자동 취소 실패 - paymentKey={}, orderId={}, 주문 실패 사유={}, 취소 실패 사유={}",
+                        paymentKey, orderId, e.getMessage(), cancelError, e);
+                model.addAttribute("confirmError",
+                        "주문 처리에 실패했고 결제 자동 취소도 실패했습니다. 고객센터로 문의해 주세요.");
+            }
+            return "store/order-complete";
+        }
         session.removeAttribute("orderTemp"); // 새로고침해도 중복저장 안 되게 바로 비움
 
         // 포인트 사용 시 세션 잔액 갱신 (옛 세션 값 표시 방지)
@@ -447,28 +486,45 @@ public String payment(@RequestParam(required = false) Long productId,
             return res;
         }
 
+        // 주문 저장 실패 시 catch에서 결제를 취소하려고 try 밖에 둠
+        String paymentKey = approved.getPaymentKey() != null
+                ? approved.getPaymentKey() : ("BILLING-" + tossOrderId);
+        // 주문이 저장된 뒤의 예외로 결제가 취소되지 않게 저장 호출만 감쌈
+        String orderNo;
         try {
-            String paymentKey = approved.getPaymentKey() != null
-                    ? approved.getPaymentKey() : ("BILLING-" + tossOrderId);
             // 빌링 결제는 PAY_METHOD=BILLING 으로 저장 (취소 시 billing 시크릿)
-            String orderNo = storeShopService.completeOrder(orderTemp, paymentKey, tossOrderId, "BILLING");
-            session.removeAttribute("orderTemp");
-
-            // 등록카드 결제도 DB 잔액으로 세션 동기화
-            syncSessionPointBalance(session);
-
-            // 완료 화면은 GET order-complete 인데 세션을 이미 비움 → 전용 완료 redirect 파라미터
-            res.put("ok", true);
-            res.put("orderNo", orderNo);
-            res.put("redirectUrl", "/store/order-complete-billing?orderNo="
-                    + java.net.URLEncoder.encode(orderNo, java.nio.charset.StandardCharsets.UTF_8)
-                    + "&amount=" + amount);
-            return res;
+            orderNo = storeShopService.completeOrder(orderTemp, paymentKey, tossOrderId, "BILLING");
         } catch (Exception e) {
+            // 주문 저장이 실패하면 이미 승인된 결제를 취소해 돈만 빠지는 상황을 막음
+            // 실제 결제키가 아니면 취소가 안 되므로 "취소했다"고 안내하지 않고 실패로 처리
+            String cancelError = com.petcare.petcare.common.external.service.TossPaymentService.isSkipCancelPaymentKey(paymentKey)
+                    ? "실제 결제키가 없어 자동 취소 불가"
+                    : tossPaymentService.cancelPaymentSmart(
+                            paymentKey, "주문 처리 실패로 결제 자동 취소", null, "BILLING");
+            session.removeAttribute("orderTemp");
             res.put("ok", false);
-            res.put("message", "결제는 승인됐으나 주문 저장 중 오류: " + e.getMessage());
+            if (cancelError == null) {
+                res.put("message", "주문 처리 중 문제가 생겨 결제를 자동으로 취소했습니다. (사유: " + e.getMessage() + ")");
+            } else {
+                // 자동 취소도 실패하면 나중에 수동 환불할 수 있게 결제 정보를 남김
+                log.error("주문 저장 실패 후 결제 자동 취소 실패 - paymentKey={}, orderId={}, 주문 실패 사유={}, 취소 실패 사유={}",
+                        paymentKey, tossOrderId, e.getMessage(), cancelError, e);
+                res.put("message", "주문 처리에 실패했고 결제 자동 취소도 실패했습니다. 고객센터로 문의해 주세요.");
+            }
             return res;
         }
+        session.removeAttribute("orderTemp");
+
+        // 등록카드 결제도 DB 잔액으로 세션 동기화
+        syncSessionPointBalance(session);
+
+        // 완료 화면은 GET order-complete 인데 세션을 이미 비움 → 전용 완료 redirect 파라미터
+        res.put("ok", true);
+        res.put("orderNo", orderNo);
+        res.put("redirectUrl", "/store/order-complete-billing?orderNo="
+                + java.net.URLEncoder.encode(orderNo, java.nio.charset.StandardCharsets.UTF_8)
+                + "&amount=" + amount);
+        return res;
     }
 
     /**

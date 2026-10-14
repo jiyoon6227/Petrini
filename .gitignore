@@ -61,3 +61,4 @@ cart-test*.log
 
 config/gcs-key.json
 **/gcs-key*.json
+logs/

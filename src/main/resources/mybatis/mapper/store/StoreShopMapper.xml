@@ -221,7 +221,8 @@
         o.OPTION_COLOR,
         o.OPTION_SIZE,
         TO_NUMBER(ci.QTY)   AS QTY,
-        TO_NUMBER(ci.PRICE) AS PRICE,
+        <!-- 장바구니 저장 가격 대신 DB 판매가 + 옵션 추가금 사용 (가격 조작 방지) -->
+        TO_NUMBER(p.SALE_PRICE) + NVL(o.ADD_PRICE, 0) AS PRICE,
         o.STOCK_QTY
     FROM TB_CART_ITEM ci
     JOIN TB_CART c ON c.CART_ID = ci.CART_ID
@@ -254,7 +255,8 @@
         o.OPTION_COLOR,
         o.OPTION_SIZE,
         TO_NUMBER(ci.QTY)   AS QTY,
-        TO_NUMBER(ci.PRICE) AS PRICE,
+        <!-- 장바구니 저장 가격 대신 DB 판매가 + 옵션 추가금 사용 (가격 조작 방지) -->
+        TO_NUMBER(p.SALE_PRICE) + NVL(o.ADD_PRICE, 0) AS PRICE,
         o.STOCK_QTY
     FROM TB_CART_ITEM ci
 

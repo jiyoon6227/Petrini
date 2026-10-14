@@ -13,6 +13,11 @@
 <c:if test="${cartAddSuccess}">
 <script>alert('장바구니에 상품을 담았습니다.');</script>
 </c:if>
+<%-- 결제 전 재고 확인에서 막힌 상품을 알려주기 위함 (따옴표가 섞여도 깨지지 않게 속성값으로 전달) --%>
+<c:if test="${not empty stockError}">
+<div id="stockErrorMsg" data-msg="<c:out value='${stockError}'/>" hidden></div>
+<script>alert(document.getElementById('stockErrorMsg').dataset.msg);</script>
+</c:if>
 
 
 
