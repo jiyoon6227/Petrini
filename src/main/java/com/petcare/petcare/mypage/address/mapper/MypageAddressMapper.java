@@ -14,7 +14,7 @@ public interface MypageAddressMapper {
     // 기본배송지 1건 조회 (없으면 null, 주문서 프리필용)
     MypageAddressVO selectDefaultAddress(@Param("memberNo") Long memberNo);
 
-    // 다음 ADDR_ID 미리 조회 (프로젝트 공통 MAX+1 채번 규칙)
+    // 다음 ADDR_ID 미리 조회 (SEQ_TB_MEMBER_ADDRESS로 번호를 먼저 받아 둠)
     Long selectNextAddrId();
 
     // 배송지 신규 등록

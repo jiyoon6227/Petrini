@@ -37,7 +37,7 @@
                                     APPROVE_DATE,
                                     STATUS_CD
                                 )
-        SELECT  (SELECT NVL(MAX(HOSPITAL_ID), 0) + 1 FROM TB_HOSPITAL),
+        SELECT  SEQ_TB_HOSPITAL.NEXTVAL,
                 B.BIZ_NO,
                 (SELECT MEMBER_NO
                    FROM TB_MEMBER
@@ -256,11 +256,11 @@
          ORDER BY R.RESV_DATE DESC, R.RESV_TIME DESC
     </select>
 
-    <!-- 진료기록 등록 (MAX+1) -->
+    <!-- 진료기록 등록 (PK는 SEQ_TB_MEDICAL_RECORD) -->
     <insert id="insertMedicalRecord"
             parameterType="com.petcare.petcare.hospital.vo.MedicalRecordVO">
         <selectKey keyProperty="recordId" resultType="long" order="BEFORE">
-            SELECT NVL(MAX(RECORD_ID), 0) + 1 FROM TB_MEDICAL_RECORD
+            SELECT SEQ_TB_MEDICAL_RECORD.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TB_MEDICAL_RECORD (
             RECORD_ID, HOSPITAL_ID, RESV_ID, PET_ID, MEMBER_NO,
@@ -485,7 +485,7 @@
     <insert id="insertTreatType"
             parameterType="com.petcare.petcare.hospital.vo.HospitalTreatTypeVO">
         <selectKey keyProperty="treatTypeId" resultType="long" order="BEFORE">
-            SELECT NVL(MAX(TREAT_TYPE_ID), 0) + 1 FROM TB_HOSPITAL_TREAT_TYPE
+            SELECT SEQ_TB_HOSPITAL_TREAT_TYPE.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TB_HOSPITAL_TREAT_TYPE (
             TREAT_TYPE_ID, HOSPITAL_ID, TYPE_NAME, DURATION_MIN,
@@ -544,7 +544,7 @@
     <insert id="insertDoctor"
             parameterType="com.petcare.petcare.hospital.vo.HospitalDoctorVO">
         <selectKey keyProperty="doctorId" resultType="long" order="BEFORE">
-            SELECT NVL(MAX(DOCTOR_ID), 0) + 1 FROM TB_HOSPITAL_DOCTOR
+            SELECT SEQ_TB_HOSPITAL_DOCTOR.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TB_HOSPITAL_DOCTOR (
             DOCTOR_ID, HOSPITAL_ID, DOCTOR_NAME, SPECIALTY,
@@ -640,7 +640,7 @@
     <insert id="insertResvException"
             parameterType="com.petcare.petcare.hospital.vo.HospitalResvExceptionVO">
         <selectKey keyProperty="excId" resultType="long" order="BEFORE">
-            SELECT NVL(MAX(EXC_ID), 0) + 1 FROM TB_HOSPITAL_RESV_EXCEPTION
+            SELECT SEQ_TB_HOSPITAL_RESV_EXCEPTION.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TB_HOSPITAL_RESV_EXCEPTION (
             EXC_ID, HOSPITAL_ID, DOCTOR_ID, EXC_DATE, EXC_TYPE,

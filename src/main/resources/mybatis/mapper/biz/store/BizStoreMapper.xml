@@ -65,7 +65,7 @@
 
 <!-- 다음 PRODUCT_ID 조회 (등록할 때 PRODUCT_CD 생성용으로 미리 뽑음) -->
 <select id="selectNextProductId" resultType="Long">
-    SELECT NVL(MAX(PRODUCT_ID), 0) + 1 FROM TB_PRODUCT
+    SELECT SEQ_TB_PRODUCT.NEXTVAL FROM DUAL
 </select>
 
 <!-- 재고는 TB_PRODUCT_OPTION에서만 관리 (STOCK_QTY 컬럼 없음) -->
@@ -141,9 +141,9 @@
     ORDER BY OPTION_ID
 </select>
 
-<!-- 다음 OPTION_ID 조회 (시퀀스 있으면 SELECT SEQ_PRODUCT_OPTION.NEXTVAL FROM DUAL 로 교체) -->
+<!-- 다음 OPTION_ID 조회 (옵션 INSERT 전에 미리 뽑아서 사용) -->
 <select id="selectNextOptionId" resultType="Long">
-    SELECT NVL(MAX(OPTION_ID), 0) + 1 FROM TB_PRODUCT_OPTION
+    SELECT SEQ_TB_PRODUCT_OPTION.NEXTVAL FROM DUAL
 </select>
 
 <!-- 상품 옵션 등록 -->
@@ -348,7 +348,7 @@
 <!-- 포인트 복구 이력 -->
 <insert id="insertPointRefundHistory">
     INSERT INTO TB_POINT (POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT, BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE)
-    VALUES ((SELECT NVL(MAX(POINT_ID),0)+1 FROM TB_POINT), #{memberNo}, 'REFUND', #{pointAmount}, #{balanceAfter}, 'ORDER_CANCEL', 'ORDER', #{orderId}, SYSDATE)
+    VALUES (SEQ_TB_POINT.NEXTVAL, #{memberNo}, 'REFUND', #{pointAmount}, #{balanceAfter}, 'ORDER_CANCEL', 'ORDER', #{orderId}, SYSDATE)
 </insert>
 
 <!-- 취소승인 시 쿠폰 복구 -->
@@ -491,7 +491,7 @@
 <!-- 리뷰 삭제요청 등록 (관리자 승인 대기) -->
 <insert id="insertReviewDeleteRequest">
     INSERT INTO TB_REVIEW_REPORT (REPORT_ID, REPORTER_TYPE, REPORTER_NO, REVIEW_ID, BIZ_NO, REASON, STATUS_CD, REG_DATE)
-    VALUES ((SELECT NVL(MAX(REPORT_ID), 0) + 1 FROM TB_REVIEW_REPORT), 'BIZ', #{bizNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
+    VALUES (SEQ_TB_REVIEW_REPORT.NEXTVAL, 'BIZ', #{bizNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
 </insert>
 
 <!-- 사이드바 "주문관리" 뱃지용 - 결제완료(PAID) 상태 주문 개수 -->

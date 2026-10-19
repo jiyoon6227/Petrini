@@ -23,7 +23,7 @@
 </select>
 
 <select id="selectNextAddrId" resultType="Long">
-    SELECT NVL(MAX(ADDR_ID), 0) + 1 FROM TB_MEMBER_ADDRESS
+    SELECT SEQ_TB_MEMBER_ADDRESS.NEXTVAL FROM DUAL
 </select>
 
 <insert id="insertAddress">

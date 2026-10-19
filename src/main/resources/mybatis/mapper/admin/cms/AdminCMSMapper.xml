@@ -163,7 +163,7 @@
 
     <insert id="insertFaq" parameterType="com.petcare.petcare.admin.cms.vo.FaqVO">
         <selectKey keyProperty="faqId" resultType="long" order="BEFORE">
-            SELECT NVL(MAX(FAQ_ID), 0) + 1 FROM TB_FAQ
+            SELECT SEQ_TB_FAQ.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TB_FAQ (
             FAQ_ID, CATEGORY_CD, QUESTION, ANSWER,
@@ -228,7 +228,7 @@
 
     <insert id="insertNotice" parameterType="com.petcare.petcare.admin.cms.vo.NoticeVO">
         <selectKey keyProperty="noticeId" resultType="long" order="BEFORE">
-            SELECT NVL(MAX(NOTICE_ID), 0) + 1 FROM TB_NOTICE
+            SELECT SEQ_TB_NOTICE.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TB_NOTICE (
             NOTICE_ID, NOTICE_TYPE_CD, TITLE, BODY, WRITER_NAME,

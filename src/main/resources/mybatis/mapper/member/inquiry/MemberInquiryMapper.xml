@@ -42,7 +42,7 @@
 
   <insert id="insertInquiry" parameterType="com.petcare.petcare.member.inquiry.vo.MemberInquiryVO">
     <selectKey keyProperty="inquiryId" resultType="long" order="BEFORE">
-      SELECT NVL(MAX(INQUIRY_ID), 0) + 1 FROM TB_INQUIRY
+      SELECT SEQ_TB_INQUIRY.NEXTVAL FROM DUAL
     </selectKey>
     INSERT INTO TB_INQUIRY (
       INQUIRY_ID, INQUIRY_TYPE, MEMBER_NO, TITLE, BODY,

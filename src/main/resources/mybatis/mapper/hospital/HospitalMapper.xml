@@ -355,7 +355,7 @@
     <insert id="insertResvHold"
             parameterType="com.petcare.petcare.hospital.vo.HospitalResvHoldVO">
         <selectKey keyProperty="holdId" resultType="long" order="BEFORE">
-            SELECT NVL(MAX(HOLD_ID), 0) + 1 FROM TB_HOSPITAL_RESV_HOLD
+            SELECT SEQ_TB_HOSPITAL_RESV_HOLD.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TB_HOSPITAL_RESV_HOLD (
             HOLD_ID, HOSPITAL_ID, DOCTOR_ID, TREAT_TYPE_ID, MEMBER_NO,

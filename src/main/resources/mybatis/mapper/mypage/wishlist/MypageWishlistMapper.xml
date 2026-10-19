@@ -85,7 +85,7 @@
 
 <insert id="insertFavorite" parameterType="com.petcare.petcare.mypage.wishlist.vo.MypageWishlistVO">
     <selectKey keyProperty="favId" resultType="long" order="BEFORE">
-        SELECT NVL(MAX(FAV_ID), 0) + 1 FROM TB_FAVORITE
+        SELECT SEQ_TB_FAVORITE.NEXTVAL FROM DUAL
     </selectKey>
     INSERT INTO TB_FAVORITE (FAV_ID, MEMBER_NO, FAV_TYPE, TARGET_ID, REG_DATE)
     VALUES (#{favId}, #{memberNo}, #{favType}, #{targetId}, SYSDATE)

@@ -40,7 +40,7 @@
                                     APPROVE_DATE,
                                     STATUS_CD
                                 )
-        SELECT  (SELECT NVL(MAX(STAY_ID), 0) + 1 FROM TB_STAY),
+        SELECT  SEQ_TB_STAY.NEXTVAL,
                 B.BIZ_NO,
                 (SELECT MEMBER_NO
                    FROM TB_MEMBER
@@ -128,13 +128,13 @@
            AND  STAY_ID = #{stayId}
     </select>
 
-    <!-- 객실 등록 (PK 수동 채번) -->
+    <!-- 객실 등록 (PK는 SEQ_TB_STAY_ROOM) -->
     <insert id="insertRoom" parameterType="com.petcare.petcare.stay.vo.StayRoomVO">
         INSERT INTO TB_STAY_ROOM (
             ROOM_ID, STAY_ID, NAME,
             PRICE_PER_NIGHT, CAPACITY, PET_LIMIT, STATUS_CD
         ) VALUES (
-            (SELECT NVL(MAX(ROOM_ID), 0) + 1 FROM TB_STAY_ROOM),
+            SEQ_TB_STAY_ROOM.NEXTVAL,
             #{stayId}, #{name},
             #{pricePerNight}, #{capacity, jdbcType=NUMERIC},
             #{petLimit, jdbcType=NUMERIC}, #{statusCd}

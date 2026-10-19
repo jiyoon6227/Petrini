@@ -6,7 +6,7 @@
   <!-- 알림 1건 등록 (사업자 반려 시 제목·반려사유 전달) -->
   <insert id="insertNotification" parameterType="com.petcare.petcare.mypage.notify.vo.MypageNotifyVO">
     <selectKey keyProperty="notiId" resultType="long" order="BEFORE">
-      SELECT NVL(MAX(NOTI_ID), 0) + 1 FROM TB_NOTIFICATION
+      SELECT SEQ_TB_NOTIFICATION.NEXTVAL FROM DUAL
     </selectKey>
     INSERT INTO TB_NOTIFICATION (
       NOTI_ID,

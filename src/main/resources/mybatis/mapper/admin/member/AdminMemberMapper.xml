@@ -253,7 +253,7 @@
       POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT,
       BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE
     ) VALUES (
-      (SELECT NVL(MAX(POINT_ID), 0) + 1 FROM TB_POINT),
+      SEQ_TB_POINT.NEXTVAL,
       #{memberNo},
       #{pointType},
       #{pointAmount},

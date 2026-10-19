@@ -320,10 +320,10 @@ SELECT
 <select id="selectCartIdByMember" resultType="Long">
     SELECT CART_ID FROM TB_CART WHERE MEMBER_NO = #{memberNo}
 </select>
-<!-- 신규 장바구니 생성 (CART_ID는 기존 최대값+1로 간단 처리, 시퀀스 없음) -->
+<!-- 신규 장바구니 생성 (CART_ID는 SEQ_TB_CART) -->
 <insert id="insertCart">
     INSERT INTO TB_CART (CART_ID, MEMBER_NO, REG_DATE)
-    VALUES ((SELECT NVL(MAX(CART_ID), 0) + 1 FROM TB_CART), #{memberNo}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'))
+    VALUES (SEQ_TB_CART.NEXTVAL, #{memberNo}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'))
 </insert>
 <!-- 같은 상품+옵션이 이미 담겨있는지 확인 -->
 <!-- optionId null 시 ORA-17004 방지용 jdbcType=NUMERIC 명시
@@ -345,11 +345,11 @@ SELECT
     SET QTY = TO_NUMBER(QTY) + #{addQty}
     WHERE CART_ITEM_ID = #{cartItemId}
 </update>
-<!-- 새 장바구니 항목 추가 (CART_ITEM_ID는 최대값+1로 간단 처리) -->
+<!-- 새 장바구니 항목 추가 (CART_ITEM_ID는 SEQ_TB_CART_ITEM) -->
 <!-- optionId null 삽입 시 ORA-17004 방지용 jdbcType=NUMERIC 명시 -->
 <insert id="insertCartItem">
     INSERT INTO TB_CART_ITEM (CART_ITEM_ID, CART_ID, PRODUCT_ID, OPTION_ID, QTY, PRICE)
-    VALUES ((SELECT NVL(MAX(CART_ITEM_ID), 0) + 1 FROM TB_CART_ITEM), #{cartId}, #{productId}, #{optionId, jdbcType=NUMERIC}, #{qty}, #{price})
+    VALUES (SEQ_TB_CART_ITEM.NEXTVAL, #{cartId}, #{productId}, #{optionId, jdbcType=NUMERIC}, #{qty}, #{price})
 </insert>
 
 <!-- 장바구니 수량 변경 -->
@@ -399,7 +399,7 @@ SELECT
 <!-- 상품 Q&A 문의 등록 -->
 <insert id="insertProductQna">
     INSERT INTO TB_PRODUCT_QNA (QNA_ID, PRODUCT_ID, MEMBER_NO, QUESTION, REG_DATE, OPTION_ID)
-    VALUES ((SELECT NVL(MAX(QNA_ID), 0) + 1 FROM TB_PRODUCT_QNA), #{productId}, #{memberNo}, #{question}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{optionId, jdbcType=NUMERIC})
+    VALUES (SEQ_TB_PRODUCT_QNA.NEXTVAL, #{productId}, #{memberNo}, #{question}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{optionId, jdbcType=NUMERIC})
 </insert>
 
 <!-- 상품 Q&A 삭제: MEMBER_NO 조건으로 본인 글만, ANSWER IS NULL 조건으로 답변 달린 글은 삭제 불가 -->
@@ -408,7 +408,7 @@ SELECT
     WHERE QNA_ID = #{qnaId} AND MEMBER_NO = #{memberNo} AND ANSWER IS NULL
 </delete>
 
-<!-- 방금 등록한 문의의 QNA_ID 조회 (MAX+1 채번 방식이라 등록 직후 다시 조회해서 값을 알아냄) -->
+<!-- 방금 등록한 문의의 QNA_ID 조회 (INSERT에서 키를 돌려받지 않아서 등록 직후 다시 조회) -->
 <select id="selectLatestQnaId" resultType="Long">
     SELECT MAX(QNA_ID) FROM TB_PRODUCT_QNA
     WHERE PRODUCT_ID = #{productId} AND MEMBER_NO = #{memberNo}
@@ -452,7 +452,7 @@ SELECT
     )
 </insert>
 
-<!-- SEQ_PAYMENT 채번 (팀 시퀀스 규칙, MAX+1은 숙소 SEQ와 PK 충돌) -->
+<!-- SEQ_PAYMENT 채번 (MAX+1은 숙소 SEQ와 PK 충돌) -->
 <insert id="insertPayment">
     INSERT INTO TB_PAYMENT (
         PAYMENT_ID, ORDER_ID, PAY_TYPE, PAY_METHOD, PAY_AMOUNT,
@@ -483,7 +483,7 @@ SELECT
 <insert id="insertPointHistory">
     INSERT INTO TB_POINT (POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT, BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE)
     VALUES (
-        (SELECT NVL(MAX(POINT_ID), 0) + 1 FROM TB_POINT), #{memberNo}, 'USE', #{pointUsed},
+        SEQ_TB_POINT.NEXTVAL, #{memberNo}, 'USE', #{pointUsed},
         (SELECT POINT_BALANCE FROM TB_MEMBER WHERE MEMBER_NO = #{memberNo}),
         'ORDER_USE', 'ORDER', #{orderId}, TO_CHAR(SYSDATE, 'YYYY-MM-DD')
     )
@@ -526,10 +526,10 @@ SELECT
      WHERE REVIEW_ID = #{reviewId} AND REPORTER_TYPE = 'USER' AND REPORTER_NO = #{reporterNo}
 </select>
 
-<!-- 유저 리뷰신고 등록 (TB_REVIEW와 동일하게 시퀀스 없이 MAX+1) -->
+<!-- 유저 리뷰신고 등록 (PK는 SEQ_TB_REVIEW_REPORT) -->
 <insert id="insertUserReviewReport">
     INSERT INTO TB_REVIEW_REPORT (REPORT_ID, REPORTER_TYPE, REPORTER_NO, REVIEW_ID, BIZ_NO, REASON, STATUS_CD, REG_DATE)
-    VALUES ((SELECT NVL(MAX(REPORT_ID), 0) + 1 FROM TB_REVIEW_REPORT), 'USER', #{reporterNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
+    VALUES (SEQ_TB_REVIEW_REPORT.NEXTVAL, 'USER', #{reporterNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
 </insert>
 
 <!-- 리뷰 삭제 전 신고/삭제요청 FK 참조 해제 (관리자 승인 처리와 동일) -->

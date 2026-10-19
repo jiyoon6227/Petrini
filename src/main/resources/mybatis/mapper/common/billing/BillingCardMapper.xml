@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!-- PK는 시퀀스 없이 NVL(MAX)+1, 삭제는 STATUS_CD = DELETED -->
+<!-- PK는 SEQ_TB_BILLING_CARD, 삭제는 STATUS_CD = DELETED -->
 <mapper namespace="com.petcare.petcare.common.billing.mapper.BillingCardMapper">
 
     <!-- 소유자 활성 카드 목록 (최신 등록순) -->

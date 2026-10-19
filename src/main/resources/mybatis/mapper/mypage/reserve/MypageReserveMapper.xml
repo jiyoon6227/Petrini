@@ -301,11 +301,11 @@
        AND MEMBER_NO = #{memberNo}
   </select>
 
-  <!-- 병원 리뷰 등록 (시퀀스 없이 MAX+1) -->
+  <!-- 병원 리뷰 등록 (PK는 SEQ_TB_REVIEW) -->
   <insert id="insertHospitalReview"
           parameterType="com.petcare.petcare.hospital.vo.HospitalReviewVO">
     <selectKey keyProperty="reviewId" resultType="long" order="BEFORE">
-      SELECT NVL(MAX(REVIEW_ID), 0) + 1 FROM TB_REVIEW
+      SELECT SEQ_TB_REVIEW.NEXTVAL FROM DUAL
     </selectKey>
     INSERT INTO TB_REVIEW (
       REVIEW_ID, REVIEW_TYPE, TARGET_ID, MEMBER_NO, RESV_ID,
@@ -374,7 +374,7 @@
   <insert id="insertStayReview"
           parameterType="com.petcare.petcare.stay.vo.StayReviewVO">
     <selectKey keyProperty="reviewId" resultType="long" order="BEFORE">
-      SELECT NVL(MAX(REVIEW_ID), 0) + 1 FROM TB_REVIEW
+      SELECT SEQ_TB_REVIEW.NEXTVAL FROM DUAL
     </selectKey>
     INSERT INTO TB_REVIEW (
       REVIEW_ID, REVIEW_TYPE, TARGET_ID, MEMBER_NO, RESV_ID,
@@ -391,7 +391,7 @@
       POINT_ID, MEMBER_NO, POINT_TYPE, POINT_AMOUNT,
       BALANCE_AFTER, REASON_CD, REF_TYPE, REF_ID, REG_DATE
     ) VALUES (
-      (SELECT NVL(MAX(POINT_ID), 0) + 1 FROM TB_POINT),
+      SEQ_TB_POINT.NEXTVAL,
       #{memberNo},
       'EARN',
       #{pointAmount},
