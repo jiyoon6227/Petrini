@@ -32,10 +32,10 @@
   .cart-cb{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;background:#fff;position:relative;cursor:pointer;flex-shrink:0;transition:border-color .15s}
   .cart-cb:checked{border-color:var(--primary)}
   .cart-cb:checked::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:9px;border:solid var(--primary);border-width:0 2px 2px 0;transform:rotate(45deg)}
-  .cart-thumb{width:80px;height:80px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0}
+  .cart-thumb{width:80px;height:80px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0;cursor:pointer}
   .cart-info{flex:1;min-width:0}
   .cart-brand{font-size:12px;color:var(--text-muted);margin-bottom:3px}
-  .cart-name{font-size:14px;font-weight:600;color:var(--text-main);margin-bottom:4px}
+  .cart-name{font-size:14px;font-weight:600;color:var(--text-main);margin-bottom:4px;cursor:pointer}
   .cart-opt{font-size:12px;color:var(--text-muted)}
   .cart-qty-wrap{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;width:100px;flex-shrink:0}
   .cart-qty-wrap button{width:32px;border:none;background:#f5f5f5;font-size:16px;cursor:pointer;color:var(--text-sub)}
@@ -90,10 +90,10 @@
         <c:set var="cartThumbSrc" value="${fn:startsWith(item.thumbnailUrl,'http') ? item.thumbnailUrl : contextPath.concat('/upload/').concat(item.thumbnailUrl)}"/>
         <div class="cart-item" data-price="${item.price}" data-cart-item-id="${item.cartItemId}" data-biz-no="${item.bizNo}">
           <input type="checkbox" class="cart-cb" checked>
-          <img class="cart-thumb" src="${cartThumbSrc}" alt="${item.productName}" onerror="this.src='https://placehold.co/80x80/EAF7F2/2BAB82?text=IMG'">
+          <img class="cart-thumb" src="${cartThumbSrc}" alt="${item.productName}" onclick="location.href='${contextPath}/store/detail?id=${item.productId}'" onerror="this.src='https://placehold.co/80x80/EAF7F2/2BAB82?text=IMG'">
           <div class="cart-info">
             <div class="cart-brand">${item.brandName}</div>
-            <div class="cart-name">${item.productName}</div>
+            <div class="cart-name" onclick="location.href='${contextPath}/store/detail?id=${item.productId}'">${item.productName}</div>
             <div class="cart-opt">
               <c:choose>
                 <c:when test="${not empty item.optionColor && item.optionColor != '기본'}">옵션: ${item.optionColor} / ${item.optionSize}</c:when>

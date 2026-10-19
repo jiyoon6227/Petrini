@@ -147,6 +147,11 @@ public class MypageAccountServiceImpl implements MypageAccountService {
             return "전화번호를 입력해 주세요.";
         }
 
+        // 휴대전화 형식 체크 (기본배송지 연락처로도 쓰이므로 배송지 등록과 같은 규칙)
+        if (!com.petcare.petcare.common.util.PhoneNormalizeUtil.isValidMobile(vo.getPhone())) {
+            return "전화번호 11자리를 정확히 입력해 주세요. (예: 010-1234-5678)";
+        }
+
         mypageAccountMapper.updateMemberProfile(vo);
 
         // 주소 입력 시 기본배송지도 동기화
