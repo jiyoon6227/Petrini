@@ -2691,7 +2691,7 @@ COMMENT ON TABLE TB_STAY IS '숙소 | 숙소 마스터';
 -- COMMENT ON TABLE TB_AD_PAYMENT IS '광고결제 | 월 선납·연장';
 COMMENT ON TABLE TB_ADMIN IS '관리자 | 어드민 계정';
 -- COMMENT ON TABLE TB_WALK_COURSE IS '산책코스 | 추천 코스';
-COMMENT ON TABLE TB_BANNER IS '배너 | 사업자 신청·관리자 승인·위치별 노출 (yeju)';
+COMMENT ON TABLE TB_BANNER IS '배너 | 사업자 신청·관리자 승인·위치별 노출';
 COMMENT ON TABLE TB_MEMBER_SOCIAL IS '소셜연동 | 카카오/네이버/구글 OAuth 연동';
 COMMENT ON TABLE TB_MEMBER_AGREEMENT IS '회원약관동의 | 이용약관·개인정보·마케팅 동의';
 COMMENT ON TABLE TB_MEMBER_ADDRESS IS '회원배송지 | 기본/추가 배송지';
