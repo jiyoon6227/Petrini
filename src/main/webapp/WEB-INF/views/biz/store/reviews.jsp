@@ -82,7 +82,25 @@
     renderList();
   }
 
-  // "신고접수 N건" 뱃지 클릭 시에만 신고자 목록 보여주기 (renderList 다시 안 타므로 DOM에서 바로 토글)
+  // 리뷰·사유 등 사용자 입력은 innerHTML에 넣기 전에 이스케이프 (병원·숙소 리뷰 화면과 동일)
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // 고객 신고 사유 목록 (신고자는 표시하지 않음)
+  function reportReasonsHtml(r) {
+    var items = (r.reportReasons || []).map(function (rr) {
+      return '<li><span style="color:#888">' + escapeHtml(rr.date) + '</span> ' + escapeHtml(rr.reason || '(사유 없음)') + '</li>';
+    }).join('');
+    return '<div class="biz-review-reporters" id="reporters-' + r.id + '" style="display:none">' +
+             '<div style="font-weight:600;margin-bottom:4px">신고 사유</div>' +
+             '<ul style="margin:0;padding-left:16px">' + items + '</ul>' +
+           '</div>';
+  }
+
+  // "신고접수 N건" 뱃지 클릭 시에만 신고 사유 보여주기 (renderList 다시 안 타므로 DOM에서 바로 토글)
   function toggleReporters(id) {
     var el = document.getElementById('reporters-' + id);
     if (el) el.style.display = (el.style.display === 'none') ? 'block' : 'none';
@@ -117,7 +135,7 @@
         replyBoxHtml =
           '<div class="biz-reply-box">' +
             '<div class="biz-reply-box-label"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>답글 작성</div>' +
-            '<textarea id="replyInput-' + r.id + '" placeholder="답글 내용을 입력해주세요">' + (r.reply || '') + '</textarea>' +
+            '<textarea id="replyInput-' + r.id + '" placeholder="답글 내용을 입력해주세요">' + escapeHtml(r.reply || '') + '</textarea>' +
             '<div class="biz-reply-box-actions">' +
               '<button class="btn-cancel" onclick="toggleReply(' + r.id + ')">취소</button>' +
               '<button class="btn-submit" onclick="submitReply(' + r.id + ')">등록</button>' +
@@ -131,8 +149,8 @@
           '<div class="biz-review-product-row">' +
     (r.thumbnail ? '<img class="biz-review-thumb" src="' + (r.thumbnail.indexOf('http') === 0 ? r.thumbnail : contextPath + '/upload/' + r.thumbnail) + '">' : '<div class="biz-review-thumb biz-review-thumb-empty"></div>') +
             '<div class="biz-review-product-info">' +
-              '<div class="biz-review-product-name">' + r.product + '</div>' +
-              (r.option ? '<div class="biz-review-option">옵션: ' + r.option + '</div>' : '') +
+              '<div class="biz-review-product-name">' + escapeHtml(r.product) + '</div>' +
+              (r.option ? '<div class="biz-review-option">옵션: ' + escapeHtml(r.option) + '</div>' : '') +
             '</div>' +
           '</div>' +
           '<div class="biz-review-top">' +
@@ -141,10 +159,11 @@
             (r.deleteRejected ? '<span class="biz-review-rejected">삭제요청 반려됨</span>' : '') +
             (r.reportCount > 0 ? '<button type="button" class="biz-review-flagged" onclick="toggleReporters(' + r.id + ')">신고접수 ' + r.reportCount + '건</button>' : '') +
           '</div>' +
-          '<div class="biz-review-meta"><span class="biz-review-author">' + r.author + '</span><span class="biz-review-date">' + r.date + '</span></div>' +
-          (r.reportCount > 0 ? '<div class="biz-review-reporters" id="reporters-' + r.id + '" style="display:none">신고자: ' + (r.reporterNames || '-') + '</div>' : '') +
-          '<div class="biz-review-content">' + r.content + '</div>' +
-          (r.reply && openReplyId !== r.id ? '<div class="biz-review-reply"><span class="biz-review-reply-label">판매자</span><span class="biz-review-reply-date">' + r.date + '</span><div class="biz-review-reply-text">' + r.reply + '</div></div>' : '') +
+          (r.deleteRejected && r.rejectReason ? '<div style="margin-top:6px;font-size:13px;color:#B91C1C">반려 사유: ' + escapeHtml(r.rejectReason) + '</div>' : '') +
+          '<div class="biz-review-meta"><span class="biz-review-author">' + escapeHtml(r.author) + '</span><span class="biz-review-date">' + escapeHtml(r.date) + '</span></div>' +
+          (r.reportCount > 0 ? reportReasonsHtml(r) : '') +
+          '<div class="biz-review-content">' + escapeHtml(r.content) + '</div>' +
+          (r.reply && openReplyId !== r.id ? '<div class="biz-review-reply"><span class="biz-review-reply-label">판매자</span><span class="biz-review-reply-date">' + escapeHtml(r.date) + '</span><div class="biz-review-reply-text">' + escapeHtml(r.reply) + '</div></div>' : '') +
           replyBoxHtml +
         '</div>' +
         '<div class="biz-review-actions">' +
@@ -165,7 +184,7 @@
     document.getElementById('replyForm').submit();
   }
 
-  // 삭제요청: 즉시 삭제 없이 사유와 함께 등록 (TB_REVIEW_REPORT, 관리자 승인 후 삭제)
+  // 삭제요청: 즉시 삭제 없이 사유와 함께 등록 (TB_REVIEW_DELETE_REQUEST, 관리자 승인 후 삭제)
   function requestDelete(id) {
     var reason = prompt('삭제 사유를 입력해주세요 (관리자 승인 후 삭제됩니다)');
     if (reason === null) return;

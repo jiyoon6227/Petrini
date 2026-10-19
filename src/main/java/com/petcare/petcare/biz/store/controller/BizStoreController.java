@@ -359,6 +359,16 @@ return json;
 
         List<BizReviewVO> reviewList = bizStoreService.getBizReviewList(bizNo);
         java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
+
+        // 리뷰별 고객 신고 사유 (신고자는 보내지 않음)
+        java.util.Map<Long, List<java.util.Map<String, Object>>> reasonsByReview = new java.util.HashMap<>();
+        for (com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO rr : bizStoreService.getBizReviewReportReasons(bizNo)) {
+            java.util.Map<String, Object> reasonRow = new java.util.LinkedHashMap<>();
+            reasonRow.put("reason", rr.getReason() != null ? rr.getReason() : "");
+            reasonRow.put("date", rr.getRegDate() != null ? df.format(rr.getRegDate()) : "");
+            reasonsByReview.computeIfAbsent(rr.getReviewId(), k -> new ArrayList<>()).add(reasonRow);
+        }
+
         List<java.util.Map<String, Object>> rows = new ArrayList<>();
         for (BizReviewVO r : reviewList) {
             java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
@@ -377,11 +387,12 @@ return json;
             row.put("option", optText);
             row.put("content", r.getContent() != null ? r.getContent() : "");
             row.put("reply", r.getBizReply());
-            row.put("deleteRequested", "PENDING".equals(r.getReportStatus())); // 삭제요청 대기중이면 true
-            // 리뷰가 남아 있고 요청상태가 DONE이면 반려 (승인 시 리뷰 자체가 삭제되어 조회 안 됨)
-            row.put("deleteRejected", "DONE".equals(r.getReportStatus()));
-            row.put("reportCount", r.getReportCount() != null ? r.getReportCount() : 0); // 유저 신고 건수
-            row.put("reporterNames", r.getReporterNames());                              // 신고자 닉네임 목록
+            row.put("deleteRequested", "PENDING".equals(r.getDeleteReqStatus())); // 삭제요청 대기중이면 true
+            // 가장 최근 요청이 반려면 반려 사유 표시 (승인 시 리뷰 자체가 삭제되어 조회 안 됨)
+            row.put("deleteRejected", "REJECTED".equals(r.getDeleteReqStatus()));
+            row.put("rejectReason", r.getDeleteRejectReason());
+            row.put("reportCount", r.getReportCount() != null ? r.getReportCount() : 0); // 고객 신고 건수
+            row.put("reportReasons", reasonsByReview.getOrDefault(r.getReviewId(), List.of())); // 신고 사유 (익명)
             rows.add(row);
         }
         model.addAttribute("reviewListJson", objectMapper.writeValueAsString(rows));
@@ -401,7 +412,7 @@ return json;
         return "redirect:/biz/store/reviews";
     }
 
-    // 리뷰 삭제요청: 즉시 삭제 없이 TB_REVIEW_REPORT에 PENDING 등록 (관리자 승인 후 삭제)
+    // 리뷰 삭제요청: 즉시 삭제 없이 TB_REVIEW_DELETE_REQUEST에 PENDING 등록 (관리자 승인 후 삭제)
     @PostMapping("/reviews/delete-request")
     public String requestReviewDelete(@RequestParam("reviewId") Long reviewId,
                                        @RequestParam(value = "reason", required = false) String reason,

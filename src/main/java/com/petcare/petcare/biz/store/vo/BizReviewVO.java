@@ -26,10 +26,10 @@ public class BizReviewVO {
     private String optionSize;
     private String thumbnailUrl; // 상품 썸네일 (리뷰카드 UI 개선)
 
-    // 삭제요청 상태 (TB_REVIEW_REPORT.STATUS_CD, 요청 없으면 null)
-    private String reportStatus;
+    // 가장 최근 삭제요청 (TB_REVIEW_DELETE_REQUEST, 요청 없으면 null)
+    private String deleteReqStatus;     // PENDING/APPROVED/REJECTED/CANCELED
+    private String deleteRejectReason;  // 관리자 반려 사유
 
-    // 유저 신고 정보 (REPORTER_TYPE='USER' 건수/신고자 목록)
+    // 고객 신고 건수 (TB_REVIEW_REPORT)
     private Integer reportCount;
-    private String reporterNames; // 쉼표로 구분된 신고자 닉네임 목록
 }

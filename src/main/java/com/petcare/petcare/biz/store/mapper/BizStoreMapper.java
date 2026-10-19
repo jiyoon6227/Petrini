@@ -177,10 +177,13 @@ public interface BizStoreMapper {
     int selectReviewOwnedByBiz(@Param("reviewId") Long reviewId, @Param("bizNo") Long bizNo);
 
     // 이미 대기중인 삭제요청이 있는지 확인 (중복 요청 방지)
-    int selectPendingReportExists(@Param("reviewId") Long reviewId);
+    int selectPendingDeleteRequestExists(@Param("reviewId") Long reviewId);
 
-    // 리뷰 삭제요청 등록 (TB_REVIEW_REPORT, REPORTER_TYPE='BIZ')
+    // 리뷰 삭제요청 등록 (TB_REVIEW_DELETE_REQUEST, REVIEW_TYPE='PRODUCT')
     void insertReviewDeleteRequest(@Param("reviewId") Long reviewId, @Param("bizNo") Long bizNo, @Param("reason") String reason);
+
+    // 내 상품 리뷰에 걸린 고객 신고 사유 (익명)
+    List<com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO> selectBizReviewReportReasons(@Param("bizNo") Long bizNo);
 
     // 사이드바 "주문관리" 뱃지용 - 결제완료(PAID) 상태 주문 개수
     int selectPaidOrderCount(@Param("bizNo") Long bizNo);

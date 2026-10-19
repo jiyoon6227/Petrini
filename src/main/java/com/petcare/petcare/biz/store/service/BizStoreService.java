@@ -79,6 +79,9 @@ public interface BizStoreService {
     // 리뷰관리 목록 조회 (내 상품 리뷰 + 삭제요청 상태 포함)
     List<com.petcare.petcare.biz.store.vo.BizReviewVO> getBizReviewList(Long bizNo);
 
+    // 리뷰관리용 고객 신고 사유 (신고자 없이 사유·날짜만)
+    List<com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO> getBizReviewReportReasons(Long bizNo);
+
     // 답글 작성/수정. 본인 상품 리뷰 아니면 false
     boolean saveReviewBizReply(Long bizNo, Long reviewId, String bizReply);
 

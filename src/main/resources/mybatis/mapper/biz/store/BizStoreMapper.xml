@@ -440,15 +440,16 @@
             p.PRODUCT_NAME AS productName,
             oi.OPTION_COLOR AS optionColor,
             oi.OPTION_SIZE  AS optionSize,
-            (SELECT rr.STATUS_CD FROM TB_REVIEW_REPORT rr
-              WHERE rr.REVIEW_ID = r.REVIEW_ID AND rr.REPORTER_TYPE = 'BIZ'
-              ORDER BY rr.REPORT_ID DESC
-              FETCH FIRST 1 ROWS ONLY) AS reportStatus,
-            (SELECT COUNT(*) FROM TB_REVIEW_REPORT rr2
-              WHERE rr2.REVIEW_ID = r.REVIEW_ID AND rr2.REPORTER_TYPE = 'USER') AS reportCount,
-            (SELECT LISTAGG(m2.NICKNAME, ', ') WITHIN GROUP (ORDER BY rr2.REG_DATE)
-               FROM TB_REVIEW_REPORT rr2 JOIN TB_MEMBER m2 ON m2.MEMBER_NO = rr2.REPORTER_NO
-             WHERE rr2.REVIEW_ID = r.REVIEW_ID AND rr2.REPORTER_TYPE = 'USER') AS reporterNames,
+            (SELECT dr.STATUS_CD FROM TB_REVIEW_DELETE_REQUEST dr
+              WHERE dr.REVIEW_ID = r.REVIEW_ID AND dr.REVIEW_TYPE = 'PRODUCT'
+              ORDER BY dr.REQUEST_ID DESC
+              FETCH FIRST 1 ROWS ONLY) AS deleteReqStatus,
+            (SELECT dr.REJECT_REASON FROM TB_REVIEW_DELETE_REQUEST dr
+              WHERE dr.REVIEW_ID = r.REVIEW_ID AND dr.REVIEW_TYPE = 'PRODUCT'
+              ORDER BY dr.REQUEST_ID DESC
+              FETCH FIRST 1 ROWS ONLY) AS deleteRejectReason,
+            (SELECT COUNT(*) FROM TB_REVIEW_REPORT rr
+              WHERE rr.REVIEW_ID = r.REVIEW_ID) AS reportCount,
             f.FILE_URL AS thumbnailUrl
       FROM  TB_REVIEW r
       JOIN  TB_MEMBER m  ON m.MEMBER_NO = r.MEMBER_NO
@@ -483,16 +484,33 @@
 </select>
 
 <!-- 이미 대기중인 삭제요청 있는지 확인 (0/1) -->
-<select id="selectPendingReportExists" resultType="int">
-    SELECT COUNT(*) FROM TB_REVIEW_REPORT
-     WHERE REVIEW_ID = #{reviewId} AND REPORTER_TYPE = 'BIZ' AND STATUS_CD = 'PENDING'
+<select id="selectPendingDeleteRequestExists" resultType="int">
+    SELECT COUNT(*) FROM TB_REVIEW_DELETE_REQUEST
+     WHERE REVIEW_ID = #{reviewId} AND REVIEW_TYPE = 'PRODUCT' AND STATUS_CD = 'PENDING'
 </select>
 
-<!-- 리뷰 삭제요청 등록 (관리자 승인 대기) -->
+<!-- 리뷰 삭제요청 등록 (관리자 승인 대기, 병원·숙소와 같은 TB_REVIEW_DELETE_REQUEST 사용, TARGET_ID = 상품ID) -->
 <insert id="insertReviewDeleteRequest">
-    INSERT INTO TB_REVIEW_REPORT (REPORT_ID, REPORTER_TYPE, REPORTER_NO, REVIEW_ID, BIZ_NO, REASON, STATUS_CD, REG_DATE)
-    VALUES (SEQ_TB_REVIEW_REPORT.NEXTVAL, 'BIZ', #{bizNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
+    INSERT INTO TB_REVIEW_DELETE_REQUEST (REQUEST_ID, REVIEW_ID, REVIEW_TYPE, TARGET_ID, BIZ_NO, REQUEST_REASON, STATUS_CD, REQ_DATE)
+    SELECT SEQ_TB_REVIEW_DELETE_REQUEST.NEXTVAL, r.REVIEW_ID, 'PRODUCT', r.TARGET_ID, #{bizNo},
+           #{reason, jdbcType=VARCHAR}, 'PENDING', SYSDATE
+      FROM TB_REVIEW r
+     WHERE r.REVIEW_ID = #{reviewId}
+       AND r.REVIEW_TYPE = 'PRODUCT'
 </insert>
+
+<!-- 내 상품 리뷰에 걸린 고객 신고 사유 (신고자는 숨기고 사유·날짜만) -->
+<select id="selectBizReviewReportReasons" resultType="com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO">
+    SELECT rr.REVIEW_ID AS reviewId,
+           rr.REASON    AS reason,
+           rr.REG_DATE  AS regDate
+      FROM TB_REVIEW_REPORT rr
+      JOIN TB_REVIEW r  ON r.REVIEW_ID = rr.REVIEW_ID
+      JOIN TB_PRODUCT p ON p.PRODUCT_ID = r.TARGET_ID
+     WHERE r.REVIEW_TYPE = 'PRODUCT'
+       AND p.BIZ_NO = #{bizNo}
+     ORDER BY rr.REG_DATE, rr.REPORT_ID
+</select>
 
 <!-- 사이드바 "주문관리" 뱃지용 - 결제완료(PAID) 상태 주문 개수 -->
 <select id="selectPaidOrderCount" resultType="int">
