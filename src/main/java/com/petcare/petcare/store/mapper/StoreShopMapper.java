@@ -173,8 +173,8 @@ Long selectNextOrderId();
     // 신고할 리뷰가 속한 상품의 BIZ_NO 조회
     Long selectBizNoByReviewId(@Param("reviewId") Long reviewId);
 
-    // 리뷰 삭제 전 TB_REVIEW_REPORT FK 참조 해제
-    void clearReviewReportsByReviewId(@Param("reviewId") Long reviewId);
+    // 본인이 쓴 상품 리뷰인지 확인 (0/1)
+    int countOwnProductReview(@Param("reviewId") Long reviewId, @Param("memberNo") Long memberNo);
 
     // 본인이 작성한 상품 리뷰 삭제 (삭제 row 수)
     int deleteProductReview(@Param("reviewId") Long reviewId, @Param("memberNo") Long memberNo);

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 리뷰를 지우기 직전에 남은 고객 신고·삭제요청을 정리 (관리자 삭제, 작성자 본인 삭제 공통) -->
+<mapper namespace="com.petcare.petcare.common.review.mapper.ReviewCleanupMapper">
+
+  <!-- TB_REVIEW_REPORT.REVIEW_ID FK 때문에 리뷰 삭제 전에 REVIEW_ID를 비워야 ORA-02292가 안 남.
+       이미 처리된 신고(REJECTED 등)는 상태를 그대로 두고 REVIEW_ID만 비움 -->
+  <update id="closeReportsByReviewId">
+    UPDATE TB_REVIEW_REPORT
+       SET STATUS_CD    = CASE WHEN STATUS_CD = 'PENDING' THEN #{pendingStatus} ELSE STATUS_CD END,
+           ADMIN_NO     = CASE WHEN STATUS_CD = 'PENDING' THEN #{adminNo, jdbcType=NUMERIC} ELSE ADMIN_NO END,
+           PROCESS_DATE = CASE WHEN STATUS_CD = 'PENDING' THEN SYSDATE ELSE PROCESS_DATE END,
+           REVIEW_ID    = NULL
+     WHERE REVIEW_ID = #{reviewId}
+  </update>
+
+  <!-- TB_REVIEW_DELETE_REQUEST는 FK가 없어서 정리 안 하면 리뷰 없는 대기 건이 남음 -->
+  <update id="closePendingDeleteRequestsByReviewId">
+    UPDATE TB_REVIEW_DELETE_REQUEST
+       SET STATUS_CD    = #{newStatus},
+           ADMIN_NO     = #{adminNo, jdbcType=NUMERIC},
+           PROCESS_DATE = SYSDATE
+     WHERE REVIEW_ID = #{reviewId}
+       AND STATUS_CD = 'PENDING'
+  </update>
+
+</mapper>

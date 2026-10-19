@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.petcare.petcare.common.review.service.ReviewCleanupService;
 import com.petcare.petcare.mypage.notify.service.MypageNotifyService;
 import com.petcare.petcare.file.service.FileService;
 import com.petcare.petcare.store.mapper.StoreShopMapper;
@@ -32,6 +33,9 @@ public class StoreShopServiceImpl implements StoreShopService {
 
     @Autowired
     private MypageNotifyService mypageNotifyService;
+
+    @Autowired
+    private ReviewCleanupService reviewCleanupService;
 
     // 품절 시 사업자에게 이메일 알림 보내기 위해 주입
     @Autowired
@@ -385,11 +389,15 @@ public boolean reportReview(Long reviewId, Long reporterNo, String reason) {
     return true;
 }
 
-// 본인 상품 리뷰 삭제 (신고 FK 해제 + 첨부 사진 + TB_REVIEW)
+// 본인 상품 리뷰 삭제 (본인 확인 → 남은 신고·삭제요청 정리 → 첨부 사진 → TB_REVIEW)
+// 본인 확인을 먼저 해야 남의 리뷰 ID로 호출했을 때 신고·사진이 정리되지 않음
 @Override
 @Transactional
 public boolean deleteProductReview(Long reviewId, Long memberNo) {
-    storeShopMapper.clearReviewReportsByReviewId(reviewId);
+    if (storeShopMapper.countOwnProductReview(reviewId, memberNo) == 0) {
+        return false;
+    }
+    reviewCleanupService.beforeWriterDelete(reviewId);
     try {
         fileService.deleteFilesByRef("REVIEW", reviewId);
     } catch (Exception e) {

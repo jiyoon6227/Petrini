@@ -183,8 +183,8 @@
 <select id="selectProductReviews" resultType="com.petcare.petcare.store.vo.ReviewVO">
     SELECT r.REVIEW_ID, r.MEMBER_NO, m.NICKNAME, r.RATING, r.CONTENT, r.REG_DATE, r.BIZ_REPLY,
            CASE WHEN EXISTS (
-               SELECT 1 FROM TB_REVIEW_REPORT rr
-               WHERE rr.REVIEW_ID = r.REVIEW_ID AND rr.REPORTER_TYPE = 'BIZ' AND rr.STATUS_CD = 'PENDING'
+               SELECT 1 FROM TB_REVIEW_DELETE_REQUEST dr
+               WHERE dr.REVIEW_ID = r.REVIEW_ID AND dr.REVIEW_TYPE = 'PRODUCT' AND dr.STATUS_CD = 'PENDING'
            ) THEN 1 ELSE 0 END AS BLINDED
     FROM TB_REVIEW r
     JOIN TB_MEMBER m ON m.MEMBER_NO = r.MEMBER_NO
@@ -532,10 +532,11 @@ SELECT
     VALUES (SEQ_TB_REVIEW_REPORT.NEXTVAL, 'USER', #{reporterNo}, #{reviewId}, #{bizNo}, #{reason}, 'PENDING', SYSDATE)
 </insert>
 
-<!-- 리뷰 삭제 전 신고/삭제요청 FK 참조 해제 (관리자 승인 처리와 동일) -->
-<update id="clearReviewReportsByReviewId">
-    UPDATE TB_REVIEW_REPORT SET REVIEW_ID = NULL WHERE REVIEW_ID = #{reviewId}
-</update>
+<!-- 본인이 쓴 상품 리뷰인지 확인 (0/1) -->
+<select id="countOwnProductReview" resultType="int">
+    SELECT COUNT(*) FROM TB_REVIEW
+    WHERE REVIEW_ID = #{reviewId} AND MEMBER_NO = #{memberNo} AND REVIEW_TYPE = 'PRODUCT'
+</select>
 
 <!-- 본인 상품 리뷰만 삭제 -->
 <delete id="deleteProductReview">
