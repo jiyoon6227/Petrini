@@ -9,9 +9,9 @@
 SET DEFINE OFF;
 
 -- =========================================================
--- 2026/07/21 장우철 — 미사용 테이블 정리 (팀 확인용)
+-- 미사용 테이블 정리
 -- 제외 대상 CREATE / FK / COMMENT 는 주석 처리
--- DROP 은 유지 (기존 DB 정리용). 팀 확인 후 DROP 도 주석 예정
+-- DROP 은 유지 (기존 DB 정리용)
 -- 제외: PET_HEALTH, STATUS_HIST, SYSTEM_POLICY, AUTH_VERIFY,
 --       PRODUCT_APPROVAL, EXPERIENCE_*, PROMOTION, POI*, SHELTER,
 --       PUBLIC_DATA_SYNC, DONATION, VOLUNTEER*, WALK_*
@@ -19,7 +19,7 @@ SET DEFINE OFF;
 
 -- ==================== 1. DROP TABLE ====================
 
--- 2026/07/13 장우철 — 유저↔사업자 신고 (TB_POST_REPORT 와 별개, 자식 테이블 먼저 DROP)
+-- 유저↔사업자 신고 (TB_POST_REPORT 와 별개, 자식 테이블 먼저 DROP)
 -- TB_REVIEW_REPORT
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE TB_REVIEW_REPORT CASCADE CONSTRAINTS PURGE';
@@ -29,7 +29,7 @@ EXCEPTION
 END;
 /
 
--- 2026/07/13 유정 — 재능나눔 (TB_POST.SHARE 와 별개, TB_BUSINESS FK 자식)
+-- 재능나눔 (TB_POST.SHARE 와 별개, TB_BUSINESS FK 자식)
 -- TB_TALENT
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE TB_TALENT CASCADE CONSTRAINTS PURGE';
@@ -164,7 +164,6 @@ EXCEPTION
         IF SQLCODE != -942 THEN RAISE; END IF;
 END;
 /
--- 2026/07/29 장우철
 -- 정산 상세
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE TB_SETTLEMENT_ITEM CASCADE CONSTRAINTS PURGE';
@@ -210,7 +209,7 @@ EXCEPTION
 END;
 /
 
--- 2026/07/16 장우철 고도화작업 — 예약 임시 선점 (RESERVATION보다 먼저 DROP)
+-- 예약 임시 선점 (RESERVATION보다 먼저 DROP)
 -- TB_HOSPITAL_RESV_HOLD
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE TB_HOSPITAL_RESV_HOLD CASCADE CONSTRAINTS PURGE';
@@ -229,8 +228,8 @@ EXCEPTION
 END;
 /
 
--- 2026/07/15 장우철 고도화작업 — 진료유형·의사 (RESERVATION 뒤, HOSPITAL 앞 DROP)
--- 2026/07/16 장우철 고도화작업 — 예약규칙·예외 (의사보다 먼저 DROP)
+-- 진료유형·의사 (RESERVATION 뒤, HOSPITAL 앞 DROP)
+-- 예약규칙·예외 (의사보다 먼저 DROP)
 -- TB_HOSPITAL_RESV_EXCEPTION
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE TB_HOSPITAL_RESV_EXCEPTION CASCADE CONSTRAINTS PURGE';
@@ -240,7 +239,7 @@ EXCEPTION
 END;
 /
 
--- 2026/07/16 장우철 고도화작업 — RESV_RULE 폐기(병원 HOURS_JSON·RESV_INTERVAL_MIN 으로 통합)
+-- RESV_RULE 폐기(병원 HOURS_JSON·RESV_INTERVAL_MIN 으로 통합)
 -- CREATE는 제거됨. 구 DB 정리용 DROP은 유지(나중에 직접 삭제)
 -- TB_HOSPITAL_RESV_RULE
 BEGIN
@@ -419,7 +418,7 @@ EXCEPTION
 END;
 /
 
--- 2026/07/16 장우철 고도화작업 — 슬롯 폐기(규칙 방식으로 전환). 구 DB 잔여 테이블만 DROP
+-- 슬롯 폐기(규칙 방식으로 전환). 구 DB 잔여 테이블만 DROP
 -- TB_RESERVATION_SLOT
 BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE TB_RESERVATION_SLOT CASCADE CONSTRAINTS PURGE';
@@ -759,7 +758,7 @@ END;
 
 -- ==================== 2. CREATE TABLE ====================
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_AUTH_VERIFY (인증코드)
 -- CREATE TABLE TB_AUTH_VERIFY (
 --     VERIFY_ID                        NUMBER                   NOT NULL,  -- 인증 ID
@@ -802,7 +801,7 @@ CREATE TABLE TB_BUSINESS (
     FEE_RATE                         NUMBER(5,2)              NULL,  -- 수수료율(%) [계약 정보 흡수]
     SETTLE_ACCOUNT                   VARCHAR2(50)             NULL,  -- 정산계좌 [계약 정보 흡수]
     SETTLE_BANK                      VARCHAR2(20)             NULL,  -- 은행 [계약 정보 흡수]
-    -- 2026/07/28 장우철 — 금결원 계좌실명조회(정산계좌 인증)용 컬럼
+    -- 금결원 계좌실명조회(정산계좌 인증)용 컬럼
     SETTLE_BANK_CODE                 VARCHAR2(3)              NULL,  -- 은행 표준코드(금결원 bank_code_std, 예: 088)
     SETTLE_HOLDER                    VARCHAR2(100)            NULL,  -- 예금주명(인증·표시용)
     SETTLE_VERIFY_YN                 CHAR(1)                  DEFAULT 'N' NULL,  -- 계좌실명인증 여부 (Y/N)
@@ -826,7 +825,7 @@ CREATE TABLE TB_ADMIN_ROLE (
     CONSTRAINT PK_TB_ADMIN_ROLE PRIMARY KEY (ROLE_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_SYSTEM_POLICY (운영정책)
 -- CREATE TABLE TB_SYSTEM_POLICY (
 --     POLICY_ID                        NUMBER                   NOT NULL,  -- 정책 ID
@@ -836,7 +835,7 @@ CREATE TABLE TB_ADMIN_ROLE (
 --     CONSTRAINT PK_TB_SYSTEM_POLICY PRIMARY KEY (POLICY_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_PROMOTION (기획전)
 -- CREATE TABLE TB_PROMOTION (
 --     PROMO_ID                         NUMBER                   NOT NULL,  -- 기획전 ID
@@ -875,7 +874,7 @@ CREATE TABLE TB_COUPON (
     CONSTRAINT UK_TB_COUPON_1 UNIQUE (COUPON_CODE)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_POI (POI장소)
 -- CREATE TABLE TB_POI (
 --     POI_ID                           NUMBER                   NOT NULL,  -- 장소 ID
@@ -892,7 +891,7 @@ CREATE TABLE TB_COUPON (
 --     CONSTRAINT PK_TB_POI PRIMARY KEY (POI_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_SHELTER (보호소)
 -- CREATE TABLE TB_SHELTER (
 --     SHELTER_ID                       NUMBER                   NOT NULL,  -- 보호소 ID
@@ -920,7 +919,7 @@ CREATE TABLE TB_FILE (
     CONSTRAINT PK_TB_FILE PRIMARY KEY (FILE_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_PUBLIC_DATA_SYNC (공공데이터동기화)
 -- CREATE TABLE TB_PUBLIC_DATA_SYNC (
 --     SYNC_ID                          NUMBER                   NOT NULL,  -- 동기화 ID
@@ -964,8 +963,8 @@ CREATE TABLE TB_MEMBER (
     JOIN_DATE                        DATE                     NOT NULL,  -- 가입일
     LAST_LOGIN_DATE                  DATE                     NULL,  -- 최종 로그인
     WITHDRAW_DATE                    DATE                     NULL,  -- 탈퇴일
-    SUSPEND_END_DATE                 DATE                     NULL,  -- 정지 종료일 (팀원)
-        -- 2026-07-28 박유정 — 회원 생년월일·성별
+    SUSPEND_END_DATE                 DATE                     NULL,  -- 정지 종료일
+        -- 회원 생년월일·성별
     BIRTH_DATE                       DATE                     NULL,  -- 회원 생년월일
     GENDER                           CHAR(1)                  NULL,  -- 회원 성별 (M: 남, F: 여)
     POST_COUNT                       NUMBER                   DEFAULT 0 NOT NULL,  -- 게시글 작성 누적
@@ -977,7 +976,6 @@ CREATE TABLE TB_MEMBER (
     CONSTRAINT UK_TB_MEMBER_1 UNIQUE (MEMBER_ID),
     CONSTRAINT UK_TB_MEMBER_2 UNIQUE (EMAIL)
 );
--- 2026/07/29 하예주
 -- TB_MEMBER_WITHDRAW (탈퇴회원)
 CREATE TABLE TB_MEMBER_WITHDRAW (
     MEMBER_NO                        NUMBER                   NOT NULL,  -- 회원번호
@@ -1008,15 +1006,15 @@ CREATE TABLE TB_HOSPITAL (
     HOURS_JSON                       CLOB                     NULL,  -- 진료시간 JSON (HOSPITAL_HOURS 통합)
     DESCRIPTION                       VARCHAR2(2000)       NULL,  -- 상세설명
     TAG_LIST                        VARCHAR2(500)            NULL,  -- 운영특성 (HOSPITAL_DEPT 통합)
-    -- 2026/07/15 장우철 고도화작업 — 병원 기본 동시예약 정원
-    -- 2026/07/16 장우철 고도화작업 — 슬롯 폐기 후에도 규칙·겹침 시 동시 정원 기본값으로 사용
+    -- 병원 기본 동시예약 정원
+    -- 슬롯 폐기 후에도 규칙·겹침 시 동시 정원 기본값으로 사용
     RESV_CAPACITY                    NUMBER                   NULL,  -- 기본 동시 예약 인원
-    -- 2026/07/16 장우철 고도화작업 — RESV_RULE 통합: 예약 시작시각 간격(분). 요일·오픈·점심은 HOURS_JSON
+    -- RESV_RULE 통합: 예약 시작시각 간격(분). 요일·오픈·점심은 HOURS_JSON
     RESV_INTERVAL_MIN                NUMBER        DEFAULT 15 NULL,  -- 예약 시작 간격(분)
     CONSTRAINT PK_TB_HOSPITAL PRIMARY KEY (HOSPITAL_ID)
 );
 
--- TB_STAY (숙소) — 2026-07-11 LODGE → STAY (앱 StayMapper 기준)
+-- TB_STAY (숙소) — LODGE → STAY (앱 StayMapper 기준)
 CREATE TABLE TB_STAY (
     STAY_ID                          NUMBER                   NOT NULL,  -- 숙소 ID
     BIZ_NO                           NUMBER                   NOT NULL,  -- 사업자번호
@@ -1038,7 +1036,7 @@ CREATE TABLE TB_STAY (
     DESCRIPTION                      CLOB                     NULL,  -- 공간 소개
     PET_FEE                          NUMBER                   NULL,  -- 반려동물 추가비용 안내
     REGION		                     VARCHAR2(20) 	          NULL,  --지역 필터링
-        -- 2026-07-28 박유정 — 숙소 평점·리뷰수
+        -- 숙소 평점·리뷰수
     AVG_RATING                       NUMBER(3,1)              NULL,  -- 숙소 평균 평점 (소수점 1자리)
     REVIEW_CNT                       NUMBER                   DEFAULT 0 NULL,  -- 등록된 리뷰 총 개수
     CONSTRAINT PK_TB_STAY PRIMARY KEY (STAY_ID)
@@ -1069,7 +1067,7 @@ CREATE TABLE TB_ADMIN (
     CONSTRAINT UK_TB_ADMIN_1 UNIQUE (ADMIN_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_WALK_COURSE (산책코스)
 -- CREATE TABLE TB_WALK_COURSE (
 --     COURSE_ID                        NUMBER                   NOT NULL,  -- 코스ID
@@ -1083,7 +1081,7 @@ CREATE TABLE TB_ADMIN (
 -- );
 
 -- TB_BANNER (배너)
--- 2026/08/01 장우철 — yeju 팀원 스키마 반영 (BANNER_TYPE/USE_YN 제거, BIZ_NO·TITLE·POSITION_CD·STATUS_CD 등)
+-- 배너 스키마 반영 (BANNER_TYPE/USE_YN 제거, BIZ_NO·TITLE·POSITION_CD·STATUS_CD 등)
 CREATE TABLE TB_BANNER (
     BANNER_ID                        NUMBER GENERATED BY DEFAULT ON NULL AS IDENTITY,  -- 배너 ID
     BIZ_NO                           NUMBER                   NOT NULL,  -- 사업자번호
@@ -1150,7 +1148,7 @@ CREATE TABLE TB_PET (
     PHOTO_URL                        VARCHAR2(500)            NULL,  -- 사진(Google Drive)
     DEL_YN                           CHAR(1)    DEFAULT 'N'   NULL,  -- 삭제 Y/N (Y=목록 비표시)
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
-        -- 2026-07-28 박유정 — 반려 상세 (털색·중성화·특징·메모)
+        -- 반려 상세 (털색·중성화·특징·메모)
     FUR_COLOR                        VARCHAR2(50)             NULL,  -- 털 색상
     NEUTER_YN                        CHAR(1)                  NULL,  -- 중성화 (Y/N/U)
     TRAITS                           VARCHAR2(200)            NULL,  -- 성격·특징 (쉼표 구분)
@@ -1159,7 +1157,7 @@ CREATE TABLE TB_PET (
 );
 
 -- =========================================================
--- 2026/07/15 장우철 고도화작업 — 병원 진료유형 (소요시간)
+-- 병원 진료유형 (소요시간)
 -- =========================================================
 -- TB_HOSPITAL_TREAT_TYPE (병원 진료유형)
 CREATE TABLE TB_HOSPITAL_TREAT_TYPE (
@@ -1171,13 +1169,13 @@ CREATE TABLE TB_HOSPITAL_TREAT_TYPE (
     SORT_ORDR                        NUMBER                   NULL,  -- 화면 정렬
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
     CONSTRAINT PK_TB_HOSPITAL_TREAT_TYPE PRIMARY KEY (TREAT_TYPE_ID),
-    -- 2026/07/15 장우철 고도화작업 — FK 병원
+    -- FK 병원
     CONSTRAINT FK_PTN65_0100 FOREIGN KEY (HOSPITAL_ID)
         REFERENCES TB_HOSPITAL (HOSPITAL_ID)
 );
 
 -- =========================================================
--- 2026/07/15 장우철 고도화작업 — 병원 의사 (상세에서만 표시, 의사별 캘린더 없음)
+-- 병원 의사 (상세에서만 표시, 의사별 캘린더 없음)
 -- =========================================================
 -- TB_HOSPITAL_DOCTOR (병원 의사)
 CREATE TABLE TB_HOSPITAL_DOCTOR (
@@ -1189,19 +1187,19 @@ CREATE TABLE TB_HOSPITAL_DOCTOR (
     SORT_ORDR                        NUMBER                   NULL,  -- 화면 정렬
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
     CONSTRAINT PK_TB_HOSPITAL_DOCTOR PRIMARY KEY (DOCTOR_ID),
-    -- 2026/07/15 장우철 고도화작업 — FK 병원
+    -- FK 병원
     CONSTRAINT FK_PTN65_0103 FOREIGN KEY (HOSPITAL_ID)
         REFERENCES TB_HOSPITAL (HOSPITAL_ID)
 );
 -- =========================================================
--- 2026/07/16 장우철 고도화작업 — 병원 예약 예외 (미리 설정, 특정일 덮어쓰기)
+-- 병원 예약 예외 (미리 설정, 특정일 덮어쓰기)
 -- 예: 특정일 CLOSE / 의사 휴가(의사 지정) / REPLACE 단축
 -- =========================================================
 -- TB_HOSPITAL_RESV_EXCEPTION (병원 예약예외)
 CREATE TABLE TB_HOSPITAL_RESV_EXCEPTION (
     EXC_ID                           NUMBER                   NOT NULL,  -- 예외 ID
     HOSPITAL_ID                      NUMBER                   NOT NULL,  -- 병원 ID
-    -- 2026/07/16 장우철 고도화작업 — NULL=병원 공통 예외, 값=의사별 예외
+    -- NULL=병원 공통 예외, 값=의사별 예외
     DOCTOR_ID                        NUMBER                   NULL,  -- 의사 ID (선택)
     EXC_DATE                         DATE                     NOT NULL,  -- 예외 적용일
     -- REPLACE=그날 이 구간(들)만 오픈, CLOSE=그날 이 구간 예약 불가
@@ -1213,16 +1211,16 @@ CREATE TABLE TB_HOSPITAL_RESV_EXCEPTION (
     STATUS_CD                        VARCHAR2(10)  DEFAULT 'Y' NULL,  -- 사용여부 Y/N
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
     CONSTRAINT PK_TB_HOSPITAL_RESV_EXCEPTION PRIMARY KEY (EXC_ID),
-    -- 2026/07/16 장우철 고도화작업 — FK 병원
+    -- FK 병원
     CONSTRAINT FK_PTN65_0108 FOREIGN KEY (HOSPITAL_ID)
         REFERENCES TB_HOSPITAL (HOSPITAL_ID),
-    -- 2026/07/16 장우철 고도화작업 — FK 의사 (NULL 허용)
+    -- FK 의사 (NULL 허용)
     CONSTRAINT FK_PTN65_0109 FOREIGN KEY (DOCTOR_ID)
         REFERENCES TB_HOSPITAL_DOCTOR (DOCTOR_ID)
 );
 
 -- =========================================================
--- 2026/07/16 장우철 고도화작업 — 병원 예약 임시 선점
+-- 병원 예약 임시 선점
 -- 유저가 시간 선택 후 펫·증상 단계로 넘어갈 때 구간 점유 (만료 EXPIRE_DATE)
 -- =========================================================
 -- TB_HOSPITAL_RESV_HOLD (병원 예약 임시 선점)
@@ -1263,7 +1261,7 @@ CREATE TABLE TB_NOTIFICATION (
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
     CONSTRAINT PK_TB_NOTIFICATION PRIMARY KEY (NOTI_ID)
 );
--- 2026-08-11 박유정 — 공지사항 테이블
+-- 공지사항 테이블
 CREATE TABLE TB_NOTICE (
     NOTICE_ID      NUMBER         NOT NULL,
     NOTICE_TYPE_CD VARCHAR2(20)   NOT NULL,   -- NOTICE / INFO
@@ -1344,7 +1342,7 @@ CREATE TABLE TB_POINT (
     CONSTRAINT PK_TB_POINT PRIMARY KEY (POINT_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_DONATION (기부내역)
 -- CREATE TABLE TB_DONATION (
 --     DONATION_ID                      NUMBER                   NOT NULL,  -- 기부 ID
@@ -1359,7 +1357,7 @@ CREATE TABLE TB_POINT (
 --     CONSTRAINT PK_TB_DONATION PRIMARY KEY (DONATION_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_VOLUNTEER (봉사모집)
 -- CREATE TABLE TB_VOLUNTEER (
 --     VOLUNTEER_ID                     NUMBER                   NOT NULL,  -- 봉사 ID
@@ -1376,10 +1374,10 @@ CREATE TABLE TB_POINT (
 --     CONSTRAINT PK_TB_VOLUNTEER PRIMARY KEY (VOLUNTEER_ID)
 -- );
 
--- 2026/07/16 장우철 고도화작업 — TB_RESERVATION_SLOT CREATE 제거 (규칙·예외 테이블로 대체)
+-- TB_RESERVATION_SLOT CREATE 제거 (규칙·예외 테이블로 대체)
 -- (구 DB 잔여분은 상단 DROP TABLE TB_RESERVATION_SLOT 로 정리)
 
--- TB_STAY_ROOM (숙소객실) — 2026-07-11 LODGE_ROOM → STAY_ROOM
+-- TB_STAY_ROOM (숙소객실) — LODGE_ROOM → STAY_ROOM
 CREATE TABLE TB_STAY_ROOM (
     ROOM_ID                          NUMBER                   NOT NULL,  -- 객실 ID
     STAY_ID                          NUMBER                   NOT NULL,  -- 숙소
@@ -1420,7 +1418,7 @@ CREATE TABLE TB_BUSINESS_AUTH (
 --     CONSTRAINT PK_TB_ADMIN_LOG PRIMARY KEY (LOG_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_POI_REQUEST (POI등록신청)
 -- CREATE TABLE TB_POI_REQUEST (
 --     REQUEST_ID                       NUMBER                   NOT NULL,  -- 요청ID
@@ -1458,7 +1456,7 @@ CREATE TABLE TB_CONTENT (
     CONSTRAINT PK_TB_CONTENT PRIMARY KEY (CONTENT_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_STATUS_HIST (STATUS_HIST)
 -- CREATE TABLE TB_STATUS_HIST (
 --     HIST_ID                          NUMBER                   NOT NULL,  -- 이력 ID
@@ -1499,7 +1497,7 @@ CREATE TABLE TB_CONTENT (
 --     CONSTRAINT PK_TB_AD PRIMARY KEY (AD_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_PET_HEALTH (반려동물 건강기록)
 -- CREATE TABLE TB_PET_HEALTH (
 --     HEALTH_ID                        NUMBER                   NOT NULL,  -- 건강기록 ID
@@ -1514,7 +1512,7 @@ CREATE TABLE TB_CONTENT (
 --     CONSTRAINT PK_TB_PET_HEALTH PRIMARY KEY (HEALTH_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_WALK_RECORD (산책기록)
 -- CREATE TABLE TB_WALK_RECORD (
 --     WALK_ID                          NUMBER                   NOT NULL,  -- 산책ID
@@ -1529,7 +1527,7 @@ CREATE TABLE TB_CONTENT (
 --     CONSTRAINT PK_TB_WALK_RECORD PRIMARY KEY (WALK_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_WALK_MATE (산책메이트)
 -- CREATE TABLE TB_WALK_MATE (
 --     MATE_ID                          NUMBER                   NOT NULL,  -- 메이트ID
@@ -1541,7 +1539,7 @@ CREATE TABLE TB_CONTENT (
 -- );
 
 -- TB_INQUIRY (1:1 문의)
--- 2026/07/31 장우철 — 숙소 환불신청: INQUIRY_TYPE=RESERVE, REF_TYPE=RESV, REF_ID=RESV_ID
+-- 숙소 환불신청: INQUIRY_TYPE=RESERVE, REF_TYPE=RESV, REF_ID=RESV_ID
 CREATE TABLE TB_INQUIRY (
     INQUIRY_ID                       NUMBER                   NOT NULL,  -- 문의 ID
     INQUIRY_TYPE                     VARCHAR2(20)             NOT NULL,  -- VET/PARTNER/ORDER/RESERVE/ETC (숙소환불=RESERVE)
@@ -1564,7 +1562,7 @@ CREATE TABLE TB_INQUIRY (
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
     CONSTRAINT PK_TB_INQUIRY PRIMARY KEY (INQUIRY_ID)
 );
--- 2026-08-11 박유정 — FAQ 테이블
+-- FAQ 테이블
 CREATE TABLE TB_FAQ (
     FAQ_ID       NUMBER         NOT NULL,
     CATEGORY_CD  VARCHAR2(20)   NOT NULL,   -- SERVICE / ORDER / MEMBER / RESERVE
@@ -1596,12 +1594,12 @@ CREATE TABLE TB_POST_REPORT (
     REPORTER_NO                      NUMBER                   NOT NULL,  -- REPORTER번호
     REASON                           VARCHAR2(200)            NULL,  -- 사유
     STATUS_CD                        VARCHAR2(200)            NULL,  -- 상태코드
-    -- 2026/07/11 장우철 — 신고 접수 시 ADMIN_NO=NULL (처리 전이므로 NULL 허용, 코드 insertReport 와 맞춤)
+    -- 신고 접수 시 ADMIN_NO=NULL (처리 전이므로 NULL 허용, 코드 insertReport 와 맞춤)
     ADMIN_NO                         NUMBER                   NULL,  -- 관리자번호 (접수 시 NULL, 처리 시 세팅)
     CONSTRAINT PK_TB_POST_REPORT PRIMARY KEY (REPORT_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_VOLUNTEER_APPLY (봉사신청)
 -- CREATE TABLE TB_VOLUNTEER_APPLY (
 --     APPLY_ID                         NUMBER                   NOT NULL,  -- 신청 ID
@@ -1615,7 +1613,7 @@ CREATE TABLE TB_POST_REPORT (
 -- );
 
 -- TB_RESERVATION (예약)
--- 2026/07/31 장우철 — STATUS에 CHECKIN/CHECKOUT 추가, 취소 위약금/환불액 컬럼
+-- STATUS에 CHECKIN/CHECKOUT 추가, 취소 위약금/환불액 컬럼
 CREATE TABLE TB_RESERVATION (
     RESV_ID                          NUMBER                   NOT NULL,  -- 예약 ID
     RESV_NO                          VARCHAR2(100)            NOT NULL,  -- 예약번호
@@ -1635,12 +1633,12 @@ CREATE TABLE TB_RESERVATION (
     TOTAL_AMOUNT                     NUMBER(12)               NULL,  -- 총 주문금액
     STATUS_CD                        VARCHAR2(20)             NOT NULL,  -- PENDING/CONFIRMED/CHECKIN/CHECKOUT/DONE/CANCEL/REJECTED
     REJECT_REASON                    VARCHAR2(500)            NULL,  -- 거절·취소 사유
-    -- 2026/07/31 장우철 — 유저/사업자 취소 시 금액 스냅샷 (1-4·1-6)
+    -- 유저/사업자 취소 시 금액 스냅샷 (1-4·1-6)
     CANCEL_FEE_AMT                   NUMBER(12)               NULL,  -- 취소수수료(위약금, 정산 A 대상)
     REFUND_AMT                       NUMBER(12)               NULL,  -- 유저 환불액
     CANCEL_AT                        DATE                     NULL,  -- 취소 처리 시각
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
-    -- 2026/07/15 장우철 고도화작업 — 유형·소요·종료·의사
+    -- 유형·소요·종료·의사
     TREAT_TYPE_ID                    NUMBER                   NULL,  -- 진료유형 FK
     DURATION_MIN                     NUMBER                   NULL,  -- 소요 분
     END_TIME                         VARCHAR2(20)             NULL,  -- 종료시각
@@ -1653,7 +1651,7 @@ CREATE TABLE TB_RESERVATION (
     CONSTRAINT UK_TB_RESERVATION_1 UNIQUE (RESV_NO)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_WALK_REWARD_HIST (산책리워드이력)
 -- CREATE TABLE TB_WALK_REWARD_HIST (
 --     HIST_ID                          NUMBER                   NOT NULL,  -- 이력 ID
@@ -1680,7 +1678,6 @@ CREATE TABLE TB_MEDICAL_RECORD (
     REG_DATE                         DATE                     NOT NULL,  -- 등록일
     CONSTRAINT PK_TB_MEDICAL_RECORD PRIMARY KEY (RECORD_ID)
 );
--- 2026/07/29 장우철
 -- TB_SETTLEMENT : 정산 마스터 (숙소/쇼핑 공용)
 CREATE TABLE TB_SETTLEMENT (
     SETTLE_ID               NUMBER          NOT NULL,  -- 정산 ID (PK)
@@ -1717,7 +1714,6 @@ CREATE TABLE TB_SETTLEMENT (
     COUPON_DISCOUNT_AMOUNT  NUMBER          DEFAULT 0 NULL, -- 사업자 부담 쿠폰 합(정산 차감)
     CONSTRAINT PK_TB_SETTLEMENT PRIMARY KEY (SETTLE_ID)
 );
--- 2026/07/29 장우철
 -- TB_SETTLEMENT_REQUEST : 중간정산 요청
 CREATE TABLE TB_SETTLEMENT_REQUEST (
     REQUEST_ID      NUMBER         NOT NULL,  -- 요청 ID (PK)
@@ -1737,11 +1733,11 @@ CREATE TABLE TB_SETTLEMENT_REQUEST (
 );
 
 -- TB_SETTLEMENT_ITEM : 정산 상세 (숙소=예약, 쇼핑=주문상품)
--- 2026/07/31 장우철 — ITEM_TYPE 추가 (STAY / CANCEL_FEE / ORDER_ITEM)
+-- ITEM_TYPE 추가 (STAY / CANCEL_FEE / ORDER_ITEM)
 CREATE TABLE TB_SETTLEMENT_ITEM (
     SETTLE_ITEM_ID        NUMBER         NOT NULL,  -- 상세 ID (PK)
     SETTLE_ID             NUMBER         NOT NULL,  -- TB_SETTLEMENT.SETTLE_ID
-    -- 2026/07/31 장우철 — 정산 상세 유형
+    -- 정산 상세 유형
     ITEM_TYPE             VARCHAR2(20)   NOT NULL,  -- STAY / CANCEL_FEE / ORDER_ITEM
     -- 숙소용
     RESV_ID               NUMBER         NULL,      -- 예약 ID (쇼핑이면 NULL)
@@ -1818,7 +1814,7 @@ CREATE TABLE TB_PRODUCT_OPTION (
     CONSTRAINT PK_TB_PRODUCT_OPTION PRIMARY KEY (OPTION_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_PRODUCT_APPROVAL (상품승인)
 -- CREATE TABLE TB_PRODUCT_APPROVAL (
 --     APPROVAL_ID                      NUMBER                   NOT NULL,  -- 승인ID
@@ -1853,7 +1849,6 @@ CREATE TABLE TB_CART_ITEM (
     PRICE                            VARCHAR2(200)            NULL,  -- 가격
     CONSTRAINT PK_TB_CART_ITEM PRIMARY KEY (CART_ITEM_ID)
 );
--- 2026/07/29 장우철
 -- TB_ORDER : 주문
 CREATE TABLE TB_ORDER (
     ORDER_ID              NUMBER          NOT NULL,  -- 주문 ID
@@ -1889,13 +1884,12 @@ CREATE TABLE TB_ORDER (
     RETURN_REASON         VARCHAR2(500)   NULL,      -- 사유(레거시 텍스트)
     RETURN_STATUS_CD      VARCHAR2(20)    NULL,      -- 주문단위 반품상태(레거시)
     RETURN_REQUESTED_AT   DATE            NULL,      -- 주문단위 반품 신청일시(레거시)
-    CONFIRM_YN                        CHAR(1)   DEFAULT 'N'    NULL,  -- 구매확정 여부 (Y=적립금 지급완료, 26.7.23 지윤추가)
-    CONFIRMED_AT                      DATE                     NULL,  -- 구매확정 일시 (26.7.23 지윤추가)
+    CONFIRM_YN                        CHAR(1)   DEFAULT 'N'    NULL,  -- 구매확정 여부 (Y=적립금 지급완료)
+    CONFIRMED_AT                      DATE                     NULL,  -- 구매확정 일시
     CONSTRAINT PK_TB_ORDER PRIMARY KEY (ORDER_ID),
     CONSTRAINT UK_TB_ORDER_1 UNIQUE (ORDER_NO)
 );
 
--- 2026/07/29 장우철
 -- TB_ORDER_ITEM : 주문상품 + 구매확정/반품 상태
 CREATE TABLE TB_ORDER_ITEM (
     ORDER_ITEM_ID          NUMBER         NOT NULL,  -- 주문상품 ID
@@ -1941,15 +1935,15 @@ CREATE TABLE TB_ORDER_DELIVERY (
     REGISTERED_AT                    DATE                     NULL,  -- 송장등록일(사업자)
     MEMO                             VARCHAR2(200)            NULL,  -- 비고(택배API미사용)
     DELIVERY_FEE                     NUMBER                   NOT NULL,  -- 배송비
-    READY_AT                         DATE                     NULL,  -- 배송준비로 바뀐 시각(26.7.21 지윤추가)
-    SHIPPING_AT                      DATE                     NULL,  -- 배송중으로 바뀐 시각(26.7.21 지윤추가)
-    DELIVERED_AT                     DATE                     NULL,  -- 배송완료로 바뀐 시각(26.7.21 지윤추가)
-    COURIER_CODE		VARCHAR(10)	NULL, -- 스마트택배 API 택배사 코드 (26.7.28 지윤추가)
+    READY_AT                         DATE                     NULL,  -- 배송준비로 바뀐 시각
+    SHIPPING_AT                      DATE                     NULL,  -- 배송중으로 바뀐 시각
+    DELIVERED_AT                     DATE                     NULL,  -- 배송완료로 바뀐 시각
+    COURIER_CODE		VARCHAR(10)	NULL, -- 스마트택배 API 택배사 코드
     CONSTRAINT PK_TB_ORDER_DELIVERY PRIMARY KEY (DELIVERY_ID)
 );
 
 -- TB_PAYMENT (결제)
--- 2026/07/31 장우철 — 부분환불 금액 REFUND_AMT
+-- 부분환불 금액 REFUND_AMT
 CREATE TABLE TB_PAYMENT (
     PAYMENT_ID                       NUMBER                   NOT NULL,  -- 결제 ID
     ORDER_ID                         NUMBER                   NULL,  -- 주문
@@ -1961,7 +1955,7 @@ CREATE TABLE TB_PAYMENT (
     TOSS_ORDER_ID                    VARCHAR2(100)            NULL,  -- 토스 orderId
     PAY_STATUS                       VARCHAR2(20)             NOT NULL,  -- READY/DONE/CANCEL/REFUND
     PAY_DATE                         DATE                     NULL,  -- 결제일
-    -- 2026/07/31 장우철 — 실제 환불 누적/최종액 (부분환불)
+    -- 실제 환불 누적/최종액 (부분환불)
     REFUND_AMT                       NUMBER(12)               NULL,  -- 환불금액 (부분환불 포함)
     CONSTRAINT PK_TB_PAYMENT PRIMARY KEY (PAYMENT_ID)
 );
@@ -1978,7 +1972,7 @@ CREATE TABLE TB_POST_COMMENT (
     CONSTRAINT PK_TB_POST_COMMENT PRIMARY KEY (COMMENT_ID)
 );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_EXPERIENCE_GROUP (체험단)
 -- CREATE TABLE TB_EXPERIENCE_GROUP (
 --     EXP_ID                           NUMBER                   NOT NULL,  -- 체험단 ID
@@ -1989,7 +1983,7 @@ CREATE TABLE TB_POST_COMMENT (
 --     CONSTRAINT PK_TB_EXPERIENCE_GROUP PRIMARY KEY (EXP_ID)
 -- );
 
--- 2026/07/21 장우철 — 제외 예정 테이블 CREATE 주석 (DROP은 유지, 팀 확인 후 DROP도 주석)
+-- 제외 예정 테이블 CREATE 주석 (DROP은 유지)
 -- TB_EXPERIENCE_APPLY (체험단신청)
 -- CREATE TABLE TB_EXPERIENCE_APPLY (
 --     APPLY_ID                         NUMBER                   NOT NULL,  -- 신청 ID
@@ -2014,7 +2008,7 @@ CREATE TABLE TB_REVIEW (
     CONSTRAINT PK_TB_REVIEW PRIMARY KEY (REVIEW_ID)
 );
 
--- 2026/07/13 유정 — 사업자 재능나눔 신청 (커뮤니티 TB_POST BOARD_TYPE=SHARE 무료나눔과 분리)
+-- 사업자 재능나눔 신청 (커뮤니티 TB_POST BOARD_TYPE=SHARE 무료나눔과 분리)
 -- TB_TALENT (재능나눔)
 CREATE TABLE TB_TALENT (
     TALENT_ID                        NUMBER                   NOT NULL,  -- 재능나눔 ID
@@ -2081,7 +2075,6 @@ CREATE TABLE TB_REVIEW_DELETE_REQUEST (
     CONSTRAINT PK_TB_REVIEW_DELETE_REQUEST PRIMARY KEY (REQUEST_ID)
 );
 -- TB_BILLING_CARD (토스 빌링키/등록카드)
--- 2026/07/27 장우철
 CREATE TABLE TB_BILLING_CARD (
     BILLING_CARD_ID                  NUMBER                   NOT NULL,  -- 빌링카드 ID
     OWNER_TYPE                       VARCHAR2(20)             NOT NULL,  -- 소유자 유형 (MEMBER/ADMIN)
@@ -2132,7 +2125,7 @@ ALTER TABLE TB_NOTIFICATION
     ADD CONSTRAINT FK_PTN65_0007
     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/08/10 장우철 — TB_FCM_TOKEN CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
+-- TB_FCM_TOKEN CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
 -- TB_FCM_TOKEN.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_FCM_TOKEN
 --     ADD CONSTRAINT FK_PTN65_0008
@@ -2173,7 +2166,7 @@ ALTER TABLE TB_ADMIN
     ADD CONSTRAINT FK_PTN65_0015
     FOREIGN KEY (ROLE_ID) REFERENCES TB_ADMIN_ROLE (ROLE_ID);
 
--- 2026/08/10 장우철 — TB_ADMIN_LOG CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
+-- TB_ADMIN_LOG CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
 -- TB_ADMIN_LOG.ADMIN_NO → TB_ADMIN.ADMIN_NO
 -- ALTER TABLE TB_ADMIN_LOG
 --     ADD CONSTRAINT FK_PTN65_0016
@@ -2199,13 +2192,13 @@ ALTER TABLE TB_PRODUCT_OPTION
     ADD CONSTRAINT FK_PTN65_0020
     FOREIGN KEY (PRODUCT_ID) REFERENCES TB_PRODUCT (PRODUCT_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_PRODUCT_APPROVAL.PRODUCT_ID → TB_PRODUCT.PRODUCT_ID
 -- ALTER TABLE TB_PRODUCT_APPROVAL
 --     ADD CONSTRAINT FK_PTN65_0021
 --     FOREIGN KEY (PRODUCT_ID) REFERENCES TB_PRODUCT (PRODUCT_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_PRODUCT_APPROVAL.ADMIN_NO → TB_ADMIN.ADMIN_NO
 -- ALTER TABLE TB_PRODUCT_APPROVAL
 --     ADD CONSTRAINT FK_PTN65_0022
@@ -2302,7 +2295,7 @@ ALTER TABLE TB_MEMBER_COUPON
     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
 -- TB_BANNER.BIZ_NO → TB_BUSINESS.BIZ_NO
--- 2026/08/01 장우철 — yeju 배너 스키마
+-- 배너 스키마
 ALTER TABLE TB_BANNER
     ADD CONSTRAINT FK_PTN65_0041A
     FOREIGN KEY (BIZ_NO) REFERENCES TB_BUSINESS (BIZ_NO);
@@ -2312,7 +2305,7 @@ ALTER TABLE TB_BANNER
     ADD CONSTRAINT FK_PTN65_0041
     FOREIGN KEY (FILE_ID) REFERENCES TB_FILE (FILE_ID);
 
--- 2026/08/10 장우철 — TB_AD_PAYMENT CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
+-- TB_AD_PAYMENT CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
 -- TB_AD_PAYMENT.BIZ_NO → TB_BUSINESS.BIZ_NO
 -- ALTER TABLE TB_AD_PAYMENT
 --     ADD CONSTRAINT FK_PTN65_0042
@@ -2333,7 +2326,7 @@ ALTER TABLE TB_RESERVATION
     ADD CONSTRAINT FK_PTN65_0045
     FOREIGN KEY (ROOM_ID) REFERENCES TB_STAY_ROOM (ROOM_ID);
 
--- 2026/07/16 장우철 고도화작업 — TB_RESERVATION_SLOT.HOSPITAL_ID FK(0046) 제거 (슬롯 테이블 폐기)
+-- TB_RESERVATION_SLOT.HOSPITAL_ID FK(0046) 제거 (슬롯 테이블 폐기)
 
 -- TB_MEDICAL_RECORD.HOSPITAL_ID → TB_HOSPITAL.HOSPITAL_ID
 ALTER TABLE TB_MEDICAL_RECORD
@@ -2355,7 +2348,7 @@ ALTER TABLE TB_MEDICAL_RECORD
     ADD CONSTRAINT FK_PTN65_0050
     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_PET_HEALTH.PET_ID → TB_PET.PET_ID
 -- ALTER TABLE TB_PET_HEALTH
 --     ADD CONSTRAINT FK_PTN65_0051
@@ -2402,78 +2395,78 @@ ALTER TABLE TB_POST_REPORT
     FOREIGN KEY (REPORTER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
 -- TB_POST_REPORT.ADMIN_NO → TB_ADMIN.ADMIN_NO
--- 2026/07/11 장우철 — ADMIN_NO NULL 허용 (접수 건은 FK 미연결, 처리 시에만 참조)
+-- ADMIN_NO NULL 허용 (접수 건은 FK 미연결, 처리 시에만 참조)
 ALTER TABLE TB_POST_REPORT
     ADD CONSTRAINT FK_PTN65_0060
     FOREIGN KEY (ADMIN_NO) REFERENCES TB_ADMIN (ADMIN_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_EXPERIENCE_GROUP.PRODUCT_ID → TB_PRODUCT.PRODUCT_ID
 -- ALTER TABLE TB_EXPERIENCE_GROUP
 --     ADD CONSTRAINT FK_PTN65_0061
 --     FOREIGN KEY (PRODUCT_ID) REFERENCES TB_PRODUCT (PRODUCT_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_EXPERIENCE_APPLY.EXP_ID → TB_EXPERIENCE_GROUP.EXP_ID
 -- ALTER TABLE TB_EXPERIENCE_APPLY
 --     ADD CONSTRAINT FK_PTN65_0062
 --     FOREIGN KEY (EXP_ID) REFERENCES TB_EXPERIENCE_GROUP (EXP_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_EXPERIENCE_APPLY.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_EXPERIENCE_APPLY
 --     ADD CONSTRAINT FK_PTN65_0063
 --     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_WALK_RECORD.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_WALK_RECORD
 --     ADD CONSTRAINT FK_PTN65_0064
 --     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_WALK_RECORD.PET_ID → TB_PET.PET_ID
 -- ALTER TABLE TB_WALK_RECORD
 --     ADD CONSTRAINT FK_PTN65_0065
 --     FOREIGN KEY (PET_ID) REFERENCES TB_PET (PET_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_WALK_COURSE.POI_ID → TB_POI.POI_ID
 -- ALTER TABLE TB_WALK_COURSE
 --     ADD CONSTRAINT FK_PTN65_0066
 --     FOREIGN KEY (POI_ID) REFERENCES TB_POI (POI_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_WALK_MATE.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_WALK_MATE
 --     ADD CONSTRAINT FK_PTN65_0067
 --     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_WALK_MATE.PET_ID → TB_PET.PET_ID
 -- ALTER TABLE TB_WALK_MATE
 --     ADD CONSTRAINT FK_PTN65_0068
 --     FOREIGN KEY (PET_ID) REFERENCES TB_PET (PET_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_WALK_REWARD_HIST.WALK_ID → TB_WALK_RECORD.WALK_ID
 -- ALTER TABLE TB_WALK_REWARD_HIST
 --     ADD CONSTRAINT FK_PTN65_0069
 --     FOREIGN KEY (WALK_ID) REFERENCES TB_WALK_RECORD (WALK_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_WALK_REWARD_HIST.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_WALK_REWARD_HIST
 --     ADD CONSTRAINT FK_PTN65_0070
 --     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_POI_REQUEST.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_POI_REQUEST
 --     ADD CONSTRAINT FK_PTN65_0071
 --     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_POI_REQUEST.ADMIN_NO → TB_ADMIN.ADMIN_NO
 -- ALTER TABLE TB_POI_REQUEST
 --     ADD CONSTRAINT FK_PTN65_0072
@@ -2484,37 +2477,37 @@ ALTER TABLE TB_POINT
     ADD CONSTRAINT FK_PTN65_0073
     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_DONATION.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_DONATION
 --     ADD CONSTRAINT FK_PTN65_0074
 --     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_DONATION.SHELTER_ID → TB_SHELTER.SHELTER_ID
 -- ALTER TABLE TB_DONATION
 --     ADD CONSTRAINT FK_PTN65_0075
 --     FOREIGN KEY (SHELTER_ID) REFERENCES TB_SHELTER (SHELTER_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_DONATION.CERT_FILE_ID → TB_FILE.FILE_ID
 -- ALTER TABLE TB_DONATION
 --     ADD CONSTRAINT FK_PTN65_0076
 --     FOREIGN KEY (CERT_FILE_ID) REFERENCES TB_FILE (FILE_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_VOLUNTEER.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_VOLUNTEER
 --     ADD CONSTRAINT FK_PTN65_0077
 --     FOREIGN KEY (MEMBER_NO) REFERENCES TB_MEMBER (MEMBER_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_VOLUNTEER_APPLY.VOLUNTEER_ID → TB_VOLUNTEER.VOLUNTEER_ID
 -- ALTER TABLE TB_VOLUNTEER_APPLY
 --     ADD CONSTRAINT FK_PTN65_0078
 --     FOREIGN KEY (VOLUNTEER_ID) REFERENCES TB_VOLUNTEER (VOLUNTEER_ID);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_VOLUNTEER_APPLY.MEMBER_NO → TB_MEMBER.MEMBER_NO
 -- ALTER TABLE TB_VOLUNTEER_APPLY
 --     ADD CONSTRAINT FK_PTN65_0079
@@ -2555,7 +2548,7 @@ ALTER TABLE TB_REVIEW
     ADD CONSTRAINT FK_PTN65_0086
     FOREIGN KEY (RESV_ID) REFERENCES TB_RESERVATION (RESV_ID);
 
--- 2026/07/13 유정 — TB_TALENT FK
+-- TB_TALENT FK
 -- TB_TALENT.BIZ_NO → TB_BUSINESS.BIZ_NO
 ALTER TABLE TB_TALENT
     ADD CONSTRAINT FK_PTN65_0093
@@ -2566,7 +2559,7 @@ ALTER TABLE TB_TALENT
     ADD CONSTRAINT FK_PTN65_0094
     FOREIGN KEY (ADMIN_NO) REFERENCES TB_ADMIN (ADMIN_NO);
 
--- 2026/07/13 장우철 — TB_REVIEW_REPORT FK
+-- TB_REVIEW_REPORT FK
 -- TB_REVIEW_REPORT.REVIEW_ID → TB_REVIEW.REVIEW_ID
 ALTER TABLE TB_REVIEW_REPORT
     ADD CONSTRAINT FK_PTN65_0097
@@ -2582,7 +2575,7 @@ ALTER TABLE TB_REVIEW_REPORT
     ADD CONSTRAINT FK_PTN65_0099
     FOREIGN KEY (ADMIN_NO) REFERENCES TB_ADMIN (ADMIN_NO);
 
--- 2026/07/21 장우철 — 제외 테이블 관련 FK 주석
+-- 제외 테이블 관련 FK 주석
 -- TB_STATUS_HIST.ADMIN_NO → TB_ADMIN.ADMIN_NO
 -- ALTER TABLE TB_STATUS_HIST
 --     ADD CONSTRAINT FK_PTN65_0087
@@ -2617,7 +2610,7 @@ ALTER TABLE TB_SETTLEMENT_ITEM
     ADD CONSTRAINT FK_SETTLE_ITEM_ORDER_ITEM
     FOREIGN KEY (ORDER_ITEM_ID) REFERENCES TB_ORDER_ITEM (ORDER_ITEM_ID);
 
--- 2026/08/10 장우철 — TB_AD CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
+-- TB_AD CREATE 미사용(주석) + 앱 코드 미연동 → FK 비활성
 -- TB_AD.BIZ_NO → TB_BUSINESS.BIZ_NO
 -- ALTER TABLE TB_AD
 --     ADD CONSTRAINT FK_PTN65_0090
@@ -2634,10 +2627,10 @@ ALTER TABLE TB_SETTLEMENT_ITEM
 --     FOREIGN KEY (ADMIN_NO) REFERENCES TB_ADMIN (ADMIN_NO);
 
 -- =========================================================
--- 2026/07/15 장우철 고도화작업 — 병원 예약 FK
+-- 병원 예약 FK
 -- CREATE 절: FK_PTN65_0100 (유형→병원), FK_PTN65_0103 (의사→병원)
--- 2026/07/16 장우철 고도화작업 — 슬롯 FK(0102/0105) 제거, 규칙·예외 FK는 CREATE에 포함(0106~0109)
--- 2026/07/16 장우철 고도화작업 — 선점 FK는 아래 ALTER(0110~0113)
+-- 슬롯 FK(0102/0105) 제거, 규칙·예외 FK는 CREATE에 포함(0106~0109)
+-- 선점 FK는 아래 ALTER(0110~0113)
 -- =========================================================
 
 -- TB_RESERVATION.TREAT_TYPE_ID → TB_HOSPITAL_TREAT_TYPE.TREAT_TYPE_ID
@@ -2650,7 +2643,7 @@ ALTER TABLE TB_RESERVATION
     ADD CONSTRAINT FK_PTN65_0104
     FOREIGN KEY (DOCTOR_ID) REFERENCES TB_HOSPITAL_DOCTOR (DOCTOR_ID);
 
--- 2026/07/16 장우철 고도화작업 — 선점 테이블 FK
+-- 선점 테이블 FK
 -- TB_HOSPITAL_RESV_HOLD.HOSPITAL_ID → TB_HOSPITAL.HOSPITAL_ID
 ALTER TABLE TB_HOSPITAL_RESV_HOLD
     ADD CONSTRAINT FK_PTN65_0110
@@ -2709,7 +2702,7 @@ COMMENT ON TABLE TB_POST IS '게시글 | 동네소식/분실보호/나눔/집사
 COMMENT ON TABLE TB_POINT IS '포인트이력 | 적립/차감';
 -- COMMENT ON TABLE TB_DONATION IS '기부내역 | 포인트/금액 기부 · 기부증서 포함';
 -- COMMENT ON TABLE TB_VOLUNTEER IS '봉사모집 | 유기동물 봉사 모집';
--- 2026/07/16 장우철 고도화작업 — 슬롯 TABLE COMMENT 제거 (TB_RESERVATION_SLOT 폐기)
+-- 슬롯 TABLE COMMENT 제거 (TB_RESERVATION_SLOT 폐기)
 COMMENT ON TABLE TB_STAY_ROOM IS '숙소객실 | 객실 등록·승인';
 COMMENT ON TABLE TB_BUSINESS_AUTH IS '사업자인증신청 | 등록증 업로드·승인대기';
 --COMMENT ON TABLE TB_ADMIN_LOG IS '관리자작업로그 | 감사 로그';
@@ -2728,13 +2721,13 @@ COMMENT ON TABLE TB_POST_LIKE IS '게시글좋아요 | 좋아요';
 COMMENT ON TABLE TB_POST_REPORT IS '게시글신고 | 신고·검수';
 -- COMMENT ON TABLE TB_VOLUNTEER_APPLY IS '봉사신청 | 봉사 참여 신청';
 COMMENT ON TABLE TB_RESERVATION IS '예약 | 병원·숙소 통합 예약';
--- 2026/07/15 장우철 고도화작업 — 신규 테이블 COMMENT
--- 2026/07/16 장우철 고도화작업 — 규칙·예외 TABLE COMMENT 추가
+-- 신규 테이블 COMMENT
+-- 규칙·예외 TABLE COMMENT 추가
 COMMENT ON TABLE TB_HOSPITAL_TREAT_TYPE IS '병원진료유형 | 병원별 유형·소요분';
 COMMENT ON TABLE TB_HOSPITAL_DOCTOR IS '병원의사 | 병원별 의료진(캘린더는 병원단위, 의사는 예약상세)';
--- 2026/07/16 장우철 고도화작업 — TB_HOSPITAL_RESV_RULE COMMENT 제거(병원 테이블로 통합)
+-- TB_HOSPITAL_RESV_RULE COMMENT 제거(병원 테이블로 통합)
 COMMENT ON TABLE TB_HOSPITAL_RESV_EXCEPTION IS '병원예약예외 | 특정일 미리 설정(REPLACE/CLOSE)';
--- 2026/07/16 장우철 고도화작업 — 예약 임시 선점 TABLE COMMENT
+-- 예약 임시 선점 TABLE COMMENT
 COMMENT ON TABLE TB_HOSPITAL_RESV_HOLD IS '병원예약선점 | 펫·증상 입력 중 시간 임시 점유';
 -- COMMENT ON TABLE TB_WALK_REWARD_HIST IS '산책리워드이력 | 포인트 적립 이력';
 COMMENT ON TABLE TB_MEDICAL_RECORD IS '진료기록 | 재방문 확인용(자체DB)';
@@ -2743,7 +2736,7 @@ COMMENT ON TABLE TB_PRODUCT_CATEGORY IS '상품카테고리 | 대/소분류 트�
 COMMENT ON TABLE TB_PRODUCT IS '상품 | 상품 마스터';
 COMMENT ON TABLE TB_PRODUCT_OPTION IS '상품옵션 | 사이즈·색상 등';
 -- COMMENT ON TABLE TB_PRODUCT_APPROVAL IS '상품승인 | 관리자 승인/반려';
--- 2026/07/08 장우철 : COMMENT는 문자열 리터럴만 허용 → CHR(38) 연결식 제거(ORA-00933), SET DEFINE OFF라 & 직접 사용
+-- COMMENT는 문자열 리터럴만 허용 → CHR(38) 연결식 제거(ORA-00933), SET DEFINE OFF라 & 직접 사용
 COMMENT ON TABLE TB_PRODUCT_QNA IS '상품Q&A | 질문·관리자 답변';
 COMMENT ON TABLE TB_CART_ITEM IS '장바구니항목 | 장바구니 상품';
 COMMENT ON TABLE TB_ORDER IS '주문 | 주문 마스터';
@@ -2754,9 +2747,7 @@ COMMENT ON TABLE TB_POST_COMMENT IS '게시글댓글 | 댓글·대댓글';
 -- COMMENT ON TABLE TB_EXPERIENCE_GROUP IS '체험단 | 체험단 모집';
 -- COMMENT ON TABLE TB_EXPERIENCE_APPLY IS '체험단신청 | 체험단 신청';
 COMMENT ON TABLE TB_REVIEW IS 'REVIEW | 통합 테이블';
--- 2026/07/13 유정
 COMMENT ON TABLE TB_TALENT IS '재능나눔 | 사업자 재능나눔 신청 (TB_POST SHARE 와 별개)';
--- 2026/07/13 장우철
 COMMENT ON TABLE TB_REVIEW_REPORT IS '고객 리뷰 신고 | 사업자 삭제요청은 TB_REVIEW_DELETE_REQUEST (TB_POST_REPORT 와 별개)';
 
 -- COMMENT ON COLUMN TB_AUTH_VERIFY.VERIFY_ID IS '인증 ID';
@@ -2886,9 +2877,9 @@ COMMENT ON COLUMN TB_HOSPITAL.STATUS_CD IS '승인상태';
 COMMENT ON COLUMN TB_HOSPITAL.APPROVE_DATE IS '승인일';
 COMMENT ON COLUMN TB_HOSPITAL.HOURS_JSON IS '진료시간 JSON (HOSPITAL_HOURS 통합)';
 COMMENT ON COLUMN TB_HOSPITAL.TAG_LIST IS '진료과목 (HOSPITAL_DEPT 통합)';
--- 2026/07/15 장우철 고도화작업 — 병원 컬럼 COMMENT
+-- 병원 컬럼 COMMENT
 COMMENT ON COLUMN TB_HOSPITAL.RESV_CAPACITY IS '기본 동시 예약 인원';
--- 2026/07/16 장우철 고도화작업 — RESV_RULE 통합: 시작 간격만 병원 컬럼으로
+-- RESV_RULE 통합: 시작 간격만 병원 컬럼으로
 COMMENT ON COLUMN TB_HOSPITAL.RESV_INTERVAL_MIN IS '예약 시작 시각 간격(분)';
 COMMENT ON COLUMN TB_STAY.STAY_ID IS '숙소 ID';
 COMMENT ON COLUMN TB_STAY.BIZ_NO IS '사업자번호';
@@ -2968,10 +2959,10 @@ COMMENT ON COLUMN TB_PET.AGE IS '나이';
 COMMENT ON COLUMN TB_PET.WEIGHT IS '체중(kg)';
 COMMENT ON COLUMN TB_PET.IS_REPRESENT IS '대표 Y/N';
 COMMENT ON COLUMN TB_PET.PHOTO_URL IS '사진(Google Drive)';
--- 2026/07/11 장우철 — 펫 소프트 삭제 플래그
+-- 펫 소프트 삭제 플래그
 COMMENT ON COLUMN TB_PET.DEL_YN IS '삭제 Y/N (Y=소프트삭제, 목록·예약선택 비표시)';
 COMMENT ON COLUMN TB_PET.REG_DATE IS '등록일';
--- 2026/07/08 장우철 : 관심상품(찜) COUNT 기준 테이블 확인용 (TB_WISHLIST 아님, TB_FAVORITE 사용)
+-- 관심상품(찜) COUNT 기준 테이블 확인용 (TB_WISHLIST 아님, TB_FAVORITE 사용)
 COMMENT ON COLUMN TB_FAVORITE.FAV_ID IS '즐겨찾기 ID';
 COMMENT ON COLUMN TB_FAVORITE.MEMBER_NO IS '회원';
 COMMENT ON COLUMN TB_FAVORITE.FAV_TYPE IS '즐겨찾기 유형 (PRODUCT/HOSPITAL/STAY/POI)';
@@ -2997,7 +2988,7 @@ COMMENT ON COLUMN TB_MEMBER_COUPON.MEMBER_COUPON_ID IS '회원쿠폰ID';
 COMMENT ON COLUMN TB_MEMBER_COUPON.COUPON_ID IS '쿠폰 ID';
 COMMENT ON COLUMN TB_MEMBER_COUPON.MEMBER_NO IS '회원번호';
 COMMENT ON COLUMN TB_MEMBER_COUPON.EXPIRE_DATE IS '만료일';
--- 2026/07/08 장우철 : STATUS_CD 코멘트에 상태값 3단계 명시 (기존 '상태코드' → UNUSED/USED/EXPIRED)
+-- STATUS_CD 코멘트에 상태값 3단계 명시 (기존 '상태코드' → UNUSED/USED/EXPIRED)
 COMMENT ON COLUMN TB_MEMBER_COUPON.STATUS_CD IS '상태코드 (UNUSED=미사용/이용중, USED=사용완료, EXPIRED=기간만료)';
 COMMENT ON COLUMN TB_POST.POST_ID IS '게시글 ID';
 COMMENT ON COLUMN TB_POST.MEMBER_NO IS '작성자';
@@ -3044,7 +3035,7 @@ COMMENT ON COLUMN TB_POINT.REG_DATE IS '등록일';
 -- COMMENT ON COLUMN TB_VOLUNTEER.CURRENT_COUNT IS '현재 신청 인원';
 -- COMMENT ON COLUMN TB_VOLUNTEER.STATUS_CD IS '상태코드';
 -- COMMENT ON COLUMN TB_VOLUNTEER.REG_DATE IS '등록일';
--- 2026/07/16 장우철 고도화작업 — 슬롯 COLUMN COMMENT 제거 (TB_RESERVATION_SLOT 폐기)
+-- 슬롯 COLUMN COMMENT 제거 (TB_RESERVATION_SLOT 폐기)
 COMMENT ON COLUMN TB_STAY_ROOM.ROOM_ID IS '객실 ID';
 COMMENT ON COLUMN TB_STAY_ROOM.STAY_ID IS '숙소';
 COMMENT ON COLUMN TB_STAY_ROOM.NAME IS '객실명';
@@ -3181,7 +3172,7 @@ COMMENT ON COLUMN TB_POST_REPORT.COMMENT_ID IS '댓글·대댓글 ID (TARGET_TYP
 COMMENT ON COLUMN TB_POST_REPORT.REPORTER_NO IS 'REPORTER번호';
 COMMENT ON COLUMN TB_POST_REPORT.REASON IS '사유';
 COMMENT ON COLUMN TB_POST_REPORT.STATUS_CD IS '상태코드';
--- 2026/07/11 장우철 — 접수 시 NULL, 관리자 처리 시 ADMIN_NO 세팅
+-- 접수 시 NULL, 관리자 처리 시 ADMIN_NO 세팅
 COMMENT ON COLUMN TB_POST_REPORT.ADMIN_NO IS '관리자번호 (신고 접수 시 NULL 허용)';
 -- COMMENT ON COLUMN TB_VOLUNTEER_APPLY.APPLY_ID IS '신청 ID';
 -- COMMENT ON COLUMN TB_VOLUNTEER_APPLY.VOLUNTEER_ID IS '봉사 ID';
@@ -3209,8 +3200,8 @@ COMMENT ON COLUMN TB_RESERVATION.TOTAL_AMOUNT IS '총 주문금액';
 COMMENT ON COLUMN TB_RESERVATION.STATUS_CD IS '상태코드';
 COMMENT ON COLUMN TB_RESERVATION.REJECT_REASON IS '거절사유';
 COMMENT ON COLUMN TB_RESERVATION.REG_DATE IS '등록일';
--- 2026/07/15 장우철 고도화작업 — 예약·유형·의사 컬럼 COMMENT
--- 2026/07/16 장우철 고도화작업 — SLOT_ID COMMENT 제거, 규칙·예외 컬럼 COMMENT 추가
+-- 예약·유형·의사 컬럼 COMMENT
+-- SLOT_ID COMMENT 제거, 규칙·예외 컬럼 COMMENT 추가
 COMMENT ON COLUMN TB_RESERVATION.TREAT_TYPE_ID IS '진료유형 ID';
 COMMENT ON COLUMN TB_RESERVATION.DURATION_MIN IS '소요 분';
 COMMENT ON COLUMN TB_RESERVATION.END_TIME IS '종료시각';
@@ -3232,7 +3223,7 @@ COMMENT ON COLUMN TB_HOSPITAL_DOCTOR.SPECIALTY IS '전문분야';
 COMMENT ON COLUMN TB_HOSPITAL_DOCTOR.STATUS_CD IS '사용여부 Y/N';
 COMMENT ON COLUMN TB_HOSPITAL_DOCTOR.SORT_ORDR IS '정렬';
 COMMENT ON COLUMN TB_HOSPITAL_DOCTOR.REG_DATE IS '등록일';
--- 2026/07/16 장우철 고도화작업 — TB_HOSPITAL_RESV_RULE 컬럼 COMMENT 제거
+-- TB_HOSPITAL_RESV_RULE 컬럼 COMMENT 제거
 COMMENT ON COLUMN TB_HOSPITAL_RESV_EXCEPTION.EXC_ID IS '예외 ID';
 COMMENT ON COLUMN TB_HOSPITAL_RESV_EXCEPTION.HOSPITAL_ID IS '병원 ID';
 COMMENT ON COLUMN TB_HOSPITAL_RESV_EXCEPTION.DOCTOR_ID IS '의사 ID (NULL=공통)';
@@ -3244,7 +3235,7 @@ COMMENT ON COLUMN TB_HOSPITAL_RESV_EXCEPTION.INTERVAL_MIN IS '시작 간격(분)
 COMMENT ON COLUMN TB_HOSPITAL_RESV_EXCEPTION.MEMO IS '메모';
 COMMENT ON COLUMN TB_HOSPITAL_RESV_EXCEPTION.STATUS_CD IS '사용여부 Y/N';
 COMMENT ON COLUMN TB_HOSPITAL_RESV_EXCEPTION.REG_DATE IS '등록일';
--- 2026/07/16 장우철 고도화작업 — 예약 임시 선점 COLUMN COMMENT
+-- 예약 임시 선점 COLUMN COMMENT
 COMMENT ON COLUMN TB_HOSPITAL_RESV_HOLD.HOLD_ID IS '선점 ID';
 COMMENT ON COLUMN TB_HOSPITAL_RESV_HOLD.HOSPITAL_ID IS '병원 ID';
 COMMENT ON COLUMN TB_HOSPITAL_RESV_HOLD.DOCTOR_ID IS '의사 ID';
@@ -3272,7 +3263,7 @@ COMMENT ON COLUMN TB_MEDICAL_RECORD.DIAGNOSIS IS '진단';
 COMMENT ON COLUMN TB_MEDICAL_RECORD.PRESCRIPTION IS '처방';
 COMMENT ON COLUMN TB_MEDICAL_RECORD.MEMO IS '메모';
 COMMENT ON COLUMN TB_MEDICAL_RECORD.VET_NAME IS '수의사명';
-COMMENT ON COLUMN TB_MEDICAL_RECORD.REG_DATE IS '등록일';-- 2026/07/29 장우철
+COMMENT ON COLUMN TB_MEDICAL_RECORD.REG_DATE IS '등록일';
 -- TB_SETTLEMENT COMMENT
 COMMENT ON TABLE TB_SETTLEMENT IS '정산 마스터(숙소/쇼핑 공용)';
 COMMENT ON COLUMN TB_SETTLEMENT.SETTLE_ID IS '정산 ID (PK)';
@@ -3430,7 +3421,6 @@ COMMENT ON COLUMN TB_ORDER_ITEM.UNIT_PRICE IS '단가';
 COMMENT ON COLUMN TB_ORDER_ITEM.TOTAL_PRICE IS '합계';
 COMMENT ON COLUMN TB_ORDER_ITEM.CLAIM_STATUS IS '클레임 상태';
 COMMENT ON COLUMN TB_ORDER_ITEM.CLAIM_REASON IS '클레임 사유';
--- 2026/07/29 장우철
 COMMENT ON COLUMN TB_ORDER_ITEM.CONFIRMED_AT IS '구매확정 시각. 정산월 집계 기준';
 COMMENT ON COLUMN TB_ORDER_ITEM.CONFIRM_DUE_AT IS '배송완료+7일 자동확정 예정 시각';
 COMMENT ON COLUMN TB_ORDER_ITEM.CONFIRM_HOLD_YN IS '반품신청 중 Y면 자동구매확정 중지';
@@ -3490,7 +3480,7 @@ COMMENT ON COLUMN TB_REVIEW.CONTENT IS '리뷰 내용';
 COMMENT ON COLUMN TB_REVIEW.BIZ_REPLY IS '사업자 답글';
 COMMENT ON COLUMN TB_REVIEW.REG_DATE IS '작성일';
 
--- 2026/07/13 유정 — TB_TALENT 컬럼 주석
+-- TB_TALENT 컬럼 주석
 COMMENT ON COLUMN TB_TALENT.TALENT_ID IS '재능나눔 ID';
 COMMENT ON COLUMN TB_TALENT.BIZ_NO IS '사업자번호';
 COMMENT ON COLUMN TB_TALENT.TITLE IS '제목';
@@ -3509,7 +3499,7 @@ COMMENT ON COLUMN TB_TALENT.ADMIN_NO IS '승인·반려 처리 관리자';
 COMMENT ON COLUMN TB_TALENT.REG_DATE IS '등록일';
 COMMENT ON COLUMN TB_TALENT.APPROVE_DATE IS '승인일';
 
--- 2026/07/13 장우철 — TB_REVIEW_REPORT 컬럼 주석
+-- TB_REVIEW_REPORT 컬럼 주석
 COMMENT ON COLUMN TB_REVIEW_REPORT.REPORT_ID IS '신고 ID';
 COMMENT ON COLUMN TB_REVIEW_REPORT.REPORTER_TYPE IS '신고자 유형 (USER만 사용)';
 COMMENT ON COLUMN TB_REVIEW_REPORT.REPORTER_NO IS '신고한 회원 MEMBER_NO';
@@ -3521,7 +3511,7 @@ COMMENT ON COLUMN TB_REVIEW_REPORT.REJECT_REASON IS '관리자 반려 사유';
 COMMENT ON COLUMN TB_REVIEW_REPORT.ADMIN_NO IS '처리 관리자 (접수 시 NULL)';
 COMMENT ON COLUMN TB_REVIEW_REPORT.REG_DATE IS '접수일';
 COMMENT ON COLUMN TB_REVIEW_REPORT.PROCESS_DATE IS '처리일';
--- 2026/07/27 장우철 - TB_BILLING_CARD(토스 빌링키 , 카드등록)
+-- TB_BILLING_CARD(토스 빌링키 , 카드등록)
 COMMENT ON TABLE TB_BILLING_CARD IS '토스 자동결제(빌링) 등록카드';
 COMMENT ON COLUMN TB_BILLING_CARD.BILLING_CARD_ID IS '빌링카드 ID';
 COMMENT ON COLUMN TB_BILLING_CARD.OWNER_TYPE IS '소유자 유형 — MEMBER/ADMIN';
@@ -3761,9 +3751,9 @@ CREATE SEQUENCE SEQ_TB_SETTLEMENT START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_TB_SETTLEMENT_REQUEST START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_TB_SETTLEMENT_ITEM START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_TB_BILLING_CARD START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;  -- BillingCardMapper 사용
-CREATE SEQUENCE SEQ_ORDER START WITH 4 INCREMENT BY 1 NOCACHE NOCYCLE;           -- 데모 주문 1~3 다음 (지윤 26.10.06)
-CREATE SEQUENCE SEQ_ORDER_ITEM START WITH 5 INCREMENT BY 1 NOCACHE NOCYCLE;      -- 데모 주문상품 1~4 다음 (지윤 26.10.06)
-CREATE SEQUENCE SEQ_ORDER_DELIVERY START WITH 4 INCREMENT BY 1 NOCACHE NOCYCLE;  -- 데모 배송 1~3 다음 (지윤 26.10.06)
+CREATE SEQUENCE SEQ_ORDER START WITH 4 INCREMENT BY 1 NOCACHE NOCYCLE;           -- 데모 주문 1~3 다음
+CREATE SEQUENCE SEQ_ORDER_ITEM START WITH 5 INCREMENT BY 1 NOCACHE NOCYCLE;      -- 데모 주문상품 1~4 다음
+CREATE SEQUENCE SEQ_ORDER_DELIVERY START WITH 4 INCREMENT BY 1 NOCACHE NOCYCLE;  -- 데모 배송 1~3 다음
 
 -- 아래 시퀀스의 START WITH는 데모 데이터 최대 ID + 1 (데모 데이터가 없으면 1)
 CREATE SEQUENCE SEQ_TB_POINT START WITH 2 INCREMENT BY 1 NOCACHE NOCYCLE;
