@@ -2,11 +2,9 @@ package com.petcare.petcare.biz.hospital.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,6 +33,7 @@ import com.petcare.petcare.hospital.vo.HospitalTreatTypeVO;
 import com.petcare.petcare.hospital.vo.HospitalVO;
 import com.petcare.petcare.hospital.vo.MedicalRecordVO;
 import com.petcare.petcare.hospital.vo.ReservationVO;
+import com.petcare.petcare.common.review.BizReviewRows;
 import com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO;
 import com.petcare.petcare.member.vo.MemberVO;
 
@@ -607,54 +606,27 @@ public class BizHospitalController extends BizBaseController {
         List<HospitalReviewVO> reviewList =
                 bizHospitalService.getBizHospitalReviews(hospital.getHospitalId());
 
-        // 삭제요청 탭 + PENDING 뱃지용
+        // 삭제요청 이력 (탭 기록 + 리뷰별 최근 상태)
         List<ReviewDeleteRequestVO> deleteRequests = List.of();
         if (hospital.getBizNo() != null) {
             deleteRequests = bizHospitalService.getBizReviewDeleteRequests(
                     hospital.getHospitalId(), hospital.getBizNo());
         }
-        Set<Long> pendingReviewIds = new HashSet<>();
-        for (ReviewDeleteRequestVO dr : deleteRequests) {
-            if ("PENDING".equals(dr.getStatusCd()) && dr.getReviewId() != null) {
-                pendingReviewIds.add(dr.getReviewId());
-            }
-        }
+        Map<Long, ReviewDeleteRequestVO> latestRequest = BizReviewRows.latestByReview(deleteRequests);
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        // 리뷰관리 JSON (쇼핑·숙소와 같은 모양, resources/js/biz-review.js)
         List<Map<String, Object>> rows = new ArrayList<>();
         for (HospitalReviewVO r : reviewList) {
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put("id", r.getReviewId());
-            row.put("author", (r.getNickname() != null && !r.getNickname().isBlank())
-                    ? r.getNickname() : "회원");
-            row.put("date", r.getRegDate() != null ? df.format(r.getRegDate()) : "");
-            row.put("rating", r.getRating() != null ? r.getRating() : 0);
-            row.put("content", r.getContent() != null ? r.getContent() : "");
-            row.put("reply", r.getBizReply());
-            row.put("deleteRequestPending", pendingReviewIds.contains(r.getReviewId()));
-            rows.add(row);
+            rows.add(BizReviewRows.reviewRow(r.getReviewId(), hospital.getName(), r.getNickname(),
+                    r.getRegDate(), r.getRating(), r.getContent(), r.getBizReply(),
+                    latestRequest.get(r.getReviewId())));
         }
-
-        List<Map<String, Object>> deleteRows = new ArrayList<>();
-        for (ReviewDeleteRequestVO dr : deleteRequests) {
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put("requestId", dr.getRequestId());
-            row.put("reviewId", dr.getReviewId());
-            row.put("author", (dr.getReviewerNickname() != null && !dr.getReviewerNickname().isBlank())
-                    ? dr.getReviewerNickname() : "회원");
-            row.put("rating", dr.getReviewRating() != null ? dr.getReviewRating() : 0);
-            row.put("content", dr.getReviewContent() != null ? dr.getReviewContent() : "(삭제된 리뷰)");
-            row.put("requestReason", dr.getRequestReason() != null ? dr.getRequestReason() : "");
-            row.put("rejectReason", dr.getRejectReason());
-            row.put("statusCd", dr.getStatusCd());
-            row.put("reqDate", dr.getReqDate() != null ? df.format(dr.getReqDate()) : "");
-            row.put("processDate", dr.getProcessDate() != null ? df.format(dr.getProcessDate()) : "");
-            deleteRows.add(row);
-        }
+        List<Map<String, Object>> deleteRows =
+                BizReviewRows.deleteRequestRows(deleteRequests, hospital.getName());
 
         model.addAttribute("hospital", hospital);
-        model.addAttribute("reviewListJson", objectMapper.writeValueAsString(rows));
-        model.addAttribute("deleteRequestListJson", objectMapper.writeValueAsString(deleteRows));
+        model.addAttribute("reviewListJson", BizReviewRows.toScriptJson(objectMapper, rows));
+        model.addAttribute("deleteRequestListJson", BizReviewRows.toScriptJson(objectMapper, deleteRows));
         return "biz/hospital/reviews";
     }
 

@@ -25,6 +25,7 @@ import com.petcare.petcare.biz.controller.BizBaseController;
 import com.petcare.petcare.biz.store.service.BizStoreService;
 import com.petcare.petcare.biz.store.vo.BizProductVO;
 import com.petcare.petcare.biz.store.vo.BizReviewVO;
+import com.petcare.petcare.common.review.BizReviewRows;
 import com.petcare.petcare.member.vo.MemberVO;
 import com.petcare.petcare.settlement.service.StoreSettlementService;
 import com.petcare.petcare.settlement.vo.StoreSettlementItemVO;
@@ -360,6 +361,12 @@ return json;
         List<BizReviewVO> reviewList = bizStoreService.getBizReviewList(bizNo);
         java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
 
+        // 삭제요청 이력 (탭 기록 + 리뷰별 최근 상태)
+        List<com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO> deleteRequests =
+                bizStoreService.getBizReviewDeleteRequests(bizNo);
+        java.util.Map<Long, com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO> latestRequest =
+                BizReviewRows.latestByReview(deleteRequests);
+
         // 리뷰별 고객 신고 사유 (신고자는 보내지 않음)
         java.util.Map<Long, List<java.util.Map<String, Object>>> reasonsByReview = new java.util.HashMap<>();
         for (com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO rr : bizStoreService.getBizReviewReportReasons(bizNo)) {
@@ -371,12 +378,10 @@ return json;
 
         List<java.util.Map<String, Object>> rows = new ArrayList<>();
         for (BizReviewVO r : reviewList) {
-            java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
-            row.put("id", r.getReviewId());
-            row.put("author", (r.getNickname() != null && !r.getNickname().isBlank()) ? r.getNickname() : "회원");
-            row.put("date", r.getRegDate() != null ? df.format(r.getRegDate()) : "");
-            row.put("rating", r.getRating() != null ? r.getRating() : 0);
-            row.put("product", r.getProductName());
+            // 공통 필드는 병원·숙소와 같은 모양 (resources/js/biz-review.js)
+            java.util.Map<String, Object> row = BizReviewRows.reviewRow(r.getReviewId(), r.getProductName(),
+                    r.getNickname(), r.getRegDate(), r.getRating(), r.getContent(), r.getBizReply(),
+                    latestRequest.get(r.getReviewId()));
             row.put("thumbnail", r.getThumbnailUrl()); // 상품 썸네일
             // 실제 구매 옵션 (색상/사이즈)
             String optText = "";
@@ -385,17 +390,13 @@ return json;
                         ? r.getOptionColor() + " / " + r.getOptionSize() : r.getOptionSize();
             }
             row.put("option", optText);
-            row.put("content", r.getContent() != null ? r.getContent() : "");
-            row.put("reply", r.getBizReply());
-            row.put("deleteRequested", "PENDING".equals(r.getDeleteReqStatus())); // 삭제요청 대기중이면 true
-            // 가장 최근 요청이 반려면 반려 사유 표시 (승인 시 리뷰 자체가 삭제되어 조회 안 됨)
-            row.put("deleteRejected", "REJECTED".equals(r.getDeleteReqStatus()));
-            row.put("rejectReason", r.getDeleteRejectReason());
             row.put("reportCount", r.getReportCount() != null ? r.getReportCount() : 0); // 고객 신고 건수
             row.put("reportReasons", reasonsByReview.getOrDefault(r.getReviewId(), List.of())); // 신고 사유 (익명)
             rows.add(row);
         }
-        model.addAttribute("reviewListJson", objectMapper.writeValueAsString(rows));
+        model.addAttribute("reviewListJson", BizReviewRows.toScriptJson(objectMapper, rows));
+        model.addAttribute("deleteRequestListJson",
+                BizReviewRows.toScriptJson(objectMapper, BizReviewRows.deleteRequestRows(deleteRequests, null)));
         return "biz/store/reviews";
     }
 
@@ -415,13 +416,13 @@ return json;
     // 리뷰 삭제요청: 즉시 삭제 없이 TB_REVIEW_DELETE_REQUEST에 PENDING 등록 (관리자 승인 후 삭제)
     @PostMapping("/reviews/delete-request")
     public String requestReviewDelete(@RequestParam("reviewId") Long reviewId,
-                                       @RequestParam(value = "reason", required = false) String reason,
+                                       @RequestParam(value = "requestReason", required = false) String requestReason,
                                        HttpSession session, RedirectAttributes rttr) {
         MemberVO biz = getBizMember(session);
         if (biz == null) return "redirect:/login";
         Long bizNo = bizStoreService.getBizNo(biz.getMemberId());
         try {
-            bizStoreService.requestReviewDelete(bizNo, reviewId, reason);
+            bizStoreService.requestReviewDelete(bizNo, reviewId, requestReason);
             rttr.addFlashAttribute("msg", "삭제 요청이 접수되었습니다. 관리자 승인 후 삭제됩니다.");
         } catch (IllegalArgumentException | IllegalStateException e) {
             rttr.addFlashAttribute("errorMsg", e.getMessage());

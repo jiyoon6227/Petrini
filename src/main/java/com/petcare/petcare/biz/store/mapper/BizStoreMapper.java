@@ -182,6 +182,9 @@ public interface BizStoreMapper {
     // 리뷰 삭제요청 등록 (TB_REVIEW_DELETE_REQUEST, REVIEW_TYPE='PRODUCT')
     void insertReviewDeleteRequest(@Param("reviewId") Long reviewId, @Param("bizNo") Long bizNo, @Param("reason") String reason);
 
+    // 쇼핑 삭제요청 이력 (대기·승인·반려·작성자 삭제)
+    List<com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO> selectBizStoreReviewDeleteRequests(@Param("bizNo") Long bizNo);
+
     // 내 상품 리뷰에 걸린 고객 신고 사유 (익명)
     List<com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO> selectBizReviewReportReasons(@Param("bizNo") Long bizNo);
 

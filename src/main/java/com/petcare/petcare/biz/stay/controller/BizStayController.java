@@ -37,13 +37,10 @@ import com.petcare.petcare.stay.vo.StayVO;
 
 import jakarta.servlet.http.HttpSession;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petcare.petcare.common.review.BizReviewRows;
 import com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO;
 import com.petcare.petcare.member.inquiry.vo.MemberInquiryVO;
 import com.petcare.petcare.stay.vo.StayReviewVO;
@@ -267,54 +264,21 @@ public class BizStayController extends BizBaseController {
                 stay.getStayId(), stay.getBizNo());
     }
 
-    // PENDING 건은 답글·삭제요청 버튼 숨김용
-    Set<Long> pendingReviewIds = new HashSet<>();
-    for (ReviewDeleteRequestVO dr : deleteRequests) {
-        if ("PENDING".equals(dr.getStatusCd()) && dr.getReviewId() != null) {
-            pendingReviewIds.add(dr.getReviewId());
-        }
-    }
+    Map<Long, ReviewDeleteRequestVO> latestRequest = BizReviewRows.latestByReview(deleteRequests);
 
-    // reviews.jsp var reviews (id/author/date/rating/content/reply/deleteRequestPending)
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    // 리뷰관리 JSON (병원·쇼핑과 같은 모양, resources/js/biz-review.js)
     List<Map<String, Object>> rows = new ArrayList<>();
-
     for (StayReviewVO r : reviewList) {
-        Map<String, Object> row = new LinkedHashMap<>();
-        row.put("id", r.getReviewId());
-        row.put("author", (r.getNickname() != null && !r.getNickname().isBlank())
-                ? r.getNickname() : "회원");
-        row.put("date", r.getRegDate() != null ? df.format(r.getRegDate()) : "");
-        row.put("rating", r.getRating() != null ? r.getRating() : 0);
-        row.put("content", r.getContent() != null ? r.getContent() : "");
-        row.put("reply", r.getBizReply());
-        row.put("deleteRequestPending", pendingReviewIds.contains(r.getReviewId()));
-        rows.add(row);
+        rows.add(BizReviewRows.reviewRow(r.getReviewId(), stay.getName(), r.getNickname(),
+                r.getRegDate(), r.getRating(), r.getContent(), r.getBizReply(),
+                latestRequest.get(r.getReviewId())));
     }
-
-    // reviews.jsp var deleteRequests (statusCd·reqDate·processDate 등)
-    List<Map<String, Object>> deleteRows = new ArrayList<>();
-
-    for (ReviewDeleteRequestVO dr : deleteRequests) {
-        Map<String, Object> row = new LinkedHashMap<>();
-        row.put("requestId", dr.getRequestId());
-        row.put("reviewId", dr.getReviewId());
-        row.put("author", (dr.getReviewerNickname() != null && !dr.getReviewerNickname().isBlank())
-                ? dr.getReviewerNickname() : "회원");
-        row.put("rating", dr.getReviewRating() != null ? dr.getReviewRating() : 0);
-        row.put("content", dr.getReviewContent() != null ? dr.getReviewContent() : "(삭제된 리뷰)");
-        row.put("requestReason", dr.getRequestReason() != null ? dr.getRequestReason() : "");
-        row.put("rejectReason", dr.getRejectReason());
-        row.put("statusCd", dr.getStatusCd());
-        row.put("reqDate", dr.getReqDate() != null ? df.format(dr.getReqDate()) : "");
-        row.put("processDate", dr.getProcessDate() != null ? df.format(dr.getProcessDate()) : "");
-        deleteRows.add(row);
-    }
+    List<Map<String, Object>> deleteRows = BizReviewRows.deleteRequestRows(deleteRequests, stay.getName());
 
     // reviewListJson / deleteRequestListJson (ObjectMapper)
     model.addAttribute("stay", stay);
-    model.addAttribute("reviewListJson", objectMapper.writeValueAsString(rows));
-    model.addAttribute("deleteRequestListJson", objectMapper.writeValueAsString(deleteRows));
+    model.addAttribute("reviewListJson", BizReviewRows.toScriptJson(objectMapper, rows));
+    model.addAttribute("deleteRequestListJson", BizReviewRows.toScriptJson(objectMapper, deleteRows));
     return "biz/stay/reviews";
 }
 

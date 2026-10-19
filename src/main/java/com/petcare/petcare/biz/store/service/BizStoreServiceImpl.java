@@ -476,6 +476,12 @@ public class BizStoreServiceImpl implements BizStoreService {
         return bizStoreMapper.selectBizReviewList(bizNo);
     }
 
+    // 리뷰관리용 삭제요청 이력
+    @Override
+    public List<com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO> getBizReviewDeleteRequests(Long bizNo) {
+        return bizStoreMapper.selectBizStoreReviewDeleteRequests(bizNo);
+    }
+
     // 리뷰관리용 고객 신고 사유 (익명)
     @Override
     public List<com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO> getBizReviewReportReasons(Long bizNo) {
@@ -491,7 +497,15 @@ public class BizStoreServiceImpl implements BizStoreService {
 
     // 리뷰 삭제요청: 즉시 삭제 없이 TB_REVIEW_DELETE_REQUEST에 PENDING 등록 (관리자 승인 후 삭제)
     @Override
-    public void requestReviewDelete(Long bizNo, Long reviewId, String reason) {
+    public void requestReviewDelete(Long bizNo, Long reviewId, String requestReason) {
+        // 사유 필수 (병원·숙소와 같은 규칙)
+        if (requestReason == null || requestReason.isBlank()) {
+            throw new IllegalArgumentException("삭제 요청 사유를 입력해 주세요.");
+        }
+        String reason = requestReason.trim();
+        if (reason.length() > 500) {
+            reason = reason.substring(0, 500);
+        }
         if (bizStoreMapper.selectReviewOwnedByBiz(reviewId, bizNo) == 0) {
             throw new IllegalArgumentException("본인 상품의 리뷰가 아닙니다.");
         }

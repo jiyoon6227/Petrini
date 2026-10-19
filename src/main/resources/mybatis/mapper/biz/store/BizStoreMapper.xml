@@ -440,14 +440,6 @@
             p.PRODUCT_NAME AS productName,
             oi.OPTION_COLOR AS optionColor,
             oi.OPTION_SIZE  AS optionSize,
-            (SELECT dr.STATUS_CD FROM TB_REVIEW_DELETE_REQUEST dr
-              WHERE dr.REVIEW_ID = r.REVIEW_ID AND dr.REVIEW_TYPE = 'PRODUCT'
-              ORDER BY dr.REQUEST_ID DESC
-              FETCH FIRST 1 ROWS ONLY) AS deleteReqStatus,
-            (SELECT dr.REJECT_REASON FROM TB_REVIEW_DELETE_REQUEST dr
-              WHERE dr.REVIEW_ID = r.REVIEW_ID AND dr.REVIEW_TYPE = 'PRODUCT'
-              ORDER BY dr.REQUEST_ID DESC
-              FETCH FIRST 1 ROWS ONLY) AS deleteRejectReason,
             (SELECT COUNT(*) FROM TB_REVIEW_REPORT rr
               WHERE rr.REVIEW_ID = r.REVIEW_ID) AS reportCount,
             f.FILE_URL AS thumbnailUrl
@@ -498,6 +490,37 @@
      WHERE r.REVIEW_ID = #{reviewId}
        AND r.REVIEW_TYPE = 'PRODUCT'
 </insert>
+
+<!-- 쇼핑 삭제요청 이력 (승인 후 리뷰가 지워져도 LEFT JOIN으로 기록 유지, 상품명은 TARGET_ID 기준) -->
+<select id="selectBizStoreReviewDeleteRequests" resultType="com.petcare.petcare.hospital.vo.ReviewDeleteRequestVO">
+    SELECT dr.REQUEST_ID     AS requestId,
+           dr.REVIEW_ID      AS reviewId,
+           dr.REQUEST_REASON AS requestReason,
+           dr.REJECT_REASON  AS rejectReason,
+           dr.STATUS_CD      AS statusCd,
+           dr.REQ_DATE       AS reqDate,
+           dr.PROCESS_DATE   AS processDate,
+           m.NICKNAME        AS reviewerNickname,
+           r.RATING          AS reviewRating,
+           r.CONTENT         AS reviewContent,
+           p.PRODUCT_NAME    AS targetName,
+           f.FILE_URL        AS thumbnailUrl
+      FROM TB_REVIEW_DELETE_REQUEST dr
+      LEFT JOIN TB_REVIEW r
+        ON r.REVIEW_ID = dr.REVIEW_ID
+       AND r.REVIEW_TYPE = dr.REVIEW_TYPE
+      LEFT JOIN TB_MEMBER m ON m.MEMBER_NO = r.MEMBER_NO
+      LEFT JOIN TB_PRODUCT p ON p.PRODUCT_ID = dr.TARGET_ID
+      LEFT JOIN (
+          SELECT REF_ID, FILE_URL,
+                 ROW_NUMBER() OVER (PARTITION BY REF_ID ORDER BY FILE_ID) AS RN
+          FROM TB_FILE
+          WHERE REF_TYPE = 'PRODUCT'
+      ) f ON f.REF_ID = dr.TARGET_ID AND f.RN = 1
+     WHERE dr.BIZ_NO = #{bizNo}
+       AND dr.REVIEW_TYPE = 'PRODUCT'
+     ORDER BY dr.REQ_DATE DESC, dr.REQUEST_ID DESC
+</select>
 
 <!-- 내 상품 리뷰에 걸린 고객 신고 사유 (신고자는 숨기고 사유·날짜만) -->
 <select id="selectBizReviewReportReasons" resultType="com.petcare.petcare.biz.store.vo.BizReviewReportReasonVO">
