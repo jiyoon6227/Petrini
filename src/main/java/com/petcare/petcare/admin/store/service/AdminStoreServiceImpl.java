@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.petcare.petcare.admin.store.mapper.AdminStoreMapper;
-import com.petcare.petcare.admin.store.vo.AdminReviewReportVO;
 import com.petcare.petcare.admin.store.vo.AdminStoreOrderVO;
 import com.petcare.petcare.admin.store.vo.AdminStoreProductVO;
 
@@ -16,29 +15,6 @@ public class AdminStoreServiceImpl implements AdminStoreService {
 
     @Autowired
     private AdminStoreMapper adminStoreMapper;
-
-    // 대기중인 리뷰 삭제요청 목록
-    @Override
-    public List<AdminReviewReportVO> getPendingReviewReports() {
-        return adminStoreMapper.selectPendingReviewReports();
-    }
-
-    // FK 참조 때문에 신고 참조를 먼저 끊고 리뷰 삭제 (ORA-02292 방지)
-    @Override
-    @Transactional
-    public void approveReviewReport(Long reportId, Long reviewId, Long adminNo) {
-        adminStoreMapper.updateReportApproved(reportId, adminNo);
-        // 같은 리뷰에 다른 신고(예: 유저신고 여러 건)가 더 걸려있어도 그것들의 REVIEW_ID도 마저 비워야
-        //TB_REVIEW 삭제할 때 ORA-02292(자식 레코드 발견) 안 남
-        adminStoreMapper.clearAllReportRefsByReviewId(reviewId);
-        adminStoreMapper.deleteReview(reviewId);
-    }
-
-    // 반려 - 리뷰는 그대로 두고 요청만 DONE 처리
-    @Override
-    public void rejectReviewReport(Long reportId, Long adminNo) {
-        adminStoreMapper.updateReportDone(reportId, adminNo);
-    }
 
     // 전 사업자 상품 목록
     @Override

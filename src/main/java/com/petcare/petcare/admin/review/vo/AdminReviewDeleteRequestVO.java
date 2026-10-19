@@ -1,6 +1,8 @@
 package com.petcare.petcare.admin.review.vo;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,11 +15,11 @@ public class AdminReviewDeleteRequestVO {
 
     private Long requestId;       // REQUEST_ID — 요청 번호
     private Long reviewId;        // REVIEW_ID — 대상 리뷰 번호
-    private String reviewType;    // REVIEW_TYPE — 리뷰 유형 (HOSPITAL)
-    private Long targetId;        // TARGET_ID — 병원 ID
+    private String reviewType;    // REVIEW_TYPE — 리뷰 유형 (HOSPITAL/STAY/PRODUCT)
+    private Long targetId;        // TARGET_ID — 병원/숙소/상품 ID
     private Long bizNo;           // BIZ_NO — 요청 사업자 번호
     private String requestReason; // REQUEST_REASON — 삭제 요청 사유
-    private String statusCd;      // STATUS_CD — 처리 상태 (PENDING/APPROVED/REJECTED)
+    private String statusCd;      // STATUS_CD — 처리 상태 (PENDING/APPROVED/REJECTED/CANCELED)
     private Date reqDate;         // REQ_DATE — 요청일
     private Long adminNo;         // ADMIN_NO — 처리 관리자 번호
     private Date processDate;     // PROCESS_DATE — 처리일
@@ -32,6 +34,7 @@ public class AdminReviewDeleteRequestVO {
     private String reviewerNickname; // M.NICKNAME — 리뷰 작성자 닉네임
     private Date reviewRegDate;      // R.REG_DATE — 리뷰 작성일
 
-    // DELETE_REQ(병원·숙소) / REPORT(쇼핑 TB_REVIEW_REPORT)
-    private String sourceCd;
+    // 이 리뷰에 걸린 고객 신고 (건수 + 펼치기용 목록)
+    private Integer reportCount;
+    private List<AdminReviewReportVO> reports = new ArrayList<>();
 }

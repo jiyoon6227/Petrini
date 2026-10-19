@@ -3,53 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.petcare.petcare.admin.store.mapper.AdminStoreMapper">
 
-<!-- 대기중(PENDING)인 사업자 리뷰 삭제요청 목록 - 리뷰 원본 + 상품명 + 사업자명까지 같이 조회 -->
-<select id="selectPendingReviewReports" resultType="com.petcare.petcare.admin.store.vo.AdminReviewReportVO">
-    SELECT  rr.REPORT_ID    AS reportId,
-            rr.REVIEW_ID    AS reviewId,
-            rr.REASON       AS reason,
-            rr.REG_DATE     AS regDate,
-            rr.BIZ_NO       AS bizNo,
-            b.BIZ_NAME      AS bizName,
-            p.PRODUCT_NAME  AS productName,
-            r.CONTENT       AS content,
-            r.RATING        AS rating,
-            m.NICKNAME      AS nickname
-      FROM  TB_REVIEW_REPORT rr
-      JOIN  TB_REVIEW r    ON r.REVIEW_ID = rr.REVIEW_ID
-      JOIN  TB_PRODUCT p   ON p.PRODUCT_ID = r.TARGET_ID
-      JOIN  TB_BUSINESS b  ON b.BIZ_NO = rr.BIZ_NO
-      JOIN  TB_MEMBER m    ON m.MEMBER_NO = r.MEMBER_NO
-     WHERE  rr.REPORTER_TYPE = 'BIZ'
-       AND  rr.STATUS_CD = 'PENDING'
-     ORDER BY rr.REG_DATE ASC
-</select>
-
-<!-- 승인 처리 - FK(TB_REVIEW_REPORT.REVIEW_ID -> TB_REVIEW.REVIEW_ID) 참조부터 끊어야
-     이후 TB_REVIEW DELETE할 때 ORA-02292(자식 레코드 발견) 안 남. adminNo는 jdbcType 명시 안 하면 null일 때 ORA-17004 남 -->
-<update id="updateReportApproved">
-    UPDATE TB_REVIEW_REPORT
-       SET STATUS_CD = 'DONE', ADMIN_NO = #{adminNo,jdbcType=NUMERIC}, REVIEW_ID = NULL
-     WHERE REPORT_ID = #{reportId}
-</update>
-
-<!-- 이 리뷰를 참조하는 "모든" 행(다른 유저신고/삭제요청 포함) REVIEW_ID 비우기 -->
-<update id="clearAllReportRefsByReviewId">
-    UPDATE TB_REVIEW_REPORT SET REVIEW_ID = NULL WHERE REVIEW_ID = #{reviewId}
-</update>
-
-<!-- 승인 - 원본 리뷰 실제 삭제 (clearAllReportRefsByReviewId로 FK 참조 다 끊은 다음에만 호출) -->
-<delete id="deleteReview">
-    DELETE FROM TB_REVIEW WHERE REVIEW_ID = #{reviewId}
-</delete>
-
-<!-- 반려 처리 완료 표시 (REVIEW_ID 유지, 블라인드 해제되어 그대로 노출) -->
-<update id="updateReportDone">
-    UPDATE TB_REVIEW_REPORT
-       SET STATUS_CD = 'DONE', ADMIN_NO = #{adminNo,jdbcType=NUMERIC}
-     WHERE REPORT_ID = #{reportId}
-</update>
-
 <!-- 관리자: 전 사업자 상품 목록 -->
 <sql id="adminProductFilter">
     1 = 1

@@ -6,11 +6,12 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.petcare.petcare.admin.review.vo.AdminReviewDeleteRequestVO;
+import com.petcare.petcare.admin.review.vo.AdminReviewReportVO;
 
 @Mapper
 public interface AdminReviewMapper {
 
-    // 삭제 요청 목록 (검색·필터·페이징)
+    // 삭제 요청 목록 (검색·필터·페이징, 병원·숙소·쇼핑)
     List<AdminReviewDeleteRequestVO> selectAdminReviewDeleteRequestList(
             @Param("keyword") String keyword,
             @Param("statusCd") String statusCd,
@@ -29,9 +30,9 @@ public interface AdminReviewMapper {
     AdminReviewDeleteRequestVO selectAdminReviewDeleteRequestDetail(
             @Param("requestId") long requestId);
 
-    // 쇼핑(TB_REVIEW_REPORT) 삭제요청 단건
-    AdminReviewDeleteRequestVO selectAdminStoreReviewReportDetail(
-            @Param("reportId") long reportId);
+    // 같은 리뷰에 대기 중인 삭제요청 목록
+    List<AdminReviewDeleteRequestVO> selectPendingDeleteRequestsByReviewId(
+            @Param("reviewId") long reviewId);
 
     // 승인 처리
     int updateReviewDeleteRequestApproved(
@@ -44,8 +45,34 @@ public interface AdminReviewMapper {
             @Param("adminNo") long adminNo,
             @Param("rejectReason") String rejectReason);
 
+    // 고객 신고 목록 (검색·필터·페이징)
+    List<AdminReviewReportVO> selectAdminReviewReportList(
+            @Param("keyword") String keyword,
+            @Param("statusCd") String statusCd,
+            @Param("offset") int offset,
+            @Param("limit") int limit);
+
+    // 고객 신고 총 건수
+    int selectAdminReviewReportCount(
+            @Param("keyword") String keyword,
+            @Param("statusCd") String statusCd);
+
+    // 고객 신고 PENDING 건수 (탭 배지용)
+    int countPendingReviewReport();
+
+    // 고객 신고 단건 (삭제/반려 시 검증)
+    AdminReviewReportVO selectAdminReviewReportDetail(@Param("reportId") long reportId);
+
+    // 여러 리뷰에 걸린 고객 신고 (삭제요청 목록 펼치기용)
+    List<AdminReviewReportVO> selectReviewReportsByReviewIds(@Param("reviewIds") List<Long> reviewIds);
+
+    // 고객 신고 반려 (REJECT_REASON 저장)
+    int updateReviewReportRejected(
+            @Param("reportId") long reportId,
+            @Param("adminNo") long adminNo,
+            @Param("rejectReason") String rejectReason);
+
     // 리뷰 삭제
-    // reviewType(STAY/HOSPITAL)별 테이블 분기
     int deleteReviewById(@Param("reviewId") long reviewId,
                          @Param("reviewType") String reviewType);
 

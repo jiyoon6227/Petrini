@@ -4,15 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.petcare.petcare.admin.controller.AdminBaseController;
 import com.petcare.petcare.admin.store.service.AdminStoreService;
-import com.petcare.petcare.member.vo.MemberVO;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -22,33 +18,6 @@ public class AdminStoreController extends AdminBaseController {
 
     @Autowired
     private AdminStoreService adminStoreService;
-
-    // 리뷰관리 메뉴 제거, 사업자 리뷰(/admin/review/list)로 통합
-    @GetMapping("/review-report")
-    public String reviewReport() {
-        return "redirect:/admin/review/list?statusCd=PENDING";
-    }
-
-    @PostMapping("/review-report/{reportId}/approve")
-    public String approveReviewReport(@PathVariable Long reportId, @RequestParam Long reviewId,
-                                       HttpSession session, RedirectAttributes rttr) {
-        MemberVO admin = getAdmin(session);
-        if (admin == null) return redirectToLogin();
-
-        adminStoreService.approveReviewReport(reportId, reviewId, admin.getMemberNo());
-        rttr.addFlashAttribute("successMsg", "삭제 요청을 승인했습니다.");
-        return "redirect:/admin/review/list?statusCd=APPROVED";
-    }
-
-    @PostMapping("/review-report/{reportId}/reject")
-    public String rejectReviewReport(@PathVariable Long reportId, HttpSession session, RedirectAttributes rttr) {
-        MemberVO admin = getAdmin(session);
-        if (admin == null) return redirectToLogin();
-
-        adminStoreService.rejectReviewReport(reportId, admin.getMemberNo());
-        rttr.addFlashAttribute("successMsg", "삭제 요청을 반려했습니다.");
-        return "redirect:/admin/review/list?statusCd=REJECTED";
-    }
 
     // 상품 관리 (전 사업자)
     @GetMapping("/product-list")

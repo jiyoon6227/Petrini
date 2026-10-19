@@ -1,59 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!-- 병원·숙소 삭제 요청 + 쇼핑(TB_REVIEW_REPORT BIZ) 삭제요청 UNION -->
+<!-- 사업자 리뷰 삭제요청(TB_REVIEW_DELETE_REQUEST, 병원·숙소·쇼핑) + 고객 리뷰 신고(TB_REVIEW_REPORT) -->
 <mapper namespace="com.petcare.petcare.admin.review.mapper.AdminReviewMapper">
 
-  <!-- 병원·숙소: TB_REVIEW_DELETE_REQUEST -->
-  <sql id="hsStatusFilter">
-    <if test="statusCd != null and statusCd != '' and statusCd != 'ALL'">
-      AND DR.STATUS_CD = #{statusCd}
-    </if>
-  </sql>
+  <!-- ===================== 사업자 삭제요청 ===================== -->
 
-  <sql id="hsKeywordFilter">
-    <if test="keyword != null and keyword != ''">
-      AND (
-            H.NAME LIKE '%' || #{keyword} || '%'
-         OR S.NAME LIKE '%' || #{keyword} || '%'
-         OR B.BIZ_NAME LIKE '%' || #{keyword} || '%'
-         OR M.NICKNAME LIKE '%' || #{keyword} || '%'
-         OR DR.REQUEST_REASON LIKE '%' || #{keyword} || '%'
-      )
-    </if>
-  </sql>
-
-  <!-- 쇼핑: TB_REVIEW_REPORT (BIZ) — DONE은 REVIEW_ID 유무로 승인/반려 구분 -->
-  <sql id="storeStatusFilter">
-    <if test="statusCd != null and statusCd != '' and statusCd != 'ALL'">
-      <choose>
-        <when test="statusCd == 'PENDING'">
-          AND RR.STATUS_CD = 'PENDING'
-        </when>
-        <when test="statusCd == 'APPROVED'">
-          AND RR.STATUS_CD = 'DONE'
-          AND RR.REVIEW_ID IS NULL
-        </when>
-        <when test="statusCd == 'REJECTED'">
-          AND RR.STATUS_CD = 'DONE'
-          AND RR.REVIEW_ID IS NOT NULL
-        </when>
-      </choose>
-    </if>
-  </sql>
-
-  <sql id="storeKeywordFilter">
-    <if test="keyword != null and keyword != ''">
-      AND (
-            P.PRODUCT_NAME LIKE '%' || #{keyword} || '%'
-         OR B.BIZ_NAME LIKE '%' || #{keyword} || '%'
-         OR M.NICKNAME LIKE '%' || #{keyword} || '%'
-         OR RR.REASON LIKE '%' || #{keyword} || '%'
-      )
-    </if>
-  </sql>
-
-  <sql id="unifiedDeleteRequestUnion">
+  <sql id="deleteRequestSelect">
     SELECT
       DR.REQUEST_ID     AS requestId,
       DR.REVIEW_ID      AS reviewId,
@@ -66,13 +19,14 @@
       DR.REQ_DATE       AS reqDate,
       DR.ADMIN_NO       AS adminNo,
       DR.PROCESS_DATE   AS processDate,
-      COALESCE(H.NAME, S.NAME) AS hospitalName,
+      COALESCE(H.NAME, S.NAME, P.PRODUCT_NAME) AS hospitalName,
       B.BIZ_NAME        AS bizName,
       R.RATING          AS reviewRating,
       R.CONTENT         AS reviewContent,
       M.NICKNAME        AS reviewerNickname,
       R.REG_DATE        AS reviewRegDate,
-      'DELETE_REQ'      AS sourceCd
+      (SELECT COUNT(*) FROM TB_REVIEW_REPORT RR
+        WHERE RR.REVIEW_ID = DR.REVIEW_ID) AS reportCount
     FROM TB_REVIEW_DELETE_REQUEST DR
     LEFT JOIN TB_REVIEW R
       ON R.REVIEW_ID = DR.REVIEW_ID
@@ -84,45 +38,28 @@
     LEFT JOIN TB_STAY S
       ON S.STAY_ID = DR.TARGET_ID
      AND DR.REVIEW_TYPE = 'STAY'
+    LEFT JOIN TB_PRODUCT P
+      ON P.PRODUCT_ID = DR.TARGET_ID
+     AND DR.REVIEW_TYPE = 'PRODUCT'
     JOIN TB_BUSINESS B ON B.BIZ_NO = DR.BIZ_NO
-   WHERE DR.REVIEW_TYPE IN ('HOSPITAL', 'STAY')
-    <include refid="hsStatusFilter"/>
-    <include refid="hsKeywordFilter"/>
+  </sql>
 
-    UNION ALL
-
-    SELECT
-      RR.REPORT_ID      AS requestId,
-      RR.REVIEW_ID      AS reviewId,
-      'PRODUCT'         AS reviewType,
-      R.TARGET_ID       AS targetId,
-      RR.BIZ_NO         AS bizNo,
-      RR.REASON         AS requestReason,
-      CAST(NULL AS VARCHAR2(500)) AS rejectReason,
-      CASE
-        WHEN RR.STATUS_CD = 'PENDING' THEN 'PENDING'
-        WHEN RR.STATUS_CD = 'DONE' AND RR.REVIEW_ID IS NULL THEN 'APPROVED'
-        WHEN RR.STATUS_CD = 'DONE' THEN 'REJECTED'
-        ELSE RR.STATUS_CD
-      END               AS statusCd,
-      RR.REG_DATE       AS reqDate,
-      RR.ADMIN_NO       AS adminNo,
-      CAST(NULL AS DATE) AS processDate,
-      P.PRODUCT_NAME    AS hospitalName,
-      B.BIZ_NAME        AS bizName,
-      R.RATING          AS reviewRating,
-      R.CONTENT         AS reviewContent,
-      M.NICKNAME        AS reviewerNickname,
-      R.REG_DATE        AS reviewRegDate,
-      'REPORT'          AS sourceCd
-    FROM TB_REVIEW_REPORT RR
-    LEFT JOIN TB_REVIEW R ON R.REVIEW_ID = RR.REVIEW_ID
-    LEFT JOIN TB_MEMBER M ON M.MEMBER_NO = R.MEMBER_NO
-    LEFT JOIN TB_PRODUCT P ON P.PRODUCT_ID = R.TARGET_ID AND R.REVIEW_TYPE = 'PRODUCT'
-    JOIN TB_BUSINESS B ON B.BIZ_NO = RR.BIZ_NO
-   WHERE RR.REPORTER_TYPE = 'BIZ'
-    <include refid="storeStatusFilter"/>
-    <include refid="storeKeywordFilter"/>
+  <sql id="deleteRequestFilter">
+    <where>
+      <if test="statusCd != null and statusCd != '' and statusCd != 'ALL'">
+        AND DR.STATUS_CD = #{statusCd}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        AND (
+              H.NAME LIKE '%' || #{keyword} || '%'
+           OR S.NAME LIKE '%' || #{keyword} || '%'
+           OR P.PRODUCT_NAME LIKE '%' || #{keyword} || '%'
+           OR B.BIZ_NAME LIKE '%' || #{keyword} || '%'
+           OR M.NICKNAME LIKE '%' || #{keyword} || '%'
+           OR DR.REQUEST_REASON LIKE '%' || #{keyword} || '%'
+        )
+      </if>
+    </where>
   </sql>
 
   <select id="selectAdminReviewDeleteRequestList"
@@ -132,7 +69,8 @@
         SELECT U.*,
                ROW_NUMBER() OVER (ORDER BY U.reqDate DESC, U.requestId DESC) AS rn
           FROM (
-            <include refid="unifiedDeleteRequestUnion"/>
+            <include refid="deleteRequestSelect"/>
+            <include refid="deleteRequestFilter"/>
           ) U
       )
      WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{limit}
@@ -141,93 +79,29 @@
   <select id="selectAdminReviewDeleteRequestCount" resultType="int">
     SELECT COUNT(*)
       FROM (
-        <include refid="unifiedDeleteRequestUnion"/>
+        <include refid="deleteRequestSelect"/>
+        <include refid="deleteRequestFilter"/>
       )
   </select>
 
   <select id="countPendingReviewDeleteRequest" resultType="int">
-    SELECT
-      (SELECT COUNT(*)
-         FROM TB_REVIEW_DELETE_REQUEST
-        WHERE STATUS_CD = 'PENDING'
-          AND REVIEW_TYPE IN ('HOSPITAL', 'STAY'))
-    + (SELECT COUNT(*)
-         FROM TB_REVIEW_REPORT
-        WHERE REPORTER_TYPE = 'BIZ'
-          AND STATUS_CD = 'PENDING')
-      FROM DUAL
+    SELECT COUNT(*)
+      FROM TB_REVIEW_DELETE_REQUEST
+     WHERE STATUS_CD = 'PENDING'
   </select>
 
   <select id="selectAdminReviewDeleteRequestDetail"
           resultType="com.petcare.petcare.admin.review.vo.AdminReviewDeleteRequestVO">
-    SELECT
-      DR.REQUEST_ID     AS requestId,
-      DR.REVIEW_ID      AS reviewId,
-      DR.REVIEW_TYPE    AS reviewType,
-      DR.TARGET_ID      AS targetId,
-      DR.BIZ_NO         AS bizNo,
-      DR.REQUEST_REASON AS requestReason,
-      DR.REJECT_REASON  AS rejectReason,
-      DR.STATUS_CD      AS statusCd,
-      DR.REQ_DATE       AS reqDate,
-      DR.ADMIN_NO       AS adminNo,
-      DR.PROCESS_DATE   AS processDate,
-      COALESCE(H.NAME, S.NAME) AS hospitalName,
-      B.BIZ_NAME        AS bizName,
-      R.RATING          AS reviewRating,
-      R.CONTENT         AS reviewContent,
-      M.NICKNAME        AS reviewerNickname,
-      R.REG_DATE        AS reviewRegDate,
-      'DELETE_REQ'      AS sourceCd
-    FROM TB_REVIEW_DELETE_REQUEST DR
-    LEFT JOIN TB_REVIEW R
-      ON R.REVIEW_ID = DR.REVIEW_ID
-     AND R.REVIEW_TYPE = DR.REVIEW_TYPE
-    LEFT JOIN TB_MEMBER M ON M.MEMBER_NO = R.MEMBER_NO
-    LEFT JOIN TB_HOSPITAL H
-      ON H.HOSPITAL_ID = DR.TARGET_ID
-     AND DR.REVIEW_TYPE = 'HOSPITAL'
-    LEFT JOIN TB_STAY S
-      ON S.STAY_ID = DR.TARGET_ID
-     AND DR.REVIEW_TYPE = 'STAY'
-    JOIN TB_BUSINESS B ON B.BIZ_NO = DR.BIZ_NO
-   WHERE DR.REQUEST_ID = #{requestId}
+    <include refid="deleteRequestSelect"/>
+    WHERE DR.REQUEST_ID = #{requestId}
   </select>
 
-  <!-- 쇼핑 삭제요청 단건 -->
-  <select id="selectAdminStoreReviewReportDetail"
+  <!-- 같은 리뷰에 대기 중인 삭제요청 (고객 신고 탭에서 리뷰 삭제 시 사업자 알림용) -->
+  <select id="selectPendingDeleteRequestsByReviewId"
           resultType="com.petcare.petcare.admin.review.vo.AdminReviewDeleteRequestVO">
-    SELECT
-      RR.REPORT_ID      AS requestId,
-      RR.REVIEW_ID      AS reviewId,
-      'PRODUCT'         AS reviewType,
-      R.TARGET_ID       AS targetId,
-      RR.BIZ_NO         AS bizNo,
-      RR.REASON         AS requestReason,
-      CAST(NULL AS VARCHAR2(500)) AS rejectReason,
-      CASE
-        WHEN RR.STATUS_CD = 'PENDING' THEN 'PENDING'
-        WHEN RR.STATUS_CD = 'DONE' AND RR.REVIEW_ID IS NULL THEN 'APPROVED'
-        WHEN RR.STATUS_CD = 'DONE' THEN 'REJECTED'
-        ELSE RR.STATUS_CD
-      END               AS statusCd,
-      RR.REG_DATE       AS reqDate,
-      RR.ADMIN_NO       AS adminNo,
-      CAST(NULL AS DATE) AS processDate,
-      P.PRODUCT_NAME    AS hospitalName,
-      B.BIZ_NAME        AS bizName,
-      R.RATING          AS reviewRating,
-      R.CONTENT         AS reviewContent,
-      M.NICKNAME        AS reviewerNickname,
-      R.REG_DATE        AS reviewRegDate,
-      'REPORT'          AS sourceCd
-    FROM TB_REVIEW_REPORT RR
-    LEFT JOIN TB_REVIEW R ON R.REVIEW_ID = RR.REVIEW_ID
-    LEFT JOIN TB_MEMBER M ON M.MEMBER_NO = R.MEMBER_NO
-    LEFT JOIN TB_PRODUCT P ON P.PRODUCT_ID = R.TARGET_ID AND R.REVIEW_TYPE = 'PRODUCT'
-    JOIN TB_BUSINESS B ON B.BIZ_NO = RR.BIZ_NO
-   WHERE RR.REPORT_ID = #{reportId}
-     AND RR.REPORTER_TYPE = 'BIZ'
+    <include refid="deleteRequestSelect"/>
+    WHERE DR.REVIEW_ID = #{reviewId}
+      AND DR.STATUS_CD = 'PENDING'
   </select>
 
   <update id="updateReviewDeleteRequestApproved">
@@ -248,6 +122,118 @@
      WHERE REQUEST_ID = #{requestId}
        AND STATUS_CD = 'PENDING'
   </update>
+
+  <!-- ===================== 고객 리뷰 신고 ===================== -->
+
+  <sql id="reviewReportSelect">
+    SELECT
+      RR.REPORT_ID      AS reportId,
+      RR.REVIEW_ID      AS reviewId,
+      RR.BIZ_NO         AS bizNo,
+      RR.REASON         AS reason,
+      RR.STATUS_CD      AS statusCd,
+      RR.REJECT_REASON  AS rejectReason,
+      RR.REG_DATE       AS regDate,
+      RR.PROCESS_DATE   AS processDate,
+      RM.NICKNAME       AS reporterNickname,
+      R.REVIEW_TYPE     AS reviewType,
+      R.TARGET_ID       AS targetId,
+      R.RATING          AS reviewRating,
+      R.CONTENT         AS reviewContent,
+      WM.NICKNAME       AS reviewerNickname,
+      COALESCE(P.PRODUCT_NAME, H.NAME, S.NAME) AS targetName,
+      B.BIZ_NAME        AS bizName
+    FROM TB_REVIEW_REPORT RR
+    LEFT JOIN TB_MEMBER RM ON RM.MEMBER_NO = RR.REPORTER_NO
+    LEFT JOIN TB_REVIEW R ON R.REVIEW_ID = RR.REVIEW_ID
+    LEFT JOIN TB_MEMBER WM ON WM.MEMBER_NO = R.MEMBER_NO
+    LEFT JOIN TB_PRODUCT P
+      ON P.PRODUCT_ID = R.TARGET_ID
+     AND R.REVIEW_TYPE = 'PRODUCT'
+    LEFT JOIN TB_HOSPITAL H
+      ON H.HOSPITAL_ID = R.TARGET_ID
+     AND R.REVIEW_TYPE = 'HOSPITAL'
+    LEFT JOIN TB_STAY S
+      ON S.STAY_ID = R.TARGET_ID
+     AND R.REVIEW_TYPE = 'STAY'
+    LEFT JOIN TB_BUSINESS B ON B.BIZ_NO = RR.BIZ_NO
+  </sql>
+
+  <sql id="reviewReportFilter">
+    <where>
+      <if test="statusCd != null and statusCd != '' and statusCd != 'ALL'">
+        AND RR.STATUS_CD = #{statusCd}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        AND (
+              P.PRODUCT_NAME LIKE '%' || #{keyword} || '%'
+           OR H.NAME LIKE '%' || #{keyword} || '%'
+           OR S.NAME LIKE '%' || #{keyword} || '%'
+           OR B.BIZ_NAME LIKE '%' || #{keyword} || '%'
+           OR RM.NICKNAME LIKE '%' || #{keyword} || '%'
+           OR WM.NICKNAME LIKE '%' || #{keyword} || '%'
+           OR RR.REASON LIKE '%' || #{keyword} || '%'
+        )
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectAdminReviewReportList"
+          resultType="com.petcare.petcare.admin.review.vo.AdminReviewReportVO">
+    SELECT *
+      FROM (
+        SELECT U.*,
+               ROW_NUMBER() OVER (ORDER BY U.regDate DESC, U.reportId DESC) AS rn
+          FROM (
+            <include refid="reviewReportSelect"/>
+            <include refid="reviewReportFilter"/>
+          ) U
+      )
+     WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+  </select>
+
+  <select id="selectAdminReviewReportCount" resultType="int">
+    SELECT COUNT(*)
+      FROM (
+        <include refid="reviewReportSelect"/>
+        <include refid="reviewReportFilter"/>
+      )
+  </select>
+
+  <select id="countPendingReviewReport" resultType="int">
+    SELECT COUNT(*)
+      FROM TB_REVIEW_REPORT
+     WHERE STATUS_CD = 'PENDING'
+  </select>
+
+  <select id="selectAdminReviewReportDetail"
+          resultType="com.petcare.petcare.admin.review.vo.AdminReviewReportVO">
+    <include refid="reviewReportSelect"/>
+    WHERE RR.REPORT_ID = #{reportId}
+  </select>
+
+  <!-- 삭제요청 목록 행을 펼쳤을 때 보여줄 고객 신고 (현재 페이지 리뷰들만 한 번에 조회) -->
+  <select id="selectReviewReportsByReviewIds"
+          resultType="com.petcare.petcare.admin.review.vo.AdminReviewReportVO">
+    <include refid="reviewReportSelect"/>
+    WHERE RR.REVIEW_ID IN
+    <foreach collection="reviewIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+    ORDER BY RR.REG_DATE, RR.REPORT_ID
+  </select>
+
+  <update id="updateReviewReportRejected">
+    UPDATE TB_REVIEW_REPORT
+       SET STATUS_CD = 'REJECTED',
+           REJECT_REASON = #{rejectReason, jdbcType=VARCHAR},
+           ADMIN_NO = #{adminNo},
+           PROCESS_DATE = SYSDATE
+     WHERE REPORT_ID = #{reportId}
+       AND STATUS_CD = 'PENDING'
+  </update>
+
+  <!-- ===================== 공통 ===================== -->
 
   <delete id="deleteReviewById">
     DELETE FROM TB_REVIEW

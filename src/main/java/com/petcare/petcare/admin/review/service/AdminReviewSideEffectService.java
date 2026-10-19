@@ -41,13 +41,21 @@ public class AdminReviewSideEffectService {
     }
 
     private void refreshRating(AdminReviewDeleteRequestVO req) {
-        if (req == null || req.getTargetId() == null) {
+        if (req == null) {
             return;
         }
-        if ("HOSPITAL".equals(req.getReviewType())) {
-            ratingService.refreshHospitalRating(req.getTargetId());
-        } else if ("STAY".equals(req.getReviewType())) {
-            ratingService.refreshStayRating(req.getTargetId());
+        refreshRating(req.getReviewType(), req.getTargetId());
+    }
+
+    // 병원·숙소만 평점 컬럼 갱신 (상품 평점은 조회 시 계산)
+    public void refreshRating(String reviewType, Long targetId) {
+        if (targetId == null) {
+            return;
+        }
+        if ("HOSPITAL".equals(reviewType)) {
+            ratingService.refreshHospitalRating(targetId);
+        } else if ("STAY".equals(reviewType)) {
+            ratingService.refreshStayRating(targetId);
         }
     }
 
