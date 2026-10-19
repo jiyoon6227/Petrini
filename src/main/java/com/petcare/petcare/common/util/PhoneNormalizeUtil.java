@@ -21,4 +21,10 @@ public final class PhoneNormalizeUtil {
         }
         return phone.trim();
     }
+
+    /** 하이픈 정규화 후 010-1234-5678 형식(11자리 휴대전화)인지 확인 */
+    public static boolean isValidMobile(String phone) {
+        String normalized = toHyphenPhone(phone);
+        return normalized != null && normalized.matches("^01[016789]-\\d{4}-\\d{4}$");
+    }
 }

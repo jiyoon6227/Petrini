@@ -317,7 +317,7 @@
     <div id="newAddressForm" style="display:none; border:1px solid #E2E8E4; border-radius:10px; padding:16px; margin-bottom:14px;">
       <div style="display:flex; gap:8px; margin-bottom:8px;">
         <input type="text" id="newRecvName" placeholder="받는 분" style="flex:1; border:1px solid #E2E8E4; border-radius:8px; padding:8px 10px; font-size:13px;">
-        <input type="text" id="newRecvPhone" placeholder="연락처 (010-0000-0000)" style="flex:1; border:1px solid #E2E8E4; border-radius:8px; padding:8px 10px; font-size:13px;">
+        <input type="text" id="newRecvPhone" placeholder="연락처 (010-0000-0000)" maxlength="13" inputmode="numeric" oninput="this.value = formatPhone(this.value)" style="flex:1; border:1px solid #E2E8E4; border-radius:8px; padding:8px 10px; font-size:13px;">
       </div>
       <div style="display:flex; gap:8px; margin-bottom:8px;">
         <input type="text" id="newZipcode" placeholder="우편번호" readonly style="width:110px; border:1px solid #E2E8E4; border-radius:8px; padding:8px 10px; font-size:13px;">
@@ -658,6 +658,14 @@ function selectAddress(addrId, recvName, recvPhone, zipCode, addr1, addr2) {
   closeAddressModal();
 }
 
+// 숫자만 남기고 최대 11자리, 010-0000-0000 형태로 하이픈 삽입 (입력·붙여넣기 모두 처리)
+function formatPhone(value) {
+  var digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+  if (digits.length < 4) return digits;
+  if (digits.length < 8) return digits.slice(0, 3) + '-' + digits.slice(3);
+  return digits.slice(0, 3) + '-' + digits.slice(3, 7) + '-' + digits.slice(7);
+}
+
 // 지금 수정 중인 배송지 ID (null이면 "신규 등록" 모드, 값 있으면 "수정" 모드)
 var editingAddrId = null;
 
@@ -677,7 +685,7 @@ function toggleNewAddressForm() {
 function editAddress(addrId, recvName, recvPhone, zipCode, addr1, addr2) {
   editingAddrId = addrId;
   document.getElementById('newRecvName').value = recvName;
-  document.getElementById('newRecvPhone').value = recvPhone;
+  document.getElementById('newRecvPhone').value = formatPhone(recvPhone);
   document.getElementById('newZipcode').value = zipCode;
   document.getElementById('newAddr1').value = addr1;
   document.getElementById('newAddr2').value = addr2;
@@ -733,6 +741,11 @@ function saveNewAddress() {
     return;
   }
 
+  if (!/^01[016789]-\d{4}-\d{4}$/.test(recvPhone)) {
+    alert('연락처 11자리를 정확히 입력해주세요. (예: 010-1234-5678)');
+    return;
+  }
+
   var isEdit = editingAddrId !== null;
   var url = isEdit ? '/mypage/address/update' : '/mypage/address/add';
 
@@ -766,6 +779,8 @@ function saveNewAddress() {
         loadAddressList();
       } else if (result === 'LOGIN_REQUIRED') {
         alert('로그인 세션이 없습니다.');
+      } else if (result === 'INVALID_PHONE') {
+        alert('연락처 11자리를 정확히 입력해주세요. (예: 010-1234-5678)');
       } else {
         alert('저장에 실패했습니다.');
       }

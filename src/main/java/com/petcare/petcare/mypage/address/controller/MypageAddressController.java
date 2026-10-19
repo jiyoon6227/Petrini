@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.petcare.petcare.common.util.PhoneNormalizeUtil;
 import com.petcare.petcare.member.vo.MemberVO;
 import com.petcare.petcare.mypage.address.service.MypageAddressService;
 import com.petcare.petcare.mypage.address.vo.MypageAddressVO;
@@ -42,6 +43,7 @@ public class MypageAddressController {
                        HttpSession session) {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
         if (member == null) return "LOGIN_REQUIRED";
+        if (!PhoneNormalizeUtil.isValidMobile(recvPhone)) return "INVALID_PHONE";
         mypageAddressService.addAddress(member.getMemberNo(), recvName, recvPhone, zipCode, addr1, addr2, setDefault);
         return "OK";
     }
@@ -64,6 +66,7 @@ public class MypageAddressController {
                           @RequestParam(required = false) String addr2, HttpSession session) {
         MemberVO member = (MemberVO) session.getAttribute("memberInfo");
         if (member == null) return "LOGIN_REQUIRED";
+        if (!PhoneNormalizeUtil.isValidMobile(recvPhone)) return "INVALID_PHONE";
         boolean ok = mypageAddressService.updateAddress(addrId, member.getMemberNo(), recvName, recvPhone, zipCode, addr1, addr2);
         return ok ? "OK" : "FAILED";
     }
