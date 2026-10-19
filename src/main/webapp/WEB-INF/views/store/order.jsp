@@ -334,6 +334,7 @@
 
 <!-- 카카오 우편번호 API -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="${contextPath}/resources/js/phone.js"></script>
 <script>
 // 배송지 목록 모달 fetch 호출용 contextPath
 var contextPath = '${contextPath}';
@@ -658,14 +659,6 @@ function selectAddress(addrId, recvName, recvPhone, zipCode, addr1, addr2) {
   closeAddressModal();
 }
 
-// 숫자만 남기고 최대 11자리, 010-0000-0000 형태로 하이픈 삽입 (입력·붙여넣기 모두 처리)
-function formatPhone(value) {
-  var digits = String(value || '').replace(/\D/g, '').slice(0, 11);
-  if (digits.length < 4) return digits;
-  if (digits.length < 8) return digits.slice(0, 3) + '-' + digits.slice(3);
-  return digits.slice(0, 3) + '-' + digits.slice(3, 7) + '-' + digits.slice(7);
-}
-
 // 지금 수정 중인 배송지 ID (null이면 "신규 등록" 모드, 값 있으면 "수정" 모드)
 var editingAddrId = null;
 
@@ -741,7 +734,7 @@ function saveNewAddress() {
     return;
   }
 
-  if (!/^01[016789]-\d{4}-\d{4}$/.test(recvPhone)) {
+  if (!isValidPhone(recvPhone)) {
     alert('연락처 11자리를 정확히 입력해주세요. (예: 010-1234-5678)');
     return;
   }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.petcare.petcare.common.util.PhoneNormalizeUtil;
 import com.petcare.petcare.file.service.FileService;
 import com.petcare.petcare.file.vo.FileVO;
 import com.petcare.petcare.member.auth.exception.MemberLoginBlockedException;
@@ -271,6 +272,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         if (validateError != null) {
             return validateError;
         }
+        // 숫자만 보내도 통과하므로 저장은 010-1234-5678 형태로 통일
+        vo.setPhone(PhoneNormalizeUtil.toHyphenPhone(vo.getPhone()));
 
         String email = vo.getEmail().trim();
         
@@ -377,7 +380,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
                 || !vo.getPassword().equals(vo.getPasswordConfirm())) {
             return "password_mismatch";
         }
-        if (vo.getPhone() == null || !vo.getPhone().matches("^01[0-9]-\\d{4}-\\d{4}$")) {
+        // 휴대전화 11자리 (배송지·회원정보 수정과 같은 규칙)
+        if (!PhoneNormalizeUtil.isValidMobile(vo.getPhone())) {
             return "phone";
         }
         // 생년월일 필수 (join.jsp Step2와 동일)

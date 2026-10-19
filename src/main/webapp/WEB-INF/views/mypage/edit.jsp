@@ -109,10 +109,9 @@
             </div>
             <div class="edit-group">
                 <label>전화번호 <span class="req">*</span></label>
-                <div class="edit-input-row">
-                    <input type="tel" id="phone" name="phone" value="${profile.phone}">
-                    <button class="btn-verify" type="button">인증</button>
-                </div>
+                <input type="tel" id="phone" name="phone" value="${profile.phone}"
+                       placeholder="010-0000-0000" maxlength="13" inputmode="numeric"
+                       oninput="this.value = formatPhone(this.value)">
             </div>
             <div class="edit-group">
                 <label>생년월일</label>
@@ -198,7 +197,15 @@
 <%-- 토스 빌링 SDK + 카드등록 Ajax --%>
 <script src="https://js.tosspayments.com/v2/standard"></script>
 <script src="${contextPath}/resources/js/billing-card.js"></script>
+<%-- 전화번호 하이픈·형식 검사 (회원가입·주문서와 공통) --%>
+<script src="${contextPath}/resources/js/phone.js"></script>
 <script>
+/* 예전에 하이픈 없이 저장된 번호도 화면에서는 010-0000-0000 형태로 */
+(function () {
+  var phoneInput = document.getElementById('phone');
+  if (phoneInput) phoneInput.value = formatPhone(phoneInput.value);
+})();
+
 /* 회원정보 카드등록 (목록 Ajax + requestBillingAuth) */
 /* 등록 카드 전부 표시 */
 (function () {
@@ -310,6 +317,11 @@ $("#btnSaveProfile").click(function(){
     }
     if (phone.length === 0) {
         alert("전화번호를 입력해 주세요.");
+        $("#phone").focus();
+        return;
+    }
+    if (!isValidPhone(phone)) {
+        alert("전화번호 11자리를 정확히 입력해 주세요. (예: 010-1234-5678)");
         $("#phone").focus();
         return;
     }

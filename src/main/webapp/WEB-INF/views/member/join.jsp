@@ -223,7 +223,8 @@
               <label class="form-label" for="phone">전화번호 <span class="req">*</span></label>
               <input type="tel" id="phone" name="phone"
                      class="form-input no-icon" placeholder="010-0000-0000"
-                     oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3')">
+                     maxlength="13" inputmode="numeric"
+                     oninput="this.value = formatPhone(this.value)">
               <p class="field-error" id="errPhone">올바른 전화번호를 입력해 주세요.</p>
             </div>
 
@@ -530,9 +531,10 @@
 <%-- 토스 빌링 SDK + 카드등록 Ajax --%>
 <script src="https://js.tosspayments.com/v2/standard"></script>
 <script src="${contextPath}/resources/js/billing-card.js"></script>
-<script src="${contextPath}/resources/js/billing-card.js"></script>
 <%-- 회원가입·마이페이지 공통 품종 목록 --%>
 <script src="${contextPath}/resources/js/pet-breeds.js"></script>
+<%-- 전화번호 하이픈·형식 검사 (회원정보 수정·주문서와 공통) --%>
+<script src="${contextPath}/resources/js/phone.js"></script>
 <script>
 (function () {
 
@@ -1128,8 +1130,7 @@
     if (pw !== cpw) { err('errPwConfirm', 'okPwConfirm'); valid = false; }
 
     var phone = document.getElementById('phone').value.trim();
-    var phoneRe = /^01[0-9]-\d{4}-\d{4}$/;
-    if (!phoneRe.test(phone)) { err('errPhone', null); valid = false; }
+    if (!isValidPhone(phone)) { err('errPhone', null); valid = false; }
     else                        clearMsg('errPhone', null);
 
     var birth = document.getElementById('birthDate').value;
