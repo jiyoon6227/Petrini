@@ -2,6 +2,8 @@ package com.petcare.petcare.common.external.service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petcare.petcare.common.external.vo.TossCancelResultVO;
+import com.petcare.petcare.common.external.vo.TossCancelResultVO.ResultType;
+import com.petcare.petcare.common.external.vo.TossPaymentLookupVO;
 
 @Service
 public class TossPaymentService {
@@ -23,6 +28,16 @@ public class TossPaymentService {
     // 빌링키 결제는 위젯 시크릿과 분리 (섞으면 cancel FORBIDDEN_REQUEST)
     @Value("${toss.billing.secret-key}")
     private String tossBillingSecretKey;
+
+    // 취소 재처리용 메서드(cancelPaymentWithKey, getPayment)에만 적용
+    @Value("${toss.api-base-url:https://api.tosspayments.com}")
+    private String tossApiBaseUrl;
+
+    @Value("${toss.cancel.connect-timeout-ms:5000}")
+    private int cancelConnectTimeoutMs;
+
+    @Value("${toss.cancel.read-timeout-ms:30000}")
+    private int cancelReadTimeoutMs;
 
     public String cancelPayment(String paymentKey, String cancelReason) {
         return cancelPayment(paymentKey, cancelReason, null, false);
@@ -56,14 +71,9 @@ public class TossPaymentService {
             conn.setRequestProperty("Idempotency-Key", java.util.UUID.randomUUID().toString());
             conn.setDoOutput(true);
 
-            String safeReason = cancelReason == null ? "취소" : cancelReason.replace("\"", "'");
-            StringBuilder body = new StringBuilder("{\"cancelReason\":\"").append(safeReason).append("\"");
-            if (cancelAmount != null && cancelAmount > 0) {
-                body.append(",\"cancelAmount\":").append(cancelAmount);
-            }
-            body.append("}");
+            String body = buildCancelBody(cancelReason, cancelAmount);
             try (OutputStream os = conn.getOutputStream()) {
-                os.write(body.toString().getBytes(StandardCharsets.UTF_8));
+                os.write(body.getBytes(StandardCharsets.UTF_8));
             }
 
             int status = conn.getResponseCode();
@@ -134,6 +144,130 @@ public class TossPaymentService {
             return tossBillingSecretKey;
         }
         return tossSecretKey;
+    }
+
+    /** 취소 요청 바디. 같은 사유·금액이면 항상 같은 문자열 (재시도 시 바디 동일 보장) */
+    static String buildCancelBody(String cancelReason, Long cancelAmount) {
+        String safeReason = cancelReason == null ? "취소" : cancelReason.replace("\"", "'");
+        StringBuilder body = new StringBuilder("{\"cancelReason\":\"").append(safeReason).append("\"");
+        if (cancelAmount != null && cancelAmount > 0) {
+            body.append(",\"cancelAmount\":").append(cancelAmount);
+        }
+        body.append("}");
+        return body.toString();
+    }
+
+    /**
+     * 멱등키를 밖에서 받아 결제취소 (주문 실패 후 자동취소·재처리용)
+     * - 같은 결제는 처음부터 끝까지 같은 멱등키·사유·금액으로 보내야 토스가 중복 취소로 처리하지 않음
+     * - 시크릿은 billingPayment 로 정한 하나만 사용 (반대 시크릿 재시도 없음)
+     * - 연결 5초 / 응답 30초 타임아웃 (application.properties)
+     */
+    public TossCancelResultVO cancelPaymentWithKey(String paymentKey, String cancelReason, Long cancelAmount,
+                                                   boolean billingPayment, String idempotencyKey) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(tossApiBaseUrl + "/v1/payments/" + paymentKey + "/cancel");
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(cancelConnectTimeoutMs);
+            conn.setReadTimeout(cancelReadTimeoutMs);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Authorization", basicAuth(resolveCancelSecret(billingPayment)));
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Idempotency-Key", idempotencyKey);
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(buildCancelBody(cancelReason, cancelAmount).getBytes(StandardCharsets.UTF_8));
+            }
+
+            int status = conn.getResponseCode();
+            String responseBody = readBody(conn, status);
+            if (status == 200) {
+                return new TossCancelResultVO(ResultType.SUCCESS, status, null, "취소 성공");
+            }
+
+            String code = null;
+            String message = "토스 결제취소 요청이 거절되었습니다.";
+            if (responseBody != null && !responseBody.isBlank()) {
+                try {
+                    JsonNode json = new ObjectMapper().readTree(responseBody);
+                    code = json.path("code").asText(null);
+                    message = json.path("message").asText(message);
+                } catch (IOException ignore) {
+                    // JSON이 아닌 응답(게이트웨이 오류 페이지 등)은 기본 메시지 사용
+                }
+            }
+            return new TossCancelResultVO(classifyCancelResponse(status, code), status, code, message);
+
+        } catch (IOException e) {
+            // 타임아웃·연결 실패 등 네트워크 오류 → 토스에 도달했는지 알 수 없으므로 같은 멱등키로 재시도
+            return new TossCancelResultVO(ResultType.RETRYABLE, 0, null,
+                    "토스 API 통신 오류: " + e.getClass().getSimpleName() + " " + e.getMessage());
+        } catch (Exception e) {
+            // 시크릿 미설정 등 설정 오류
+            return new TossCancelResultVO(ResultType.NOT_RETRYABLE, 0, null,
+                    "토스 결제취소 요청 준비 중 오류: " + e.getMessage());
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+    }
+
+    /** 응답 상태코드·토스 에러코드로 결과 구분 */
+    static ResultType classifyCancelResponse(int status, String code) {
+        if (status == 200) return ResultType.SUCCESS;
+        if (status == 400 && "ALREADY_CANCELED_PAYMENT".equals(code)) return ResultType.ALREADY_CANCELED;
+        if (status == 409 && "IDEMPOTENT_REQUEST_PROCESSING".equals(code)) return ResultType.RETRYABLE;
+        if (status >= 500) return ResultType.RETRYABLE;
+        return ResultType.NOT_RETRYABLE;
+    }
+
+    /**
+     * 결제 조회 (GET /v1/payments/{paymentKey}) — status 가 CANCELED 인지 확인용
+     * @param billingPayment true면 빌링 시크릿으로 조회
+     */
+    public TossPaymentLookupVO getPayment(String paymentKey, boolean billingPayment) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(tossApiBaseUrl + "/v1/payments/" + paymentKey);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(cancelConnectTimeoutMs);
+            conn.setReadTimeout(cancelReadTimeoutMs);
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", basicAuth(resolveCancelSecret(billingPayment)));
+
+            int status = conn.getResponseCode();
+            String responseBody = readBody(conn, status);
+            JsonNode json = (responseBody == null || responseBody.isBlank())
+                    ? null : new ObjectMapper().readTree(responseBody);
+            if (status == 200) {
+                return new TossPaymentLookupVO(true, status,
+                        json != null ? json.path("status").asText(null) : null, null);
+            }
+            String message = json != null ? json.path("message").asText("결제 조회 실패") : "결제 조회 실패";
+            return new TossPaymentLookupVO(false, status, null, message);
+
+        } catch (Exception e) {
+            return new TossPaymentLookupVO(false, 0, null, "토스 결제조회 오류: " + e.getMessage());
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+    }
+
+    private static String basicAuth(String secret) {
+        return "Basic " + Base64.getEncoder().encodeToString((secret + ":").getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** 응답 바디 읽기 (5xx 등에서 에러 스트림이 없으면 null) */
+    private static String readBody(HttpURLConnection conn, int status) throws IOException {
+        InputStream in = status < 400 ? conn.getInputStream() : conn.getErrorStream();
+        if (in == null) return null;
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) sb.append(line);
+            return sb.toString();
+        }
     }
 
     /**

@@ -27,6 +27,11 @@
   <c:when test="${not empty noOrderData}">
     <%-- confirmError(승인 실패) 있으면 그 사유, 없으면(세션만료 등) 기본 문구 표시 --%>
     <c:choose>
+      <%-- 자동취소가 바로 안 돼서 재처리 대기 중 (스케줄러가 환불 진행) --%>
+      <c:when test="${not empty cancelPending}">
+        <div class="complete-title">주문 처리에 실패했습니다.</div>
+        <div class="complete-desc">${confirmError}<br>환불이 완료되면 결제하신 수단으로 금액이 돌아갑니다.</div>
+      </c:when>
       <c:when test="${not empty confirmError}">
         <div class="complete-title">${not empty autoCanceled ? '주문 처리에 실패했습니다.' : '결제 승인에 실패했습니다.'}</div>
         <div class="complete-desc" style="color:#E2445C;">${confirmError}</div>

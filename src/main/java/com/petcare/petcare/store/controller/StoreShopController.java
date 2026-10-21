@@ -25,6 +25,7 @@ import com.petcare.petcare.common.billing.service.BillingCardService;
 import com.petcare.petcare.common.billing.vo.BillingApproveResultVO;
 import com.petcare.petcare.common.billing.vo.BillingCardVO;
 import com.petcare.petcare.common.external.service.TossBillingService;
+import com.petcare.petcare.common.paycancel.service.OrderPaymentAutoCancelService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,10 @@ public class StoreShopController {
     // 결제승인(confirm) API 호출용
     @Autowired
     private com.petcare.petcare.common.external.service.TossPaymentService tossPaymentService;
+
+    // 주문 저장 실패 시 결제 자동취소 (+실패 건 재처리 등록)
+    @Autowired
+    private OrderPaymentAutoCancelService orderPaymentAutoCancelService;
 
     // 등록카드(빌링) 결제
     @Autowired
@@ -381,22 +386,38 @@ public String payment(@RequestParam(required = false) Long productId,
         try {
             orderNo = storeShopService.completeOrder(orderTemp, paymentKey, orderId, "TOSS");
         } catch (Exception e) {
-            // 실제 결제키가 아니면 취소가 안 되므로 "취소했다"고 안내하지 않고 실패로 처리
-            String cancelError = com.petcare.petcare.common.external.service.TossPaymentService.isSkipCancelPaymentKey(paymentKey)
-                    ? "실제 결제키가 없어 자동 취소 불가"
-                    : tossPaymentService.cancelPaymentSmart(
-                            paymentKey, "주문 처리 실패로 결제 자동 취소", null, "TOSS");
             session.removeAttribute("orderTemp");
             model.addAttribute("noOrderData", true);
             // 화면 제목을 "결제 승인 실패" 대신 "주문 처리 실패"로 보여주기 위함
             model.addAttribute("autoCanceled", true);
-            if (cancelError == null) {
+
+            // 실제 결제키가 아니면 취소가 안 되므로 "취소했다"고 안내하지 않고 실패로 처리
+            if (com.petcare.petcare.common.external.service.TossPaymentService.isSkipCancelPaymentKey(paymentKey)) {
+                log.error("주문 저장 실패 후 결제 자동 취소 실패 - paymentKey={}, orderId={}, 주문 실패 사유={}, 취소 실패 사유={}",
+                        paymentKey, orderId, e.getMessage(), "실제 결제키가 없어 자동 취소 불가", e);
+                model.addAttribute("confirmError",
+                        "주문 처리에 실패했고 결제 자동 취소도 실패했습니다. 고객센터로 문의해 주세요.");
+                return "store/order-complete";
+            }
+
+            // 같은 멱등키로 취소(+1회 재시도) → 그래도 실패면 재처리 테이블에 저장 (스케줄러가 이어서 취소)
+            Long cancelAmount = orderTemp.getFinalTotal() != null ? orderTemp.getFinalTotal().longValue() : null;
+            OrderPaymentAutoCancelService.Outcome outcome = orderPaymentAutoCancelService.cancelAfterOrderFailure(
+                    paymentKey, orderId, "TOSS", cancelAmount, "주문 처리 실패로 결제 자동 취소");
+
+            if (outcome == OrderPaymentAutoCancelService.Outcome.CANCELED) {
                 model.addAttribute("confirmError",
                         "주문 처리 중 문제가 생겨 결제를 자동으로 취소했습니다. (사유: " + e.getMessage() + ")");
+            } else if (outcome == OrderPaymentAutoCancelService.Outcome.QUEUED) {
+                log.error("주문 저장 실패 - 결제 취소 재처리 대기 - paymentKey={}, orderId={}, 주문 실패 사유={}",
+                        paymentKey, orderId, e.getMessage(), e);
+                model.addAttribute("cancelPending", true);
+                model.addAttribute("confirmError",
+                        "주문 처리 중 문제가 생겨 결제 취소를 진행 중입니다. 환불이 완료될 때까지 잠시 기다려 주세요.");
             } else {
-                // 자동 취소도 실패하면 나중에 수동 환불할 수 있게 결제 정보를 남김
-                log.error("주문 저장 실패 후 결제 자동 취소 실패 - paymentKey={}, orderId={}, 주문 실패 사유={}, 취소 실패 사유={}",
-                        paymentKey, orderId, e.getMessage(), cancelError, e);
+                // 재처리 저장까지 실패 → 수동 환불 대상 (결제 정보는 서비스 쪽 log.error 에 남김)
+                log.error("주문 저장 실패 후 결제 자동 취소 실패 - paymentKey={}, orderId={}, amount={}, 주문 실패 사유={}",
+                        paymentKey, orderId, cancelAmount, e.getMessage(), e);
                 model.addAttribute("confirmError",
                         "주문 처리에 실패했고 결제 자동 취소도 실패했습니다. 고객센터로 문의해 주세요.");
             }
@@ -496,19 +517,33 @@ public String payment(@RequestParam(required = false) Long productId,
             orderNo = storeShopService.completeOrder(orderTemp, paymentKey, tossOrderId, "BILLING");
         } catch (Exception e) {
             // 주문 저장이 실패하면 이미 승인된 결제를 취소해 돈만 빠지는 상황을 막음
-            // 실제 결제키가 아니면 취소가 안 되므로 "취소했다"고 안내하지 않고 실패로 처리
-            String cancelError = com.petcare.petcare.common.external.service.TossPaymentService.isSkipCancelPaymentKey(paymentKey)
-                    ? "실제 결제키가 없어 자동 취소 불가"
-                    : tossPaymentService.cancelPaymentSmart(
-                            paymentKey, "주문 처리 실패로 결제 자동 취소", null, "BILLING");
             session.removeAttribute("orderTemp");
             res.put("ok", false);
-            if (cancelError == null) {
-                res.put("message", "주문 처리 중 문제가 생겨 결제를 자동으로 취소했습니다. (사유: " + e.getMessage() + ")");
-            } else {
-                // 자동 취소도 실패하면 나중에 수동 환불할 수 있게 결제 정보를 남김
+
+            // 실제 결제키가 아니면 취소가 안 되므로 "취소했다"고 안내하지 않고 실패로 처리
+            if (com.petcare.petcare.common.external.service.TossPaymentService.isSkipCancelPaymentKey(paymentKey)) {
                 log.error("주문 저장 실패 후 결제 자동 취소 실패 - paymentKey={}, orderId={}, 주문 실패 사유={}, 취소 실패 사유={}",
-                        paymentKey, tossOrderId, e.getMessage(), cancelError, e);
+                        paymentKey, tossOrderId, e.getMessage(), "실제 결제키가 없어 자동 취소 불가", e);
+                res.put("message", "주문 처리에 실패했고 결제 자동 취소도 실패했습니다. 고객센터로 문의해 주세요.");
+                return res;
+            }
+
+            // 같은 멱등키로 취소(+1회 재시도) → 그래도 실패면 재처리 테이블에 저장 (빌링 시크릿으로 스케줄러가 이어서 취소)
+            Long cancelAmount = (long) amount;
+            OrderPaymentAutoCancelService.Outcome outcome = orderPaymentAutoCancelService.cancelAfterOrderFailure(
+                    paymentKey, tossOrderId, "BILLING", cancelAmount, "주문 처리 실패로 결제 자동 취소");
+
+            if (outcome == OrderPaymentAutoCancelService.Outcome.CANCELED) {
+                res.put("message", "주문 처리 중 문제가 생겨 결제를 자동으로 취소했습니다. (사유: " + e.getMessage() + ")");
+            } else if (outcome == OrderPaymentAutoCancelService.Outcome.QUEUED) {
+                log.error("주문 저장 실패 - 결제 취소 재처리 대기 - paymentKey={}, orderId={}, 주문 실패 사유={}",
+                        paymentKey, tossOrderId, e.getMessage(), e);
+                res.put("cancelPending", true);
+                res.put("message", "주문 처리 중 문제가 생겨 결제 취소를 진행 중입니다. 환불이 완료될 때까지 잠시 기다려 주세요.");
+            } else {
+                // 재처리 저장까지 실패 → 수동 환불 대상 (결제 정보는 서비스 쪽 log.error 에 남김)
+                log.error("주문 저장 실패 후 결제 자동 취소 실패 - paymentKey={}, orderId={}, amount={}, 주문 실패 사유={}",
+                        paymentKey, tossOrderId, cancelAmount, e.getMessage(), e);
                 res.put("message", "주문 처리에 실패했고 결제 자동 취소도 실패했습니다. 고객센터로 문의해 주세요.");
             }
             return res;

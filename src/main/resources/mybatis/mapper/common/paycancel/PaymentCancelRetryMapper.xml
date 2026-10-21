@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- PK는 SEQ_TB_PAYMENT_CANCEL_RETRY, PAYMENT_KEY 는 UNIQUE -->
+<mapper namespace="com.petcare.petcare.common.paycancel.mapper.PaymentCancelRetryMapper">
+
+    <!-- 같은 PAYMENT_KEY 가 없을 때만 INSERT (있으면 0건) -->
+    <insert id="insertRetryIfAbsent" parameterType="com.petcare.petcare.common.paycancel.vo.PaymentCancelRetryVO">
+        MERGE INTO TB_PAYMENT_CANCEL_RETRY T
+        USING (SELECT #{paymentKey} AS PAYMENT_KEY FROM DUAL) S
+        ON (T.PAYMENT_KEY = S.PAYMENT_KEY)
+        WHEN NOT MATCHED THEN
+            INSERT (
+                RETRY_ID,
+                PAYMENT_KEY,
+                ORDER_ID,
+                PAY_METHOD,
+                CANCEL_AMOUNT,
+                CANCEL_REASON,
+                IDEMPOTENCY_KEY,
+                STATUS_CD,
+                ATTEMPT_CNT,
+                LAST_ERROR,
+                REG_DATE
+            ) VALUES (
+                SEQ_TB_PAYMENT_CANCEL_RETRY.NEXTVAL,
+                #{paymentKey},
+                #{orderId, jdbcType=VARCHAR},
+                #{payMethod},
+                #{cancelAmount, jdbcType=NUMERIC},
+                SUBSTRB(#{cancelReason, jdbcType=VARCHAR}, 1, 200),
+                #{idempotencyKey},
+                'PENDING',
+                0,
+                SUBSTRB(#{lastError, jdbcType=VARCHAR}, 1, 1000),
+                SYSDATE
+            )
+    </insert>
+
+    <!-- PENDING 목록 (먼저 등록된 건부터) -->
+    <select id="selectPendingList" resultType="com.petcare.petcare.common.paycancel.vo.PaymentCancelRetryVO">
+        SELECT  RETRY_ID,
+                PAYMENT_KEY,
+                ORDER_ID,
+                PAY_METHOD,
+                CANCEL_AMOUNT,
+                CANCEL_REASON,
+                IDEMPOTENCY_KEY,
+                STATUS_CD,
+                ATTEMPT_CNT,
+                LAST_ERROR,
+                REG_DATE,
+                PROCESS_DATE
+        FROM    TB_PAYMENT_CANCEL_RETRY
+        WHERE   STATUS_CD = 'PENDING'
+        ORDER BY RETRY_ID
+    </select>
+
+    <!-- 선점 (PENDING 일 때만 PROCESSING 으로) -->
+    <update id="updateClaim">
+        UPDATE  TB_PAYMENT_CANCEL_RETRY
+        SET     STATUS_CD    = 'PROCESSING',
+                PROCESS_DATE = SYSDATE
+        WHERE   RETRY_ID  = #{retryId}
+        AND     STATUS_CD = 'PENDING'
+    </update>
+
+    <!-- 취소 완료 -->
+    <update id="updateSuccess">
+        UPDATE  TB_PAYMENT_CANCEL_RETRY
+        SET     STATUS_CD    = 'SUCCESS',
+                PROCESS_DATE = SYSDATE
+        WHERE   RETRY_ID  = #{retryId}
+        AND     STATUS_CD = 'PROCESSING'
+    </update>
+
+    <!-- 실패 → 다음 주기에 다시 시도 -->
+    <update id="updateRetry">
+        UPDATE  TB_PAYMENT_CANCEL_RETRY
+        SET     STATUS_CD    = 'PENDING',
+                ATTEMPT_CNT  = ATTEMPT_CNT + 1,
+                LAST_ERROR   = SUBSTRB(#{lastError, jdbcType=VARCHAR}, 1, 1000),
+                PROCESS_DATE = SYSDATE
+        WHERE   RETRY_ID  = #{retryId}
+        AND     STATUS_CD = 'PROCESSING'
+    </update>
+
+    <!-- 최대 횟수 초과 → 최종 실패 (수동 환불 대상) -->
+    <update id="updateFailed">
+        UPDATE  TB_PAYMENT_CANCEL_RETRY
+        SET     STATUS_CD    = 'FAILED',
+                ATTEMPT_CNT  = ATTEMPT_CNT + 1,
+                LAST_ERROR   = SUBSTRB(#{lastError, jdbcType=VARCHAR}, 1, 1000),
+                PROCESS_DATE = SYSDATE
+        WHERE   RETRY_ID  = #{retryId}
+        AND     STATUS_CD = 'PROCESSING'
+    </update>
+
+    <!-- PROCESSING 상태로 stuckMinutes 분 넘게 멈춘 건 되돌리기 -->
+    <update id="updateReleaseStuck">
+        UPDATE  TB_PAYMENT_CANCEL_RETRY
+        SET     STATUS_CD = 'PENDING'
+        WHERE   STATUS_CD = 'PROCESSING'
+        AND     PROCESS_DATE &lt; SYSDATE - (#{stuckMinutes} / 1440)
+    </update>
+
+</mapper>
