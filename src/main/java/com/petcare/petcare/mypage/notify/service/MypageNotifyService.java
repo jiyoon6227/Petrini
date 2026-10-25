@@ -61,16 +61,17 @@ public interface MypageNotifyService {
     // 2-1. 유저/시스템 → 사업자
 
     // 신규 주문 알림 → 사업자 회원 알림함 "주문" 탭
-    void sendNewOrderNotification(Long bizMemberNo, String orderNo, String productName, int itemCount);
+    // orderGroupNo: 주문번호(결제 단위) / orderNo: 사업자 주문번호 (다르면 병기)
+    void sendNewOrderNotification(Long bizMemberNo, String orderGroupNo, String orderNo, String productName, int itemCount);
 
     // 상품 품절 알림 → 사업자 회원 알림함 "재고" 탭
     void sendProductSoldoutNotification(Long bizMemberNo, String productName, Long productId);
 
     // 주문취소 신청 알림 → 사업자 회원 알림함 "주문" 탭
-    void sendCancelRequestNotification(Long bizMemberNo, String orderNo, String reason);
+    void sendCancelRequestNotification(Long bizMemberNo, String orderGroupNo, String orderNo, String reason);
 
     // 상품 환불 신청 알림 → 사업자 (환불신청 페이지)
-    void sendRefundRequestNotification(Long bizMemberNo, String orderNo, String productName, String reasonCd);
+    void sendRefundRequestNotification(Long bizMemberNo, String orderGroupNo, String orderNo, String productName, String reasonCd);
 
     // 2-2. 사업자 → 유저
 

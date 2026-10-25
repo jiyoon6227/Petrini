@@ -42,7 +42,8 @@
                 <c:if test="${ovs.first || o.orderGroupId != orderList[ovs.index-1].orderGroupId}">
                 <div class="order-card">
                     <div class="order-card-head">
-                        <span>${o.orderDate} 주문 <strong>#${o.orderNo}</strong></span>
+                        <%-- 주문번호는 결제 단위(orderGroupNo)라 카드 머리에 어느 사업자 주문이 와도(탭 필터 포함) 같은 번호 --%>
+                        <span>${o.orderDate} 주문 <strong>#${o.orderGroupNo}</strong></span>
                         <%-- 사업자별로 나뉘어도 유저에겐 결제 1건이라 주문번호/상세보기는 카드당 하나
                              어느 사업자 주문의 orderId를 넘겨도 상세페이지에서 같은 결제그룹 전체를 묶어서 보여줌 --%>
                         <a href="${contextPath}/mypage/orders/detail?orderId=${o.orderId}" style="font-size:13px;color:var(--text-muted);text-decoration:none">주문상세보기 &gt;</a>

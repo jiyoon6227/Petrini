@@ -171,7 +171,7 @@ public class MypageOrderServiceImpl implements MypageOrderService {
         if (updated > 0) {
             Long bizMemberNo = mypageOrderMapper.selectBizMemberNoByOrderId(orderId);
             MypageOrderVO order = mypageOrderMapper.selectOrderDetail(orderId, memberNo);
-            mypageNotifyService.sendCancelRequestNotification(bizMemberNo, order.getOrderNo(), reason);
+            mypageNotifyService.sendCancelRequestNotification(bizMemberNo, order.getOrderGroupNo(), order.getOrderNo(), reason);
         }
         return updated > 0;
     }
@@ -256,8 +256,9 @@ public class MypageOrderServiceImpl implements MypageOrderService {
 
         Long bizMemberNo = mypageOrderMapper.selectBizMemberNoByOrderItemId(orderItemId);
         String orderNo = mypageOrderMapper.selectOrderNoByOrderItemId(orderItemId);
+        String orderGroupNo = mypageOrderMapper.selectOrderGroupNoByOrderItemId(orderItemId);
         mypageNotifyService.sendRefundRequestNotification(
-                bizMemberNo, orderNo, item.getProductName(), reasonCd);
+                bizMemberNo, orderGroupNo, orderNo, item.getProductName(), reasonCd);
 
         return null;
     }

@@ -9,7 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AdminStoreOrderVO {
     private Long orderId;
-    private String orderNo;
+    private String orderNo;      // 사업자 주문번호
+    private String orderGroupNo; // 주문번호 (결제 단위)
     private Long bizNo;
     private String bizName;
     private String buyerName;

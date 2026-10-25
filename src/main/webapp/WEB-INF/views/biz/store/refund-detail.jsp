@@ -101,7 +101,8 @@
       <div class="rf-grid">
         <div>
           <h4>주문 · 결제</h4>
-          <div class="rf-row"><span>주문번호</span><span><c:out value="${refund.orderNo}"/></span></div>
+          <div class="rf-row"><span>주문번호</span><span><c:out value="${refund.orderGroupNo}"/></span></div>
+          <div class="rf-row"><span>사업자 주문번호</span><span style="font-size:12px;color:#999"><c:out value="${refund.orderNo}"/></span></div>
           <div class="rf-row"><span>주문상태</span>
             <span>
               <c:choose>

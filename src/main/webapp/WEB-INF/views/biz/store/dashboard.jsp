@@ -163,7 +163,9 @@
             <c:otherwise>
               <c:forEach var="o" items="${recentOrders}">
                 <tr>
-                  <td>#${o.orderNo}</td>
+                  <td>#${o.orderGroupNo}
+                    <div style="font-size:11px;color:#999;margin-top:2px">사업자 주문번호 ${o.orderNo}</div>
+                  </td>
                   <td>${o.buyerName}</td>
                   <td>${o.firstProductName}<c:if test="${o.itemCount > 1}"> 외 ${o.itemCount - 1}건</c:if></td>
                   <td><fmt:formatNumber value="${o.payAmount}" pattern="#,###"/>원</td>

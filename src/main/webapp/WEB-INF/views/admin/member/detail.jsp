@@ -334,7 +334,9 @@
                         <c:otherwise>
                             <c:forEach var="o" items="${orderList}">
                                 <tr>
-                                    <td>#${o.orderNo}</td>
+                                    <td>#${o.orderGroupNo}
+                                        <div style="font-size:11px;color:#999;margin-top:2px">사업자 주문번호 ${o.orderNo}</div>
+                                    </td>
                                     <td>
                                         ${o.firstProductName}
                                         <c:if test="${o.itemCount != null and o.itemCount > 1}">

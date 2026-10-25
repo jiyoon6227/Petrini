@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BizDeliveryVO {
     private Long orderId;
-    private String orderNo;
+    private String orderNo;      // 사업자 주문번호
+    private String orderGroupNo; // 주문번호 (결제 단위)
     private String buyerName;
     private String courierName;
     private String courierCode;   // 스마트택배 API 택배사 코드

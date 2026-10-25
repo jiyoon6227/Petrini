@@ -104,7 +104,9 @@ public interface StoreShopMapper {
    // 주문 저장 (결제 완료 시)
    // 배송 요청사항(deliveryMemo)
    // 사용한 회원쿠폰(memberCouponId) (취소 시 복구용)
-   void insertOrder(@Param("orderId") Long orderId, @Param("orderNo") String orderNo, @Param("memberNo") Long memberNo,
+   // 주문번호(orderGroupNo): 같은 결제로 생기는 사업자 주문 전부 같은 값 / orderNo는 사업자 주문번호
+   void insertOrder(@Param("orderId") Long orderId, @Param("orderNo") String orderNo,
+                  @Param("orderGroupNo") String orderGroupNo, @Param("memberNo") Long memberNo,
                   @Param("totalAmount") Integer totalAmount, @Param("deliveryFee") Integer deliveryFee,
                   @Param("discountAmount") Integer discountAmount, @Param("pointUsed") Integer pointUsed,
                   @Param("payAmount") Integer payAmount, @Param("recvName") String recvName,

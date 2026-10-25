@@ -58,6 +58,7 @@ public interface MypageOrderMapper {
                           @Param("returnFeePayer") String returnFeePayer);
     Long selectBizMemberNoByOrderItemId(@Param("orderItemId") Long orderItemId);
     String selectOrderNoByOrderItemId(@Param("orderItemId") Long orderItemId);
+    String selectOrderGroupNoByOrderItemId(@Param("orderItemId") Long orderItemId);
     int confirmPurchaseItems(@Param("orderId") Long orderId);
     // 부분 확정 시 적립 기준 금액
     int selectConfirmableItemsAmount(@Param("orderId") Long orderId);

@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MypageOrderVO {
     private Long orderId;
-    private String orderNo;
+    private String orderNo;      // 사업자 주문번호 (내부 처리용)
+    private String orderGroupNo; // 주문번호 (결제 단위, 구매자 화면 표시용)
     private String orderGroupId; // 같은 결제(TOSS_ORDER_ID)로 묶인 여러 사업자 주문을 화면에서 하나로 그룹핑하기 위한 키
     private String orderDate;
     private String orderStatus;   //PAID/READY/SHIPPING/DONE/CANCEL

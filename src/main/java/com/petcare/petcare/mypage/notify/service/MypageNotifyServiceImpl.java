@@ -305,16 +305,24 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
 
     // 2-1. 유저/시스템 → 사업자
 
+    // 사업자 알림용 주문번호 표기: 주문번호(결제 단위) + 사업자 주문번호 병기 (같으면 하나만, 옛 데이터는 사업자 주문번호)
+    private String bizOrderNoLabel(String orderGroupNo, String orderNo) {
+        if (orderGroupNo == null || orderGroupNo.isBlank() || orderGroupNo.equals(orderNo)) {
+            return orderNo;
+        }
+        return orderGroupNo + " (사업자 주문번호 " + orderNo + ")";
+    }
+
      // 신규 주문 알림 (알림함 "주문" 탭은 NOTI_TYPE='ORDER' 기준으로 필터링됨)
     @Override
     @Transactional
-    public void sendNewOrderNotification(Long bizMemberNo, String orderNo, String productName, int itemCount) {
+    public void sendNewOrderNotification(Long bizMemberNo, String orderGroupNo, String orderNo, String productName, int itemCount) {
         if (bizMemberNo == null) {
             return;
         }
         String safeName = productName != null ? productName : "상품";
         String extra = itemCount > 1 ? " 외 " + (itemCount - 1) + "건" : "";
-        String content = "[" + safeName + extra + "] 주문이 새로 접수되었습니다.\n\n주문번호: " + orderNo + "\n주문 관리에서 확인해 주세요.";
+        String content = "[" + safeName + extra + "] 주문이 새로 접수되었습니다.\n\n주문번호: " + bizOrderNoLabel(orderGroupNo, orderNo) + "\n주문 관리에서 확인해 주세요.";
 
         MypageNotifyVO vo = new MypageNotifyVO();
         vo.setMemberNo(bizMemberNo);
@@ -352,12 +360,12 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
     // 주문취소 신청 알림 (알림함 "주문" 탭은 NOTI_TYPE='ORDER' 기준으로 필터링됨)
     @Override
     @Transactional
-    public void sendCancelRequestNotification(Long bizMemberNo, String orderNo, String reason) {
+    public void sendCancelRequestNotification(Long bizMemberNo, String orderGroupNo, String orderNo, String reason) {
         if (bizMemberNo == null) {
             return;
         }
         String safeReason = (reason != null && !reason.isBlank()) ? reason : "사유 없음";
-        String content = "주문번호 " + orderNo + " 건에 대해 구매자가 취소를 신청했습니다.\n\n신청사유: " + safeReason
+        String content = "주문번호 " + bizOrderNoLabel(orderGroupNo, orderNo) + " 건에 대해 구매자가 취소를 신청했습니다.\n\n신청사유: " + safeReason
                 + "\n\n주문 관리 > 배송전취소 탭에서 확인해 주세요.";
 
         MypageNotifyVO vo = new MypageNotifyVO();
@@ -374,13 +382,13 @@ public class MypageNotifyServiceImpl implements MypageNotifyService {
     // 상품 환불 신청 → 사업자
     @Override
     @Transactional
-    public void sendRefundRequestNotification(Long bizMemberNo, String orderNo, String productName, String reasonCd) {
+    public void sendRefundRequestNotification(Long bizMemberNo, String orderGroupNo, String orderNo, String productName, String reasonCd) {
         if (bizMemberNo == null) {
             return;
         }
         String reasonLabel = "DEFECT".equals(reasonCd) ? "상품이상" : "단순변심";
         String safeProduct = productName != null ? productName : "상품";
-        String content = "주문번호 " + orderNo + " / " + safeProduct
+        String content = "주문번호 " + bizOrderNoLabel(orderGroupNo, orderNo) + " / " + safeProduct
                 + "\n환불 유형: " + reasonLabel
                 + "\n\n주문 관리 > 환불신청에서 승인·거절해 주세요.";
 

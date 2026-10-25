@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BizOrderVO {
     private Long orderId;
-    private String orderNo;
+    private String orderNo;      // 사업자 주문번호
+    private String orderGroupNo; // 주문번호 (결제 단위, 구매자·다른 사업자와 같은 번호)
     private String orderStatus;
     private Integer payAmount;
     private String orderDate;

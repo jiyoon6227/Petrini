@@ -289,7 +289,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         orderCancelTxService.applyCancelToDb(order, bizNo);
         // 취소 승인 → 구매자 알림
         try {
-            mypageNotifyService.sendCancelApproveToBuyerNotification(order.getMemberNo(), order.getOrderNo());
+            mypageNotifyService.sendCancelApproveToBuyerNotification(order.getMemberNo(), order.getOrderGroupNo());
         } catch (Exception ignored) {
         }
         return null;
@@ -303,7 +303,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         // 취소 거절 → 구매자 알림
         if (ok && order != null) {
             try {
-                mypageNotifyService.sendCancelRejectToBuyerNotification(order.getMemberNo(), order.getOrderNo());
+                mypageNotifyService.sendCancelRejectToBuyerNotification(order.getMemberNo(), order.getOrderGroupNo());
             } catch (Exception ignored) {
             }
         }
@@ -384,9 +384,9 @@ public class BizStoreServiceImpl implements BizStoreService {
                 return;
             }
             if ("SHIPPING".equals(orderStatus)) {
-                mypageNotifyService.sendOrderShippingToBuyerNotification(order.getMemberNo(), order.getOrderNo());
+                mypageNotifyService.sendOrderShippingToBuyerNotification(order.getMemberNo(), order.getOrderGroupNo());
             } else {
-                mypageNotifyService.sendOrderDeliveredToBuyerNotification(order.getMemberNo(), order.getOrderNo());
+                mypageNotifyService.sendOrderDeliveredToBuyerNotification(order.getMemberNo(), order.getOrderGroupNo());
             }
         } catch (Exception ignored) {
         }
@@ -619,7 +619,7 @@ public class BizStoreServiceImpl implements BizStoreService {
             return "승인 처리에 실패했습니다.";
         }
         mypageNotifyService.sendRefundApproveToBuyerNotification(
-                detail.getMemberNo(), detail.getOrderNo(), detail.getProductName(),
+                detail.getMemberNo(), detail.getOrderGroupNo(), detail.getProductName(),
                 detail.getReturnReasonCd());
         return null;
     }
@@ -638,7 +638,7 @@ public class BizStoreServiceImpl implements BizStoreService {
             return "거절 처리에 실패했습니다.";
         }
         mypageNotifyService.sendRefundRejectToBuyerNotification(
-                detail.getMemberNo(), detail.getOrderNo(), detail.getProductName(), rejectReason.trim());
+                detail.getMemberNo(), detail.getOrderGroupNo(), detail.getProductName(), rejectReason.trim());
         return null;
     }
 
@@ -701,7 +701,7 @@ public class BizStoreServiceImpl implements BizStoreService {
         }
 
         mypageNotifyService.sendRefundDoneToBuyerNotification(
-                detail.getMemberNo(), detail.getOrderNo(), detail.getProductName(), refundAmount);
+                detail.getMemberNo(), detail.getOrderGroupNo(), detail.getProductName(), refundAmount);
         return null;
     }
 

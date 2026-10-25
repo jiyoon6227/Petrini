@@ -51,7 +51,7 @@
   <div class="od-head">
     <div>
       <h2 class="mp-title" style="margin-bottom:4px">주문 상세</h2>
-      <p class="mp-desc" style="margin:0">주문번호 <strong>#${order.orderNo}</strong> · ${order.orderDate}</p>
+      <p class="mp-desc" style="margin:0">주문번호 <strong>#${order.orderGroupNo}</strong> · ${order.orderDate}</p>
     </div>
   </div>
 
@@ -59,7 +59,7 @@
   <%-- 주문처리상태는 사업자마다 다를 수 있어 사업자별 블록에 표시 --%>
   <div class="od-section">
     <p class="od-section-title">📋 주문정보</p>
-    <div class="od-row"><span class="label">주문번호</span><span class="value">#${order.orderNo}</span></div>
+    <div class="od-row"><span class="label">주문번호</span><span class="value">#${order.orderGroupNo}</span></div>
     <div class="od-row"><span class="label">주문일자</span><span class="value">${order.orderDate}</span></div>
     <div class="od-row"><span class="label">주문자</span><span class="value">${order.ordererName}</span></div>
   </div>

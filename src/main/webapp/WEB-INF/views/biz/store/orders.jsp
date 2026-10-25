@@ -387,7 +387,10 @@
           <c:otherwise>
             <c:forEach var="o" items="${orderList}">
               <tr>
-                <td>#${o.orderNo}</td>
+                <%-- 주문번호(결제 단위) = 구매자·다른 사업자와 같은 번호 / 사업자 주문번호는 보조 표시 --%>
+                <td>#${o.orderGroupNo}
+                  <div style="font-size:11px;color:#999;margin-top:2px">사업자 주문번호 ${o.orderNo}</div>
+                </td>
                 <td>${o.buyerName}</td>
                 <td>
                   ${o.firstProductName}
@@ -428,6 +431,7 @@
         <div>
           <h4>주문 정보</h4>
           <div class="od-info-row"><span>주문번호</span><span id="dOrderNo"></span></div>
+          <div class="od-info-row"><span>사업자 주문번호</span><span id="dBizOrderNo" style="font-size:12px;color:#999"></span></div>
           <div class="od-info-row"><span>주문일</span><span id="dOrderDate"></span></div>
           <div class="od-info-row"><span>구매자</span><span id="dBuyer"></span></div>
           <div class="od-info-row"><span>연락처</span><span id="dPhone"></span></div>
@@ -578,7 +582,8 @@ function fmtWon(n){ return (n || 0).toLocaleString('ko-KR') + '원'; }
         if (!o) { alert('조회에 실패했습니다.'); return; }
         currentOrderId = orderId;
 
-        document.getElementById('dOrderNo').textContent    = o.orderNo;
+        document.getElementById('dOrderNo').textContent    = o.orderGroupNo || o.orderNo;
+        document.getElementById('dBizOrderNo').textContent = o.orderNo;
         document.getElementById('dOrderDate').textContent  = o.orderDate;
         document.getElementById('dBuyer').textContent      = o.buyerName;
         // 구매자 연락처/이메일 (TB_MEMBER 조인값)

@@ -63,7 +63,7 @@ Long addProductQna(Long productId, Long memberNo, String question, Long optionId
 // 상품 Q&A 삭제 (본인 글 + 답변 미완료 건만). 성공 여부 반환
 boolean deleteProductQna(Long qnaId, Long memberNo);
 
-// 결제 완료 시 주문/주문상품/결제내역 저장 + 쿠폰사용처리 + 포인트차감 + 주문한 장바구니항목 삭제를 한 트랜잭션으로 처리. 생성된 ORDER_NO 반환
+// 결제 완료 시 주문/주문상품/결제내역 저장 + 쿠폰사용처리 + 포인트차감 + 주문한 장바구니항목 삭제를 한 트랜잭션으로 처리. 주문번호(ORDER_GROUP_NO, 결제 단위) 반환
 /** @param payMethod TOSS(위젯) / BILLING(등록카드) / POINT 등 — TB_PAYMENT.PAY_METHOD */
 String completeOrder(OrderTempVO orderTemp, String tossPaymentKey, String tossOrderId, String payMethod);
 

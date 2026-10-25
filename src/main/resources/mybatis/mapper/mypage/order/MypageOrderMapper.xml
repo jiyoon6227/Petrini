@@ -5,7 +5,7 @@
 
 <!-- TB_PAYMENT.TOSS_ORDER_ID를 ORDER_GROUP_ID로 조회 (같은 결제의 사업자별 주문을 화면에서 묶기용) -->
 <select id="selectOrderList" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderVO">
-    SELECT o.ORDER_ID, o.ORDER_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT, o.CONFIRM_YN,
+    SELECT o.ORDER_ID, o.ORDER_NO, NVL(o.ORDER_GROUP_NO, o.ORDER_NO) AS ORDER_GROUP_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT, o.CONFIRM_YN,
            o.CLAIM_STATUS,
            d.COURIER_NAME, d.COURIER_CODE, d.TRACKING_NO,
            b.BIZ_NAME,
@@ -94,7 +94,7 @@
 <!-- 배송조회(스마트택배 API) 버튼용 COURIER_CODE -->
 <!-- BIZ_NAME, ORDER_GROUP_ID(TOSS_ORDER_ID): 상세보기 결제그룹 단위 표시용 -->
 <select id="selectOrderDetail" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderVO">
-    SELECT o.ORDER_ID, o.ORDER_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT,
+    SELECT o.ORDER_ID, o.ORDER_NO, NVL(o.ORDER_GROUP_NO, o.ORDER_NO) AS ORDER_GROUP_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT,
            o.TOTAL_AMOUNT, o.DELIVERY_FEE, o.DISCOUNT_AMOUNT, o.POINT_USED,
            o.RECV_NAME, o.RECV_PHONE, o.ZIP_CODE, o.ADDR1, o.ADDR2, o.DELIVERY_MEMO,
            m.NICKNAME AS ORDERER_NAME,
@@ -114,7 +114,7 @@
 
 <!-- 같은 결제(TOSS_ORDER_ID)로 묶인 사업자별 주문 전체 조회 (주문상세보기 결제그룹 단위 표시용) -->
 <select id="selectOrdersByGroupId" resultType="com.petcare.petcare.mypage.order.vo.MypageOrderVO">
-    SELECT o.ORDER_ID, o.ORDER_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT,
+    SELECT o.ORDER_ID, o.ORDER_NO, NVL(o.ORDER_GROUP_NO, o.ORDER_NO) AS ORDER_GROUP_NO, o.ORDER_DATE, o.ORDER_STATUS, o.PAY_AMOUNT,
            o.TOTAL_AMOUNT, o.DELIVERY_FEE, o.DISCOUNT_AMOUNT, o.POINT_USED,
            o.RECV_NAME, o.RECV_PHONE, o.ZIP_CODE, o.ADDR1, o.ADDR2, o.DELIVERY_MEMO,
            m.NICKNAME AS ORDERER_NAME,
@@ -284,6 +284,14 @@
 
 <select id="selectOrderNoByOrderItemId" resultType="String">
     SELECT O.ORDER_NO
+      FROM TB_ORDER_ITEM OI
+      JOIN TB_ORDER O ON O.ORDER_ID = OI.ORDER_ID
+     WHERE OI.ORDER_ITEM_ID = #{orderItemId}
+</select>
+
+<!-- 환불신청 알림에 넣을 주문번호(결제 단위). 옛 데이터(NULL)는 사업자 주문번호로 대체 -->
+<select id="selectOrderGroupNoByOrderItemId" resultType="String">
+    SELECT NVL(O.ORDER_GROUP_NO, O.ORDER_NO)
       FROM TB_ORDER_ITEM OI
       JOIN TB_ORDER O ON O.ORDER_ID = OI.ORDER_ID
      WHERE OI.ORDER_ITEM_ID = #{orderItemId}

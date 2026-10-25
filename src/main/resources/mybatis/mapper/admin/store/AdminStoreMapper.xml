@@ -68,6 +68,7 @@
     <if test="keyword != null and keyword != ''">
         AND (
             UPPER(o.ORDER_NO) LIKE '%' || UPPER(#{keyword}) || '%'
+            OR UPPER(o.ORDER_GROUP_NO) LIKE '%' || UPPER(#{keyword}) || '%'
             OR UPPER(m.NICKNAME) LIKE '%' || UPPER(#{keyword}) || '%'
             OR UPPER(m.MEMBER_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
             OR UPPER(b.BIZ_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
@@ -83,6 +84,7 @@
     SELECT
         o.ORDER_ID     AS orderId,
         o.ORDER_NO     AS orderNo,
+        NVL(o.ORDER_GROUP_NO, o.ORDER_NO) AS orderGroupNo,
         o.BIZ_NO       AS bizNo,
         b.BIZ_NAME     AS bizName,
         NVL(m.NICKNAME, m.MEMBER_NAME) AS buyerName,
@@ -115,6 +117,7 @@
     SELECT
         o.ORDER_ID     AS orderId,
         o.ORDER_NO     AS orderNo,
+        NVL(o.ORDER_GROUP_NO, o.ORDER_NO) AS orderGroupNo,
         o.BIZ_NO       AS bizNo,
         b.BIZ_NAME     AS bizName,
         NVL(m.NICKNAME, m.MEMBER_NAME) AS buyerName,

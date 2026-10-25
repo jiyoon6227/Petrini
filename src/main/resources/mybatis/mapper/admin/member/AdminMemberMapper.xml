@@ -271,6 +271,7 @@
     SELECT
       O.ORDER_ID   AS orderId,
       O.ORDER_NO   AS orderNo,
+      NVL(O.ORDER_GROUP_NO, O.ORDER_NO) AS orderGroupNo,
       O.ORDER_STATUS AS orderStatus,
       TO_NUMBER(NVL(O.PAY_AMOUNT, '0')) AS payAmount,
       O.ORDER_DATE AS orderDate,

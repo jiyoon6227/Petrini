@@ -26,13 +26,15 @@
         <c:otherwise>
             <div class="adm-card">
                 <div class="adm-card-head">
-                    <span class="adm-card-head-title">${order.orderNo}</span>
+                    <span class="adm-card-head-title">${order.orderGroupNo}</span>
                     <span class="adm-card-head-sub">${order.orderStatus}</span>
                 </div>
                 <div class="adm-card-body">
                     <table class="adm-table">
                         <tbody>
-                            <tr><th style="width:140px">사업자</th><td>${order.bizName}</td></tr>
+                            <tr><th style="width:140px">주문번호</th><td>${order.orderGroupNo}</td></tr>
+                            <tr><th>사업자 주문번호</th><td>${order.orderNo}</td></tr>
+                            <tr><th>사업자</th><td>${order.bizName}</td></tr>
                             <tr><th>주문자</th><td>${order.buyerName}</td></tr>
                             <tr><th>상품</th>
                                 <td>

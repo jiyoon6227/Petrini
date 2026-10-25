@@ -61,7 +61,10 @@
                         <c:otherwise>
                             <c:forEach var="o" items="${orderList}">
                                 <tr>
-                                    <td>${o.orderNo}</td>
+                                    <%-- 주문번호(결제 단위) + 사업자 주문번호 --%>
+                                    <td>${o.orderGroupNo}
+                                        <div style="font-size:11px;color:#999;margin-top:2px">사업자 주문번호 ${o.orderNo}</div>
+                                    </td>
                                     <td>${o.bizName}</td>
                                     <td>${o.buyerName}</td>
                                     <td>

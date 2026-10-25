@@ -240,7 +240,8 @@ public String completeOrder(OrderTempVO p, String tossPaymentKey, String tossOrd
     int groupIndex = 0;
     int groupCount = groups.size();
 
-    java.util.List<String> orderNos = new java.util.ArrayList<>();
+    // 주문번호(결제 단위): 첫 번째 사업자 주문의 ORDER_NO를 그대로 쓰고, 같은 결제의 사업자 주문 전부에 저장
+    String orderGroupNo = null;
 
     for (java.util.Map.Entry<Long, java.util.List<CartItemVO>> entry : groups.entrySet()) {
         groupIndex++;
@@ -278,18 +279,20 @@ public String completeOrder(OrderTempVO p, String tossPaymentKey, String tossOrd
         Long orderId = storeShopMapper.selectNextOrderId();
         String datePart = new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date());
         String orderNo = "ORD" + datePart + "-" + String.format("%06d", orderId);
-        orderNos.add(orderNo);
+        if (orderGroupNo == null) {
+            orderGroupNo = orderNo;
+        }
 
         Long groupMemberCouponId = groupCouponDiscount > 0 ? p.getCouponMemberCouponId() : null;
 
-        storeShopMapper.insertOrder(orderId, orderNo, p.getMemberNo(), groupSubtotal, groupDeliveryFee,
+        storeShopMapper.insertOrder(orderId, orderNo, orderGroupNo, p.getMemberNo(), groupSubtotal, groupDeliveryFee,
                 groupDiscountAmount, groupPointUsed, groupFinalTotal,
                 p.getRecvName(), p.getRecvPhone(), p.getZipCode(), p.getAddr1(), p.getAddr2(), bizNo,
                 p.getDeliveryMemo(), groupMemberCouponId, groupCouponDiscount);
 
         // 주문 접수 즉시 사업자에게 알림 (알림함 "주문" 탭). 대표 상품명은 이 그룹 첫 상품 기준
         Long bizMemberNoForOrder = storeShopMapper.selectBizMemberNoByBizNo(bizNo);
-        mypageNotifyService.sendNewOrderNotification(bizMemberNoForOrder, orderNo,
+        mypageNotifyService.sendNewOrderNotification(bizMemberNoForOrder, orderGroupNo, orderNo,
                 items.get(0).getProductName(), items.size());
 
         for (CartItemVO item : items) {
@@ -367,8 +370,8 @@ public String completeOrder(OrderTempVO p, String tossPaymentKey, String tossOrd
         storeShopMapper.deleteCartItems(p.getCartItemIds());
     }
 
-    // 주문이 여러 건으로 나뉠 수 있어 쉼표로 이어 반환 (order-complete 화면에 그대로 표시)
-    return String.join(", ", orderNos);
+    // 사업자별로 주문이 나뉘어도 구매자에겐 결제 1건이라 주문번호(결제 단위) 하나만 반환 (order-complete 화면에 그대로 표시)
+    return orderGroupNo;
 }
 
 // DB 실제 보유 포인트

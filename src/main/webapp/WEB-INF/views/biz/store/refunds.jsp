@@ -71,7 +71,9 @@
             <c:forEach var="r" items="${returnList}">
               <tr>
                 <td><fmt:formatDate value="${r.returnRequestedAt}" pattern="yyyy.MM.dd HH:mm"/></td>
-                <td><c:out value="${r.orderNo}"/></td>
+                <td><c:out value="${r.orderGroupNo}"/>
+                  <div style="font-size:11px;color:#999;margin-top:2px">사업자 주문번호 <c:out value="${r.orderNo}"/></div>
+                </td>
                 <td><c:out value="${r.buyerName}"/></td>
                 <td>
                   <c:out value="${r.productName}"/>

@@ -76,7 +76,10 @@
           <c:otherwise>
             <c:forEach var="d" items="${deliveryList}">
               <tr>
-                <td>#${d.orderNo}</td>
+                <%-- 주문번호(결제 단위) + 사업자 주문번호 보조 표시 --%>
+                <td>#${d.orderGroupNo}
+                  <div style="font-size:11px;color:#999;margin-top:2px">사업자 주문번호 ${d.orderNo}</div>
+                </td>
                 <td>${d.buyerName}</td>
                 <%-- JSTL c:choose로 택배사코드 → 한글명 분기 --%>
                 <%-- 예전 영문코드값 데이터도 표시, 신규 택배사명은 그대로 출력 --%>
@@ -104,7 +107,7 @@
                 <td>${empty d.shipDate ? '-' : d.shipDate}</td>
                 <%-- openEdit(ORDER_ID, 현재값들)로 모달 바로 채움 (AJAX 재조회 없음) --%>
                 <td>
-  <button class="biz-btn" onclick="openEdit(${d.orderId}, '${d.orderNo}', '${d.orderStatus}', '${d.courierName}', '${d.courierCode}', '${d.trackingNo}')">${empty d.trackingNo ? '송장등록' : '수정'}</button>
+  <button class="biz-btn" onclick="openEdit(${d.orderId}, '${d.orderGroupNo}','${d.orderStatus}', '${d.courierName}', '${d.courierCode}', '${d.trackingNo}')">${empty d.trackingNo ? '송장등록' : '수정'}</button>
   <c:if test="${not empty d.trackingNo and not empty d.courierCode}">
     <button class="biz-btn" onclick="trackDelivery(${d.orderId}, '${d.courierCode}', '${d.trackingNo}')">배송조회</button>
   </c:if>
@@ -126,7 +129,7 @@
   <div class="biz-card" id="bulkCard" style="display:none">
     <div class="biz-card-head"><span>송장 일괄등록</span></div>
     <div class="dlv-bulk-box">
-      <p class="dlv-bulk-hint">한 줄에 하나씩, <b>주문번호,택배사코드,송장번호</b> 형식으로 입력하세요. 택배사코드: cj / hanjin / lotte / post<br>예) ORD-2026-0892,cj,651234567890</p>
+      <p class="dlv-bulk-hint">한 줄에 하나씩, <b>주문번호,택배사코드,송장번호</b> 형식으로 입력하세요. 주문번호 자리에는 주문번호·사업자 주문번호 둘 다 쓸 수 있습니다. 택배사코드: cj / hanjin / lotte / post<br>예) ORD-2026-0892,cj,651234567890</p>
       <textarea id="bulkText" placeholder="ORD-2026-0892,cj,651234567890&#10;ORD-2026-0891,hanjin,482910384710"></textarea>
       <div class="dlv-bulk-actions">
         <button type="button" class="biz-btn-ghost" onclick="closeBulk()">취소</button>
@@ -248,6 +251,7 @@
   }
 
   // openEdit(): 목록 렌더링 시 넘긴 값으로 별도 AJAX 조회 없이 모달 채움
+  // orderNo 인자는 화면 표시용(주문번호, 결제 단위)이고, 저장은 eOrderId(ORDER_ID) 기준
   function openEdit(orderId, orderNo, status, carrier, courierCode, trackingNo) {
     eOrderId = orderId;
     document.getElementById('eOrderNo').value = orderNo;
