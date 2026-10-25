@@ -30,11 +30,11 @@
       <%-- 자동취소가 바로 안 돼서 재처리 대기 중 (스케줄러가 환불 진행) --%>
       <c:when test="${not empty cancelPending}">
         <div class="complete-title">주문 처리에 실패했습니다.</div>
-        <div class="complete-desc">${confirmError}<br>환불이 완료되면 결제하신 수단으로 금액이 돌아갑니다.</div>
+        <div class="complete-desc"><c:out value="${confirmError}"/><br>환불이 완료되면 결제하신 수단으로 금액이 돌아갑니다.</div>
       </c:when>
       <c:when test="${not empty confirmError}">
         <div class="complete-title">${not empty autoCanceled ? '주문 처리에 실패했습니다.' : '결제 승인에 실패했습니다.'}</div>
-        <div class="complete-desc" style="color:#E2445C;">${confirmError}</div>
+        <div class="complete-desc" style="color:#E2445C;"><c:out value="${confirmError}"/></div>
       </c:when>
       <c:otherwise>
         <div class="complete-title">주문 정보를 찾을 수 없습니다.</div>
@@ -48,10 +48,11 @@
   <c:otherwise>
     <div class="complete-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
     <div class="complete-title">주문이 완료되었습니다!</div>
-    <div class="complete-desc">주문번호 <strong>#${orderNo}</strong><br>주문 내역은 마이페이지에서 확인하세요.</div>
+    <%-- 빌링 완료 화면은 orderNo가 요청 파라미터로 들어오므로 c:out으로 이스케이프 (XSS 방지) --%>
+    <div class="complete-desc">주문번호 <strong>#<c:out value="${orderNo}"/></strong><br>주문 내역은 마이페이지에서 확인하세요.</div>
     <div class="complete-card">
       <h3>주문 정보</h3>
-      <div class="complete-row"><span>주문번호</span><span>#${orderNo}</span></div>
+      <div class="complete-row"><span>주문번호</span><span>#<c:out value="${orderNo}"/></span></div>
       <div class="complete-row"><span>주문 상품</span>
         <span>
           <c:out value="${orderItems[0].productName}"/>
@@ -59,7 +60,7 @@
         </span>
       </div>
       <div class="complete-row"><span>결제 금액</span><span style="color:var(--primary-dark);font-size:16px;font-weight:800"><fmt:formatNumber value="${payAmount}" pattern="#,###"/>원</span></div>
-      <div class="complete-row"><span>결제 수단</span><span>${payMethodLabel}</span></div>
+      <div class="complete-row"><span>결제 수단</span><span><c:out value="${payMethodLabel}"/></span></div>
     </div>
     <div class="complete-btns">
       <button class="btn-complete-my" onclick="location.href='${contextPath}/mypage/orders'">주문 내역 보기</button>
