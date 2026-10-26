@@ -11,7 +11,6 @@
 | **팀&nbsp;규모** | 4명 |
 | **본인&nbsp;담당** | 쇼핑몰 모듈 (상품 · 주문 · 결제 · 배송) |
 | **참여&nbsp;범위** | 쿠폰 · 숙소/병원 사업자센터 · 마이페이지 · 관리자 · 가족찾기 등 기능 개발, 모듈 통합 · 오류 수정 |
-| **Live&nbsp;Service** | **https://petrini.kr** |
 | **GitHub** | https://github.com/jiyoon6227/Petrini |
 
 ---
@@ -41,7 +40,7 @@
 ---
 ## 배포 및 테스트 계정
 
-**https://petrini.kr** 에 접속한 뒤 아래 테스트 계정으로 사용자 · 쇼핑 사업자 · 관리자 기능을 바로 확인할 수 있습니다.
+로컬 실행 후 DB를 초기화하면 아래 테스트 계정으로 사용자 · 쇼핑 사업자 · 관리자 기능을 확인할 수 있습니다.
 
 
 | 구분 | ID | PW | 주요 확인 기능 |
@@ -63,7 +62,7 @@
 ```text
 사용자
   ↓ HTTPS
-petrini.kr
+운영 도메인
   ↓
 Nginx :443
   ↓
@@ -487,7 +486,7 @@ src/main/resources/mybatis/mapper/   # MyBatis XML
 ---
 ## 로컬 실행 방법
 
-> 내 PC에서 직접 실행하는 방법입니다. 배포된 서비스는 [https://petrini.kr](https://petrini.kr)에서 바로 확인할 수 있습니다.
+> 내 PC에서 직접 실행하는 방법입니다.
 
 ### 요구 사항
 - JDK 21
@@ -570,8 +569,8 @@ spring.datasource.url=jdbc:oracle:thin:@//10.178.0.2:1521/xe
 spring.datasource.username=
 spring.datasource.password=
 
-app.base-url=https://petrini.kr
-kakao.redirect-uri=https://petrini.kr/oauth/kakao/callback
+app.base-url=https://운영도메인
+kakao.redirect-uri=https://운영도메인/oauth/kakao/callback
 ```
 
 > 로컬 실행은 `spring.profiles.active=local`, 서버 배포 시에는 `spring.profiles.active=prod`로 변경합니다.
