@@ -1,4 +1,4 @@
-# Petrini (펫린이) 🐾
+# Petrini (펫린이) 
 
 반려동물 **숙소 · 쇼핑 · 병원 · 커뮤니티 · 가족찾기 · 펫맵**을 하나의 웹에서 이용할 수 있는 **Spring Boot 기반 통합 플랫폼** 팀 프로젝트입니다.
 이 중 **쇼핑몰 모듈 전반을 주도적으로 개발**하고, 결제 · 쿠폰 · 사업자센터 · 마이페이지 · 관리자 등
@@ -16,7 +16,7 @@
 ---
 ## 목차
 - [프로젝트 소개](#프로젝트-소개)
-- [배포 및 테스트 계정](#배포-및-테스트-계정)
+- [테스트 계정 · 배포 구성](#테스트-계정--배포-구성)
 - [주요 기능](#주요-기능)
 - [본인 담당 기능](#본인-담당-기능-곽지윤)
 - [핵심 구현 및 문제 해결](#핵심-구현-및-문제-해결-본인-담당)
@@ -38,7 +38,7 @@
 - **관리자(ADMIN)** — 회원 · 사업자 · 콘텐츠 · 쿠폰 · 정산 관리
 
 ---
-## 배포 및 테스트 계정
+## 테스트 계정 · 배포 구성
 
 로컬 실행 후 DB를 초기화하면 아래 테스트 계정으로 사용자 · 쇼핑 사업자 · 관리자 기능을 확인할 수 있습니다.
 
@@ -423,6 +423,9 @@ UPDATE TB_COUPON
 | **장우철** | 병원 · 숙소 · 정산 · 결제 | 병원 예약(홀드·슬롯·스케줄·진료기록), 숙소 취소·환불 정책, 토스 결제·빌링, 금결원 계좌 실명 조회, GCS·로컬 파일 업로드, 사업자 입점 승인, 정산(숙소·쇼핑), 관리자 예약·정산·숙소 |
 | **하예주** | 숙소 예약·결제 · 회원 · 보안 | 숙소 예약·결제(토스·포인트·빌링·쿠폰), 미결제 자동 취소·숙박 완료 스케줄러, 쿠폰 만료 스케줄러, 카카오 OAuth·로그인 잠금, 회원 탈퇴, 커뮤니티 수정·삭제·7일 purge, 사업자 숙소 쿠폰·배너·대시보드, CSRF 공통 처리 |
 
+
+> 개발 당시 팀 공동 GitHub 저장소에서 협업했으며, 프로젝트 종료 후 기능 개선을 위해 현재 저장소로 옮겨 관리하고 있습니다.
+> 원본 팀 저장소(본인 작업 이력, 이전 계정 `zziyoon6227-g`): [JJangwoochul/Petrini](https://github.com/JJangwoochul/Petrini/commits/main?author=zziyoon6227-g)
 ---
 ## 기술 스택
 
@@ -498,6 +501,9 @@ src/main/resources/mybatis/mapper/   # MyBatis XML
 `src/main/resources/`의 아래 세 파일은 Git에 포함되지 않습니다. 아래 내용으로 직접 작성하세요.
 값이 비어 있는 API 키는 해당 기능을 사용할 때만 입력하면 됩니다. (키 자체는 지우지 마세요. 비어 있어도 서버는 기동됩니다.)
 
+<details>
+<summary>설정 파일 예시 펼치기</summary>
+
 **application.properties**
 ```properties
 spring.profiles.active=local
@@ -569,9 +575,11 @@ spring.datasource.url=jdbc:oracle:thin:@//10.178.0.2:1521/xe
 spring.datasource.username=
 spring.datasource.password=
 
-app.base-url=https://운영도메인
-kakao.redirect-uri=https://운영도메인/oauth/kakao/callback
+app.base-url=https://your-domain.com
+kakao.redirect-uri=https://your-domain.com/oauth/kakao/callback
 ```
+
+</details>
 
 > 로컬 실행은 `spring.profiles.active=local`, 서버 배포 시에는 `spring.profiles.active=prod`로 변경합니다.
 
@@ -579,7 +587,7 @@ kakao.redirect-uri=https://운영도메인/oauth/kakao/callback
 `src/main/resources/sql/petrini.sql`을 Oracle에서 실행합니다.
 (테이블 · 시퀀스 생성 + 데모 데이터 입력. **기존 테이블과 데이터는 삭제됩니다.**)
 `application-local.properties`에 적은 DB 계정으로 접속해서 실행하세요. 그 계정의 스키마에 테이블이 만들어집니다.
-계정은 [테스트 계정](#배포-및-테스트-계정)과 같고, 구매자 계정 `user02`가 하나 더 있습니다.
+계정은 [테스트 계정](#테스트-계정--배포-구성)과 같고, 구매자 계정 `user02`가 하나 더 있습니다.
 
 ### 3. 실행
 ```bash
